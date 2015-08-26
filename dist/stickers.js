@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         tabResolutionType: "xxhdpi",
 
         htmlForEmptyRecent: "<div class='emptyRecent'>Ваши Стикеры</div>",
-        apikey: "bf08944b1d3a5662afd84aef282db2b2",
+        apikey: "72921666b5ff8651f374747bfefaf7b2",
         packsUrl: "http://api.stickerpipe.com/api/v1/client-packs",
         trackStatUrl: "http://api.stickerpipe.com/api/v1/track-statistic",
 

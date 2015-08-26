@@ -31,7 +31,7 @@ module.exports = function(grunt) {
                 files: [{
                     cwd: 'js/',
                     src: 'stickers.js',
-                    dist: 'dist/'
+                    dest: 'dist/'
                 }]
             }
         },
