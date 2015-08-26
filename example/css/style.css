@@ -61,3 +61,21 @@
     content: "R";
     font-size: 32px;
 }
+
+#custom_tab{
+    width: 74px;
+    height: 55px;
+    display: block;
+    position: relative;
+    float: left;
+    text-align: center;
+    padding-top: 20px;
+    border-radius: 50%;
+    margin-right: -10px;
+}
+
+
+#custom_tab::before{
+    content: "CT";
+    font-size: 32px;
+}
