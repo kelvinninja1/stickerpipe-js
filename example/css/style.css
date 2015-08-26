@@ -1,0 +1,63 @@
+
+#paste_sticker{
+    height: 300px;
+    overflow: hidden;
+    overflow-y: scroll;
+}
+
+.sttab{
+    background-color: #f6f6f0;
+    padding: 10px;
+    height: 76px;
+}
+
+    .sttab .active{
+        background-color: white;
+    }
+
+    .sttab_item{
+        display: inline-block;
+        cursor: pointer;
+        margin: 0 15px;
+    }
+
+.stitems{
+    cursor: pointer;
+    height: 300px;
+    overflow-y: scroll;
+}
+
+.emptyRecent{
+    text-align: center;
+    padding: 50px;
+    font-size: 20px;
+}
+
+.stnewtab::before{
+    content: "";
+    width: 20px;
+    height: 20px;
+    display: block;
+    position: absolute;
+    background-color: #f60;
+    border-radius: 50%;
+    margin-left: 50px;
+    margin-top: 51px;
+}
+
+#recents_tab{
+    width: 74px;
+    height: 55px;
+    display: block;
+    position: relative;
+    float: left;
+    text-align: center;
+    padding-top: 20px;
+    border-radius: 50%;
+    margin-right: -10px;
+}
+
+#recents_tab::before{
+    content: "R";
+    font-size: 32px;
+}

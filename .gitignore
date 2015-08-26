@@ -1,0 +1,9 @@
+/img
+.settings/*
+.buildpath
+.project
+sitemaps
+sitemaps/*
+/add.php
+.idea/*
+node_modules/**
