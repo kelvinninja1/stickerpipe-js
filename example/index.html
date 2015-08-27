@@ -30,7 +30,7 @@
                 stickerResolutionType: "mdpi",
                 tabResolutionType: "xxhdpi",
 
-                htmlForEmptyRecent: "<div class='emptyRecent'>Ваши Стикеры</div>",
+                htmlForEmptyRecent: "<div class='emptyRecent'>empty recent text</div>",
 
                 apikey: "72921666b5ff8651f374747bfefaf7b2",
                 storgePrefix: "stickerPipe",
@@ -42,7 +42,7 @@
 
             sticker.onClickSticker(function(text) {
                 var parseObj = sticker.getStickerUrl(text),
-                        htmlEl;
+                    htmlEl;
 
                 if(parseObj.isSticker) {
                     htmlEl = "<div> <img src=" + parseObj.url + " /> </div>"
