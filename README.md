@@ -1,6 +1,6 @@
 ## About
 
-**Stickerpipe-js** is a javascript library for fast injection stickers in your project.
+**Stickerpipe-js** is a javascript library for easy integration stickers in your project.
 
 
 ## Install

@@ -1,0 +1,27 @@
+{
+  "name": "stikers-js",
+  "version": "0.0.1",
+  "homepage": "http://stickerpipe.com",
+  "authors": [
+    "Dmitry Shevchuk shevchuk@908.dp.ua"
+  ],
+  "description": "Stickerpipe-js is a javascript library for fast injection stickers in your project",
+  "main": "dist/stickers.min.js",
+  "keywords": [
+    "stickers",
+    "stickerpipe",
+    "sticker"
+  ],
+  "license": "apache",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/908Inc/stickerpipe-js.git"
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
