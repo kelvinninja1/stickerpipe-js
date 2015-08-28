@@ -2,6 +2,10 @@
 
 **Stickerpipe-js** is a javascript library for easy integration stickers in your project.
 
+## Demo
+
+http://stickerpipe.com/demo
+
 
 ## Install
 
@@ -12,7 +16,11 @@
 
 ### CDN
 
-
+```js
+<script src="http://cdn.stickerpipe.com/stickerjs/lib/0.0.1/stickers.js"></script>
+<!-- or -->
+<script src="http://cdn.stickerpipe.com/stickerjs/lib/0.0.1/stickers.min.js"></script>
+```
 
 ### Bower
 
@@ -29,10 +37,9 @@ demo apikey: 72921666b5ff8651f374747bfefaf7b2
 
 If you want use own apikey: http://stickerpipe.com/
 
-js code
-
+js
 ```js
-	var sticker = new Stickers({
+    var sticker = new Stickers({
         
         tabContainerId: "sttab",
         tabItemClass: "sttab_item",
@@ -52,11 +59,10 @@ js code
     sticker.start();
 ```
 
-html code
-
+html
 ```html
 
-	<div class="sttab" id="sttab"></div>
+    <div class="sttab" id="sttab"></div>
     <div class="stitems" id="stitems"></div>
 ```
 
@@ -65,17 +71,17 @@ html code
 
 -  render stickers and tabs
 ```js
-	sticker.start();
+    sticker.start();
 ```
 
 -  parse text and return img url if text is sticker
 ```js
-	sticker.getStickerUrl(text);
+    sticker.getStickerUrl(text);
 ```
 
 -  open current tab
 ```js
-	sticker.renderCurrentTab(tabName);
+    sticker.renderCurrentTab(tabName);
 ```
 
 
@@ -83,21 +89,21 @@ html code
 ## Events
 
 - when user click on sticker
-	
+    
 ```js
-	sticker.onClickSticker(function(text) { {...}, context );
+    sticker.onClickSticker(function(text) { {...}, context );
 ```
 
 - when user click on tab
-	
+    
 ```js
-	sticker.onClickTab(function(el) { {...}, context );
+    sticker.onClickTab(function(el) { {...}, context );
 ```
 
 - when user click on custom tab
-	
+    
 ```js
-	sticker.onClickCustomTab(function(el) { {...}, context );
+    sticker.onClickCustomTab(function(el) { {...}, context );
 ```
 
 
