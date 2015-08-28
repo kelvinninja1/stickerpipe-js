@@ -12,7 +12,22 @@
 
 ### CDN
 
+
+
+### Bower
+
+
+Bower: bower install stickers --save
+
+
+
+
+
 ## Initialize
+
+demo apikey: 72921666b5ff8651f374747bfefaf7b2
+
+If you want use own apikey: http://stickerpipe.com/
 
 js code
 
@@ -29,7 +44,8 @@ js code
         tabResolutionType: "xxhdpi",
 
         htmlForEmptyRecent: "<div class='emptyRecent'>empty recent text</div>",
-        storgePrefix: "stickerPipe"
+        storgePrefix: "stickerPipe",
+        apikey: "72921666b5ff8651f374747bfefaf7b2",
 
     });
     
