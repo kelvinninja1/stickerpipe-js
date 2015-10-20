@@ -1,12 +1,12 @@
 
 
-// include: "analytics.js"
-// include: "config_base.js"
-// include: "Lockr.js"
-// include: "helper.js"
-// include: "controller_base.js"
-// include: "service_base.js"
-// include: "view_base.js"
+include: "analytics.js"
+include: "config_base.js"
+include: "Lockr.js"
+include: "helper.js"
+include: "controller_base.js"
+include: "service_base.js"
+include: "view_base.js"
 
 
 (function(Plugin, _module) {
@@ -81,7 +81,7 @@
             stService.getPacksFromServer(
                 Config.packsUrl,
                 Config.apikey,
-                (function(response) {
+                function(response) {
                     if(response.status == "success") {
                         var stickerPacks = response.data;
 
@@ -97,7 +97,7 @@
 
                         if(attrs.callback) attrs.callback.apply();
                     }
-                }).bind(this)
+                }
             );
         };
 
@@ -113,9 +113,7 @@
                 stickersModel = storgeStickerData.packs;
                 _init();
 
-                if(callback) {
-                    callback.apply();
-                }
+                if(callback) callback.apply();
             } else {
 
                 this.fetchPacks({
@@ -154,6 +152,7 @@
 
         };
 
+
         this.getNewStickersFlag = function() {
             return stService.getNewStickersFlag(stService.getPacksFromStorge().packs || []);
         };
@@ -164,7 +163,7 @@
 
         this.getStickerUrl = function(text) {
             return stService.getStickerUrl(text);
-        };
+        }
 
         this.renderCurrentTab = function(tabName) {
             var obj = stService.getPacksFromStorge();
@@ -183,13 +182,14 @@
             //stService.setPacksToStorge(stickersModel);
 
             _renderAll();
-        };
+        }
+
 
         this.isNewPack = function(packName) {
             return stService.isNewPack(stickersModel, packName);
-        };
+        }
 
-    }
+    };
 
     Plugin.Stickers = Stickers;
 
