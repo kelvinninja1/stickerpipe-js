@@ -6,7 +6,7 @@
     Plugin.StickersModule.StickerHelper = {
 
         forEach: function(data, callback) {
-            for (var x in data){
+            for (var x in data) {
                 callback(data[x], x);
             }
         },
