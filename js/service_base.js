@@ -149,20 +149,12 @@
             StickerHelper.ajaxGet(url, apikey, callback);
         };
 
-        this.parseStickerCode = function(text) {
-            return text.match(/\[\[(\S+)_(\S+)\]\]/);
-        };
-
-        this.isSticker = function(text) {
-            return !!this.parseStickerCode(text);
-        };
-
-        this.getStickerUrl = function(text) {
+        this.parseStickerFromText = function(text) {
             var outData = {
                     isSticker: false,
                     url: ''
                 },
-                matchData = this.parseStickerCode(text);
+                matchData = text.match(/\[\[(\S+)_(\S+)\]\]/);
 
             parseStickerStatHandle(!!matchData);
 
@@ -199,7 +191,26 @@
 
             return isNew;
 
-        }
+        };
+
+        this.onUserMessageSent = function(isSticker) {
+            var nowDate = new Date().getTime() / 1000 | 0,
+                action = 'send',
+                category = 'message',
+                label = (isSticker) ? 'sticker' : 'text';
+
+            StickerHelper.ajaxPost(Config.trackStatUrl, Config.apikey, [
+                {
+                    action: action,
+                    category: category,
+                    label: label,
+                    time: nowDate
+                }
+            ]);
+
+
+            ga('stickerTracker.send', 'event', category, action, label);
+        };
 
     }
 

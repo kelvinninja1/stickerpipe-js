@@ -444,20 +444,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
             StickerHelper.ajaxGet(url, apikey, callback);
         };
 
-        this.parseStickerCode = function(text) {
-            return text.match(/\[\[(\S+)_(\S+)\]\]/);
-        };
-
-        this.isSticker = function(text) {
-            return !!this.parseStickerCode(text);
-        };
-
-        this.getStickerUrl = function(text) {
+        this.parseStickerFromText = function(text) {
             var outData = {
                     isSticker: false,
                     url: ''
                 },
-                matchData = this.parseStickerCode(text);
+                matchData = text.match(/\[\[(\S+)_(\S+)\]\]/);
 
             parseStickerStatHandle(!!matchData);
 
@@ -494,7 +486,26 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
             return isNew;
 
-        }
+        };
+
+        this.onUserMessageSent = function(isSticker) {
+            var nowDate = new Date().getTime() / 1000 | 0,
+                action = 'send',
+                category = 'message',
+                label = (isSticker) ? 'sticker' : 'text';
+
+            StickerHelper.ajaxPost(Config.trackStatUrl, Config.apikey, [
+                {
+                    action: action,
+                    category: category,
+                    label: label,
+                    time: nowDate
+                }
+            ]);
+
+
+            ga('stickerTracker.send', 'event', category, action, label);
+        };
 
     }
 
@@ -585,7 +596,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
             StickerHelper.forEach(latesUseSticker, function(sticker) {
 
-                var icon_src = base_service.getStickerUrl("[[" + sticker.code + "]]"),
+                var icon_src = base_service.parseStickerFromText("[[" + sticker.code + "]]"),
                     packItem;
 
                     packItem = "<span data-sticker-string=" + sticker.code +" class=" + stickerItemClass + "> <img src=" + icon_src.url + "></span>";
@@ -785,12 +796,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
             return stService.resetNewStickersFlag();
         };
 
-        this.isSticker = function(text) {
-            return stService.isSticker(text);
-        };
-
-        this.getStickerUrl = function(text) {
-            return stService.getStickerUrl(text);
+        this.parseStickerFromText = function(text) {
+            return stService.parseStickerFromText(text);
         };
 
         this.renderCurrentTab = function(tabName) {
@@ -817,22 +824,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         };
 
         this.onUserMessageSent = function(isSticker) {
-            var nowDate = new Date().getTime() / 1000 | 0,
-                action = 'send',
-                category = 'message',
-                label = (isSticker) ? 'sticker' : 'text';
-
-            _module.StickerHelper.ajaxPost(Config.trackStatUrl, Config.apikey, [
-                {
-                    action: action,
-                    category: category,
-                    label: label,
-                    time: nowDate
-                }
-            ]);
-
-
-            ga('stickerTracker.send', 'event', category, action, label);
+            return stService.onUserMessageSent(isSticker);
         };
 
     }
