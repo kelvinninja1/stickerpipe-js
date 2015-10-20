@@ -185,8 +185,8 @@
             _renderAll();
         };
 
-        this.isNewPack = function(packName, defaultValue) {
-            return stService.isNewPack(stickersModel, packName, defaultValue || false);
+        this.isNewPack = function(packName) {
+            return stService.isNewPack(stickersModel, packName);
         };
 
     }

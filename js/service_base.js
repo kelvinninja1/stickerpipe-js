@@ -101,7 +101,7 @@
         this.markNewPacks = function(oldPacks, newPacks) {
             var globalNew = false;
 
-            if (oldPacks.length != 0){
+            if (oldPacks.length){
 
                 var installedPacks = [];
 
@@ -122,7 +122,7 @@
 
                 }).bind(this));
 
-                if (installedPacks.length != 0) {
+                if (installedPacks.length) {
                     this.registerInstalledPacks(installedPacks);
                 }
 
@@ -130,6 +130,9 @@
                     Lockr.set('sticker_have_new', globalNew);
                 }
             } else {
+                StickerHelper.forEach(newPacks, function(pack) {
+                   pack['newPack'] = false;
+                });
                 this.registerInstalledPacks(newPacks);
             }
 
@@ -194,8 +197,8 @@
             return outData;
         };
 
-        this.isNewPack = function(packs, packName, defaultValue) {
-            var isNew = defaultValue || true;
+        this.isNewPack = function(packs, packName) {
+            var isNew = true;
 
             var pack = this.getPackByName(packs, packName);
             if (pack) {
