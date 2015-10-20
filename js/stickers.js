@@ -151,7 +151,6 @@
 
         };
 
-
         this.getNewStickersFlag = function() {
             return stService.getNewStickersFlag(stService.getPacksFromStorge().packs || []);
         };
@@ -160,9 +159,13 @@
             return stService.resetNewStickersFlag();
         };
 
+        this.isSticker = function(text) {
+            return stService.isSticker(text);
+        };
+
         this.getStickerUrl = function(text) {
             return stService.getStickerUrl(text);
-        }
+        };
 
         this.renderCurrentTab = function(tabName) {
             var obj = stService.getPacksFromStorge();
@@ -181,14 +184,32 @@
             //stService.setPacksToStorge(stickersModel);
 
             _renderAll();
-        }
-
+        };
 
         this.isNewPack = function(packName) {
             return stService.isNewPack(stickersModel, packName);
-        }
+        };
 
-    };
+        this.onUserMessageSent = function(isSticker) {
+            var nowDate = new Date().getTime() / 1000 | 0,
+                action = 'send',
+                category = 'message',
+                label = (isSticker) ? 'sticker' : 'text';
+
+            _module.StickerHelper.ajaxPost(Config.trackStatUrl, Config.apikey, [
+                {
+                    action: action,
+                    category: category,
+                    label: label,
+                    time: nowDate
+                }
+            ]);
+
+
+            ga('stickerTracker.send', 'event', category, action, label);
+        };
+
+    }
 
     Plugin.Stickers = Stickers;
 
