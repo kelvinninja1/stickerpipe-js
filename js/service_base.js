@@ -118,7 +118,7 @@
 
                     globalNew = isNewPack || globalNew;
 
-                    newPacks.newPack = isNewPack;
+                    newPack.newPack = isNewPack;
 
                 }).bind(this));
 
