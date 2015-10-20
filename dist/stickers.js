@@ -627,7 +627,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 })(window, StickersModule.StickerHelper, StickersModule.BaseService);/* End: js/view_base.js */
 
-
 (function(Plugin, _module) {
 
     function Stickers(configObj) {

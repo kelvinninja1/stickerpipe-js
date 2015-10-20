@@ -1,13 +1,12 @@
 
 
-include: "analytics.js"
-include: "config_base.js"
-include: "Lockr.js"
-include: "helper.js"
-include: "controller_base.js"
-include: "service_base.js"
-include: "view_base.js"
-
+//include: "analytics.js"
+//include: "config_base.js"
+//include: "Lockr.js"
+//include: "helper.js"
+//include: "controller_base.js"
+//include: "service_base.js"
+//include: "view_base.js"
 
 (function(Plugin, _module) {
 
