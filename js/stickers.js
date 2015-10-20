@@ -1,12 +1,12 @@
 
 
-include: "analytics.js"
-include: "config_base.js"
-include: "Lockr.js"
-include: "helper.js"
-include: "controller_base.js"
-include: "service_base.js"
-include: "view_base.js"
+// include: "analytics.js"
+// include: "config_base.js"
+// include: "Lockr.js"
+// include: "helper.js"
+// include: "controller_base.js"
+// include: "service_base.js"
+// include: "view_base.js"
 
 
 (function(Plugin, _module) {
@@ -81,7 +81,7 @@ include: "view_base.js"
             stService.getPacksFromServer(
                 Config.packsUrl,
                 Config.apikey,
-                function(response) {
+                (function(response) {
                     if(response.status == "success") {
                         var stickerPacks = response.data;
 
@@ -97,7 +97,7 @@ include: "view_base.js"
 
                         if(attrs.callback) attrs.callback.apply();
                     }
-                }
+                }).bind(this)
             );
         };
 
@@ -113,7 +113,9 @@ include: "view_base.js"
                 stickersModel = storgeStickerData.packs;
                 _init();
 
-                if(callback) callback.apply();
+                if(callback) {
+                    callback.apply();
+                }
             } else {
 
                 this.fetchPacks({
@@ -152,7 +154,6 @@ include: "view_base.js"
 
         };
 
-
         this.getNewStickersFlag = function() {
             return stService.getNewStickersFlag(stService.getPacksFromStorge().packs || []);
         };
@@ -163,7 +164,7 @@ include: "view_base.js"
 
         this.getStickerUrl = function(text) {
             return stService.getStickerUrl(text);
-        }
+        };
 
         this.renderCurrentTab = function(tabName) {
             var obj = stService.getPacksFromStorge();
@@ -182,14 +183,13 @@ include: "view_base.js"
             //stService.setPacksToStorge(stickersModel);
 
             _renderAll();
-        }
+        };
 
+        this.isNewPack = function(packName, defaultValue) {
+            return stService.isNewPack(stickersModel, packName, defaultValue || false);
+        };
 
-        this.isNewPack = function(packName) {
-            return stService.isNewPack(stickersModel, packName);
-        }
-
-    };
+    }
 
     Plugin.Stickers = Stickers;
 
