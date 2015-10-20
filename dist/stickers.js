@@ -298,7 +298,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
     Plugin.StickersModule = Plugin.StickersModule || {};
 
-     function BaseService(Config) {
+    function BaseService(Config) {
 
         var parseCountStat = 0,
             parseCountWithStickerStat = 0;
@@ -316,21 +316,21 @@ document.addEventListener("DOMContentLoaded", function(event) {
             if(parseCountStat >= 50) {
 
                 StickerHelper.ajaxPost(Config.trackStatUrl, Config.apikey, [
-                  {
-                      action: 'check',
-                      category: 'message',
-                      label: 'Events count',
-                      time: nowDate,
-                      value: parseCountStat
+                    {
+                        action: 'check',
+                        category: 'message',
+                        label: 'Events count',
+                        time: nowDate,
+                        value: parseCountStat
 
-                  },
-                  {
-                      action: 'check',
-                      category: 'message',
-                      label: 'Stickers count',
-                      time: nowDate,
-                      value: parseCountWithStickerStat
-                  }
+                    },
+                    {
+                        action: 'check',
+                        category: 'message',
+                        label: 'Stickers count',
+                        time: nowDate,
+                        value: parseCountWithStickerStat
+                    }
 
                 ]);
 
@@ -346,25 +346,25 @@ document.addEventListener("DOMContentLoaded", function(event) {
         };
 
         this.addToLatestUse = function(code) {
-          
-          var storgeDate = Lockr.get("sticker_latest_use") || [],
-              newStorgeDate = [];
 
-          StickerHelper.forEach(storgeDate, function(codeFromStorge) {
+            var storgeDate = Lockr.get("sticker_latest_use") || [],
+                newStorgeDate = [];
 
-              if(codeFromStorge.code != code) {
-                  newStorgeDate.push(codeFromStorge);
-              }
+            StickerHelper.forEach(storgeDate, function(codeFromStorge) {
 
-          });
+                if(codeFromStorge.code != code) {
+                    newStorgeDate.push(codeFromStorge);
+                }
 
-          storgeDate = newStorgeDate;
+            });
 
-          storgeDate.unshift({
-             code : code
-          });
+            storgeDate = newStorgeDate;
 
-          Lockr.set("sticker_latest_use", storgeDate);
+            storgeDate.unshift({
+                code : code
+            });
+
+            Lockr.set("sticker_latest_use", storgeDate);
         };
 
         this.getNewStickersFlag = function(packs) {
@@ -375,7 +375,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
             return Lockr.set("sticker_have_new", false);
         };
 
-
         this.getLatestUse = function() {
             return Lockr.get("sticker_latest_use") || [];
         };
@@ -385,18 +384,18 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 packsObj = Lockr.get("sticker_packs");
 
             if(typeof packsObj === "undefined" ||
-               packsObj.expireDate < expireDate) {
+                packsObj.expireDate < expireDate) {
 
-               return {
-                   actual: false,
-                   packs: typeof packsObj == "object" && packsObj.packs ? packsObj.packs : []
-               };
+                return {
+                    actual: false,
+                    packs: typeof packsObj == "object" && packsObj.packs ? packsObj.packs : []
+                };
             } else {
 
-               return {
-                   actual: true,
-                   packs: packsObj.packs
-               };
+                return {
+                    actual: true,
+                    packs: packsObj.packs
+                };
             }
         };
 
@@ -424,7 +423,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 
                 if(globalNew) {
-                    Lockr.set("sticker_have_new", globalNew);
+                    Lockr.set('sticker_have_new', globalNew);
                 }
             }
 
@@ -445,10 +444,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
             StickerHelper.ajaxGet(url, apikey, callback);
         };
 
-        this.getStickerUrl = function(text) {
+        this.parseStickerFromText = function(text) {
             var outData = {
                     isSticker: false,
-                    url: ""
+                    url: ''
                 },
                 matchData = text.match(/\[\[(\S+)_(\S+)\]\]/);
 
@@ -457,17 +456,17 @@ document.addEventListener("DOMContentLoaded", function(event) {
             if(matchData) {
                 outData.isSticker = true;
                 outData.url = Config.domain +
-                    "/" +
+                    '/' +
                     Config.baseFolder +
-                    "/" + matchData[1] +
-                    "/" + matchData[2] +
-                    "_" + Config.stickerResolutionType +
-                    ".png";
+                    '/' + matchData[1] +
+                    '/' + matchData[2] +
+                    '_' + Config.stickerResolutionType +
+                    '.png';
 
 
                 outData.pack = matchData[1];
                 outData.name = matchData[2];
-            };
+            }
 
             return outData;
         };
@@ -478,24 +477,43 @@ document.addEventListener("DOMContentLoaded", function(event) {
             StickerHelper.forEach(packs, function(pack) {
 
                 if(pack.pack_name &&
-                   pack.pack_name.toLowerCase() == packName.toLowerCase()) {
+                    pack.pack_name.toLowerCase() == packName.toLowerCase()) {
 
-                   isNew = !!pack.newPack;
+                    isNew = !!pack.newPack;
                 }
 
             });
 
             return isNew;
 
-        }
+        };
 
-    };
+        this.onUserMessageSent = function(isSticker) {
+            var nowDate = new Date().getTime() / 1000 | 0,
+                action = 'send',
+                category = 'message',
+                label = (isSticker) ? 'sticker' : 'text';
+
+            StickerHelper.ajaxPost(Config.trackStatUrl, Config.apikey, [
+                {
+                    action: action,
+                    category: category,
+                    label: label,
+                    time: nowDate
+                }
+            ]);
+
+
+            ga('stickerTracker.send', 'event', category, action, label);
+        };
+
+    }
 
     Plugin.StickersModule.BaseService = BaseService;
 
 })(window,
-   StickersModule.StickerHelper,
-   StickersModule.Lockr
+    StickersModule.StickerHelper,
+    StickersModule.Lockr
 );/* End: js/service_base.js */
 /* Begin: js/view_base.js */
 
@@ -578,7 +596,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
             StickerHelper.forEach(latesUseSticker, function(sticker) {
 
-                var icon_src = base_service.getStickerUrl("[[" + sticker.code + "]]"),
+                var icon_src = base_service.parseStickerFromText("[[" + sticker.code + "]]"),
                     packItem;
 
                     packItem = "<span data-sticker-string=" + sticker.code +" class=" + stickerItemClass + "> <img src=" + icon_src.url + "></span>";
@@ -626,7 +644,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
     Plugin.StickersModule.BaseView = BaseView;
 
 })(window, StickersModule.StickerHelper, StickersModule.BaseService);/* End: js/view_base.js */
-
 
 (function(Plugin, _module) {
 
@@ -771,7 +788,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
         };
 
-
         this.getNewStickersFlag = function() {
             return stService.getNewStickersFlag(stService.getPacksFromStorge().packs || []);
         };
@@ -780,9 +796,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
             return stService.resetNewStickersFlag();
         };
 
-        this.getStickerUrl = function(text) {
-            return stService.getStickerUrl(text);
-        }
+        this.parseStickerFromText = function(text) {
+            return stService.parseStickerFromText(text);
+        };
 
         this.renderCurrentTab = function(tabName) {
             var obj = stService.getPacksFromStorge();
@@ -801,14 +817,17 @@ document.addEventListener("DOMContentLoaded", function(event) {
             //stService.setPacksToStorge(stickersModel);
 
             _renderAll();
-        }
-
+        };
 
         this.isNewPack = function(packName) {
             return stService.isNewPack(stickersModel, packName);
-        }
+        };
 
-    };
+        this.onUserMessageSent = function(isSticker) {
+            return stService.onUserMessageSent(isSticker);
+        };
+
+    }
 
     Plugin.Stickers = Stickers;
 

@@ -76,7 +76,7 @@ html
 
 -  parse text and return img url if text is sticker
 ```js
-    sticker.getStickerUrl(text);
+    sticker.parseStickerFromText(text);
 ```
 
 -  open current tab

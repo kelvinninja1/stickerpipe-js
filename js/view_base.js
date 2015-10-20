@@ -78,7 +78,7 @@
 
             StickerHelper.forEach(latesUseSticker, function(sticker) {
 
-                var icon_src = base_service.getStickerUrl("[[" + sticker.code + "]]"),
+                var icon_src = base_service.parseStickerFromText("[[" + sticker.code + "]]"),
                     packItem;
 
                     packItem = "<span data-sticker-string=" + sticker.code +" class=" + stickerItemClass + "> <img src=" + icon_src.url + "></span>";

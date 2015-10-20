@@ -41,7 +41,7 @@
             sticker.start();
 
             sticker.onClickSticker(function(text) {
-                var parseObj = sticker.getStickerUrl(text),
+                var parseObj = sticker.parseStickerFromText(text),
                     htmlEl;
 
                 if(parseObj.isSticker) {
@@ -49,6 +49,8 @@
                     document.getElementById("paste_sticker").innerHTML += htmlEl;
                     document.getElementById("paste_sticker").scrollTop = 10000;
                 }
+
+                sticker.onUserMessageSent(parseObj.isSticker);
 
             });
 
