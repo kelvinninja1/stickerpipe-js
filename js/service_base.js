@@ -105,7 +105,7 @@
 
                 var installedPacks = [];
 
-                StickerHelper.forEach(newPacks, (function(newPack, key) {
+                StickerHelper.forEach(newPacks, (function(newPack) {
 
                     var isNewPack = true,
                         pack = this.getPackByName(oldPacks, newPack.pack_name);
@@ -118,7 +118,7 @@
 
                     globalNew = isNewPack || globalNew;
 
-                    newPacks[key]['newPack'] = isNewPack;
+                    newPacks.newPack = isNewPack;
 
                 }).bind(this));
 
