@@ -400,7 +400,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
                 var installedPacks = [];
 
-                StickerHelper.forEach(newPacks, (function(newPack, key) {
+                StickerHelper.forEach(newPacks, (function(newPack) {
 
                     var isNewPack = true,
                         pack = this.getPackByName(oldPacks, newPack.pack_name);
@@ -413,7 +413,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
                     globalNew = isNewPack || globalNew;
 
-                    newPacks[key]['newPack'] = isNewPack;
+                    newPacks.newPack = isNewPack;
 
                 }).bind(this));
 
@@ -426,7 +426,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 }
             } else {
                 StickerHelper.forEach(newPacks, function(pack) {
-                   pack['newPack'] = false;
+                   pack.newPack = false;
                 });
                 this.registerInstalledPacks(newPacks);
             }
@@ -442,11 +442,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 data.push({
                     action: 'install',
                     category: 'pack',
-                    label: pack['pack_name'],
+                    label: pack.pack_name,
                     time: nowDate
                 });
 
-                ga('stickerTracker.send', 'event', 'pack', 'install', pack['pack_name']);
+                ga('stickerTracker.send', 'event', 'pack', 'install', pack.pack_name);
             });
 
             StickerHelper.ajaxPost(Config.trackStatUrl, Config.apikey, data);
@@ -506,8 +506,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
         this.getPackByName = function(packs, packName) {
 
             for (var i = 0; i < packs.length; i++) {
-                if (packs[i]['pack_name'] &&
-                    packs[i]['pack_name'].toLowerCase() == packName.toLowerCase()) {
+                if (packs[i].pack_name &&
+                    packs[i].pack_name.toLowerCase() == packName.toLowerCase()) {
                     return packs[i];
                 }
             }

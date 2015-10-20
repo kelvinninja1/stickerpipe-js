@@ -131,7 +131,7 @@
                 }
             } else {
                 StickerHelper.forEach(newPacks, function(pack) {
-                   pack['newPack'] = false;
+                   pack.newPack = false;
                 });
                 this.registerInstalledPacks(newPacks);
             }
@@ -147,11 +147,11 @@
                 data.push({
                     action: 'install',
                     category: 'pack',
-                    label: pack['pack_name'],
+                    label: pack.pack_name,
                     time: nowDate
                 });
 
-                ga('stickerTracker.send', 'event', 'pack', 'install', pack['pack_name']);
+                ga('stickerTracker.send', 'event', 'pack', 'install', pack.pack_name);
             });
 
             StickerHelper.ajaxPost(Config.trackStatUrl, Config.apikey, data);
@@ -211,8 +211,8 @@
         this.getPackByName = function(packs, packName) {
 
             for (var i = 0; i < packs.length; i++) {
-                if (packs[i]['pack_name'] &&
-                    packs[i]['pack_name'].toLowerCase() == packName.toLowerCase()) {
+                if (packs[i].pack_name &&
+                    packs[i].pack_name.toLowerCase() == packName.toLowerCase()) {
                     return packs[i];
                 }
             }
