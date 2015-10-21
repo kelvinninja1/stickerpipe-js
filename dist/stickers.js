@@ -189,6 +189,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	Plugin.StickersModule = Plugin.StickersModule || {};
 	Plugin.StickersModule.MD5 = function (string) {
 
+		string = string && string.toString() || '';
+
 		function RotateLeft(lValue, iShiftBits) {
 			return (lValue<<iShiftBits) | (lValue>>>(32-iShiftBits));
 		}
