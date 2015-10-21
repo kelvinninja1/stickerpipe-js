@@ -7,7 +7,7 @@
 
     var Lockr = Plugin.StickersModule.Lockr;
 
-        Lockr.prefix = Config.storgePrefix;
+        Lockr.prefix = Config.storagePrefix;
 
         Lockr._getPrefixedKey = function(key, options) {
             options = options || {};

@@ -3,6 +3,7 @@
 //include: "analytics.js"
 //include: "config_base.js"
 //include: "Lockr.js"
+//include: "md5.js"
 //include: "helper.js"
 //include: "controller_base.js"
 //include: "service_base.js"
@@ -43,7 +44,7 @@
                 tabActive = +el.getAttribute("data-tab-number");
 
                 if(tabActive >= 0) stickersModel[tabActive].newPack = false;
-                stService.setPacksToStorge(stickersModel);
+                stService.setPacksToStorage(stickersModel);
 
                 _renderAll();
             });
@@ -73,19 +74,17 @@
         };
 
         this.fetchPacks = function(attrs) {
-            var storgeStickerData;
+            var storageStickerData;
 
-            storgeStickerData =  stService.getPacksFromStorge();
+            storageStickerData =  stService.getPacksFromStorage();
 
             stService.getPacksFromServer(
-                Config.packsUrl,
-                Config.apikey,
                 function(response) {
-                    if(response.status == "success") {
+                    if(response.status == 'success') {
                         var stickerPacks = response.data;
 
-                        stickerPacks = stService.markNewPacks(storgeStickerData.packs, stickerPacks);
-                        stService.setPacksToStorge(stickerPacks);
+                        stickerPacks = stService.markNewPacks(storageStickerData.packs, stickerPacks);
+                        stService.setPacksToStorage(stickerPacks);
 
                         stickersModel = stickerPacks;
 
@@ -101,15 +100,15 @@
         };
 
         this.start = function(callback) {
-            var storgeStickerData;
+            var storageStickerData;
 
             tabActive = -1;
 
-            storgeStickerData =  stService.getPacksFromStorge();
+            storageStickerData =  stService.getPacksFromStorage();
 
-            if(storgeStickerData.actual) {
+            if(storageStickerData.actual) {
 
-                stickersModel = storgeStickerData.packs;
+                stickersModel = storageStickerData.packs;
                 _init();
 
                 if(callback) callback.apply();
@@ -152,7 +151,7 @@
         };
 
         this.getNewStickersFlag = function() {
-            return stService.getNewStickersFlag(stService.getPacksFromStorge().packs || []);
+            return stService.getNewStickersFlag(stService.getPacksFromStorage().packs || []);
         };
 
         this.resetNewStickersFlag = function() {
@@ -164,7 +163,7 @@
         };
 
         this.renderCurrentTab = function(tabName) {
-            var obj = stService.getPacksFromStorge();
+            var obj = stService.getPacksFromStorage();
 
             this.start();
 
@@ -174,10 +173,10 @@
                     tabActive = +key;
                 }
 
-            })
+            });
 
             //stickersModel[tabActive].newPack = false;
-            //stService.setPacksToStorge(stickersModel);
+            //stService.setPacksToStorage(stickersModel);
 
             _renderAll();
         };
