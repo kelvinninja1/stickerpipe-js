@@ -51,7 +51,7 @@ js
         tabResolutionType: "xxhdpi",
 
         htmlForEmptyRecent: "<div class='emptyRecent'>empty recent text</div>",
-        storgePrefix: "stickerPipe",
+        storagePrefix: "stickerPipe",
         apikey: "72921666b5ff8651f374747bfefaf7b2",
 
     });
@@ -120,7 +120,7 @@ html
 | tabResolutionType | "mdpi", "hdpi", "xhdpi", "xxhdpi" | tab icon size |
 | htmlForEmptyRecent | html code | insert in empty recent block |
 | apikey | api key your account | if you wont use custom tabs |
-| storgePrefix | string | prefix for LocalStorge |
+| storagePrefix | string | prefix for LocalStorage |
 | enableCustomTab | boolean| if your wont use something other like a twitter emoji|
 
 

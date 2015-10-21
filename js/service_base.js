@@ -52,24 +52,24 @@
 
         this.addToLatestUse = function(code) {
 
-            var storgeDate = Lockr.get("sticker_latest_use") || [],
-                newStorgeDate = [];
+            var storageDate = Lockr.get("sticker_latest_use") || [],
+                newStorageDate = [];
 
-            StickerHelper.forEach(storgeDate, function(codeFromStorge) {
+            StickerHelper.forEach(storageDate, function(codeFromStorage) {
 
-                if(codeFromStorge.code != code) {
-                    newStorgeDate.push(codeFromStorge);
+                if(codeFromStorage.code != code) {
+                    newStorageDate.push(codeFromStorage);
                 }
 
             });
 
-            storgeDate = newStorgeDate;
+            storageDate = newStorageDate;
 
-            storgeDate.unshift({
+            storageDate.unshift({
                 code : code
             });
 
-            Lockr.set("sticker_latest_use", storgeDate);
+            Lockr.set("sticker_latest_use", storageDate);
         };
 
         this.getNewStickersFlag = function(packs) {
@@ -84,7 +84,7 @@
             return Lockr.get("sticker_latest_use") || [];
         };
 
-        this.getPacksFromStorge = function() {
+        this.getPacksFromStorage = function() {
             var expireDate = ( + new Date()),
                 packsObj = Lockr.get("sticker_packs");
 
@@ -135,7 +135,7 @@
             return newPacks;
         };
 
-        this.setPacksToStorge = function(packsObj) {
+        this.setPacksToStorage = function(packsObj) {
             var expireDate = new Date(),
                 saveObj = {
                     packs: packsObj,

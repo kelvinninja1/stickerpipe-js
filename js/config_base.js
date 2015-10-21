@@ -22,7 +22,7 @@
         userPacksUrl: 'http://api.stickerpipe.com/api/v1/user/packs',
         trackStatUrl: 'http://api.stickerpipe.com/api/v1/track-statistic',
 
-        storgePrefix: 'stickerPipe',
+        storagePrefix: 'stickerPipe',
         enableCustomTab: false,
 
         userId: null

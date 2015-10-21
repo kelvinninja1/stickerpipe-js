@@ -44,7 +44,7 @@
                 tabActive = +el.getAttribute("data-tab-number");
 
                 if(tabActive >= 0) stickersModel[tabActive].newPack = false;
-                stService.setPacksToStorge(stickersModel);
+                stService.setPacksToStorage(stickersModel);
 
                 _renderAll();
             });
@@ -74,17 +74,17 @@
         };
 
         this.fetchPacks = function(attrs) {
-            var storgeStickerData;
+            var storageStickerData;
 
-            storgeStickerData =  stService.getPacksFromStorge();
+            storageStickerData =  stService.getPacksFromStorage();
 
             stService.getPacksFromServer(
                 function(response) {
                     if(response.status == 'success') {
                         var stickerPacks = response.data;
 
-                        stickerPacks = stService.markNewPacks(storgeStickerData.packs, stickerPacks);
-                        stService.setPacksToStorge(stickerPacks);
+                        stickerPacks = stService.markNewPacks(storageStickerData.packs, stickerPacks);
+                        stService.setPacksToStorage(stickerPacks);
 
                         stickersModel = stickerPacks;
 
@@ -100,15 +100,15 @@
         };
 
         this.start = function(callback) {
-            var storgeStickerData;
+            var storageStickerData;
 
             tabActive = -1;
 
-            storgeStickerData =  stService.getPacksFromStorge();
+            storageStickerData =  stService.getPacksFromStorage();
 
-            if(storgeStickerData.actual) {
+            if(storageStickerData.actual) {
 
-                stickersModel = storgeStickerData.packs;
+                stickersModel = storageStickerData.packs;
                 _init();
 
                 if(callback) callback.apply();
@@ -151,7 +151,7 @@
         };
 
         this.getNewStickersFlag = function() {
-            return stService.getNewStickersFlag(stService.getPacksFromStorge().packs || []);
+            return stService.getNewStickersFlag(stService.getPacksFromStorage().packs || []);
         };
 
         this.resetNewStickersFlag = function() {
@@ -163,7 +163,7 @@
         };
 
         this.renderCurrentTab = function(tabName) {
-            var obj = stService.getPacksFromStorge();
+            var obj = stService.getPacksFromStorage();
 
             this.start();
 
@@ -176,7 +176,7 @@
             });
 
             //stickersModel[tabActive].newPack = false;
-            //stService.setPacksToStorge(stickersModel);
+            //stService.setPacksToStorage(stickersModel);
 
             _renderAll();
         };
