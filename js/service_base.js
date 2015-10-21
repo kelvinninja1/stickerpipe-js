@@ -145,8 +145,19 @@
             return Lockr.set("sticker_packs", saveObj);
         };
 
-        this.getPacksFromServer = function(url, apikey, callback){
-            StickerHelper.ajaxGet(url, apikey, callback);
+        this.getPacksFromServer = function(callback) {
+
+            var options = {
+                url: Config.clientPacksUrl,
+                header: []
+            };
+
+            if (Config.userId !== null) {
+                options.url = Config.userPacksUrl;
+                options.header['UserId'] = StickerHelper.md5(Config.userId + Config.apikey);
+            }
+
+            StickerHelper.ajaxGet(options.url, Config.apikey, callback, options.header);
         };
 
         this.parseStickerFromText = function(text) {
@@ -158,7 +169,7 @@
 
             parseStickerStatHandle(!!matchData);
 
-            if(matchData) {
+            if (matchData) {
                 outData.isSticker = true;
                 outData.url = Config.domain +
                     '/' +

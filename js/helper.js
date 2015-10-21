@@ -1,5 +1,5 @@
 
-(function(Plugin, Lockr) {
+(function(Plugin, Lockr, MD5) {
     Plugin.StickersModule = Plugin.StickersModule || {};
 
 
@@ -37,7 +37,10 @@
 
         },
 
-        ajaxGet: function(url, apikey, callback) {
+        ajaxGet: function(url, apikey, callback, header) {
+
+            header = header || {};
+
             var xmlhttp;
 
             xmlhttp = new XMLHttpRequest();
@@ -46,10 +49,14 @@
                 if (xmlhttp.readyState == 4 && xmlhttp.status == 200){
                     callback(JSON.parse(xmlhttp.responseText));
                 }
-            }
+            };
             xmlhttp.open("GET", url, true);
             xmlhttp.setRequestHeader("Apikey", apikey);
             xmlhttp.setRequestHeader("Platform", "JS");
+
+            this.forEach(header, function(value, name) {
+                xmlhttp.setRequestHeader(name, value);
+            });
 
             xmlhttp.send();
         },
@@ -60,14 +67,14 @@
 
             xmlhttp = new XMLHttpRequest();
 
-            xmlhttp.onreadystatechange = function(){
+            xmlhttp.onreadystatechange = function() {
                 if (xmlhttp.readyState == 4 &&
                     xmlhttp.status == 200,
                     typeof callback != "undefined"){
 
                     callback(JSON.parse(xmlhttp.responseText));
                 }
-            }
+            };
 
 
             if(typeof uniqUserId == "undefined") {
@@ -83,8 +90,12 @@
 
 
             xmlhttp.send(JSON.stringify(data));
+        },
+
+        md5: function(string) {
+            return MD5(string);
         }
 
     };
 
-})(window, window.StickersModule.Lockr);
+})(window, window.StickersModule.Lockr, window.StickersModule.MD5);

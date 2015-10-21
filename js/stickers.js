@@ -3,6 +3,7 @@
 //include: "analytics.js"
 //include: "config_base.js"
 //include: "Lockr.js"
+//include: "md5.js"
 //include: "helper.js"
 //include: "controller_base.js"
 //include: "service_base.js"
@@ -78,10 +79,8 @@
             storgeStickerData =  stService.getPacksFromStorge();
 
             stService.getPacksFromServer(
-                Config.packsUrl,
-                Config.apikey,
                 function(response) {
-                    if(response.status == "success") {
+                    if(response.status == 'success') {
                         var stickerPacks = response.data;
 
                         stickerPacks = stService.markNewPacks(storgeStickerData.packs, stickerPacks);
@@ -174,7 +173,7 @@
                     tabActive = +key;
                 }
 
-            })
+            });
 
             //stickersModel[tabActive].newPack = false;
             //stService.setPacksToStorge(stickersModel);
