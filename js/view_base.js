@@ -120,7 +120,20 @@
             });
         };
 
-    };
+        this.renderStorePack = function(pack) {
+
+            var storeContainerEl = document.getElementById(Config.storeContainerId);
+            var iframe = document.createElement('iframe');
+            storeContainerEl.appendChild(iframe);
+
+            iframe.style.width = '100%';
+            iframe.style.height = '100%';
+            iframe.style.border = '0';
+            iframe.src = 'http://work.stk.908.vc/api/v1/web/#/packs/' + pack;
+
+        };
+
+    }
 
 
     Plugin.StickersModule.BaseView = BaseView;

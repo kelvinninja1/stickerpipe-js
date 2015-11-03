@@ -10,6 +10,8 @@
         stickersContainerId: 'stitems',
         stickerItemClass: 'stitems_item',
 
+        storeContainerId: 'ststore',
+
         domain : 'http://api.stickerpipe.com',
         baseFolder: 'stk',
 

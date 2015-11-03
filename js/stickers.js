@@ -189,6 +189,10 @@
             return stService.onUserMessageSent(isSticker);
         };
 
+        this.renderPack = function(pack) {
+            stView.renderStorePack(pack);
+        };
+
     }
 
     Plugin.Stickers = Stickers;

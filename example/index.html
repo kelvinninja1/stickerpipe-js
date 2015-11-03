@@ -4,61 +4,110 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+
     <link rel="stylesheet" type="text/css" href="css/style.css" />
     <title>Stickers</title>
 </head>
 <body>
-    <div class="content">
-        <div id="paste_sticker"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <nav class="navbar navbar-default">
+                    <div class="container-fluid">
+                        <div class="navbar-header">
+                            <a class="navbar-brand" href="/">STICKER PIPE</a>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
 
-        <div class="sttab" id="sttab"></div>
-        <div class="stitems" id="stitems"></div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="content">
+                    <div id="messages">
+                    </div>
+
+                    <div class="stickers-block" style="display: none;">
+                        <div class="sttab" id="sttab"></div>
+                        <div class="stitems" id="stitems"></div>
+                        <div class="ststore" id="ststore"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="message-box">
+                    <div class="input-group">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default show-stickers">
+                                <i class="fa fa-smile-o fa-2x"></i>
+                            </button>
+                        </span>
+                        <textarea class="form-control" id="search-church" placeholder="Сообщение" rows='1'></textarea>
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="submit">Отправить</button>
+                        </span>
+                    </div>
+                </div>
+                <p class="text-center"><small>Нажмите shift + enter для перевода строки</small></p>
+            </div>
+        </div>
     </div>
 
+    <script id="messageTemplate" type="text/template">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="row">
+                    <div class="col-xs-2 {{ isCurrentUser && 'col-xs-push-10' }}">
+                        <img src="{{ user.picture}}" class="img-thumbnail img-responsive img-circle {{ !isCurrentUser ? 'pull-right' : 'pull-left' }}" style="width:70px;">
+                    </div>
+                    <div class="col-xs-10 {{ isCurrentUser && 'col-xs-pull-2' }}">
+                        {[ if (!sticker.isSticker) { ]}
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <h5 style="margin-top: 0;">@{{ user.username }}</h5>
+                                <p>{{ text }}</p>
+                                <small class="text-muted">{{ date }}</small>
+                            </div>
+                        </div>
+                        {[ } else { ]}
+                        <div class="text-center {{ !isCurrentUser ? 'pull-left' : 'pull-right' }}"
+                            style="margin-bottom: 30px;">
+                            <p><img src="{{ sticker.url }}"
+                                    alt=""
+                                    data-sticker="{{ sticker.pack }}_{{ sticker.name }}"
+                                    data-sticker-code="{{ text }}"
+                                    data-sticker-pack="{{ sticker.pack }}"
+                                    data-sticker-name="{{ sticker.name }}"
+                                ></p>
+                            <small class="text-muted">{{ date }}</small>
+                        </div>
+                        {[ } ]}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
+    <script src="vendor/autosize.min.js"></script>
+    <script src="vendor/lodash.min.js"></script>
     <script src="stickers.js"></script>
+    <script src="js/App.js"></script>
     <script>
 
         (function() {
-            var sticker = new Stickers({
-
-                tabContainerId: "sttab",
-                tabItemClass: "sttab_item",
-
-                stickersContainerId: "stitems",
-                stickerItemClass: "stitems_item",
-
-                stickerResolutionType: "mdpi",
-                tabResolutionType: "xxhdpi",
-
-                htmlForEmptyRecent: "<div class='emptyRecent'>empty recent text</div>",
-
-                apikey: "72921666b5ff8651f374747bfefaf7b2",
-                storagePrefix: "stickerPipe",
-                enableCustomTab: true
-
-            });
-
-            sticker.start();
-
-            sticker.onClickSticker(function(text) {
-                var parseObj = sticker.parseStickerFromText(text),
-                    htmlEl;
-
-                if(parseObj.isSticker) {
-                    htmlEl = "<div> <img src=" + parseObj.url + " /> </div>"
-                    document.getElementById("paste_sticker").innerHTML += htmlEl;
-                    document.getElementById("paste_sticker").scrollTop = 10000;
-                }
-
-                sticker.onUserMessageSent(parseObj.isSticker);
-
-            });
-
-
-            sticker.onClickCustomTab(function() {
-                alert("customTab");
-            });
-
+            var app = new App();
         })();
 
     </script>
