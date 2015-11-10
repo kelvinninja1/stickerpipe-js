@@ -8,12 +8,13 @@
 //include: "controller_base.js"
 //include: "service_base.js"
 //include: "view_base.js"
+//include: "JsApiInterface.js"
 
 (function(Plugin, _module) {
 
     function Stickers(configObj) {
 
-        var Config = _module.StickerHelper.mergeOptions(_module.Config, configObj);
+        var Config = _module.StickerHelper.mergeOptions(_module.Config, configObj),
             stService = new _module.BaseService(Config),
             stView = new _module.BaseView(Config),
             stController = new _module.BaseController(Config),
@@ -21,6 +22,7 @@
             stickersModel = {},
             tabActive = 0;
 
+        Plugin.JsApiInterface && Plugin.JsApiInterface._setConfigs(Config);
 
         var _renderAll = function() {
             
@@ -74,29 +76,16 @@
         };
 
         this.fetchPacks = function(attrs) {
-            var storageStickerData;
+            stService.updatePacks(function(stickerPacks) {
+                stickersModel = stickerPacks;
 
-            storageStickerData =  stService.getPacksFromStorage();
-
-            stService.getPacksFromServer(
-                function(response) {
-                    if(response.status == 'success') {
-                        var stickerPacks = response.data;
-
-                        stickerPacks = stService.markNewPacks(storageStickerData.packs, stickerPacks);
-                        stService.setPacksToStorage(stickerPacks);
-
-                        stickersModel = stickerPacks;
-
-                        if(!attrs.onlyFetch){
-                            _init();
-                        }
-
-
-                        if(attrs.callback) attrs.callback.apply();
-                    }
+                if(!attrs.onlyFetch){
+                    _init();
                 }
-            );
+
+
+                if(attrs.callback) attrs.callback.apply();
+            });
         };
 
         this.start = function(callback) {
@@ -193,6 +182,9 @@
             stView.renderStorePack(pack);
         };
 
+        this.purchaseSuccess = function(packName) {
+            stService.purchaseSuccess(packName);
+        };
     }
 
     Plugin.Stickers = Stickers;

@@ -20,52 +20,68 @@ var App = _makeClass(function(options) {
 	randomUsers: [],
 	currentUser: {},
 
+	$window: null,
+	$messages: null,
+	$messageBox: null,
+	$stickerPipe: null,
+	$stickerPipeStickers: null,
+	$stickerPipeStore: null,
+	$stickerPipeButton: null,
+
 	init: function() {
 
-		// setting lo-dash template
-		_.templateSettings = {
-			evaluate: /\{\[([\s\S]+?)\]\}/g,   // {[ alert() ]}
-			interpolate: /\{\{([\s\S]+?)\}\}/g, // {{ name }}
-			escape: /\{\{-([\s\S]+?)-\}\}/g // {{- html -}}
-		};
+		this.$window = $(window);
+		this.$messages = $('#messages');
+		this.$messageBox = $('.message-box');
+		this.$stickerPipe = $('.sticker-pipe');
+		this.$stickerPipeStickers = $('.stickers-block');
+		this.$stickerPipeStore = $('.store');
+		this.$stickerPipeButton = this.$messageBox.find('.show-stickers');
 
 		this.fetchRandomUsers().done((function() {
 			this.sendMessage();
 			this.sendMessage(true);
 			this.sendMessage();
 		}).bind(this));
+		this.initLoDash();
 		this.initMessageBox();
-
-		var $window = $(window).resize((function() {
-			this.resizeWindow();
-		}).bind(this));
-
-		$('.message-box textarea').on('autosize:resized', (function() {
-			this.resizeWindow();
-		}).bind(this));
-
-		_.delay(function() {
-			$window.resize();
-		}, 100);
-
-		$('#messages').on('click', 'img[data-sticker]', (function(e) {
-			var $target = $(e.target);
-			this.openPackInStore($target.attr('data-sticker-pack'));
-		}).bind(this));
-
 		this.initStickers();
-	},
 
+		this.$window.resize((function() {
+			this.resizeWindow();
+		}).bind(this));
+
+		this.$messageBox.find('textarea').on('autosize:resized', (function() {
+			this.resizeWindow();
+		}).bind(this));
+
+		_.delay((function() {
+			this.$window.resize();
+		}).bind(this), 100);
+
+		this.$messages.on('click', 'img[data-sticker]', (function(e) {
+			var $target = $(e.target);
+			this.openStickersStore($target.attr('data-sticker-pack'));
+		}).bind(this));
+	},
+	initLoDash: function() {
+		// setting lo-dash template
+		_.templateSettings = {
+			evaluate: /\{\[([\s\S]+?)\]\}/g,   // {[ alert() ]}
+			interpolate: /\{\{([\s\S]+?)\}\}/g, // {{ name }}
+			escape: /\{\{-([\s\S]+?)-\}\}/g // {{- html -}}
+		};
+	},
 	initStickers: function() {
 		this.stickers = new Stickers({
 
-			tabContainerId: 'sttab',
+			tabContainerId: 'stickersTabs',
 			tabItemClass: 'sttab_item',
 
-			stickersContainerId: 'stitems',
+			stickersContainerId: 'stickers',
 			stickerItemClass: 'stitems_item',
 
-			storeContainerId: 'ststore',
+			storeContainerId: this.$stickerPipeStore.attr('id'),
 
 			stickerResolutionType: 'mdpi',
 			tabResolutionType: 'xhdpi',
@@ -74,7 +90,31 @@ var App = _makeClass(function(options) {
 
 			apikey: '72921666b5ff8651f374747bfefaf7b2',
 			storagePrefix: 'stickerPipe',
-			enableCustomTab: true
+			enableCustomTab: true,
+
+			//userId: '12345678901234567890123456789012',
+
+			callbacks: {
+				onPurchase: (function(packTitle, productId, price, packName) {
+					if (confirm('#' + productId + ' Вы действительно хотите купить пак "' + packTitle + '", за '+ price + ' UAH?')) {
+						this.stickers.purchaseSuccess(packName);
+					}
+				}).bind(this),
+
+				onPackStoreSuccess: function(packName) {
+					console.log('Спасибо за покупку!');
+				},
+
+				onPackStoreFail: function(packName) {
+					alert('Произошла ошибка при покупке пака. Повторите еще раз!')
+				}
+			},
+
+			functions: {
+				showPackCollection: (function(packName) {
+					this.openStickers(packName);
+				}).bind(this)
+			}
 
 		});
 
@@ -89,11 +129,9 @@ var App = _makeClass(function(options) {
 			alert('customTab');
 		});
 	},
-
 	initMessageBox: function() {
-		var $messageBox = $('.message-box'),
-			$textarea = $messageBox.find('textarea'),
-			sendMessageFunc = (function() {
+		var $textarea = this.$messageBox.find('textarea'),
+			sendMessageHandler = (function() {
 				this.sendMessage(true, $textarea.val());
 
 				$textarea.val('');
@@ -103,7 +141,7 @@ var App = _makeClass(function(options) {
 
 		autosize($textarea);
 
-		$textarea.keydown(function (e) {
+		$textarea.on('keydown', function (e) {
 
 			if (e.keyCode != 13) return;
 
@@ -115,49 +153,22 @@ var App = _makeClass(function(options) {
 				return;
 			}
 
-			sendMessageFunc();
+			sendMessageHandler();
 		});
 
-		$messageBox.find('button[type=submit]').on('click', function() {
-			sendMessageFunc();
+		this.$messageBox.find('button[type=submit]').on('click', function() {
+			sendMessageHandler();
 		});
 
-		var $stickersBlock = $('.stickers-block'),
-			$showStickersButton = $messageBox.find('.show-stickers');
-
-		$showStickersButton.on('click', (function() {
-			$('.sttab').show();
-			$('.stitems').show();
-
-			$('.ststore').hide();
-
-			var $messages = $('#messages');
-
-			if ($showStickersButton.hasClass('active')) {
-				$showStickersButton.removeClass('active');
-
-
-				var messagesSavedHeight = $messages.attr('data-saved-height');
-
-				$stickersBlock.slideUp({
-					progress: function() {
-						$messages.height(messagesSavedHeight - $stickersBlock.height());
-					}
-				});
+		this.$stickerPipeButton.on('click', (function() {
+			if (this.$stickerPipeButton.hasClass('active')) {
+				this.closeStickerPipeBlock();
 			} else {
-
-				var messagesHeight = $messages.height();
-				$messages.attr('data-saved-height', messagesHeight);
-
-				$showStickersButton.addClass('active');
-				$stickersBlock.slideDown({
-					progress: function() {
-						$messages.height(messagesHeight - $stickersBlock.height());
-					}
-				});
+				this.openStickers();
 			}
 		}).bind(this));
 	},
+
 	sendMessage: function(isCurrentUser, text) {
 
 		text = (text && text.trim()) || this.getRandomMessageText();
@@ -173,16 +184,74 @@ var App = _makeClass(function(options) {
 
 		this.stickers.onUserMessageSent(parseSticker.isSticker);
 
-		var $messages = $('#messages'),
-			messageTemplate = _.template($('#messageTemplate').html());
+		var messageTemplate = _.template($('#messageTemplate').html());
 
-		$messages.append(messageTemplate({
+		this.$messages.append(messageTemplate({
 			isCurrentUser: isCurrentUser,
 			user: user,
 			text: text,
 			date: this.getDateString(0),
 			sticker: parseSticker
-		})).animate({ scrollTop: $messages[0].scrollHeight }, 1000);
+		})).animate({ scrollTop: this.$messages[0].scrollHeight }, 1000);
+	},
+
+	openStickerPipeBlock: function(completeCallback) {
+
+		if (this.$stickerPipeButton.hasClass('active')) {
+			completeCallback && completeCallback();
+			return;
+		}
+
+		var messagesHeight = this.$messages.height();
+		this.$messages.attr('data-saved-height', messagesHeight);
+
+		this.$stickerPipeButton.addClass('active');
+		this.$stickerPipe.slideDown({
+			progress: (function() {
+				this.$messages.height(messagesHeight - this.$stickerPipe.height());
+			}).bind(this),
+			complete: function() {
+				completeCallback && completeCallback();
+			}
+		});
+	},
+	closeStickerPipeBlock: function() {
+		if (!this.$stickerPipeButton.hasClass('active')) {
+			return;
+		}
+
+		var messagesSavedHeight = this.$messages.attr('data-saved-height');
+
+		this.$stickerPipeButton.removeClass('active');
+
+		this.$stickerPipe.slideUp({
+			progress: (function() {
+				this.$messages.height(messagesSavedHeight - this.$stickerPipe.height());
+			}).bind(this)
+		});
+	},
+
+	openStickers: function(packName) {
+
+		this.$stickerPipeStickers.show();
+		this.$stickerPipeStore.hide();
+
+		this.openStickerPipeBlock((function() {
+			if (packName) {
+				this.stickers.renderCurrentTab(packName);
+			}
+		}).bind(this));
+	},
+	openStickersStore: function(packName) {
+
+		this.$stickerPipeStickers.hide();
+		this.$stickerPipeStore.show();
+
+		this.openStickerPipeBlock();
+
+		this.resizeWindow();
+
+		this.stickers.renderPack(packName);
 	},
 
 	fetchRandomUsers: function() {
@@ -197,24 +266,6 @@ var App = _makeClass(function(options) {
 				});
 			}).bind(this)
 		});
-	},
-
-	openPackInStore: function(pack) {
-
-		$showStickersButton = $('.show-stickers');
-
-		if (!$showStickersButton.hasClass('active')) {
-			$showStickersButton.trigger('click');
-		}
-
-		$('.sttab').hide();
-		$('.stitems').hide();
-
-		$('.ststore').show();
-
-		this.resizeWindow();
-
-		this.stickers.renderPack(pack);
 	},
 
 	getRandom: function(min, max) {
@@ -269,21 +320,18 @@ var App = _makeClass(function(options) {
 	},
 
 	resizeWindow: function() {
-		var $window = $(window),
-			$navbar = $('.navbar'),
-			$massegeBox = $('.message-box'),
-			$massegeBoxParent = $massegeBox.parent(),
-			$messages = $('#messages'),
-			stickersBlockHeight = $('.stickers-block:visible').outerHeight(true) || 0;
+		var $navbar = $('.navbar'),
+			$messageBoxParent = this.$messageBox.parent(),
+			stickersPipeElHeight = $('.sticker-pipe:visible').outerHeight(true) || 0;
 
 
-		$messages.height(
-			$window.outerHeight(true) -
+		this.$messages.height(
+			this.$window.outerHeight(true) -
 			$navbar.offset().top -
 			$navbar.outerHeight(true) -
-			$massegeBoxParent.outerHeight(true) -
-			parseInt($messages.css('margin-bottom'), 10) -
-			stickersBlockHeight
+			$messageBoxParent.outerHeight(true) -
+			parseInt(this.$messages.css('margin-bottom'), 10) -
+			stickersPipeElHeight
 		);
 	}
 });

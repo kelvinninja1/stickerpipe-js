@@ -8,7 +8,6 @@
         var parseCountStat = 0,
             parseCountWithStickerStat = 0;
 
-
         var parseStickerStatHandle = function(is_have) {
             var nowDate = new Date().getTime()/1000|0;
 
@@ -223,6 +222,75 @@
             ga('stickerTracker.send', 'event', category, action, label);
         };
 
+        this.isExistPackInStorage = function(packName) {
+            var packs = this.getPacksFromStorage()['packs'];
+
+            for (var i = 0; i < packs.length; i++) {
+                if (packs[i].pack_name == packName) {
+                    return true;
+                }
+            }
+
+            return false;
+        };
+
+        this.updatePacks = function(successCallback) {
+            var storageStickerData;
+
+            storageStickerData = this.getPacksFromStorage();
+
+            this.getPacksFromServer(
+                (function(response) {
+                    if(response.status != 'success') {
+                        return;
+                    }
+
+                    var stickerPacks = response.data;
+
+                    stickerPacks = this.markNewPacks(storageStickerData.packs, stickerPacks);
+                    this.setPacksToStorage(stickerPacks);
+
+                    successCallback && successCallback(stickerPacks);
+                }).bind(this)
+            );
+        };
+
+		this.changeUserPackStatus = function(packName, status, callback) {
+
+			var options = {
+				url: Config.userPackUrl + '/' + packName,
+				header: {
+					UserId: StickerHelper.md5(Config.userId + Config.apikey)
+				}
+			};
+
+			StickerHelper.ajaxPost(options.url, Config.apikey, {
+				status: status
+			}, callback, options.header);
+		};
+
+        this.purchaseSuccess = function(packName) {
+			try {
+				var handler = function() {
+					if (!Plugin.JsApiInterface) {
+						throw new Error('JSApiInterface not found!');
+					}
+
+					Plugin.JsApiInterface.downloadPack(packName, function() {
+						Config.callbacks.onPackStoreSuccess(packName);
+					});
+				};
+
+				if (Config.userId !== null) {
+					this.changeUserPackStatus(packName, true, handler);
+				} else {
+					handler();
+				}
+			} catch(e) {
+				console.error(e.message);
+				Config.callbacks.onPackStoreFail(packName);
+			}
+        };
     }
 
     Plugin.StickersModule.BaseService = BaseService;
