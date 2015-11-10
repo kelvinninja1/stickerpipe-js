@@ -1,81 +1,173 @@
 
-#paste_sticker{
-    height: 300px;
+body {
+    background: rgb(240, 240, 240);
+    padding-top: 20px;
+}
+
+@media (min-width: 992px) {
+    .container {
+        width: 770px;
+    }
+}
+
+.message-box {
+    background: white;
+    margin-bottom: 5px;
+}
+
+.message-box textarea {
+    box-shadow: none;
+    max-height: 300px;
+    padding-top: 10px;
+    resize: none;
+}
+
+
+.message-box .input-group-btn {
+    vertical-align: top;
+}
+
+.message-box textarea:focus,
+.message-box .input-group-btn button:hover,
+.message-box .input-group-btn button:focus {
+    box-shadow: none;
+    outline: none;
+}
+
+.message-box .input-group-btn button:hover,
+.message-box .input-group-btn button:focus {
+    background: #fff;
+    outline: none;
+}
+
+.message-box .input-group-btn button:hover {
+    color: rgb(100, 100, 100);
+}
+
+.message-box .input-group-btn button:active {
+    color: orange;
+}
+
+.message-box textarea + .input-group-btn{
+    padding-top: 4px;
+}
+
+.message-box textarea,
+.message-box .input-group-btn button {
+    border: 0;
+    outline: none;
+}
+
+.show-stickers.active,
+.show-stickers.active:hover,
+.show-stickers.active:focus {
+    color: orange !important;
+    background: none;
+    box-shadow: none;
+}
+
+.sticker-pipe {
+    /*border: 1px solid rgb(200, 200, 200);*/
+    border-radius: 3px 3px 0 0;
+    overflow: hidden;
+}
+
+#messages {
+    height: 420px;
+    margin-bottom: 20px;
     overflow: hidden;
     overflow-y: scroll;
 }
 
-.sttab{
-    background-color: #f6f6f0;
-    padding: 10px;
-    height: 76px;
+.store {
+    background: white;
+    height: 400px;
 }
 
-    .sttab .active{
-        background-color: white;
-    }
+.tabs {
+    background-color: #fff;
+    border-bottom: 1px solid rgb(200, 200, 200);
+    overflow-x: scroll;
+    padding: 10px;
+    width: 100%;
+    white-space: nowrap;
+}
 
-    .sttab_item{
-        display: inline-block;
-        cursor: pointer;
-        margin: 0 15px;
-    }
+.tabs .active {
+    background-color: white;
+    border-color: orange;
+    color: orange;
+}
 
-.stitems{
+.sttab_item {
+    border: 2px solid #333;
+    border-radius: 50%;
+    display: inline-block;
     cursor: pointer;
+    margin: 0 15px;
+}
+
+.sttab_item img {
+    -webkit-filter: grayscale(100%);
+    filter: grayscale(100%);
+}
+
+.sttab_item.active img {
+    -webkit-filter: grayscale(0%);
+    filter: grayscale(0%);
+}
+
+.stickers {
+    background: #fff;
     height: 300px;
     overflow-y: scroll;
+    padding: 10px;
 }
 
-.emptyRecent{
+
+.stickers .stitems_item {
+    cursor: pointer;
+}
+
+.emptyRecent {
     text-align: center;
     padding: 50px;
     font-size: 20px;
 }
 
-.stnewtab::before{
+.stnewtab::before {
     content: "";
-    width: 20px;
-    height: 20px;
+    width: 15px;
+    height: 15px;
     display: block;
     position: absolute;
     background-color: #f60;
     border-radius: 50%;
-    margin-left: 50px;
-    margin-top: 51px;
+    margin-left: 36px;
+    margin-top: 36px;
+
+    /* todo */
+    z-index: 2;
 }
 
-#recents_tab{
-    width: 74px;
-    height: 55px;
+#custom_tab, #recents_tab {
+    width: 52px;
+    height: 52px;
+    line-height: 50px;
     display: block;
     position: relative;
     float: left;
     text-align: center;
-    padding-top: 20px;
-    border-radius: 50%;
-    margin-right: -10px;
 }
 
-#recents_tab::before{
-    content: "R";
-    font-size: 32px;
+#custom_tab::before, #recents_tab::before {
+    font-size: 18px;
 }
 
-#custom_tab{
-    width: 74px;
-    height: 55px;
-    display: block;
-    position: relative;
-    float: left;
-    text-align: center;
-    padding-top: 20px;
-    border-radius: 50%;
-    margin-right: -10px;
-}
-
-
-#custom_tab::before{
+#custom_tab::before {
     content: "CT";
-    font-size: 32px;
+}
+
+#recents_tab::before {
+    content: "R";
 }

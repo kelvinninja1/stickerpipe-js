@@ -44,7 +44,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
         apikey: '72921666b5ff8651f374747bfefaf7b2',
         clientPacksUrl: 'http://api.stickerpipe.com/api/v1/client-packs',
         userPacksUrl: 'http://api.stickerpipe.com/api/v1/user/packs',
-        userPackUrl: 'http://api.stickerpipe.com/api/v1/user/pack',
         trackStatUrl: 'http://api.stickerpipe.com/api/v1/track-statistic',
 
         storagePrefix: 'stickerPipe',
@@ -458,15 +457,18 @@ document.addEventListener("DOMContentLoaded", function(event) {
             xmlhttp.send();
         },
 
-        ajaxPost: function(url, apikey, data, callback, header) {
+        ajaxPost: function(url, apikey, data, callback) {
             var xmlhttp,
                 uniqUserId = Lockr.get("uniqUserId");
 
             xmlhttp = new XMLHttpRequest();
 
             xmlhttp.onreadystatechange = function() {
-                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                    callback && callback(JSON.parse(xmlhttp.responseText));
+                if (xmlhttp.readyState == 4 &&
+                    xmlhttp.status == 200,
+                    typeof callback != "undefined"){
+
+                    callback(JSON.parse(xmlhttp.responseText));
                 }
             };
 
@@ -482,9 +484,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
             xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             xmlhttp.setRequestHeader("DeviceId", uniqUserId);
 
-            this.forEach(header, function(value, name) {
-                xmlhttp.setRequestHeader(name, value);
-            });
 
             xmlhttp.send(JSON.stringify(data));
         },
@@ -528,6 +527,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
         var parseCountStat = 0,
             parseCountWithStickerStat = 0;
+
 
         var parseStickerStatHandle = function(is_have) {
             var nowDate = new Date().getTime()/1000|0;
@@ -743,75 +743,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
             ga('stickerTracker.send', 'event', category, action, label);
         };
 
-        this.isExistPackInStorage = function(packName) {
-            var packs = this.getPacksFromStorage()['packs'];
-
-            for (var i = 0; i < packs.length; i++) {
-                if (packs[i].pack_name == packName) {
-                    return true;
-                }
-            }
-
-            return false;
-        };
-
-        this.updatePacks = function(successCallback) {
-            var storageStickerData;
-
-            storageStickerData = this.getPacksFromStorage();
-
-            this.getPacksFromServer(
-                (function(response) {
-                    if(response.status != 'success') {
-                        return;
-                    }
-
-                    var stickerPacks = response.data;
-
-                    stickerPacks = this.markNewPacks(storageStickerData.packs, stickerPacks);
-                    this.setPacksToStorage(stickerPacks);
-
-                    successCallback && successCallback(stickerPacks);
-                }).bind(this)
-            );
-        };
-
-		this.changeUserPackStatus = function(packName, status, callback) {
-
-			var options = {
-				url: Config.userPackUrl + '/' + packName,
-				header: {
-					UserId: StickerHelper.md5(Config.userId + Config.apikey)
-				}
-			};
-
-			StickerHelper.ajaxPost(options.url, Config.apikey, {
-				status: status
-			}, callback, options.header);
-		};
-
-        this.purchaseSuccess = function(packName) {
-			try {
-				var handler = function() {
-					if (!Plugin.JsApiInterface) {
-						throw new Error('JSApiInterface not found!');
-					}
-
-					Plugin.JsApiInterface.downloadPack(packName, function() {
-						Config.callbacks.onPackStoreSuccess(packName);
-					});
-				};
-
-				if (Config.userId !== null) {
-					this.changeUserPackStatus(packName, true, handler);
-				} else {
-					handler();
-				}
-			} catch(e) {
-				console.error(e.message);
-				Config.callbacks.onPackStoreFail(packName);
-			}
-        };
     }
 
     Plugin.StickersModule.BaseService = BaseService;
@@ -824,206 +755,164 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 (function(Plugin, StickerHelper, BaseService) {
 
-	function BaseView(Config) {
+    function BaseView(Config) {
 
-		var clearBlock = function(idBlock) {
-			var conteinerEl = document.getElementById(idBlock);
-			conteinerEl.setAttribute("style", "display:block");
-			conteinerEl.innerHTML = "";
-		};
+        var clearBlock = function(idBlock) {
+            var conteinerEl = document.getElementById(idBlock);
+            conteinerEl.setAttribute("style", "display:block");
+            conteinerEl.innerHTML = "";
+        };
 
-		this.hideBlock = function(idBlock) {
-			var conteinerEl = document.getElementById(idBlock);
-			conteinerEl.setAttribute("style", "display:none");
-		};
+        this.hideBlock = function(idBlock) {
+            var conteinerEl = document.getElementById(idBlock);
+            conteinerEl.setAttribute("style", "display:none");
+        };
 
-		this.renderTabs = function(stickerPacks, tabActive, tabContainerId, tabItemClass) {
-			var conteinerEl = document.getElementById(tabContainerId),
-				iteratorTabs = 0,
-				newTabClass = "",
-				tabActiveClass = "";
+        this.renderTabs = function(stickerPacks, tabActive, tabContainerId, tabItemClass) {
+            var conteinerEl = document.getElementById(tabContainerId),
+                iteratorTabs = 0,
+                newTabClass = "",
+                tabActiveClass = "";
 
-			clearBlock(tabContainerId);
+            clearBlock(tabContainerId);
 
-			if(Config.enableCustomTab) {
-				tabActiveClass = tabActive == -2 ? " active" : "";
-				conteinerEl.innerHTML += "<span id = \"custom_tab\" class= \"" + tabItemClass + tabActiveClass + "\" data-tab-number = \"-2\" ></span>";
-			}
+            if(Config.enableCustomTab) {
+                tabActiveClass = tabActive == -2 ? " active" : "";
+                conteinerEl.innerHTML += "<span id = \"custom_tab\" class= \"" + tabItemClass + tabActiveClass + "\" data-tab-number = \"-2\" ></span>";
+            }
 
-			tabActiveClass = tabActive == -1 ? " active" : "";
-			conteinerEl.innerHTML += "<span id = \"recents_tab\" class= \"" + tabItemClass + tabActiveClass +  "\" data-tab-number = \"-1\" ></span>";
+            tabActiveClass = tabActive == -1 ? " active" : "";
+            conteinerEl.innerHTML += "<span id = \"recents_tab\" class= \"" + tabItemClass + tabActiveClass +  "\" data-tab-number = \"-1\" ></span>";
 
-			StickerHelper.forEach(stickerPacks, function(pack) {
+            StickerHelper.forEach(stickerPacks, function(pack) {
 
-				var tabActiveClass = newTabClass = "",
-					icon_src,
-					packItem;
+                var tabActiveClass = newTabClass = "",
+                    icon_src,
+                    packItem;
 
-				if(tabActive === iteratorTabs) {
-					tabActiveClass = " active";
-				}
+                if(tabActive === iteratorTabs) {
+                    tabActiveClass = " active";
+                }
 
-				if(pack.newPack) {
-					newTabClass = " stnewtab";
-				}
+                if(pack.newPack) {
+                    newTabClass = " stnewtab";
+                }
 
-				icon_src = Config.domain +
-					"/" +
-					Config.baseFolder +
-					"/" +
-					pack.pack_name +
-					"/tab_icon_" +
-					Config.tabResolutionType +
-					".png";
+                icon_src = Config.domain +
+                    "/" +
+                    Config.baseFolder +
+                    "/" +
+                    pack.pack_name +
+                    "/tab_icon_" +
+                    Config.tabResolutionType +
+                    ".png";
 
-				packItem = "<span class= \"" + tabItemClass + newTabClass + tabActiveClass + "\" data-tab-number = " + iteratorTabs + " > <img src=" + icon_src + "></span>";
+                packItem = "<span class= \"" + tabItemClass + newTabClass + tabActiveClass + "\" data-tab-number = " + iteratorTabs + " > <img src=" + icon_src + "></span>";
 
-				conteinerEl.innerHTML += packItem;
-				iteratorTabs++;
+                conteinerEl.innerHTML += packItem;
+                iteratorTabs++;
 
-			});
-		};
-
-		this.renderUseStickers = function(latesUseSticker, stickerContainerId, stickerItemClass) {
-			var conteinerEl = document.getElementById(stickerContainerId),
-				base_service = new BaseService(Config);
-
-			clearBlock(stickerContainerId);
-
-			if(latesUseSticker.length == 0) {
-
-				conteinerEl.innerHTML += Config.htmlForEmptyRecent;
-
-				return false;
-			};
+            });
+        };
 
 
-			StickerHelper.forEach(latesUseSticker, function(sticker) {
+        this.renderUseStickers = function(latesUseSticker, stickerContainerId, stickerItemClass) {
+            var conteinerEl = document.getElementById(stickerContainerId),
+                base_service = new BaseService(Config);
 
-				var icon_src = base_service.parseStickerFromText("[[" + sticker.code + "]]"),
-					packItem;
+            clearBlock(stickerContainerId);
 
-					packItem = "<span data-sticker-string=" + sticker.code +" class=" + stickerItemClass + "> <img src=" + icon_src.url + "></span>";
+            if(latesUseSticker.length == 0) {
 
-					conteinerEl.innerHTML += packItem;
-			});
+                conteinerEl.innerHTML += Config.htmlForEmptyRecent;
 
-		};
+                return false;
+            };
 
-		this.renderStickers = function(stickerPacks, tabActive, stickerContainerId, stickerItemClass) {
-			var conteinerEl = document.getElementById(stickerContainerId),
-				tabNumber = 0;
 
-			clearBlock(stickerContainerId);
+            StickerHelper.forEach(latesUseSticker, function(sticker) {
 
-			StickerHelper.forEach(stickerPacks, function(pack) {
+                var icon_src = base_service.parseStickerFromText("[[" + sticker.code + "]]"),
+                    packItem;
 
-				if(tabNumber == tabActive) {
-					StickerHelper.forEach(pack.stickers, function(sticker) {
+                    packItem = "<span data-sticker-string=" + sticker.code +" class=" + stickerItemClass + "> <img src=" + icon_src.url + "></span>";
 
-						var icon_src = Config.domain +
-									   "/" +
-									   Config.baseFolder +
-									   "/" +
-									   pack.pack_name +
-									   "/" +
-									   sticker.name +
-									   "_" +
-									   Config.stickerResolutionType +
-									   ".png",
+                    conteinerEl.innerHTML += packItem;
+            });
 
-							packItem = "<span data-sticker-string=" + pack.pack_name + "_" + sticker.name +" class=" + stickerItemClass + "> <img src=" + icon_src + "></span>";
+        };
 
-						conteinerEl.innerHTML += packItem;
-					});
-				};
+        this.renderStickers = function(stickerPacks, tabActive, stickerContainerId, stickerItemClass) {
+            var conteinerEl = document.getElementById(stickerContainerId),
+                tabNumber = 0;
 
-				tabNumber++;
-			});
-		};
+            clearBlock(stickerContainerId);
 
-		this.renderStorePack = function(packName) {
+            StickerHelper.forEach(stickerPacks, function(pack) {
 
-			var storeContainerEl = document.getElementById(Config.storeContainerId),
-				iframe = document.createElement('iframe'),
-				urlParams = {
-					apiKey: Config.apikey,
-					platform: 'JS',
-					userId: Config.userId,
-					density: Config.stickerResolutionType
-				},
-				urlSerialize = function(obj) {
-					var str = [];
-					for(var p in obj)
-						if (obj.hasOwnProperty(p)) {
-							str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
-						}
-					return str.join('&');
+                if(tabNumber == tabActive) {
+                    StickerHelper.forEach(pack.stickers, function(sticker) {
+
+                        var icon_src = Config.domain +
+                                       "/" +
+                                       Config.baseFolder +
+                                       "/" +
+                                       pack.pack_name +
+                                       "/" +
+                                       sticker.name +
+                                       "_" +
+                                       Config.stickerResolutionType +
+                                       ".png",
+
+                            packItem = "<span data-sticker-string=" + pack.pack_name + "_" + sticker.name +" class=" + stickerItemClass + "> <img src=" + icon_src + "></span>";
+
+                        conteinerEl.innerHTML += packItem;
+                    });
                 };
 
-			storeContainerEl.innerHTML = '';
-			storeContainerEl.appendChild(iframe);
+                tabNumber++;
+            });
+        };
 
-			iframe.style.width = '100%';
-			iframe.style.height = '100%';
-			iframe.style.border = '0';
+        this.renderStorePack = function(pack) {
 
-			// todo
-			iframe.src = 'http://work.stk.908.vc/api/v1/web/?' + urlSerialize(urlParams) + '#/packs/' + packName;
-			//iframe.src = 'http://localhost/stickerpipe/store/build/?' + urlSerialize(urlParams) + '#/packs/' + packName;
-		};
-	}
+            var storeContainerEl = document.getElementById(Config.storeContainerId),
+                iframe = document.createElement('iframe'),
+                urlParams = {
+                    apiKey: Config.apikey,
+                    platform: 'JS',
+                    userId: Config.userId,
+                    density: Config.stickerResolutionType
+                },
+                urlSerialize = function(obj) {
+                    var str = [];
+                    for(var p in obj)
+                        if (obj.hasOwnProperty(p)) {
+                            str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+                        }
+                    return str.join('&');
+                };
+
+            storeContainerEl.appendChild(iframe);
+
+            iframe.style.width = '100%';
+            iframe.style.height = '100%';
+            iframe.style.border = '0';
+            iframe.src = 'http://work.stk.908.vc/api/v1/web/?' + urlSerialize(urlParams) + '/#/packs/' + pack;
+        };
+
+    }
 
 
-	Plugin.StickersModule.BaseView = BaseView;
+    Plugin.StickersModule.BaseView = BaseView;
 
 })(window, StickersModule.StickerHelper, StickersModule.BaseService);/* End: js/view_base.js */
-/* Begin: js/JsApiInterface.js */
-
-(function(Plugin, BaseService) {
-
-	Plugin.JsApiInterface = {
-
-		config: null,
-
-		_setConfigs: function(Config) {
-			this.config = Config;
-		},
-
-		showPackCollections: function(packName) {
-			this.config.functions.showPackCollection(packName);
-		},
-
-		downloadPack: function(packName, callback) {
-			var services = new BaseService(this.config);
-			services.updatePacks((function() {
-				this.config.functions.showPackCollection(packName);
-				callback && callback();
-			}).bind(this));
-		},
-
-		purchasePackInStore: function(packTitle, packProductId, packPrice, packName) {
-			this.config.callbacks.onPurchase(packTitle, packProductId, packPrice, packName);
-		},
-
-		isPackActive: function(packName) {
-			return this.isPackExistsAtUserLibrary(packName);
-		},
-
-		isPackExistsAtUserLibrary: function(packName) {
-			var services = new BaseService(this.config);
-			return services.isExistPackInStorage(packName);
-		}
-	};
-
-})(window, StickersModule.BaseService);
-/* End: js/JsApiInterface.js */
 
 (function(Plugin, _module) {
 
     function Stickers(configObj) {
 
-        var Config = _module.StickerHelper.mergeOptions(_module.Config, configObj),
+        var Config = _module.StickerHelper.mergeOptions(_module.Config, configObj);
             stService = new _module.BaseService(Config),
             stView = new _module.BaseView(Config),
             stController = new _module.BaseController(Config),
@@ -1031,7 +920,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
             stickersModel = {},
             tabActive = 0;
 
-        Plugin.JsApiInterface && Plugin.JsApiInterface._setConfigs(Config);
 
         var _renderAll = function() {
             
@@ -1085,16 +973,29 @@ document.addEventListener("DOMContentLoaded", function(event) {
         };
 
         this.fetchPacks = function(attrs) {
-            stService.updatePacks(function(stickerPacks) {
-                stickersModel = stickerPacks;
+            var storageStickerData;
 
-                if(!attrs.onlyFetch){
-                    _init();
+            storageStickerData =  stService.getPacksFromStorage();
+
+            stService.getPacksFromServer(
+                function(response) {
+                    if(response.status == 'success') {
+                        var stickerPacks = response.data;
+
+                        stickerPacks = stService.markNewPacks(storageStickerData.packs, stickerPacks);
+                        stService.setPacksToStorage(stickerPacks);
+
+                        stickersModel = stickerPacks;
+
+                        if(!attrs.onlyFetch){
+                            _init();
+                        }
+
+
+                        if(attrs.callback) attrs.callback.apply();
+                    }
                 }
-
-
-                if(attrs.callback) attrs.callback.apply();
-            });
+            );
         };
 
         this.start = function(callback) {
@@ -1191,9 +1092,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
             stView.renderStorePack(pack);
         };
 
-        this.purchaseSuccess = function(packName) {
-            stService.purchaseSuccess(packName);
-        };
     }
 
     Plugin.Stickers = Stickers;

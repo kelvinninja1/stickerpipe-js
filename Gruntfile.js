@@ -1,83 +1,84 @@
 module.exports = function(grunt) {
 
-    // Project configuration.
-    grunt.initConfig({
+	// Project configuration.
+	grunt.initConfig({
 
-        uglify: {
-            options: {
-                report: 'gzip',
-                mangle: false
-            },
+		uglify: {
+			options: {
+				report: 'gzip',
+				mangle: false
+			},
 
-            stickers_min: {
+			stickers_min: {
 
-                options: {
-                    mangle: false
-                },
+				options: {
+					mangle: false
+				},
 
-                files: {
-                    'dist/stickers.min.js': ['dist/stickers.js']
-                }
-            }
-        },
+				files: {
+					'dist/stickers.min.js': ['dist/stickers.js']
+				}
+			}
+		},
 
-        includes: {
-            js: {
-                options: {
-                    includeRegexp: /\/\/\s*include:\s*['"]?([^'"]+)['"]?\s*$/,
-                    duplicates: false,
-                    debug: true
-                },
-                files: [{
-                    cwd: 'js/',
-                    src: 'stickers.js',
-                    dest: 'dist/'
-                }]
-            }
-        },
+		includes: {
+			js: {
+				options: {
+					includeRegexp: /\/\/\s*include:\s*['"]?([^'"]+)['"]?\s*$/,
+					duplicates: false,
+					debug: true
+				},
+				files: [{
+					cwd: 'js/',
+					src: 'stickers.js',
+					dest: 'dist/'
+				}]
 
-        watch: {
-            options: {
-                livereload: true
-            },
-            scripts: {
-                files: ['**/*.js'],
-                tasks: ['includes', 'uglify']
-            },
+			}
+		},
 
-            css: {
-                files: ['**/*.css']
-            },
+		watch: {
+			options: {
+				livereload: true
+			},
+			scripts: {
+				files: ['**/*.js'],
+				tasks: ['includes', 'uglify']
+			},
 
-            html: {
-                files: ['**/*.html']
-            }
-        },
+			css: {
+				files: ['**/*.css']
+			},
 
-        express: {
-            all: {
-                options: {
-                    port: 9000,
-                    host: 'dev',
-                    bases: ['./example', "./dist"],
-                    livereload: true
+			html: {
+				files: ['**/*.html']
+			}
+		},
 
-                }
-            }
-        }
+		express: {
+			all: {
+				options: {
+					port: 9000,
+					host: 'dev',
+					bases: ['./example', "./dist"],
+					livereload: true
 
-
-    });
-
-    grunt.loadNpmTasks('grunt-contrib-concat');
-    grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks('grunt-express');
-    grunt.loadNpmTasks('grunt-includes');
+				}
+			}
+		}
 
 
-    // Default task(s).
-    grunt.registerTask('default', ['includes', 'uglify']);
-    grunt.registerTask('server', ['express', 'watch']);
+	});
+
+	grunt.loadNpmTasks('grunt-contrib-concat');
+	grunt.loadNpmTasks('grunt-contrib-uglify');
+	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks('grunt-express');
+	grunt.loadNpmTasks('grunt-includes');
+
+
+	// Default task(s).
+	grunt.registerTask('default', ['includes', 'uglify']);
+	grunt.registerTask('server', ['express', 'watch']);
 
 };

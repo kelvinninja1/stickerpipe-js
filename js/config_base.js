@@ -10,6 +10,8 @@
         stickersContainerId: 'stitems',
         stickerItemClass: 'stitems_item',
 
+        storeContainerId: 'ststore',
+
         domain : 'http://api.stickerpipe.com',
         baseFolder: 'stk',
 
@@ -20,6 +22,7 @@
         apikey: '72921666b5ff8651f374747bfefaf7b2',
         clientPacksUrl: 'http://api.stickerpipe.com/api/v1/client-packs',
         userPacksUrl: 'http://api.stickerpipe.com/api/v1/user/packs',
+        userPackUrl: 'http://api.stickerpipe.com/api/v1/user/pack',
         trackStatUrl: 'http://api.stickerpipe.com/api/v1/track-statistic',
 
         storagePrefix: 'stickerPipe',

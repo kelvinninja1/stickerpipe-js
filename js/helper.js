@@ -61,18 +61,15 @@
             xmlhttp.send();
         },
 
-        ajaxPost: function(url, apikey, data, callback) {
+        ajaxPost: function(url, apikey, data, callback, header) {
             var xmlhttp,
                 uniqUserId = Lockr.get("uniqUserId");
 
             xmlhttp = new XMLHttpRequest();
 
             xmlhttp.onreadystatechange = function() {
-                if (xmlhttp.readyState == 4 &&
-                    xmlhttp.status == 200,
-                    typeof callback != "undefined"){
-
-                    callback(JSON.parse(xmlhttp.responseText));
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    callback && callback(JSON.parse(xmlhttp.responseText));
                 }
             };
 
@@ -88,6 +85,9 @@
             xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             xmlhttp.setRequestHeader("DeviceId", uniqUserId);
 
+            this.forEach(header, function(value, name) {
+                xmlhttp.setRequestHeader(name, value);
+            });
 
             xmlhttp.send(JSON.stringify(data));
         },
