@@ -88,6 +88,12 @@ var App = _makeClass(function(options) {
 			storagePrefix: 'stickerPipe',
 			enableCustomTab: true,
 
+			domain : 'http://work.stk.908.vc',
+			clientPacksUrl: 'http://work.stk.908.vc/api/v1/client-packs',
+			userPacksUrl: 'http://work.stk.908.vc/api/v1/user/packs',
+			userPackUrl: 'http://work.stk.908.vc/api/v1/user/pack',
+			trackStatUrl: 'http://work.stk.908.vc/api/v1/track-statistic',
+
 			//userId: '12345678901234567890123456789012',
 
 			callbacks: {
