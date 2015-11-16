@@ -73,11 +73,24 @@
 
 			this.renderControlTab(this.el, this.controlTabs.prevPacks, tabActive);
 			this.controlTabs.prevPacks.el.style.display = 'none';
+			//this.controlTabs.prevPacks.el.addEventListener('click', (function() {
+			//	this.currentPage--;
+			//	this.onWindowResize();
+			//	this.scrollableContentEl.scrollLeft = this.scrollableContentWidth * this.currentPage;
+			//}).bind(this));
 			this.controlTabs.prevPacks.el.addEventListener('click', (function() {
+				this.scrollableContentEl.firstChild.style.transition = '300ms';
+				this.scrollableContentEl.firstChild.style.marginLeft = parseInt(this.scrollableContentEl.firstChild.style.marginLeft) + (this.scrollableContentWidth * this.currentPage) + 'px';
+
 				this.currentPage--;
+				setTimeout((function() {
+					this.onWindowResize();
+				}).bind(this), 3);
 				this.onWindowResize();
-				this.scrollableContentEl.scrollLeft = this.scrollableContentWidth * this.currentPage;
+
+				//this.scrollableContentEl.scrollLeft = this.scrollableContentWidth * this.currentPage;
 			}).bind(this));
+
 
 			// scrollable container
 
@@ -108,7 +121,12 @@
 			this.controlTabs.nextPacks.el.addEventListener('click', (function() {
 				this.currentPage++;
 				this.onWindowResize();
-				this.scrollableContentEl.scrollLeft = this.scrollableContentWidth * this.currentPage;
+				//this.scrollableContentEl.scrollLeft = this.scrollableContentWidth * this.currentPage;
+
+				this.scrollableContentEl.firstChild.style.transition = '300ms';
+				this.scrollableContentEl.firstChild.style.marginLeft = -(this.scrollableContentWidth * this.currentPage) + 'px';
+
+				this.onWindowResize();
 			}).bind(this));
 
 			this.onWindowResize();
@@ -168,7 +186,8 @@
 			this.scrollableContentWidth = this.el.parentElement.offsetWidth
 				- this.controlTabs.store.el.offsetWidth
 				- this.controlTabs.nextPacks.el.offsetWidth
-				- this.controlTabs.prevPacks.el.offsetWidth;
+				- this.controlTabs.prevPacks.el.offsetWidth
+			;
 
 			this.scrollableContentEl.style.width = this.scrollableContentWidth + 'px';
 
@@ -188,6 +207,7 @@
 				packTabs[i].style.marginRight = margin + 'px';
 			}
 
+			console.log(this.scrollableContentEl.scrollWidth, this.scrollableContentEl.offsetWidth);
 			if (this.scrollableContentEl.scrollWidth > this.scrollableContentEl.offsetWidth) {
 				this.controlTabs.nextPacks.el.style.display = 'inline-block';
 			} else {

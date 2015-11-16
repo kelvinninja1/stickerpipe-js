@@ -79,6 +79,8 @@ var App = _makeClass(function(options) {
 	initStickers: function() {
 		this.stickers = new Stickers({
 
+			debug: true,
+
 			elId: this.$stickerPipeStickers.attr('id'),
 			storeContainerId: this.$stickerPipeStore.attr('id'),
 

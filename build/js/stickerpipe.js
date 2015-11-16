@@ -590,11 +590,24 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 			this.renderControlTab(this.el, this.controlTabs.prevPacks, tabActive);
 			this.controlTabs.prevPacks.el.style.display = 'none';
+			//this.controlTabs.prevPacks.el.addEventListener('click', (function() {
+			//	this.currentPage--;
+			//	this.onWindowResize();
+			//	this.scrollableContentEl.scrollLeft = this.scrollableContentWidth * this.currentPage;
+			//}).bind(this));
 			this.controlTabs.prevPacks.el.addEventListener('click', (function() {
+				this.scrollableContentEl.firstChild.style.transition = '300ms';
+				this.scrollableContentEl.firstChild.style.marginLeft = parseInt(this.scrollableContentEl.firstChild.style.marginLeft) + (this.scrollableContentWidth * this.currentPage) + 'px';
+
 				this.currentPage--;
+				setTimeout((function() {
+					this.onWindowResize();
+				}).bind(this), 3);
 				this.onWindowResize();
-				this.scrollableContentEl.scrollLeft = this.scrollableContentWidth * this.currentPage;
+
+				//this.scrollableContentEl.scrollLeft = this.scrollableContentWidth * this.currentPage;
 			}).bind(this));
+
 
 			// scrollable container
 
@@ -614,12 +627,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			this.config.enableCustomTab && this.renderControlTab(this.scrollableContentEl, this.controlTabs.custom, tabActive);
 			this.renderControlTab(this.scrollableContentEl, this.controlTabs.history, tabActive);
 
-			//this.renderPackTab(stickerPacks[0], 0, tabActive);
-
-			for (var j = 0; j < 1; j++) {
-				for (var i = 0; i < stickerPacks.length; i++) {
-					this.renderPackTab(stickerPacks[i], i, tabActive);
-				}
+			for (var i = 0; i < stickerPacks.length; i++) {
+				this.renderPackTab(stickerPacks[i], i, tabActive);
 			}
 
 			this.renderControlTab(this.scrollableContentEl, this.controlTabs.settings, tabActive);
@@ -629,7 +638,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			this.controlTabs.nextPacks.el.addEventListener('click', (function() {
 				this.currentPage++;
 				this.onWindowResize();
-				this.scrollableContentEl.scrollLeft = this.scrollableContentWidth * this.currentPage;
+				//this.scrollableContentEl.scrollLeft = this.scrollableContentWidth * this.currentPage;
+
+				this.scrollableContentEl.firstChild.style.transition = '300ms';
+				this.scrollableContentEl.firstChild.style.marginLeft = -(this.scrollableContentWidth * this.currentPage) + 'px';
+
+				this.onWindowResize();
 			}).bind(this));
 
 			this.onWindowResize();
@@ -689,7 +703,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			this.scrollableContentWidth = this.el.parentElement.offsetWidth
 				- this.controlTabs.store.el.offsetWidth
 				- this.controlTabs.nextPacks.el.offsetWidth
-				- this.controlTabs.prevPacks.el.offsetWidth;
+				- this.controlTabs.prevPacks.el.offsetWidth
+			;
 
 			this.scrollableContentEl.style.width = this.scrollableContentWidth + 'px';
 
@@ -709,6 +724,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 				packTabs[i].style.marginRight = margin + 'px';
 			}
 
+			console.log(this.scrollableContentEl.scrollWidth, this.scrollableContentEl.offsetWidth);
 			if (this.scrollableContentEl.scrollWidth > this.scrollableContentEl.offsetWidth) {
 				this.controlTabs.nextPacks.el.style.display = 'inline-block';
 			} else {
@@ -840,8 +856,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
             var expireDate = ( + new Date()),
                 packsObj = Lockr.get("sticker_packs");
 
-            if(typeof packsObj === "undefined" ||
-                packsObj.expireDate < expireDate) {
+            if(typeof packsObj === "undefined"
+                || packsObj.expireDate < expireDate
+                || Config.debug
+            ) {
 
                 return {
                     actual: false,

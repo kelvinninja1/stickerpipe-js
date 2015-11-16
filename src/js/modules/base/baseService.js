@@ -87,8 +87,10 @@
             var expireDate = ( + new Date()),
                 packsObj = Lockr.get("sticker_packs");
 
-            if(typeof packsObj === "undefined" ||
-                packsObj.expireDate < expireDate) {
+            if(typeof packsObj === "undefined"
+                || packsObj.expireDate < expireDate
+                || Config.debug
+            ) {
 
                 return {
                     actual: false,
