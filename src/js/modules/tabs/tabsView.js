@@ -97,12 +97,8 @@
 			this.config.enableCustomTab && this.renderControlTab(this.scrollableContentEl, this.controlTabs.custom, tabActive);
 			this.renderControlTab(this.scrollableContentEl, this.controlTabs.history, tabActive);
 
-			//this.renderPackTab(stickerPacks[0], 0, tabActive);
-
-			for (var j = 0; j < 1; j++) {
-				for (var i = 0; i < stickerPacks.length; i++) {
-					this.renderPackTab(stickerPacks[i], i, tabActive);
-				}
+			for (var i = 0; i < stickerPacks.length; i++) {
+				this.renderPackTab(stickerPacks[i], i, tabActive);
 			}
 
 			this.renderControlTab(this.scrollableContentEl, this.controlTabs.settings, tabActive);
