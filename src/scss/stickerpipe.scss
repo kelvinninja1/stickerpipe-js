@@ -112,9 +112,11 @@ $tabContentSize: 36px;
 
 		.sp-sticker-item {
 			cursor: pointer;
+			display: inline-table;
+			margin: 12px;
 
 			img {
-				$size: 160px;
+				$size: 80px;
 				height: $size;
 				width: $size;
 			}
