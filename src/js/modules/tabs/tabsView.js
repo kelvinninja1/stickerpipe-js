@@ -10,6 +10,8 @@
 		controlTabs: null,
 		config: null,
 
+		currentPage: 0,
+
 		_constructor: function(config) {
 			this.config = config;
 
@@ -57,6 +59,10 @@
 					el: null
 				}
 			};
+
+			window.addEventListener('resize', (function() {
+				this.onWindowResize();
+			}).bind(this));
 		},
 
 		// el == tabsEl
@@ -66,6 +72,12 @@
 			this.el.innerHTML = '';
 
 			this.renderControlTab(this.el, this.controlTabs.prevPacks, tabActive);
+			this.controlTabs.prevPacks.el.style.display = 'none';
+			this.controlTabs.prevPacks.el.addEventListener('click', (function() {
+				this.currentPage--;
+				this.onWindowResize();
+				this.scrollableContentEl.scrollLeft = this.scrollableContentWidth * this.currentPage;
+			}).bind(this));
 
 			// scrollable container
 
@@ -74,37 +86,35 @@
 
 			this.scrollableContentEl.style.width = '300px';
 			this.scrollableContentEl.style.whiteSpace = 'nowrap';
-			this.scrollableContentEl.style.borderRight = '1px solid red';
-			this.scrollableContentEl.style.overflow = 'scroll';
-
-			//float: left;
-			//width: 300px;
-			//white-space: nowrap !important;
-			///* overflow-x: scroll; */
-			//border-right: 1px solid red;
-			///* height: 50px; */
-			///* overflow-y: hidden; */
-			//overflow: scroll;
-
+			this.scrollableContentEl.style.overflow = 'hidden';
+			this.scrollableContentEl.style.display = 'flex';
 
 			this.el.appendChild(this.scrollableContentEl);
 
 			// ********************
 
-			//this.config.enableCustomTab && this.renderControlTab(this.scrollableContentEl, this.controlTabs.custom, tabActive);
+			this.config.enableCustomTab && this.renderControlTab(this.scrollableContentEl, this.controlTabs.custom, tabActive);
 			this.renderControlTab(this.scrollableContentEl, this.controlTabs.history, tabActive);
 
-			this.renderPackTab(stickerPacks[0], 0, tabActive);
+			//this.renderPackTab(stickerPacks[0], 0, tabActive);
 
-			//for (var j = 0; j < 3; j++) {
-			//	for (var i = 0; i < stickerPacks.length; i++) {
-			//		this.renderPackTab(stickerPacks[i], i, tabActive);
-			//	}
-			//}
+			for (var j = 0; j < 6; j++) {
+				for (var i = 0; i < stickerPacks.length; i++) {
+					this.renderPackTab(stickerPacks[i], i, tabActive);
+				}
+			}
 
 			this.renderControlTab(this.scrollableContentEl, this.controlTabs.settings, tabActive);
 			this.renderControlTab(this.el, this.controlTabs.store, tabActive);
+
 			this.renderControlTab(this.el, this.controlTabs.nextPacks, tabActive);
+			this.controlTabs.nextPacks.el.addEventListener('click', (function() {
+				this.currentPage++;
+				this.onWindowResize();
+				this.scrollableContentEl.scrollLeft = this.scrollableContentWidth * this.currentPage;
+			}).bind(this));
+
+			this.onWindowResize();
 		},
 		renderControlTab: function(el, tab, tabActive) {
 			tab.el = this.renderTab(el, tab.id, [tab.class, 'sp-control-tab'], tab.number, tab.content, tabActive);
@@ -146,6 +156,44 @@
 			el.appendChild(tabEl);
 
 			return tabEl;
+		},
+
+		onWindowResize: function() {
+
+			if (this.currentPage > 0) {
+				this.controlTabs.prevPacks.el.style.display = 'inline-block';
+			} else {
+				this.controlTabs.prevPacks.el.style.display = 'none';
+			}
+
+			this.scrollableContentWidth = this.el.parentElement.offsetWidth
+				- this.controlTabs.store.el.offsetWidth
+				- this.controlTabs.nextPacks.el.offsetWidth
+				- this.controlTabs.prevPacks.el.offsetWidth;
+
+			this.scrollableContentEl.style.width = this.scrollableContentWidth + 'px';
+
+			var packContainerWidth = this.scrollableContentWidth
+				- this.controlTabs.custom.el.offsetWidth
+				- this.controlTabs.history.el.offsetWidth;
+
+			var packTabs = this.scrollableContentEl.getElementsByClassName('sp-pack-tab');
+
+			var packTabWidth = packTabs[0].offsetWidth;
+			var packTabsInRow = parseInt(packContainerWidth / packTabWidth, 10);
+
+			var margin = (packContainerWidth - (packTabsInRow * packTabWidth)) / (2 * packTabsInRow);
+
+			for(var i = 0; i <packTabs.length; i++) {
+				packTabs[i].style.marginLeft = margin + 'px';
+				packTabs[i].style.marginRight = margin + 'px';
+			}
+
+			if (this.scrollableContentEl.scrollWidth > this.scrollableContentEl.offsetWidth) {
+				this.controlTabs.nextPacks.el.style.display = 'inline-block';
+			} else {
+				this.controlTabs.nextPacks.el.style.display = 'none';
+			}
 		}
 	});
 

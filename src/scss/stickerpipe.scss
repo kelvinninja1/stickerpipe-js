@@ -16,7 +16,7 @@ $tabContentSize: 36px;
 
 		.sp-tab-item {
 			display: inline-block;
-			float: left;
+			//float: left;
 			cursor: pointer;
 			padding: 6px;
 
@@ -57,6 +57,11 @@ $tabContentSize: 36px;
 				> span {
 					display: table;
 					opacity: .5;
+				}
+
+
+				&.sp-tab-prev-packs {
+					float: left;
 				}
 
 				&.sp-tab-next-packs,

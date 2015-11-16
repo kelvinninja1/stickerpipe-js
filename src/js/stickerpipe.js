@@ -79,6 +79,17 @@
             this._renderAll();
 
 			this.stView.tabsController.handleClickTab(this.stView.tabsEl, this.config.tabItemClass, (function(el) {
+				switch(+el.getAttribute('data-tab-number')) {
+					case this.stView.tabsController.view.controlTabs.settings.number:
+					case this.stView.tabsController.view.controlTabs.store.number:
+					case this.stView.tabsController.view.controlTabs.nextPacks.number:
+					case this.stView.tabsController.view.controlTabs.prevPacks.number:
+						return;
+						break;
+					default:
+						break;
+				}
+
 				this.tabActive = +el.getAttribute('data-tab-number');
 
                 if(this.tabActive >= 0) this.stickersModel[this.tabActive].newPack = false;

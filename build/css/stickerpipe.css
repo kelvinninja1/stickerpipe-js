@@ -61,7 +61,6 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   white-space: nowrap; }
   .sticker-pipe .sp-tabs .sp-tab-item {
     display: inline-block;
-    float: left;
     cursor: pointer;
     padding: 6px; }
     .sticker-pipe .sp-tabs .sp-tab-item img {
@@ -88,6 +87,8 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
       .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab > span {
         display: table;
         opacity: .5; }
+      .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-prev-packs {
+        float: left; }
       .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-next-packs, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-store {
         float: right;
         border-left: 1px solid #c8c8c8;

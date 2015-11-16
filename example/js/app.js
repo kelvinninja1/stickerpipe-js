@@ -29,6 +29,8 @@ var App = _makeClass(function(options) {
 	$stickerPipeStore: null,
 	$stickersToggle: null,
 
+	isRenderStickers: false,
+
 	init: function() {
 
 		this.$window = $(window);
@@ -112,16 +114,7 @@ var App = _makeClass(function(options) {
 
 		});
 
-		this.stickers.start();
-
-		this.stickers.onClickSticker((function(text) {
-			this.sendMessage(true, text);
-		}).bind(this));
-
-
-		this.stickers.onClickCustomTab(function() {
-			alert('customTab');
-		});
+		//this.stickers.start();
 	},
 	initMessageBox: function() {
 		var $textarea = this.$messageBox.find('textarea'),
@@ -189,6 +182,21 @@ var App = _makeClass(function(options) {
 		})).animate({ scrollTop: this.$messages[0].scrollHeight }, 1000);
 	},
 
+	startSticker: function() {
+		this.stickers.start();
+		this.isRenderStickers = true;
+		this.resizeWindow();
+
+		this.stickers.onClickSticker((function(text) {
+			this.sendMessage(true, text);
+		}).bind(this));
+
+
+		this.stickers.onClickCustomTab(function() {
+			alert('customTab');
+		});
+	},
+
 	openStickerPipeBlock: function(completeCallback) {
 
 		if (this.$stickersToggle.hasClass('active')) {
@@ -231,6 +239,9 @@ var App = _makeClass(function(options) {
 		this.$stickerPipeStore.hide();
 
 		this.openStickerPipeBlock((function() {
+			if (!this.isRenderStickers) {
+				this.startSticker();
+			}
 			if (packName) {
 				this.stickers.renderCurrentTab(packName);
 			}
