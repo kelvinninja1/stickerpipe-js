@@ -85,7 +85,7 @@ $tabContentSize: 36px;
 			}
 
 			&.sp-pack-tab {
-				&.sp-new-pack::before {
+				&.sp-new-pack::after {
 					content: "";
 					width: 10px;
 					height: 10px;
@@ -94,10 +94,7 @@ $tabContentSize: 36px;
 					background-color: #f60;
 					border-radius: 50%;
 					margin-left: 29px;
-					margin-top: 26px;
-
-					// todo
-					z-index: 2;
+					margin-top: -10px;
 				}
 			}
 		}

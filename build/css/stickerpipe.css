@@ -98,7 +98,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
       .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-prev-packs, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-next-packs {
         padding-left: 6px;
         padding-right: 6px; }
-    .sticker-pipe .sp-tabs .sp-tab-item.sp-pack-tab.sp-new-pack::before {
+    .sticker-pipe .sp-tabs .sp-tab-item.sp-pack-tab.sp-new-pack::after {
       content: "";
       width: 10px;
       height: 10px;
@@ -107,8 +107,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
       background-color: #f60;
       border-radius: 50%;
       margin-left: 29px;
-      margin-top: 26px;
-      z-index: 2; }
+      margin-top: -10px; }
 
 .sticker-pipe .sp-stickers {
   background: #fafafa;

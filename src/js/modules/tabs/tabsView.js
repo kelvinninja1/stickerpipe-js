@@ -88,6 +88,7 @@
 			this.scrollableContentEl.style.whiteSpace = 'nowrap';
 			this.scrollableContentEl.style.overflow = 'hidden';
 			this.scrollableContentEl.style.display = 'flex';
+			this.scrollableContentEl.style.position = 'relative';
 
 			this.el.appendChild(this.scrollableContentEl);
 
