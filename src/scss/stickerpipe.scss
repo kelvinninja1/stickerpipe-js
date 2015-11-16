@@ -87,16 +87,16 @@ $tabContentSize: 36px;
 			&.sp-pack-tab {
 				&.sp-new-pack::before {
 					content: "";
-					width: 15px;
-					height: 15px;
+					width: 10px;
+					height: 10px;
 					display: block;
 					position: absolute;
 					background-color: #f60;
 					border-radius: 50%;
-					margin-left: 36px;
-					margin-top: 36px;
+					margin-left: 29px;
+					margin-top: 26px;
 
-					/* todo */
+					// todo
 					z-index: 2;
 				}
 			}

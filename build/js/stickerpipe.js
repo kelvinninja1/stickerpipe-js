@@ -677,10 +677,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 		onWindowResize: function() {
 
-			if (this.currentPage > 0) {
-				this.controlTabs.prevPacks.el.style.display = 'inline-block';
-			} else {
-				this.controlTabs.prevPacks.el.style.display = 'none';
+			if (this.controlTabs.prevPacks.el) {
+				if (this.currentPage > 0) {
+					this.controlTabs.prevPacks.el.style.display = 'inline-block';
+				} else {
+					this.controlTabs.prevPacks.el.style.display = 'none';
+				}
 			}
 
 			this.scrollableContentWidth = this.el.parentElement.offsetWidth
