@@ -98,7 +98,7 @@
 
 			//this.renderPackTab(stickerPacks[0], 0, tabActive);
 
-			for (var j = 0; j < 6; j++) {
+			for (var j = 0; j < 1; j++) {
 				for (var i = 0; i < stickerPacks.length; i++) {
 					this.renderPackTab(stickerPacks[i], i, tabActive);
 				}
