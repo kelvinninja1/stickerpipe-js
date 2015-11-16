@@ -14,4 +14,3 @@ document.addEventListener("DOMContentLoaded", function(event) {
     ga('stickerTracker.send', 'pageview');
 
 });
-

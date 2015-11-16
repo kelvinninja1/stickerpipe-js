@@ -6,7 +6,7 @@
     "Dmitry Shevchuk shevchuk@908.dp.ua"
   ],
   "description": "Stickerpipe-js is a javascript library for fast injection stickers in your project",
-  "main": "dist/stickers.min.js",
+  "main": "build/js/stickerpipe.min.js",
   "keywords": [
     "stickers",
     "stickerpipe",

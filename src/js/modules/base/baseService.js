@@ -3,7 +3,7 @@
 
     Plugin.StickersModule = Plugin.StickersModule || {};
 
-    function BaseService(Config) {
+    Plugin.StickersModule.BaseService = function(Config) {
 
         var parseCountStat = 0,
             parseCountWithStickerStat = 0;
@@ -292,8 +292,6 @@
 			}
         };
     }
-
-    Plugin.StickersModule.BaseService = BaseService;
 
 })(window,
     StickersModule.StickerHelper,

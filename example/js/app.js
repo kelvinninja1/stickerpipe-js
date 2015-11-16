@@ -21,22 +21,24 @@ var App = _makeClass(function(options) {
 	currentUser: {},
 
 	$window: null,
+	$navbar: null,
 	$messages: null,
 	$messageBox: null,
-	$stickerPipe: null,
+	$stickerPipeBlock: null,
 	$stickerPipeStickers: null,
 	$stickerPipeStore: null,
-	$stickerPipeButton: null,
+	$stickersToggle: null,
 
 	init: function() {
 
 		this.$window = $(window);
+		this.$navbar = $('.navbar');
 		this.$messages = $('#messages');
-		this.$messageBox = $('.message-box');
-		this.$stickerPipe = $('.sticker-pipe');
-		this.$stickerPipeStickers = $('.stickers-block');
-		this.$stickerPipeStore = $('.store');
-		this.$stickerPipeButton = this.$messageBox.find('.show-stickers');
+		this.$messageBox = $('#messageBox');
+		this.$stickerPipeBlock = $('#stickerPipe');
+		this.$stickerPipeStickers = $('#stickers');
+		this.$stickerPipeStore = $('#store');
+		this.$stickersToggle = this.$messageBox.find('#stickersToggle');
 
 		this.fetchRandomUsers().done((function() {
 			this.sendMessage();
@@ -75,16 +77,8 @@ var App = _makeClass(function(options) {
 	initStickers: function() {
 		this.stickers = new Stickers({
 
-			tabContainerId: 'stickersTabs',
-			tabItemClass: 'sttab_item',
-
-			stickersContainerId: 'stickers',
-			stickerItemClass: 'stitems_item',
-
+			elId: this.$stickerPipeStickers.attr('id'),
 			storeContainerId: this.$stickerPipeStore.attr('id'),
-
-			stickerResolutionType: 'mdpi',
-			tabResolutionType: 'xhdpi',
 
 			htmlForEmptyRecent: '<div class="emptyRecent">empty recent text</div>',
 
@@ -160,8 +154,8 @@ var App = _makeClass(function(options) {
 			sendMessageHandler();
 		});
 
-		this.$stickerPipeButton.on('click', (function() {
-			if (this.$stickerPipeButton.hasClass('active')) {
+		this.$stickersToggle.on('click', (function() {
+			if (this.$stickersToggle.hasClass('active')) {
 				this.closeStickerPipeBlock();
 			} else {
 				this.openStickers();
@@ -197,7 +191,7 @@ var App = _makeClass(function(options) {
 
 	openStickerPipeBlock: function(completeCallback) {
 
-		if (this.$stickerPipeButton.hasClass('active')) {
+		if (this.$stickersToggle.hasClass('active')) {
 			completeCallback && completeCallback();
 			return;
 		}
@@ -205,10 +199,10 @@ var App = _makeClass(function(options) {
 		var messagesHeight = this.$messages.height();
 		this.$messages.attr('data-saved-height', messagesHeight);
 
-		this.$stickerPipeButton.addClass('active');
-		this.$stickerPipe.slideDown({
+		this.$stickersToggle.addClass('active');
+		this.$stickerPipeBlock.slideDown({
 			progress: (function() {
-				this.$messages.height(messagesHeight - this.$stickerPipe.height());
+				this.$messages.height(messagesHeight - this.$stickerPipeBlock.height());
 			}).bind(this),
 			complete: function() {
 				completeCallback && completeCallback();
@@ -216,17 +210,17 @@ var App = _makeClass(function(options) {
 		});
 	},
 	closeStickerPipeBlock: function() {
-		if (!this.$stickerPipeButton.hasClass('active')) {
+		if (!this.$stickersToggle.hasClass('active')) {
 			return;
 		}
 
 		var messagesSavedHeight = this.$messages.attr('data-saved-height');
 
-		this.$stickerPipeButton.removeClass('active');
+		this.$stickersToggle.removeClass('active');
 
-		this.$stickerPipe.slideUp({
+		this.$stickerPipeBlock.slideUp({
 			progress: (function() {
-				this.$messages.height(messagesSavedHeight - this.$stickerPipe.height());
+				this.$messages.height(messagesSavedHeight - this.$stickerPipeBlock.height());
 			}).bind(this)
 		});
 	},
@@ -320,18 +314,14 @@ var App = _makeClass(function(options) {
 	},
 
 	resizeWindow: function() {
-		var $navbar = $('.navbar'),
-			$messageBoxParent = this.$messageBox.parent(),
-			stickersPipeElHeight = $('.sticker-pipe:visible').outerHeight(true) || 0;
-
 
 		this.$messages.height(
 			this.$window.outerHeight(true) -
-			$navbar.offset().top -
-			$navbar.outerHeight(true) -
-			$messageBoxParent.outerHeight(true) -
+			this.$navbar.offset().top -
+			this.$navbar.outerHeight(true) -
+			this.$messageBox.parent().outerHeight(true) -
 			parseInt(this.$messages.css('margin-bottom'), 10) -
-			stickersPipeElHeight
+			(this.$stickerPipeBlock.is(':visible') ? this.$stickerPipeBlock.outerHeight(true) : 0)
 		);
 	}
 });

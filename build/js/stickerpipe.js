@@ -1,7 +1,4 @@
 
-
-/* Begin: js/analytics.js */
-
 document.addEventListener("DOMContentLoaded", function(event) {
 
     if(typeof window.ga === "undefined"){
@@ -18,174 +15,191 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 });
 
-/* End: js/analytics.js */
-/* Begin: js/config_base.js */
 (function(Plugin) {
 
-    Plugin.StickersModule = Plugin.StickersModule || {};
+	Plugin.StickersModule = Plugin.StickersModule || {};
 
-    Plugin.StickersModule.Config = {
+	Plugin.StickersModule.Config = {
 
-        tabContainerId: 'sttab',
-        tabItemClass: 'sttab_item',
+		elId: 'stickerPipe',
+		storeContainerId: 'stickerPipeStore',
 
-        stickersContainerId: 'stitems',
-        stickerItemClass: 'stitems_item',
+		tabItemClass: 'sp-tab-item',
+		stickerItemClass: 'sp-sticker-item',
 
-        storeContainerId: 'ststore',
+		customTabContent: '<span class="sp-icon-face"></span>',
+		historyTabContent: '<span class="sp-icon-clock"></span>',
+		storeTabContent: '<span class="sp-icon-plus"></span>',
+		settingsTabContent: '<span class="sp-icon-settings"></span>',
+		prevPacksTabContent: '<span class="sp-icon-arrow-back"></span>',
+		nextPacksTabContent: '<span class="sp-icon-arrow-forward"></span>',
 
-        domain : 'http://api.stickerpipe.com',
-        baseFolder: 'stk',
+		domain : 'http://api.stickerpipe.com',
+		baseFolder: 'stk',
 
-        stickerResolutionType : 'mdpi',
-        tabResolutionType: 'xxhdpi',
+		htmlForEmptyRecent: '<div class="emptyRecent">Ваши Стикеры</div>',
+		apikey: '72921666b5ff8651f374747bfefaf7b2',
+		clientPacksUrl: 'http://api.stickerpipe.com/api/v1/client-packs',
+		userPacksUrl: 'http://api.stickerpipe.com/api/v1/user/packs',
+		userPackUrl: 'http://api.stickerpipe.com/api/v1/user/pack',
+		trackStatUrl: 'http://api.stickerpipe.com/api/v1/track-statistic',
 
-        htmlForEmptyRecent: '<div class="emptyRecent">Ваши Стикеры</div>',
-        apikey: '72921666b5ff8651f374747bfefaf7b2',
-        clientPacksUrl: 'http://api.stickerpipe.com/api/v1/client-packs',
-        userPacksUrl: 'http://api.stickerpipe.com/api/v1/user/packs',
-        userPackUrl: 'http://api.stickerpipe.com/api/v1/user/pack',
-        trackStatUrl: 'http://api.stickerpipe.com/api/v1/track-statistic',
+		storagePrefix: 'stickerPipe',
+		enableCustomTab: false,
 
-        storagePrefix: 'stickerPipe',
-        enableCustomTab: false,
+		userId: null
 
-        userId: null
-
-    };
+	};
 
 })(window);
-/* End: js/config_base.js */
-/* Begin: js/Lockr.js */
+
+
+(function(Plugin) {
+
+	Plugin.StickersModule = Plugin.StickersModule || {};
+
+	Plugin.StickersModule.Class = function(source) {
+		var _class = function() {
+				this._constructor && this._constructor.apply(this, arguments);
+			},
+			_prototype = _class.prototype || {};
+
+		for (var property in source) {
+			_prototype[property] = source[property];
+		}
+
+		_class.prototype = _prototype;
+
+		return _class;
+
+	};
+
+})(window);
 
 (function(Plugin, Config) {
 
     Plugin.StickersModule = Plugin.StickersModule || {};
-    Plugin.StickersModule.Lockr = {};
 
+    Plugin.StickersModule.Lockr = {
+		prefix: Config.storagePrefix,
 
-    var Lockr = Plugin.StickersModule.Lockr;
+		_getPrefixedKey: function(key, options) {
+			options = options || {};
 
-        Lockr.prefix = Config.storagePrefix;
+			if (options.noPrefix) {
+				return key;
+			} else {
+				return this.prefix + key;
+			}
+		},
 
-        Lockr._getPrefixedKey = function(key, options) {
-            options = options || {};
+		set: function (key, value, options) {
+			var query_key = this._getPrefixedKey(key, options);
 
-            if (options.noPrefix) {
-                return key;
-            } else {
-                return this.prefix + key;
-            }
+			try {
+				localStorage.setItem(query_key, JSON.stringify({
+					data: value
+				}));
+			} catch (e) {
+				console && console.warn('Lockr didn\'t successfully save the "{'+ key +': '+ value +'}" pair, because the localStorage is full.');
+			}
+		},
 
-        };
+		get: function (key, missing, options) {
+			var query_key = this._getPrefixedKey(key, options),
+				value;
 
-        Lockr.set = function (key, value, options) {
-            var query_key = this._getPrefixedKey(key, options);
+			try {
+				value = JSON.parse(localStorage.getItem(query_key));
+			} catch (e) {
+				value = null;
+			}
 
-            try {
-                localStorage.setItem(query_key, JSON.stringify({"data": value}));
-            } catch (e) {
-                if (console) console.warn("Lockr didn't successfully save the '{"+ key +": "+ value +"}' pair, because the localStorage is full.");
-            }
-        };
+			return (value === null) ? missing : (value.data || missing);
+		},
 
-        Lockr.get = function (key, missing, options) {
-            var query_key = this._getPrefixedKey(key, options),
-                value;
+		sadd: function(key, value, options) {
+			var query_key = this._getPrefixedKey(key, options),
+				json;
 
-            try {
-                value = JSON.parse(localStorage.getItem(query_key));
-            } catch (e) {
-                value = null;
-            }
-            if(value === null)
-                return missing;
-            else
-                return (value.data || missing);
-        };
+			var values = this.smembers(key);
 
-        Lockr.sadd = function(key, value, options) {
-            var query_key = this._getPrefixedKey(key, options),
-                json;
+			if (values.indexOf(value) > -1) {
+				return null;
+			}
 
-            var values = Lockr.smembers(key);
+			try {
+				values.push(value);
+				json = JSON.stringify({"data": values});
+				localStorage.setItem(query_key, json);
+			} catch (e) {
+				if (console) {
+					console.log(e);
+					console.warn('Lockr didn\'t successfully add the '+ value +' to '+ key +' set, because the localStorage is full.');
+				}
+			}
+		},
 
-            if (values.indexOf(value) > -1) {
-                return null;
-            }
+		smembers: function(key, options) {
+			var query_key = this._getPrefixedKey(key, options),
+				value;
 
-            try {
-                values.push(value);
-                json = JSON.stringify({"data": values});
-                localStorage.setItem(query_key, json);
-            } catch (e) {
-                console.log(e);
-                if (console) console.warn("Lockr didn't successfully add the "+ value +" to "+ key +" set, because the localStorage is full.");
-            }
-        };
+			try {
+				value = JSON.parse(localStorage.getItem(query_key));
+			} catch (e) {
+				value = null;
+			}
 
-        Lockr.smembers = function(key, options) {
-            var query_key = this._getPrefixedKey(key, options),
-                value;
+			return (value === null) ? [] : (value.data || []);
+		},
 
-            try {
-                value = JSON.parse(localStorage.getItem(query_key));
-            } catch (e) {
-                value = null;
-            }
+		sismember: function(key, value, options) {
+			var query_key = this._getPrefixedKey(key, options);
+			return this.smembers(key).indexOf(value) > -1;
+		},
 
-            if (value === null)
-                return [];
-            else
-                return (value.data || []);
-        };
+		getAll: function () {
+			var keys = Object.keys(localStorage);
 
-        Lockr.sismember = function(key, value, options) {
-            var query_key = this._getPrefixedKey(key, options);
+			return keys.map((function (key) {
+				return this.get(key);
+			}).bind(this));
+		},
 
-            return Lockr.smembers(key).indexOf(value) > -1;
-        };
+		srem: function(key, value, options) {
+			var query_key = this._getPrefixedKey(key, options),
+				json,
+				index;
 
-        Lockr.getAll = function () {
-            var keys = Object.keys(localStorage);
+			var values = this.smembers(key, value);
 
-            return keys.map(function (key) {
-                return Lockr.get(key);
-            });
-        };
+			index = values.indexOf(value);
 
-        Lockr.srem = function(key, value, options) {
-            var query_key = this._getPrefixedKey(key, options),
-                json,
-                index;
+			if (index > -1)
+				values.splice(index, 1);
 
-            var values = Lockr.smembers(key, value);
+			json = JSON.stringify({
+				data: values
+			});
 
-            index = values.indexOf(value);
+			try {
+				localStorage.setItem(query_key, json);
+			} catch (e) {
+				console && console.warn('Lockr couldn\'t remove the ' + value + ' from the set ' + key);
+			}
+		},
 
-            if (index > -1)
-                values.splice(index, 1);
+		rm: function (key) {
+			localStorage.removeItem(key);
+		},
 
-            json = JSON.stringify({"data": values});
-
-            try {
-                localStorage.setItem(query_key, json);
-            } catch (e) {
-                if (console) console.warn("Lockr couldn't remove the "+ value +" from the set "+ key);
-            }
-        };
-
-        Lockr.rm =  function (key) {
-            localStorage.removeItem(key);
-        };
-
-        Lockr.flush = function () {
-            localStorage.clear();
-        };
+		flush: function () {
+			localStorage.clear();
+		}
+    };
 
 })(window, window.StickersModule.Config);
-/* End: js/Lockr.js */
-/* Begin: js/md5.js */
+
 
 (function(Plugin) {
 
@@ -393,12 +407,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		return temp.toLowerCase();
 	};
 
-})(window);/* End: js/md5.js */
-/* Begin: js/helper.js */
+})(window);
 
 (function(Plugin, Lockr, MD5) {
-    Plugin.StickersModule = Plugin.StickersModule || {};
 
+    Plugin.StickersModule = Plugin.StickersModule || {};
 
     Plugin.StickersModule.StickerHelper = {
 
@@ -408,22 +421,27 @@ document.addEventListener("DOMContentLoaded", function(event) {
             }
         },
 
-        mergeOptions: function(obj1, obj2){
-            var obj3 = {};
-            for (var attrname in obj1) { obj3[attrname] = obj1[attrname]; }
-            for (var attrname in obj2) { obj3[attrname] = obj2[attrname]; }
-            return obj3;
+        mergeOptions: function(obj1, obj2) {
+			var obj3 = {};
+
+			for(var attrname in obj1) {
+				obj3[attrname] = obj1[attrname];
+			}
+
+			for(var attrname in obj2) {
+				obj3[attrname] = obj2[attrname];
+			}
+
+			return obj3;
         },
 
-        setEvent: function(eventType, id, className, callback) {
+        setEvent: function(eventType, el, className, callback) {
 
-            document.getElementById(id).addEventListener(eventType, function (event) {
+            el.addEventListener(eventType, function (event) {
 
-                var el = event.target
-                    , found;
+                var el = event.target, found;
 
                 while (el && !(found = el.className.match(className))) {
-
                     el = el.parentElement;
                 }
 
@@ -447,9 +465,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     callback(JSON.parse(xmlhttp.responseText));
                 }
             };
-            xmlhttp.open("GET", url, true);
-            xmlhttp.setRequestHeader("Apikey", apikey);
-            xmlhttp.setRequestHeader("Platform", "JS");
+            xmlhttp.open('GET', url, true);
+            xmlhttp.setRequestHeader('Apikey', apikey);
+            xmlhttp.setRequestHeader('Platform', 'JS');
 
             this.forEach(header, function(value, name) {
                 xmlhttp.setRequestHeader(name, value);
@@ -460,7 +478,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
         ajaxPost: function(url, apikey, data, callback, header) {
             var xmlhttp,
-                uniqUserId = Lockr.get("uniqUserId");
+                uniqUserId = Lockr.get('uniqUserId');
 
             xmlhttp = new XMLHttpRequest();
 
@@ -471,16 +489,16 @@ document.addEventListener("DOMContentLoaded", function(event) {
             };
 
 
-            if(typeof uniqUserId == "undefined") {
+            if(typeof uniqUserId == 'undefined') {
                 uniqUserId = + new Date();
-                Lockr.set("uniqUserId", uniqUserId);
+                Lockr.set('uniqUserId', uniqUserId);
             }
 
-            xmlhttp.open("POST", url, true);
-            xmlhttp.setRequestHeader("Apikey", apikey);
-            xmlhttp.setRequestHeader("Platform", "JS");
-            xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            xmlhttp.setRequestHeader("DeviceId", uniqUserId);
+            xmlhttp.open('POST', url, true);
+            xmlhttp.setRequestHeader('Apikey', apikey);
+            xmlhttp.setRequestHeader('Platform', 'JS');
+            xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xmlhttp.setRequestHeader('DeviceId', uniqUserId);
 
             this.forEach(header, function(value, name) {
                 xmlhttp.setRequestHeader(name, value);
@@ -496,35 +514,198 @@ document.addEventListener("DOMContentLoaded", function(event) {
     };
 
 })(window, window.StickersModule.Lockr, window.StickersModule.MD5);
-/* End: js/helper.js */
-/* Begin: js/controller_base.js */
 
-(function(Plugin, StickerHelper) {
 
-    Plugin.StickersModule = Plugin.StickersModule || {};
+(function(Plugin, Module) {
 
-    function BaseController() {
 
-        this.handleClickTab = function(itemsBlockId, itemsClassName, callback) {
-            StickerHelper.setEvent("click", itemsBlockId, itemsClassName, callback);
-        };
+	Module.TabsView = Module.Class({
 
-        this.handleClickSticker = function( itemsBlockId, itemsClassName, callback) {
-            StickerHelper.setEvent("click", itemsBlockId, itemsClassName, callback);
-        };
+		el: null,
+		scrollableContentEl: null,
 
-    };
+		controlTabs: null,
+		config: null,
 
-    Plugin.StickersModule.BaseController = BaseController;
+		_constructor: function(config) {
+			this.config = config;
 
-})(window, window.StickersModule.StickerHelper);/* End: js/controller_base.js */
-/* Begin: js/service_base.js */
+			this.controlTabs = {
+				custom: {
+					id: 'spTabCustom',
+					class: 'sp-tab-custom',
+					content: this.config.customTabContent,
+					number: -1,
+					el: null
+				},
+				history: {
+					id: 'spTabHistory',
+					class: 'sp-tab-history',
+					content: this.config.historyTabContent,
+					number: -2,
+					el: null
+				},
+				settings: {
+					id: 'spTabSettings',
+					class: 'sp-tab-settings',
+					content: this.config.settingsTabContent,
+					number: -3,
+					el: null
+				},
+				store: {
+					id: 'spTabSettings',
+					class: 'sp-tab-store',
+					content: this.config.storeTabContent,
+					number: -4,
+					el: null
+				},
+				prevPacks: {
+					id: 'spTabPrevPacks',
+					class: 'sp-tab-prev-packs',
+					content: this.config.prevPacksTabContent,
+					number: -5,
+					el: null
+				},
+				nextPacks: {
+					id: 'spTabNextPacks',
+					class: 'sp-tab-next-packs',
+					content: this.config.nextPacksTabContent,
+					number: -6,
+					el: null
+				}
+			};
+		},
+
+		// el == tabsEl
+		render: function(el, stickerPacks, tabActive) {
+
+			this.el = el;
+			this.el.innerHTML = '';
+
+			this.renderControlTab(this.el, this.controlTabs.prevPacks, tabActive);
+
+			// scrollable container
+
+			this.scrollableContentEl = document.createElement('div');
+			this.scrollableContentEl.style.float = 'left';
+
+			this.scrollableContentEl.style.width = '300px';
+			this.scrollableContentEl.style.whiteSpace = 'nowrap';
+			this.scrollableContentEl.style.borderRight = '1px solid red';
+			this.scrollableContentEl.style.overflow = 'scroll';
+
+			//float: left;
+			//width: 300px;
+			//white-space: nowrap !important;
+			///* overflow-x: scroll; */
+			//border-right: 1px solid red;
+			///* height: 50px; */
+			///* overflow-y: hidden; */
+			//overflow: scroll;
+
+
+			this.el.appendChild(this.scrollableContentEl);
+
+			// ********************
+
+			//this.config.enableCustomTab && this.renderControlTab(this.scrollableContentEl, this.controlTabs.custom, tabActive);
+			this.renderControlTab(this.scrollableContentEl, this.controlTabs.history, tabActive);
+
+			this.renderPackTab(stickerPacks[0], 0, tabActive);
+
+			//for (var j = 0; j < 3; j++) {
+			//	for (var i = 0; i < stickerPacks.length; i++) {
+			//		this.renderPackTab(stickerPacks[i], i, tabActive);
+			//	}
+			//}
+
+			this.renderControlTab(this.scrollableContentEl, this.controlTabs.settings, tabActive);
+			this.renderControlTab(this.el, this.controlTabs.store, tabActive);
+			this.renderControlTab(this.el, this.controlTabs.nextPacks, tabActive);
+		},
+		renderControlTab: function(el, tab, tabActive) {
+			tab.el = this.renderTab(el, tab.id, [tab.class, 'sp-control-tab'], tab.number, tab.content, tabActive);
+			return tab.el;
+		},
+		renderPackTab: function(pack, number, tabActive) {
+			var classes = ['sp-pack-tab'];
+
+			if(pack.newPack) {
+				classes.push('sp-new-pack');
+			}
+
+			var iconSrc = this.config.domain + '/' +
+				this.config.baseFolder + '/' +
+				pack.pack_name + '/tab_icon_' +
+				this.config.tabResolutionType + '.png';
+
+			var content = '<img src=' + iconSrc + '>';
+
+			this.renderTab(this.scrollableContentEl, null, classes, number, content, tabActive);
+		},
+		renderTab: function(el ,id, classes, dataTabNumber, content, tabActive) {
+			var tabEl = document.createElement('span');
+
+			if (id) {
+				tabEl.id = id;
+			}
+
+			classes.push(this.config.tabItemClass);
+
+			if (tabActive == dataTabNumber) {
+				classes.push('active');
+			}
+
+			tabEl.classList.add.apply(tabEl.classList, classes);
+			tabEl.setAttribute('data-tab-number', dataTabNumber);
+			tabEl.innerHTML = content;
+
+			el.appendChild(tabEl);
+
+			return tabEl;
+		}
+	});
+
+})(window, window.StickersModule);
+
+(function(Plugin, Module) {
+
+	var StickerHelper = Module.StickerHelper;
+
+	Plugin.StickersModule.TabsController = Module.Class({
+
+		config: null,
+		view: null,
+
+		_constructor: function(config) {
+			this.config = config;
+			this.view = new Module.TabsView(this.config);
+		},
+
+		handleClickTab: function(el, itemsClassName, callback) {
+			StickerHelper.setEvent('click', el, itemsClassName, callback);
+		}
+
+	});
+
+})(window, window.StickersModule);
+
+(function(Plugin, Module) {
+
+    Plugin.StickersModule.BaseController = Plugin.StickersModule.Class({
+
+        handleClickSticker: function(el, itemsClassName, callback) {
+            Module.StickerHelper.setEvent('click', el, itemsClassName, callback);
+        }
+    });
+
+})(window, window.StickersModule);
 
 (function(Plugin, StickerHelper, Lockr) {
 
     Plugin.StickersModule = Plugin.StickersModule || {};
 
-    function BaseService(Config) {
+    Plugin.StickersModule.BaseService = function(Config) {
 
         var parseCountStat = 0,
             parseCountWithStickerStat = 0;
@@ -814,143 +995,235 @@ document.addEventListener("DOMContentLoaded", function(event) {
         };
     }
 
-    Plugin.StickersModule.BaseService = BaseService;
-
 })(window,
     StickersModule.StickerHelper,
     StickersModule.Lockr
-);/* End: js/service_base.js */
-/* Begin: js/view_base.js */
+);
 
-(function(Plugin, StickerHelper, BaseService) {
+(function(Plugin, Module) {
 
-	function BaseView(Config) {
+	var StickerHelper = Module.StickerHelper;
 
-		var clearBlock = function(idBlock) {
-			var conteinerEl = document.getElementById(idBlock);
-			conteinerEl.setAttribute("style", "display:block");
-			conteinerEl.innerHTML = "";
-		};
+	Plugin.StickersModule.BaseView = Module.Class({
 
-		this.hideBlock = function(idBlock) {
-			var conteinerEl = document.getElementById(idBlock);
-			conteinerEl.setAttribute("style", "display:none");
-		};
+		config: null,
+		service: null,
 
-		this.renderTabs = function(stickerPacks, tabActive, tabContainerId, tabItemClass) {
-			var conteinerEl = document.getElementById(tabContainerId),
-				iteratorTabs = 0,
-				newTabClass = "",
-				tabActiveClass = "";
+		el: null,
+		tabsEl:  null,
+		stickersEl:  null,
 
-			clearBlock(tabContainerId);
+		controlTabs:  {},
 
-			if(Config.enableCustomTab) {
-				tabActiveClass = tabActive == -2 ? " active" : "";
-				conteinerEl.innerHTML += "<span id = \"custom_tab\" class= \"" + tabItemClass + tabActiveClass + "\" data-tab-number = \"-2\" ></span>";
-			}
+		tabsController: null,
 
-			tabActiveClass = tabActive == -1 ? " active" : "";
-			conteinerEl.innerHTML += "<span id = \"recents_tab\" class= \"" + tabItemClass + tabActiveClass +  "\" data-tab-number = \"-1\" ></span>";
+		_constructor: function(config, service) {
+			this.config = config;
+			this.service = service;
 
-			StickerHelper.forEach(stickerPacks, function(pack) {
+			//this.controlTabs = {
+			//	custom: {
+			//		id: 'spTabCustom',
+			//		class: 'sp-tab-custom',
+			//		content: this.config.customTabContent,
+			//		number: -1,
+			//		el: null
+			//	},
+			//	history: {
+			//		id: 'spTabHistory',
+			//		class: 'sp-tab-history',
+			//		content: this.config.historyTabContent,
+			//		number: -2,
+			//		el: null
+			//	},
+			//	settings: {
+			//		id: 'spTabSettings',
+			//		class: 'sp-tab-settings',
+			//		content: this.config.settingsTabContent,
+			//		number: -3,
+			//		el: null
+			//	},
+			//	store: {
+			//		id: 'spTabSettings',
+			//		class: 'sp-tab-store',
+			//		content: this.config.storeTabContent,
+			//		number: -4,
+			//		el: null
+			//	},
+			//	prevPacks: {
+			//		id: 'spTabPrevPacks',
+			//		class: 'sp-tab-prev-packs',
+			//		content: this.config.prevPacksTabContent,
+			//		number: -5,
+			//		el: null
+			//	},
+			//	nextPacks: {
+			//		id: 'spTabNextPacks',
+			//		class: 'sp-tab-next-packs',
+			//		content: this.config.nextPacksTabContent,
+			//		number: -6,
+			//		el: null
+			//	}
+			//};
 
-				var tabActiveClass = newTabClass = "",
-					icon_src,
-					packItem;
+			this.tabsController = new Module.TabsController(this.config);
+		},
 
-				if(tabActive === iteratorTabs) {
-					tabActiveClass = " active";
-				}
+		clearBlock: function(el) {
+			el.setAttribute('style', 'display:block');
+			el.innerHTML = '';
+		},
 
-				if(pack.newPack) {
-					newTabClass = " stnewtab";
-				}
+		render: function(elId) {
 
-				icon_src = Config.domain +
-					"/" +
-					Config.baseFolder +
-					"/" +
-					pack.pack_name +
-					"/tab_icon_" +
-					Config.tabResolutionType +
-					".png";
+			this.el = document.getElementById(elId);
 
-				packItem = "<span class= \"" + tabItemClass + newTabClass + tabActiveClass + "\" data-tab-number = " + iteratorTabs + " > <img src=" + icon_src + "></span>";
+			this.clearBlock(this.el);
 
-				conteinerEl.innerHTML += packItem;
-				iteratorTabs++;
+			this.el.classList.add('sticker-pipe');
 
-			});
-		};
+			this.tabsEl = document.createElement('div');
+			this.tabsEl.classList.add('sp-tabs');
 
-		this.renderUseStickers = function(latesUseSticker, stickerContainerId, stickerItemClass) {
-			var conteinerEl = document.getElementById(stickerContainerId),
-				base_service = new BaseService(Config);
+			this.stickersEl = document.createElement('div');
+			this.stickersEl.classList.add('sp-stickers');
 
-			clearBlock(stickerContainerId);
+			this.el.appendChild(this.tabsEl);
+			this.el.appendChild(this.stickersEl);
+		},
 
-			if(latesUseSticker.length == 0) {
+		renderTabs: function(stickerPacks, tabActive) {
 
-				conteinerEl.innerHTML += Config.htmlForEmptyRecent;
+			this.tabsController.view.render(this.tabsEl, stickerPacks, tabActive);
+
+			//this.clearBlock(this.tabsEl);
+			//
+			//this.renderControlTab(this.controlTabs.prevPacks, tabActive);
+			//this.config.enableCustomTab && this.renderControlTab(this.controlTabs.custom, tabActive);
+			//this.renderControlTab(this.controlTabs.history, tabActive);
+			//
+			//for (var j = 0; j < 1; j++) {
+			//	for (var i = 0; i < stickerPacks.length; i++) {
+			//		this.renderPackTab(stickerPacks[i], i, tabActive);
+			//	}
+			//}
+			//
+			//this.renderControlTab(this.controlTabs.settings, tabActive);
+			//this.renderControlTab(this.controlTabs.store, tabActive);
+			//this.renderControlTab(this.controlTabs.nextPacks, tabActive);
+		},
+		//renderPackTab: function(pack, number, tabActive) {
+		//	var classes = ['sp-pack-tab'];
+		//
+		//	if(pack.newPack) {
+		//		classes.push('stnewtab');
+		//	}
+		//
+		//	var iconSrc = this.config.domain + '/' +
+		//		this.config.baseFolder + '/' +
+		//		pack.pack_name + '/tab_icon_' +
+		//		this.config.tabResolutionType + '.png';
+		//
+		//	var content = '<img src=' + iconSrc + '>';
+		//
+		//	this.renderTab(null, classes, number, content, tabActive);
+		//},
+		//renderControlTab: function(tab, tabActive) {
+		//	tab.el = this.renderTab(tab.id, [tab.class, 'sp-control-tab'], tab.number, tab.content, tabActive);
+		//	return tab.el;
+		//},
+		//renderTab: function(id, classes, dataTabNumber, content, tabActive) {
+		//	var tabEl = document.createElement('span');
+		//
+		//	if (id) {
+		//		tabEl.id = id;
+		//	}
+		//
+		//	classes.push(this.config.tabItemClass);
+		//
+		//	if (tabActive == dataTabNumber) {
+		//		classes.push('active');
+		//	}
+		//
+		//	tabEl.classList.add.apply(tabEl.classList, classes);
+		//	tabEl.setAttribute('data-tab-number', dataTabNumber);
+		//	tabEl.innerHTML = content;
+		//
+		//	this.tabsEl.appendChild(tabEl);
+		//
+		//	return tabEl;
+		//},
+
+		renderUseStickers: function(latesUseSticker, stickerItemClass) {
+			var self = this;
+
+			this.clearBlock(self.stickersEl);
+
+			if (latesUseSticker.length == 0) {
+
+				this.stickersEl.innerHTML += this.config.htmlForEmptyRecent;
 
 				return false;
-			};
+			}
 
 
-			StickerHelper.forEach(latesUseSticker, function(sticker) {
+			StickerHelper.forEach(latesUseSticker, (function(sticker) {
 
-				var icon_src = base_service.parseStickerFromText("[[" + sticker.code + "]]"),
+				var icon_src = this.service.parseStickerFromText("[[" + sticker.code + "]]"),
 					packItem;
 
-					packItem = "<span data-sticker-string=" + sticker.code +" class=" + stickerItemClass + "> <img src=" + icon_src.url + "></span>";
+				packItem = "<span data-sticker-string=" + sticker.code +" class=" + stickerItemClass + "> <img src=" + icon_src.url + "></span>";
 
-					conteinerEl.innerHTML += packItem;
-			});
+				self.stickersEl.innerHTML += packItem;
+			}).bind(this));
 
-		};
+		},
 
-		this.renderStickers = function(stickerPacks, tabActive, stickerContainerId, stickerItemClass) {
-			var conteinerEl = document.getElementById(stickerContainerId),
+		renderCustomBlock: function() {
+			this.clearBlock(this.stickersEl);
+		},
+
+		renderStickers: function(stickerPacks, tabActive, stickerItemClass) {
+			var self = this,
 				tabNumber = 0;
 
-			clearBlock(stickerContainerId);
+			this.clearBlock(this.stickersEl);
 
 			StickerHelper.forEach(stickerPacks, function(pack) {
 
-				if(tabNumber == tabActive) {
+				if (tabNumber == tabActive) {
 					StickerHelper.forEach(pack.stickers, function(sticker) {
 
-						var icon_src = Config.domain +
-									   "/" +
-									   Config.baseFolder +
-									   "/" +
-									   pack.pack_name +
-									   "/" +
-									   sticker.name +
-									   "_" +
-									   Config.stickerResolutionType +
-									   ".png",
+						var icon_src = self.config.domain +
+								"/" +
+								self.config.baseFolder +
+								"/" +
+								pack.pack_name +
+								"/" +
+								sticker.name +
+								"_" +
+								self.config.stickerResolutionType +
+								".png",
 
 							packItem = "<span data-sticker-string=" + pack.pack_name + "_" + sticker.name +" class=" + stickerItemClass + "> <img src=" + icon_src + "></span>";
 
-						conteinerEl.innerHTML += packItem;
+						self.stickersEl.innerHTML += packItem;
 					});
-				};
+				}
 
 				tabNumber++;
 			});
-		};
+		},
 
-		this.renderStorePack = function(packName) {
+		renderStorePack: function(packName) {
 
-			var storeContainerEl = document.getElementById(Config.storeContainerId),
+			var storeEl = document.getElementById(this.config.storeContainerId),
 				iframe = document.createElement('iframe'),
 				urlParams = {
-					apiKey: Config.apikey,
+					apiKey: this.config.apikey,
 					platform: 'JS',
-					userId: Config.userId,
-					density: Config.stickerResolutionType
+					userId: this.config.userId,
+					density: this.config.stickerResolutionType
 				},
 				urlSerialize = function(obj) {
 					var str = [];
@@ -959,26 +1232,23 @@ document.addEventListener("DOMContentLoaded", function(event) {
 							str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
 						}
 					return str.join('&');
-                };
+				};
 
-			storeContainerEl.innerHTML = '';
-			storeContainerEl.appendChild(iframe);
+			storeEl.classList.add('sp-store');
+			storeEl.innerHTML = '';
+			storeEl.appendChild(iframe);
 
 			iframe.style.width = '100%';
 			iframe.style.height = '100%';
 			iframe.style.border = '0';
 
 			// todo
-			iframe.src = 'http://work.stk.908.vc/api/v1/web?' + urlSerialize(urlParams) + '#/packs/' + packName;
-			//iframe.src = 'http://localhost/stickerpipe/store/build?' + urlSerialize(urlParams) + '#/packs/' + packName;
-		};
-	}
+			//iframe.src = 'http://work.stk.908.vc/api/v1/web?' + urlSerialize(urlParams) + '#/packs/' + packName;
+			iframe.src = 'http://localhost/stickerpipe/store/build?' + urlSerialize(urlParams) + '#/packs/' + packName;
+		}
+	});
 
-
-	Plugin.StickersModule.BaseView = BaseView;
-
-})(window, StickersModule.StickerHelper, StickersModule.BaseService);/* End: js/view_base.js */
-/* Begin: js/JsApiInterface.js */
+})(window, window.StickersModule);
 
 (function(Plugin, BaseService) {
 
@@ -1017,59 +1287,94 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	};
 
 })(window, StickersModule.BaseService);
-/* End: js/JsApiInterface.js */
 
-(function(Plugin, _module) {
+
+(function(Plugin, Modules) {
+
+	var helper = Modules.StickerHelper;
 
     function Stickers(configObj) {
 
-        var Config = _module.StickerHelper.mergeOptions(_module.Config, configObj),
-            stService = new _module.BaseService(Config),
-            stView = new _module.BaseView(Config),
-            stController = new _module.BaseController(Config),
-            configObj = configObj || {},
-            stickersModel = {},
-            tabActive = 0;
+		this.init = function() {
+			this.initConfigs(configObj);
 
-        Plugin.JsApiInterface && Plugin.JsApiInterface._setConfigs(Config);
+			this.stService = new Modules.BaseService(this.config);
+			this.stView = new Modules.BaseView(this.config, this.stService);
+			this.stController = new Modules.BaseController(this.config);
+			this.stickersModel = {};
+			this.tabActive = 0;
 
-        var _renderAll = function() {
-            
-            stView.renderTabs(stickersModel, tabActive, Config.tabContainerId, Config.tabItemClass);
+			Plugin.JsApiInterface && Plugin.JsApiInterface._setConfigs(this.config);
+		};
 
-            if(tabActive == -1) {
-                stView.renderUseStickers(stService.getLatestUse(), Config.stickersContainerId, Config.stickerItemClass);
-            } else if (tabActive == -2) {
-                stView.hideBlock(Config.stickersContainerId);
-            } else {
-                stView.renderStickers(stickersModel, tabActive, Config.stickersContainerId, Config.stickerItemClass);
-            }
+		this.initConfigs = function(configObj) {
+			this.config = helper.mergeOptions(Modules.Config, configObj);
+			this.config = helper.mergeOptions(this.config, {
+				stickerResolutionType : 'mdpi',
+				tabResolutionType: 'hdpi'
+			});
 
+			if (window.devicePixelRatio == 2) {
+				this.config = helper.mergeOptions(this.config, {
+					stickerResolutionType : 'xhdpi',
+					tabResolutionType: 'xxhdpi'
+				});
+			}
+		};
+
+        this._renderAll = function() {
+
+			this.stView.renderTabs(this.stickersModel, this.tabActive);
+
+			switch (this.tabActive) {
+				case this.stView.tabsController.view.controlTabs.custom.number:
+					this.stView.renderCustomBlock();
+					break;
+				case this.stView.tabsController.view.controlTabs.history.number:
+					this.stView.renderUseStickers(this.stService.getLatestUse(), this.config.stickerItemClass);
+					break;
+				case this.stView.tabsController.view.controlTabs.settings.number:
+					console.log('click on settings tab');
+					break;
+				case this.stView.tabsController.view.controlTabs.store.number:
+					console.log('click on store tab');
+					break;
+				case this.stView.tabsController.view.controlTabs.nextPacks.number:
+					console.log('click on nextPacks tab');
+					break;
+				case this.stView.tabsController.view.controlTabs.prevPacks.number:
+					console.log('click on prevPacks tab');
+					break;
+				default:
+					this.stView.renderStickers(this.stickersModel, this.tabActive, this.config.stickerItemClass);
+					break;
+			}
         };
 
-        var  _init = function() {
+        this._init = function() {
 
-            _renderAll();
+            this._renderAll();
 
-            stController.handleClickTab(Config.tabContainerId, Config.tabItemClass, function(el) {
-                tabActive = +el.getAttribute("data-tab-number");
+			this.stView.tabsController.handleClickTab(this.stView.tabsEl, this.config.tabItemClass, (function(el) {
+				this.tabActive = +el.getAttribute('data-tab-number');
 
-                if(tabActive >= 0) stickersModel[tabActive].newPack = false;
-                stService.setPacksToStorage(stickersModel);
+                if(this.tabActive >= 0) this.stickersModel[this.tabActive].newPack = false;
+				this.stService.setPacksToStorage(this.stickersModel);
 
-                _renderAll();
-            });
+                this._renderAll();
+            }).bind(this));
 
-            stController.handleClickSticker(Config.stickersContainerId, Config.stickerItemClass, function(el) {
-                var stickerAttribute = el.getAttribute("data-sticker-string"),
+			this.stController.handleClickSticker(this.stView.stickersEl, this.config.stickerItemClass, (function(el) {
+
+                var stickerAttribute = el.getAttribute('data-sticker-string'),
                     nowDate = new Date().getTime()/1000|0;
 
 
-                _module.StickerHelper.ajaxPost(Config.trackStatUrl, Config.apikey, [
+				helper.ajaxPost(this.config.trackStatUrl, this.config.apikey, [
                     {
                         action: 'use',
                         category: 'sticker',
-                        label: "[[" + stickerAttribute + "]]",
+                        label: '[[' + stickerAttribute + ']]',
                         time: nowDate
                     }
 
@@ -1077,37 +1382,40 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
                 ga('stickerTracker.send', 'event', 'sticker', stickerAttribute.split("_")[0], stickerAttribute.split("_")[1], 1);
 
-                stService.addToLatestUse(stickerAttribute)
-                _renderAll();
+				this.stService.addToLatestUse(stickerAttribute);
+                this._renderAll();
 
-            });
+            }).bind(this));
 
         };
 
         this.fetchPacks = function(attrs) {
-            stService.updatePacks(function(stickerPacks) {
-                stickersModel = stickerPacks;
+			this.stService.updatePacks((function(stickerPacks) {
+				this.stickersModel = stickerPacks;
 
                 if(!attrs.onlyFetch){
-                    _init();
+                    this._init();
                 }
 
 
                 if(attrs.callback) attrs.callback.apply();
-            });
+            }).bind(this));
         };
 
         this.start = function(callback) {
             var storageStickerData;
 
-            tabActive = -1;
+			//this.tabActive = this.stView.controlTabs.history.number;
+			this.tabActive = this.stView.tabsController.view.controlTabs.history.number;
 
-            storageStickerData =  stService.getPacksFromStorage();
+            storageStickerData =  this.stService.getPacksFromStorage();
+
+			this.stView.render(this.config.elId);
 
             if(storageStickerData.actual) {
 
-                stickersModel = storageStickerData.packs;
-                _init();
+				this.stickersModel = storageStickerData.packs;
+                this._init();
 
                 if(callback) callback.apply();
             } else {
@@ -1122,17 +1430,17 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
         this.onClickSticker = function(callback, context) {
 
-            stController.handleClickSticker(Config.stickersContainerId, Config.stickerItemClass, function(el) {
-                callback.call(context, "[[" + el.getAttribute("data-sticker-string") + "]]");
+			this.stController.handleClickSticker(this.stView.stickersEl, this.config.stickerItemClass, function(el) {
+                callback.call(context, '[[' + el.getAttribute('data-sticker-string') + ']]');
             });
 
         };
 
         this.onClickCustomTab = function(callback, context) {
 
-            stController.handleClickTab(Config.tabContainerId, Config.tabItemClass, function(el) {
+			this.stView.tabsController.handleClickTab(this.stView.tabsEl, this.config.tabItemClass, function(el) {
 
-                if (el.getAttribute("id") == "custom_tab" ) {
+                if (el.getAttribute('id') == 'spTabCustom' ) {
                     callback.call(context, el);
                 }
 
@@ -1142,58 +1450,60 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
         this.onClickTab = function(callback, context) {
 
-            stController.handleClickTab(Config.tabContainerId, Config.tabItemClass, function(el) {
+			this.stView.tabsController.handleClickTab(this.stView.tabsEl, this.config.tabItemClass, function(el) {
                 callback.call(context, el);
             });
 
         };
 
         this.getNewStickersFlag = function() {
-            return stService.getNewStickersFlag(stService.getPacksFromStorage().packs || []);
+            return this.stService.getNewStickersFlag(this.stService.getPacksFromStorage().packs || []);
         };
 
         this.resetNewStickersFlag = function() {
-            return stService.resetNewStickersFlag();
+            return this.stService.resetNewStickersFlag();
         };
 
         this.parseStickerFromText = function(text) {
-            return stService.parseStickerFromText(text);
+            return this.stService.parseStickerFromText(text);
         };
 
         this.renderCurrentTab = function(tabName) {
-            var obj = stService.getPacksFromStorage();
+            var obj = this.stService.getPacksFromStorage();
 
-            this.start();
+            //this.start(); // todo
 
-            _module.StickerHelper.forEach(obj.packs, function(pack, key) {
+			helper.forEach(obj.packs, (function(pack, key) {
 
                 if(pack.pack_name.toLowerCase() == tabName.toLowerCase()) {
-                    tabActive = +key;
+					this.tabActive = +key;
                 }
 
-            });
+            }).bind(this));
 
-            //stickersModel[tabActive].newPack = false;
-            //stService.setPacksToStorage(stickersModel);
+            //this.stickersModel[this.tabActive].newPack = false;
+            //this.stService.setPacksToStorage(this.stickersModel);
 
-            _renderAll();
+            this._renderAll();
         };
 
         this.isNewPack = function(packName) {
-            return stService.isNewPack(stickersModel, packName);
+            return this.stService.isNewPack(this.stickersModel, packName);
         };
 
         this.onUserMessageSent = function(isSticker) {
-            return stService.onUserMessageSent(isSticker);
+            return this.stService.onUserMessageSent(isSticker);
         };
 
         this.renderPack = function(pack) {
-            stView.renderStorePack(pack);
+			this.stView.renderStorePack(pack);
         };
 
         this.purchaseSuccess = function(packName) {
-            stService.purchaseSuccess(packName);
+			this.stService.purchaseSuccess(packName);
         };
+
+		this.init();
     }
 
     Plugin.Stickers = Stickers;

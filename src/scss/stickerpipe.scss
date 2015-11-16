@@ -1,0 +1,121 @@
+
+@import "icons";
+
+$tabContentSize: 36px;
+
+.sticker-pipe {
+	.sp-store {
+		background: white;
+	}
+
+	.sp-tabs {
+		background-color: #fff;
+		overflow-x: scroll;
+		width: 100%;
+		white-space: nowrap;
+
+		.sp-tab-item {
+			display: inline-block;
+			float: left;
+			cursor: pointer;
+			padding: 6px;
+
+			img {
+				border-radius: 50%;
+				height: $tabContentSize;
+				width: $tabContentSize;
+
+				opacity: .5;
+				-webkit-filter: grayscale(100%);
+				filter: grayscale(100%);
+
+				&:hover {
+					opacity: .7;
+				}
+			}
+
+			&.active {
+				background-color: white;
+				color: orange;
+
+				img {
+					opacity: 1;
+					-webkit-filter: grayscale(0%);
+					filter: grayscale(0%);
+				}
+			}
+
+			&.sp-control-tab {
+
+				margin: 0;
+				padding: 12px;
+
+				&:hover > span {
+					opacity: .7;
+				}
+
+				> span {
+					display: table;
+					opacity: .5;
+				}
+
+				&.sp-tab-next-packs,
+				&.sp-tab-store {
+					float: right;
+					border-left: 1px solid #c8c8c8;
+					border-radius: 0;
+				}
+
+				&.sp-tab-prev-packs,
+				&.sp-tab-history {
+					border-right: 1px solid #c8c8c8;
+				}
+
+
+				&.sp-tab-prev-packs,
+				&.sp-tab-next-packs {
+					padding-left: 6px;
+					padding-right: 6px;
+				}
+			}
+
+			&.sp-pack-tab {
+				&.sp-new-pack::before {
+					content: "";
+					width: 15px;
+					height: 15px;
+					display: block;
+					position: absolute;
+					background-color: #f60;
+					border-radius: 50%;
+					margin-left: 36px;
+					margin-top: 36px;
+
+					/* todo */
+					z-index: 2;
+				}
+			}
+		}
+	}
+
+	.sp-stickers {
+		background: #fafafa;
+		border-top: 1px solid rgb(200, 200, 200);
+		height: 300px;
+		overflow-y: scroll;
+		padding: 10px;
+
+		.sp-sticker-item {
+			cursor: pointer;
+
+			img {
+				$size: 160px;
+				height: $size;
+				width: $size;
+			}
+		}
+	}
+}
+
+@include sprites($spritesheet-sprites);
+@include retina-sprites($retina-groups);

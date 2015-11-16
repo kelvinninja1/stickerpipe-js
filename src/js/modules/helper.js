@@ -1,7 +1,7 @@
 
 (function(Plugin, Lockr, MD5) {
-    Plugin.StickersModule = Plugin.StickersModule || {};
 
+    Plugin.StickersModule = Plugin.StickersModule || {};
 
     Plugin.StickersModule.StickerHelper = {
 
@@ -11,22 +11,27 @@
             }
         },
 
-        mergeOptions: function(obj1, obj2){
-            var obj3 = {};
-            for (var attrname in obj1) { obj3[attrname] = obj1[attrname]; }
-            for (var attrname in obj2) { obj3[attrname] = obj2[attrname]; }
-            return obj3;
+        mergeOptions: function(obj1, obj2) {
+			var obj3 = {};
+
+			for(var attrname in obj1) {
+				obj3[attrname] = obj1[attrname];
+			}
+
+			for(var attrname in obj2) {
+				obj3[attrname] = obj2[attrname];
+			}
+
+			return obj3;
         },
 
-        setEvent: function(eventType, id, className, callback) {
+        setEvent: function(eventType, el, className, callback) {
 
-            document.getElementById(id).addEventListener(eventType, function (event) {
+            el.addEventListener(eventType, function (event) {
 
-                var el = event.target
-                    , found;
+                var el = event.target, found;
 
                 while (el && !(found = el.className.match(className))) {
-
                     el = el.parentElement;
                 }
 
@@ -50,9 +55,9 @@
                     callback(JSON.parse(xmlhttp.responseText));
                 }
             };
-            xmlhttp.open("GET", url, true);
-            xmlhttp.setRequestHeader("Apikey", apikey);
-            xmlhttp.setRequestHeader("Platform", "JS");
+            xmlhttp.open('GET', url, true);
+            xmlhttp.setRequestHeader('Apikey', apikey);
+            xmlhttp.setRequestHeader('Platform', 'JS');
 
             this.forEach(header, function(value, name) {
                 xmlhttp.setRequestHeader(name, value);
@@ -63,7 +68,7 @@
 
         ajaxPost: function(url, apikey, data, callback, header) {
             var xmlhttp,
-                uniqUserId = Lockr.get("uniqUserId");
+                uniqUserId = Lockr.get('uniqUserId');
 
             xmlhttp = new XMLHttpRequest();
 
@@ -74,16 +79,16 @@
             };
 
 
-            if(typeof uniqUserId == "undefined") {
+            if(typeof uniqUserId == 'undefined') {
                 uniqUserId = + new Date();
-                Lockr.set("uniqUserId", uniqUserId);
+                Lockr.set('uniqUserId', uniqUserId);
             }
 
-            xmlhttp.open("POST", url, true);
-            xmlhttp.setRequestHeader("Apikey", apikey);
-            xmlhttp.setRequestHeader("Platform", "JS");
-            xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            xmlhttp.setRequestHeader("DeviceId", uniqUserId);
+            xmlhttp.open('POST', url, true);
+            xmlhttp.setRequestHeader('Apikey', apikey);
+            xmlhttp.setRequestHeader('Platform', 'JS');
+            xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xmlhttp.setRequestHeader('DeviceId', uniqUserId);
 
             this.forEach(header, function(value, name) {
                 xmlhttp.setRequestHeader(name, value);
