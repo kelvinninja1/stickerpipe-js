@@ -74,11 +74,7 @@
 			this.renderControlTab(this.el, this.controlTabs.prevPacks, tabActive);
 			this.controlTabs.prevPacks.el.style.display = 'none';
 			this.controlTabs.prevPacks.el.addEventListener('click', (function() {
-
-				this.currentPage--;
-				this.onWindowResize();
-
-				this.scrollableContentEl.scrollLeft = this.scrollableContentWidth * this.currentPage;
+				this.onClickPrevPacksButton();
 			}).bind(this));
 
 
@@ -109,12 +105,7 @@
 
 			this.renderControlTab(this.el, this.controlTabs.nextPacks, tabActive);
 			this.controlTabs.nextPacks.el.addEventListener('click', (function() {
-				if (this.scrollableContentWidth * (this.currentPage + 1) > this.scrollableContentEl.scrollWidth) {
-					return;
-				}
-				this.currentPage++;
-				this.scrollableContentEl.scrollLeft = this.scrollableContentWidth * this.currentPage;
-				this.onWindowResize();
+				this.onClickNextPacksButton();
 			}).bind(this));
 
 			this.onWindowResize();
@@ -161,6 +152,21 @@
 			return tabEl;
 		},
 
+		onClickPrevPacksButton: function() {
+			this.currentPage--;
+			this.onWindowResize();
+
+			this.scrollableContentEl.scrollLeft = this.scrollableContentWidth * this.currentPage;
+		},
+		onClickNextPacksButton: function() {
+			if (this.scrollableContentWidth * (this.currentPage + 1) > this.scrollableContentEl.scrollWidth) {
+				return;
+			}
+			this.currentPage++;
+			this.scrollableContentEl.scrollLeft = this.scrollableContentWidth * this.currentPage;
+			this.onWindowResize();
+		},
+
 		onWindowResize: function() {
 
 			if (this.controlTabs.prevPacks.el) {
@@ -186,24 +192,6 @@
 			;
 
 			this.scrollableContentEl.style.width = this.scrollableContentWidth + 'px';
-
-			//var packTabs = this.scrollableContentEl.childNodes;
-			//
-			//var packTabWidth = packTabs[0].offsetWidth;
-			//var packTabsInRow = parseInt(this.scrollableContentWidth / packTabWidth, 10);
-			//
-			//var margin = (this.scrollableContentWidth - (packTabsInRow * packTabWidth)) / (2 * packTabsInRow);
-			//
-			//for(var i = 0; i <packTabs.length; i++) {
-			//	packTabs[i].style.marginLeft = margin + 'px';
-			//	packTabs[i].style.marginRight = margin + 'px';
-			//}
-			//
-			//if (this.scrollableContentWidth * (this.currentPage + 1) > this.scrollableContentEl.scrollWidth) {
-			//	this.controlTabs.nextPacks.el.style.display = 'none';
-			//} else {
-			//	this.controlTabs.nextPacks.el.style.display = 'inline-block';
-			//}
 		}
 	});
 
