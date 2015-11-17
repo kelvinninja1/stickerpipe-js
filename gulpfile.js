@@ -15,24 +15,13 @@ var gulp = require('gulp'),
 
 gulp.task('default', ['watcher'], function () {});
 
-gulp.task('watcher', ['watcher:src', 'watcher:example'], function () {});
-gulp.task('watcher:src', function () {
-	gulp.watch(['src/scss/**/*.scss'], ['css:build']);
-	gulp.watch(['src/js/**/*.js'], ['js:build']);
-	gulp.watch(['src/img/icons/*.*'], ['img:sprite']);
-});
-gulp.task('watcher:example', function () {
-	gulp.watch(['example/scss/**/*.scss'], ['css:example']);
+gulp.task('watcher', ['watcher:src'], function () {
+	gulp.watch(['src/scss/**/*.scss'], ['build:css']);
+	gulp.watch(['src/js/**/*.js'], ['build:js']);
+	gulp.watch(['src/img/icons/*.*'], ['build:img:sprite']);
 });
 
-gulp.task('css:example', ['clean:example:css'], function () {
-	return gulp.src('example/scss/**/*.scss')
-		.pipe(sass())
-		.pipe(autoprefixer())
-		.pipe(gulp.dest('example/css'))
-		.pipe(git.add());
-});
-gulp.task('css:build', ['clean:build:css'], function () {
+gulp.task('build:css', ['clean:css'], function () {
 	return gulp.src('src/scss/**/*.scss')
 		.pipe(sass())
 		.pipe(autoprefixer())
@@ -40,7 +29,7 @@ gulp.task('css:build', ['clean:build:css'], function () {
 		.pipe(git.add());
 }); // todo concat
 
-gulp.task('js:build', ['clean:build:js'], function() {
+gulp.task('build:js', ['clean:js'], function() {
 	return gulp.src(['src/js/stickerpipe.js'])
 		.pipe(include())
 		.pipe(gulp.dest('build/js'))
@@ -51,7 +40,7 @@ gulp.task('js:build', ['clean:build:js'], function() {
 		.pipe(gulp.dest('build/js'));
 });
 
-gulp.task('img:sprite', function() {
+gulp.task('build:img:sprite', function() {
 	var spriteData = gulp.src('src/img/icons/*.*')
 		.pipe(spritesmith({
 			cssName: '_icons.scss',
@@ -73,15 +62,11 @@ gulp.task('img:sprite', function() {
 
 // *** *** *** CLEANS *** *** ****
 
-gulp.task('clean:example:css', function() {
-	return gulp.src('example/css', {read: false})
-		.pipe(clean());
-});
-gulp.task('clean:build:css', function() {
+gulp.task('clean:css', function() {
 	return gulp.src('build/css', {read: false})
 		.pipe(clean());
 });
-gulp.task('clean:build:js', function() {
+gulp.task('clean:js', function() {
 	return gulp.src('build/js', {read: false})
 		.pipe(clean());
 });
