@@ -73,22 +73,12 @@
 
 			this.renderControlTab(this.el, this.controlTabs.prevPacks, tabActive);
 			this.controlTabs.prevPacks.el.style.display = 'none';
-			//this.controlTabs.prevPacks.el.addEventListener('click', (function() {
-			//	this.currentPage--;
-			//	this.onWindowResize();
-			//	this.scrollableContentEl.scrollLeft = this.scrollableContentWidth * this.currentPage;
-			//}).bind(this));
 			this.controlTabs.prevPacks.el.addEventListener('click', (function() {
-				this.scrollableContentEl.firstChild.style.transition = '300ms';
-				this.scrollableContentEl.firstChild.style.marginLeft = parseInt(this.scrollableContentEl.firstChild.style.marginLeft) + (this.scrollableContentWidth * this.currentPage) + 'px';
 
 				this.currentPage--;
-				setTimeout((function() {
-					this.onWindowResize();
-				}).bind(this), 3);
 				this.onWindowResize();
 
-				//this.scrollableContentEl.scrollLeft = this.scrollableContentWidth * this.currentPage;
+				this.scrollableContentEl.scrollLeft = this.scrollableContentWidth * this.currentPage;
 			}).bind(this));
 
 
@@ -119,13 +109,11 @@
 
 			this.renderControlTab(this.el, this.controlTabs.nextPacks, tabActive);
 			this.controlTabs.nextPacks.el.addEventListener('click', (function() {
+				if (this.scrollableContentWidth * (this.currentPage + 1) > this.scrollableContentEl.scrollWidth) {
+					return;
+				}
 				this.currentPage++;
-				this.onWindowResize();
-				//this.scrollableContentEl.scrollLeft = this.scrollableContentWidth * this.currentPage;
-
-				this.scrollableContentEl.firstChild.style.transition = '300ms';
-				this.scrollableContentEl.firstChild.style.marginLeft = -(this.scrollableContentWidth * this.currentPage) + 'px';
-
+				this.scrollableContentEl.scrollLeft = this.scrollableContentWidth * this.currentPage;
 				this.onWindowResize();
 			}).bind(this));
 
@@ -183,6 +171,14 @@
 				}
 			}
 
+			if (this.controlTabs.nextPacks.el) {
+				if (this.scrollableContentEl.scrollWidth > this.scrollableContentEl.offsetWidth) {
+					this.controlTabs.nextPacks.el.style.display = 'inline-block';
+				} else {
+					this.controlTabs.nextPacks.el.style.display = 'none';
+				}
+			}
+
 			this.scrollableContentWidth = this.el.parentElement.offsetWidth
 				- this.controlTabs.store.el.offsetWidth
 				- this.controlTabs.nextPacks.el.offsetWidth
@@ -191,28 +187,23 @@
 
 			this.scrollableContentEl.style.width = this.scrollableContentWidth + 'px';
 
-			var packContainerWidth = this.scrollableContentWidth
-				- this.controlTabs.custom.el.offsetWidth
-				- this.controlTabs.history.el.offsetWidth;
-
-			var packTabs = this.scrollableContentEl.getElementsByClassName('sp-pack-tab');
-
-			var packTabWidth = packTabs[0].offsetWidth;
-			var packTabsInRow = parseInt(packContainerWidth / packTabWidth, 10);
-
-			var margin = (packContainerWidth - (packTabsInRow * packTabWidth)) / (2 * packTabsInRow);
-
-			for(var i = 0; i <packTabs.length; i++) {
-				packTabs[i].style.marginLeft = margin + 'px';
-				packTabs[i].style.marginRight = margin + 'px';
-			}
-
-			console.log(this.scrollableContentEl.scrollWidth, this.scrollableContentEl.offsetWidth);
-			if (this.scrollableContentEl.scrollWidth > this.scrollableContentEl.offsetWidth) {
-				this.controlTabs.nextPacks.el.style.display = 'inline-block';
-			} else {
-				this.controlTabs.nextPacks.el.style.display = 'none';
-			}
+			//var packTabs = this.scrollableContentEl.childNodes;
+			//
+			//var packTabWidth = packTabs[0].offsetWidth;
+			//var packTabsInRow = parseInt(this.scrollableContentWidth / packTabWidth, 10);
+			//
+			//var margin = (this.scrollableContentWidth - (packTabsInRow * packTabWidth)) / (2 * packTabsInRow);
+			//
+			//for(var i = 0; i <packTabs.length; i++) {
+			//	packTabs[i].style.marginLeft = margin + 'px';
+			//	packTabs[i].style.marginRight = margin + 'px';
+			//}
+			//
+			//if (this.scrollableContentWidth * (this.currentPage + 1) > this.scrollableContentEl.scrollWidth) {
+			//	this.controlTabs.nextPacks.el.style.display = 'none';
+			//} else {
+			//	this.controlTabs.nextPacks.el.style.display = 'inline-block';
+			//}
 		}
 	});
 
