@@ -1,0 +1,92 @@
+.pack-screen .pack-header {
+  position: relative;
+}
+
+.pack-screen .pack-header .bg-white {
+  background: white;
+  opacity: 0;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  z-index: 0;
+}
+
+.pack-screen .pack-header .bg-white,
+.pack-screen .pack-content,
+.pack-screen .sticker {
+  -webkit-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+}
+
+.pack-screen.hasTappedSticker .pack-header .bg-white {
+  z-index: 1;
+}
+
+.pack-screen.hasTappedSticker .pack-header .bg-white,
+.pack-screen.hasTappedSticker .pack-content,
+.pack-screen.hasTappedSticker .sticker:not(.tapped) {
+  opacity: 0.5;
+}
+
+.pack-screen .pack-banner {
+  position: relative;
+}
+
+.pack-screen .pack-banner .gradient {
+  /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(37%, transparent), color-stop(100%, rgba(255, 255, 255, 0.65)));
+  /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, transparent 37%, rgba(255, 255, 255, 0.65) 100%);
+  /* Chrome10+,Safari5.1+ */
+  /* Opera 11.10+ */
+  /* IE10+ */
+  background: linear-gradient(to bottom, transparent 37%, rgba(255, 255, 255, 0.65) 100%);
+  /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='transparent', endColorstr='rgba(255, 255, 255, 0.65)',GradientType=0 );
+  /* IE6-9 */
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+}
+
+.pack-screen .pack-header > .pack-info {
+  margin-top: 20px;
+}
+
+.pack-screen .pack-header .pack-info h1,
+.pack-screen .pack-header .pack-info h2,
+.pack-screen .pack-header .pack-info h3,
+.pack-screen .pack-header .pack-info h4,
+.pack-screen .pack-header .pack-info h5,
+.pack-screen .pack-header .pack-info h6 {
+  margin: 0;
+}
+
+.pack-screen .pack-header .pack-info .pack-main-sticker {
+  margin-right: 20px;
+}
+
+.pack-screen .pack-header .pack-info .pack-main-info div[pack-action-button] {
+  text-transform: uppercase;
+}
+
+.pack-screen .pack-stickers {
+  margin-top: 30px;
+}
+
+.pack-screen .pack-stickers .row > div {
+  margin-bottom: 20px;
+}
+
+.pack-screen .pack-stickers .row > div .sticker {
+  display: table;
+  -webkit-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+}
+
+.pack-screen .pack-stickers .row > div .sticker.tapped {
+  -webkit-transform: scale(1.5);
+  -ms-transform: scale(1.5);
+  transform: scale(1.5);
+}

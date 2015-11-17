@@ -1,0 +1,60 @@
+body {
+  background: #f0f0f0;
+  padding-top: 20px; }
+
+@media (min-width: 992px) {
+  .container {
+    width: 770px; } }
+
+#messageBox {
+  background: white;
+  margin-bottom: 5px; }
+  #messageBox textarea {
+    box-shadow: none;
+    max-height: 300px;
+    padding-top: 10px;
+    resize: none; }
+    #messageBox textarea + .input-group-btn {
+      padding-top: 4px; }
+  #messageBox .input-group-btn {
+    vertical-align: top; }
+    #messageBox .input-group-btn button:hover {
+      color: #646464; }
+    #messageBox .input-group-btn button:active {
+      color: orange; }
+  #messageBox textarea,
+  #messageBox .input-group-btn button {
+    border: 0;
+    outline: none; }
+    #messageBox textarea:hover, #messageBox textarea:focus,
+    #messageBox .input-group-btn button:hover,
+    #messageBox .input-group-btn button:focus {
+      background: #fff;
+      outline: none;
+      box-shadow: none; }
+
+#stickersToggle.active, #stickersToggle.active:hover, #stickersToggle.active:focus {
+  color: orange !important;
+  background: none;
+  box-shadow: none; }
+
+#stickerPipe {
+  border-radius: 3px 3px 0 0;
+  overflow: hidden; }
+
+#messages {
+  height: 420px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  overflow-y: scroll; }
+  #messages img[data-sticker] {
+    height: 160px;
+    width: 160px; }
+
+#store {
+  height: 400px; }
+
+.emptyRecent {
+  text-align: center;
+  padding: 50px;
+  font-size: 20px; }
