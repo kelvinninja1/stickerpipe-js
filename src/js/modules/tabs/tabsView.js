@@ -5,15 +5,20 @@
 	Module.TabsView = Module.Class({
 
 		el: null,
+		scrollableContainerEl: null,
 		scrollableContentEl: null,
 
 		controlTabs: null,
+		packTabs: {},
+
 		config: null,
 
 		currentPage: 0,
 
 		_constructor: function(config) {
 			this.config = config;
+
+			this.el = document.createElement('div');
 
 			this.controlTabs = {
 				custom: {
@@ -65,57 +70,71 @@
 			}).bind(this));
 		},
 
-		// el == tabsEl
-		render: function(el, stickerPacks, tabActive) {
+		render: function(stickerPacks) {
 
-			this.el = el;
+			this.el.classList.add('sp-tabs');
 			this.el.innerHTML = '';
 
-			this.renderControlTab(this.el, this.controlTabs.prevPacks, tabActive);
-			this.controlTabs.prevPacks.el.style.display = 'none';
-			this.controlTabs.prevPacks.el.addEventListener('click', (function() {
-				this.onClickPrevPacksButton();
-			}).bind(this));
+			// PREV BUTTON
+			this.el.appendChild(this.renderControlTab(this.controlTabs.prevPacks));
+			Module.StickerHelper.setEvent('click', this.el, this.controlTabs.prevPacks.class, this.onClickPrevPacksButton.bind(this));
 
+			// SCROLLABLE CONTAINER
+			this.renderScrollableContainer();
 
-			// scrollable container
-
-			this.scrollableContentEl = document.createElement('div');
-			this.scrollableContentEl.style.float = 'left';
-
-			this.scrollableContentEl.style.width = '300px';
-			this.scrollableContentEl.style.whiteSpace = 'nowrap';
-			this.scrollableContentEl.style.overflow = 'hidden';
-			this.scrollableContentEl.style.display = 'flex';
-			this.scrollableContentEl.style.position = 'relative';
-
-			this.el.appendChild(this.scrollableContentEl);
-
-			// ********************
-
-			this.config.enableCustomTab && this.renderControlTab(this.scrollableContentEl, this.controlTabs.custom, tabActive);
-			this.renderControlTab(this.scrollableContentEl, this.controlTabs.history, tabActive);
-
-			for (var i = 0; i < stickerPacks.length; i++) {
-				this.renderPackTab(stickerPacks[i], i, tabActive);
+			// CUSTOM TAB
+			if (this.config.enableCustomTab) {
+				this.scrollableContentEl.appendChild(this.renderControlTab(this.controlTabs.custom));
 			}
 
-			this.renderControlTab(this.scrollableContentEl, this.controlTabs.settings, tabActive);
-			this.renderControlTab(this.el, this.controlTabs.store, tabActive);
+			// HISTORY TAB
+			this.scrollableContentEl.appendChild(this.renderControlTab(this.controlTabs.history));
 
-			this.renderControlTab(this.el, this.controlTabs.nextPacks, tabActive);
-			this.controlTabs.nextPacks.el.addEventListener('click', (function() {
-				this.onClickNextPacksButton();
-			}).bind(this));
+			// PACKS TABS
+			for (var i = 0; i < stickerPacks.length; i++) {
+				this.scrollableContentEl.appendChild(this.renderPackTab(stickerPacks[i], i));
+			}
+
+			// SETTINGS BUTTON
+			this.scrollableContentEl.appendChild(this.renderControlTab(this.controlTabs.settings));
+
+			// STORE BUTTON
+			this.el.appendChild(this.renderControlTab(this.controlTabs.store));
+
+			// NEXT BUTTON
+			this.el.appendChild(this.renderControlTab(this.controlTabs.nextPacks));
+			Module.StickerHelper.setEvent('click', this.el, this.controlTabs.nextPacks.class, this.onClickNextPacksButton.bind(this));
 
 			this.onWindowResize();
 		},
-		renderControlTab: function(el, tab, tabActive) {
-			tab.el = this.renderTab(el, tab.id, [tab.class, 'sp-control-tab'], tab.number, tab.content, tabActive);
+		renderScrollableContainer: function() {
+
+			// todo + classes
+			this.scrollableContentEl = document.createElement('div');
+			this.scrollableContentEl.style.whiteSpace = 'nowrap';
+			this.scrollableContentEl.style.position = 'relative';
+			this.scrollableContentEl.style.display = 'flex';
+			this.scrollableContentEl.style.transition = '300ms';
+
+
+			this.scrollableContainerEl = document.createElement('div');
+			this.scrollableContainerEl.style.float = 'left';
+			this.scrollableContainerEl.style.width = '300px';
+			this.scrollableContainerEl.style.overflow = 'hidden';
+			this.scrollableContainerEl.style.position = 'relative';
+
+			this.scrollableContainerEl.appendChild(this.scrollableContentEl);
+			this.el.appendChild(this.scrollableContainerEl);
+		},
+		renderControlTab: function(tab) {
+			tab.el = this.renderTab(tab.id, [tab.class, 'sp-control-tab'], tab.number, tab.content);
 			return tab.el;
 		},
-		renderPackTab: function(pack, number, tabActive) {
-			var classes = ['sp-pack-tab'];
+		renderPackTab: function(pack, number) {
+			var classes = ['sp-pack-tab'],
+				attrs = {
+					'data-pack-name': pack.pack_name
+				};
 
 			if(pack.newPack) {
 				classes.push('sp-new-pack');
@@ -128,9 +147,19 @@
 
 			var content = '<img src=' + iconSrc + '>';
 
-			this.renderTab(this.scrollableContentEl, null, classes, number, content, tabActive);
+			var tabEl = this.renderTab(null, classes, number, content, attrs);
+
+			tabEl.addEventListener('click', function() {
+				tabEl.classList.remove('sp-new-pack');
+			});
+
+			this.packTabs[pack.pack_name] = tabEl;
+
+			return tabEl;
 		},
-		renderTab: function(el ,id, classes, dataTabNumber, content, tabActive) {
+		renderTab: function(id, classes, dataTabNumber, content, attrs) {
+			attrs = attrs || [];
+
 			var tabEl = document.createElement('span');
 
 			if (id) {
@@ -139,35 +168,67 @@
 
 			classes.push(this.config.tabItemClass);
 
-			if (tabActive == dataTabNumber) {
-				classes.push('active');
-			}
-
 			tabEl.classList.add.apply(tabEl.classList, classes);
-			tabEl.setAttribute('data-tab-number', dataTabNumber);
+
+			attrs['data-tab-number'] = dataTabNumber;
+			Module.StickerHelper.forEach(attrs, function(value, name) {
+				tabEl.setAttribute(name, value);
+			});
+
 			tabEl.innerHTML = content;
 
-			el.appendChild(tabEl);
+			tabEl.addEventListener('click', (function() {
+
+				Module.StickerHelper.forEach(this.packTabs, function(tabEl) {
+					tabEl.classList.remove('active');
+				});
+
+				Module.StickerHelper.forEach(this.controlTabs, function(controlTab) {
+					if (controlTab && controlTab.el) {
+						controlTab.el.classList.remove('active');
+					}
+				});
+
+				tabEl.classList.add('active');
+			}).bind(this));
 
 			return tabEl;
 		},
 
 		onClickPrevPacksButton: function() {
+			console.log('click on prev button');
+
 			this.currentPage--;
 			this.onWindowResize();
 
-			this.scrollableContentEl.scrollLeft = this.scrollableContentWidth * this.currentPage;
+			this.scrollableContentEl.left = (this.scrollableContentWidth * this.currentPage) + 'px';
 		},
 		onClickNextPacksButton: function() {
-			if (this.scrollableContentWidth * (this.currentPage + 1) > this.scrollableContentEl.scrollWidth) {
+			console.log('click on next button');
+
+			if (this.scrollableContentWidth * (this.currentPage + 1) > this.scrollableContainerEl.scrollWidth) {
 				return;
 			}
 			this.currentPage++;
-			this.scrollableContentEl.scrollLeft = this.scrollableContentWidth * this.currentPage;
+			this.scrollableContentEl.left = (this.scrollableContentWidth * this.currentPage) + 'px';
 			this.onWindowResize();
 		},
 
+		handleClickOnCustomTab: function(callback) {
+			Module.StickerHelper.setEvent('click', this.el, this.controlTabs.custom.class, callback);
+		},
+		handleClickOnLastUsedPacksTab: function(callback) {
+			Module.StickerHelper.setEvent('click', this.el, this.controlTabs.history.class, callback);
+		},
+		handleClickOnPackTab: function(callback) {
+			Module.StickerHelper.setEvent('click', this.el, 'sp-pack-tab', callback);
+		},
+
 		onWindowResize: function() {
+
+			if (!this.el.parentElement) {
+				return;
+			}
 
 			if (this.controlTabs.prevPacks.el) {
 				if (this.currentPage > 0) {
@@ -178,7 +239,7 @@
 			}
 
 			if (this.controlTabs.nextPacks.el) {
-				if (this.scrollableContentEl.scrollWidth > this.scrollableContentEl.offsetWidth) {
+				if (this.scrollableContainerEl.scrollWidth > this.scrollableContainerEl.offsetWidth) {
 					this.controlTabs.nextPacks.el.style.display = 'inline-block';
 				} else {
 					this.controlTabs.nextPacks.el.style.display = 'none';
@@ -191,7 +252,7 @@
 				- this.controlTabs.prevPacks.el.offsetWidth
 			;
 
-			this.scrollableContentEl.style.width = this.scrollableContentWidth + 'px';
+			this.scrollableContainerEl.style.width = this.scrollableContentWidth + 'px';
 		}
 	});
 

@@ -11,14 +11,18 @@ var gulp = require('gulp'),
 	git = require('gulp-git'),
 	spritesmith = require('gulp.spritesmith');
 
+var exampleSrc = '../gh-pages/work/libs/sdk';
+
 // *** *** *** MAIN TASKS *** *** ****
 
 gulp.task('default', ['watcher'], function () {});
 
-gulp.task('watcher', ['watcher:src'], function () {
+gulp.task('watcher', function () {
 	gulp.watch(['src/scss/**/*.scss'], ['build:css']);
 	gulp.watch(['src/js/**/*.js'], ['build:js']);
 	gulp.watch(['src/img/icons/*.*'], ['build:img:sprite']);
+
+	gulp.watch(['build/**/*.*'], ['update:example']);
 });
 
 gulp.task('build:css', ['clean:css'], function () {
@@ -38,6 +42,11 @@ gulp.task('build:js', ['clean:js'], function() {
 			path.basename += '.min';
 		}))
 		.pipe(gulp.dest('build/js'));
+});
+
+gulp.task('update:example', ['clean:example'], function() {
+	return gulp.src(['build/**/*.*'])
+		.pipe(gulp.dest(exampleSrc));
 });
 
 gulp.task('build:img:sprite', function() {
@@ -60,6 +69,7 @@ gulp.task('build:img:sprite', function() {
 	return spriteData.css.pipe(gulp.dest('src/scss/'));
 });
 
+
 // *** *** *** CLEANS *** *** ****
 
 gulp.task('clean:css', function() {
@@ -69,4 +79,10 @@ gulp.task('clean:css', function() {
 gulp.task('clean:js', function() {
 	return gulp.src('build/js', {read: false})
 		.pipe(clean());
+});
+gulp.task('clean:example', function() {
+	return gulp.src(exampleSrc, {read: false})
+		.pipe(clean({
+			force: true
+		}));
 });

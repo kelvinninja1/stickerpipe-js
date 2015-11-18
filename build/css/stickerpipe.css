@@ -62,7 +62,10 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   .sticker-pipe .sp-tabs .sp-tab-item {
     display: inline-table;
     cursor: pointer;
-    padding: 6px; }
+    padding: 6px 10px; }
+    @media (max-width: 544px) {
+      .sticker-pipe .sp-tabs .sp-tab-item {
+        padding: 6px 6px; } }
     .sticker-pipe .sp-tabs .sp-tab-item img {
       border-radius: 50%;
       height: 36px;
