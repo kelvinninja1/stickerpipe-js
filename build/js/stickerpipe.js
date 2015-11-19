@@ -762,11 +762,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
 				var _el = this.scrollableContentEl.getElementsByClassName('sp-pack-tab')[0];
 				var styles = window.getComputedStyle(_el);
 
-				var paddingRight = parseInt(styles.paddingRight, 10) / 2;
-
+				var contentWidth = this.scrollableContentEl.scrollWidth;
 				var contentOffset = parseInt(this.scrollableContentEl.style.left, 10) || 0;
 
-				if ((contentOffset * -1) < this.scrollableContainerEl.offsetWidth) {
+				if (contentWidth + contentOffset > this.scrollableContainerEl.offsetWidth) {
 					this.controlTabs.nextPacks.el.style.display = 'inline-block';
 				} else {
 					this.controlTabs.nextPacks.el.style.display = 'none';
