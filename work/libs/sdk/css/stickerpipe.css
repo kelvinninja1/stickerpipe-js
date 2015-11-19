@@ -55,19 +55,26 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   background: white; }
 
 .sticker-pipe .sp-tabs {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
   background-color: #fff;
   overflow-x: scroll;
   width: 100%;
   white-space: nowrap; }
   .sticker-pipe .sp-tabs .sp-tabs-scrollable-container {
+    -webkit-box-flex: 1;
+    -webkit-flex: 1;
+        -ms-flex: 1;
+            flex: 1;
     float: left;
     overflow: hidden;
-    position: relative;
-    width: 300px; }
+    position: relative; }
     .sticker-pipe .sp-tabs .sp-tabs-scrollable-container .sp-tabs-scrollable-content {
       display: -webkit-box;
-      display: -webkit-flex;
       display: -ms-flexbox;
+      display: -webkit-flex;
       display: flex;
       left: 0;
       position: relative;
@@ -97,6 +104,8 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
         opacity: 1;
         -webkit-filter: grayscale(0%);
         filter: grayscale(0%); }
+      .sticker-pipe .sp-tabs .sp-tab-item.sp-tab-active.sp-control-tab > span, .sticker-pipe .sp-tabs .sp-tab-item.sp-tab-active.sp-control-button > span {
+        opacity: 0.9; }
     .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button {
       margin: 0;
       padding: 12px 16px; }
@@ -108,10 +117,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
       .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab > span, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button > span {
         display: table;
         opacity: .5; }
-      .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-prev-packs, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-prev-packs {
-        float: left; }
       .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-next-packs, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-store, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-next-packs, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-store {
-        float: right;
         border-left: 1px solid #c8c8c8;
         border-radius: 0; }
       .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-prev-packs, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-history, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-prev-packs, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-history {
