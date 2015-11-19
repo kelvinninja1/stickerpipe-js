@@ -34,42 +34,36 @@
 					id: 'spTabCustom',
 					class: 'sp-tab-custom',
 					content: this.config.customTabContent,
-					number: -1,
 					el: null
 				},
 				history: {
 					id: 'spTabHistory',
 					class: 'sp-tab-history',
 					content: this.config.historyTabContent,
-					number: -2,
 					el: null
 				},
 				settings: {
 					id: 'spTabSettings',
 					class: 'sp-tab-settings',
 					content: this.config.settingsTabContent,
-					number: -3,
 					el: null
 				},
 				store: {
 					id: 'spTabSettings',
 					class: 'sp-tab-store',
 					content: this.config.storeTabContent,
-					number: -4,
 					el: null
 				},
 				prevPacks: {
 					id: 'spTabPrevPacks',
 					class: 'sp-tab-prev-packs',
 					content: this.config.prevPacksTabContent,
-					number: -5,
 					el: null
 				},
 				nextPacks: {
 					id: 'spTabNextPacks',
 					class: 'sp-tab-next-packs',
 					content: this.config.nextPacksTabContent,
-					number: -6,
 					el: null
 				}
 			};
@@ -133,10 +127,10 @@
 			var classes = [tab.class];
 			classes.push((isTab) ? this.classes.controlTab : this.classes.controlButton);
 
-			tab.el = this.renderTab(tab.id, classes, tab.number, tab.content);
+			tab.el = this.renderTab(tab.id, classes, tab.content);
 			return tab.el;
 		},
-		renderPackTab: function(pack, number) {
+		renderPackTab: function(pack) {
 			var classes = [this.classes.packTab],
 				attrs = {
 					'data-pack-name': pack.pack_name
@@ -153,7 +147,7 @@
 
 			var content = '<img src=' + iconSrc + '>';
 
-			var tabEl = this.renderTab(null, classes, number, content, attrs);
+			var tabEl = this.renderTab(null, classes, content, attrs);
 
 			tabEl.addEventListener('click', (function() {
 				tabEl.classList.remove(this.classes.newPack);
@@ -163,7 +157,7 @@
 
 			return tabEl;
 		},
-		renderTab: function(id, classes, dataTabNumber, content, attrs) {
+		renderTab: function(id, classes, content, attrs) {
 			attrs = attrs || [];
 
 			var tabEl = document.createElement('span');
@@ -176,7 +170,6 @@
 
 			tabEl.classList.add.apply(tabEl.classList, classes);
 
-			attrs['data-tab-number'] = dataTabNumber;
 			Module.StickerHelper.forEach(attrs, function(value, name) {
 				tabEl.setAttribute(name, value);
 			});
