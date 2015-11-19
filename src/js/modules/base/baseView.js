@@ -41,9 +41,6 @@
 
 			this.el.appendChild(this.tabsView.el);
 			this.el.appendChild(this.stickersEl);
-
-			// todo resize --> flex
-			window.dispatchEvent(new Event('resize'));
 		},
 
 		renderUseStickers: function(latesUseSticker) {

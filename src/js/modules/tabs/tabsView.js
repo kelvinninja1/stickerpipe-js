@@ -8,7 +8,7 @@
 		scrollableContainerEl: null,
 		scrollableContentEl: null,
 
-		controlTabs: null,
+		controls: null,
 		packTabs: {},
 
 		classes: {
@@ -29,42 +29,48 @@
 
 			this.el = document.createElement('div');
 
-			this.controlTabs = {
+			this.controls = {
 				custom: {
 					id: 'spTabCustom',
 					class: 'sp-tab-custom',
 					content: this.config.customTabContent,
-					el: null
+					el: null,
+					isTab: true
 				},
 				history: {
 					id: 'spTabHistory',
 					class: 'sp-tab-history',
 					content: this.config.historyTabContent,
-					el: null
+					el: null,
+					isTab: true
 				},
 				settings: {
 					id: 'spTabSettings',
 					class: 'sp-tab-settings',
 					content: this.config.settingsTabContent,
-					el: null
+					el: null,
+					isTab: false
 				},
 				store: {
-					id: 'spTabSettings',
+					id: 'spTabStore',
 					class: 'sp-tab-store',
 					content: this.config.storeTabContent,
-					el: null
+					el: null,
+					isTab: false
 				},
 				prevPacks: {
 					id: 'spTabPrevPacks',
 					class: 'sp-tab-prev-packs',
 					content: this.config.prevPacksTabContent,
-					el: null
+					el: null,
+					isTab: false
 				},
 				nextPacks: {
 					id: 'spTabNextPacks',
 					class: 'sp-tab-next-packs',
 					content: this.config.nextPacksTabContent,
-					el: null
+					el: null,
+					isTab: false
 				}
 			};
 
@@ -79,19 +85,19 @@
 			this.el.innerHTML = '';
 
 			// PREV BUTTON
-			this.el.appendChild(this.renderControlButton(this.controlTabs.prevPacks, false));
-			Module.StickerHelper.setEvent('click', this.el, this.controlTabs.prevPacks.class, this.onClickPrevPacksButton.bind(this));
+			this.el.appendChild(this.renderControlButton(this.controls.prevPacks));
+			Module.StickerHelper.setEvent('click', this.el, this.controls.prevPacks.class, this.onClickPrevPacksButton.bind(this));
 
 			// SCROLLABLE CONTAINER
 			this.renderScrollableContainer();
 
 			// CUSTOM TAB
 			if (this.config.enableCustomTab) {
-				this.scrollableContentEl.appendChild(this.renderControlButton(this.controlTabs.custom, true));
+				this.scrollableContentEl.appendChild(this.renderControlButton(this.controls.custom));
 			}
 
 			// HISTORY TAB
-			this.scrollableContentEl.appendChild(this.renderControlButton(this.controlTabs.history, true));
+			this.scrollableContentEl.appendChild(this.renderControlButton(this.controls.history));
 
 			// PACKS TABS
 			for (var i = 0; i < stickerPacks.length; i++) {
@@ -99,14 +105,14 @@
 			}
 
 			// SETTINGS BUTTON
-			this.scrollableContentEl.appendChild(this.renderControlButton(this.controlTabs.settings, false));
+			this.scrollableContentEl.appendChild(this.renderControlButton(this.controls.settings));
 
 			// NEXT BUTTON
-			this.el.appendChild(this.renderControlButton(this.controlTabs.nextPacks, false));
-			Module.StickerHelper.setEvent('click', this.el, this.controlTabs.nextPacks.class, this.onClickNextPacksButton.bind(this));
+			this.el.appendChild(this.renderControlButton(this.controls.nextPacks));
+			Module.StickerHelper.setEvent('click', this.el, this.controls.nextPacks.class, this.onClickNextPacksButton.bind(this));
 
 			// STORE BUTTON
-			this.el.appendChild(this.renderControlButton(this.controlTabs.store, false));
+			this.el.appendChild(this.renderControlButton(this.controls.store));
 
 			this.onWindowResize();
 		},
@@ -121,14 +127,14 @@
 			this.scrollableContainerEl.appendChild(this.scrollableContentEl);
 			this.el.appendChild(this.scrollableContainerEl);
 		},
-		renderControlButton: function(tab, isTab) {
-			isTab = isTab || false;
+		renderControlButton: function(controlButton) {
+			controlButton.isTab = controlButton.isTab || false;
 
-			var classes = [tab.class];
-			classes.push((isTab) ? this.classes.controlTab : this.classes.controlButton);
+			var classes = [controlButton.class];
+			classes.push((controlButton.isTab) ? this.classes.controlTab : this.classes.controlButton);
 
-			tab.el = this.renderTab(tab.id, classes, tab.content);
-			return tab.el;
+			controlButton.el = this.renderTab(controlButton.id, classes, controlButton.content);
+			return controlButton.el;
 		},
 		renderPackTab: function(pack) {
 			var classes = [this.classes.packTab];
@@ -186,7 +192,7 @@
 					tabEl.classList.remove(this.classes.tabActive);
 				}).bind(this));
 
-				Module.StickerHelper.forEach(this.controlTabs, (function(controlTab) {
+				Module.StickerHelper.forEach(this.controls, (function(controlTab) {
 					if (controlTab && controlTab.el) {
 						controlTab.el.classList.remove(this.classes.tabActive);
 					}
@@ -221,10 +227,10 @@
 		},
 
 		handleClickOnCustomTab: function(callback) {
-			Module.StickerHelper.setEvent('click', this.el, this.controlTabs.custom.class, callback);
+			Module.StickerHelper.setEvent('click', this.el, this.controls.custom.class, callback);
 		},
 		handleClickOnLastUsedPacksTab: function(callback) {
-			Module.StickerHelper.setEvent('click', this.el, this.controlTabs.history.class, callback);
+			Module.StickerHelper.setEvent('click', this.el, this.controls.history.class, callback);
 		},
 		handleClickOnPackTab: function(callback) {
 			Module.StickerHelper.setEvent('click', this.el, this.classes.packTab, callback);
@@ -236,23 +242,23 @@
 				return;
 			}
 
-			if (this.controlTabs.prevPacks.el) {
+			if (this.controls.prevPacks.el) {
 				if (parseInt(this.scrollableContentEl.style.left, 10) < 0) {
-					this.controlTabs.prevPacks.el.style.display = 'block';
+					this.controls.prevPacks.el.style.display = 'block';
 				} else {
-					this.controlTabs.prevPacks.el.style.display = 'none';
+					this.controls.prevPacks.el.style.display = 'none';
 				}
 			}
 
 
-			if (this.controlTabs.nextPacks.el) {
+			if (this.controls.nextPacks.el) {
 				var contentWidth = this.scrollableContentEl.scrollWidth;
 				var contentOffset = parseInt(this.scrollableContentEl.style.left, 10) || 0;
 
 				if (contentWidth + contentOffset > this.scrollableContainerEl.offsetWidth) {
-					this.controlTabs.nextPacks.el.style.display = 'block';
+					this.controls.nextPacks.el.style.display = 'block';
 				} else {
-					this.controlTabs.nextPacks.el.style.display = 'none';
+					this.controls.nextPacks.el.style.display = 'none';
 				}
 			}
 		}
