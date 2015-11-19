@@ -522,15 +522,18 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	Module.TabsView = Module.Class({
 
 		el: null,
+		scrollableContainerEl: null,
 		scrollableContentEl: null,
 
 		controlTabs: null,
-		config: null,
+		packTabs: {},
 
-		currentPage: 0,
+		config: null,
 
 		_constructor: function(config) {
 			this.config = config;
+
+			this.el = document.createElement('div');
 
 			this.controlTabs = {
 				custom: {
@@ -582,57 +585,71 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			}).bind(this));
 		},
 
-		// el == tabsEl
-		render: function(el, stickerPacks, tabActive) {
+		render: function(stickerPacks) {
 
-			this.el = el;
+			this.el.classList.add('sp-tabs');
 			this.el.innerHTML = '';
 
-			this.renderControlTab(this.el, this.controlTabs.prevPacks, tabActive);
-			this.controlTabs.prevPacks.el.style.display = 'none';
-			this.controlTabs.prevPacks.el.addEventListener('click', (function() {
-				this.onClickPrevPacksButton();
-			}).bind(this));
+			// PREV BUTTON
+			this.el.appendChild(this.renderControlTab(this.controlTabs.prevPacks));
+			Module.StickerHelper.setEvent('click', this.el, this.controlTabs.prevPacks.class, this.onClickPrevPacksButton.bind(this));
 
+			// SCROLLABLE CONTAINER
+			this.renderScrollableContainer();
 
-			// scrollable container
-
-			this.scrollableContentEl = document.createElement('div');
-			this.scrollableContentEl.style.float = 'left';
-
-			this.scrollableContentEl.style.width = '300px';
-			this.scrollableContentEl.style.whiteSpace = 'nowrap';
-			this.scrollableContentEl.style.overflow = 'hidden';
-			this.scrollableContentEl.style.display = 'flex';
-			this.scrollableContentEl.style.position = 'relative';
-
-			this.el.appendChild(this.scrollableContentEl);
-
-			// ********************
-
-			this.config.enableCustomTab && this.renderControlTab(this.scrollableContentEl, this.controlTabs.custom, tabActive);
-			this.renderControlTab(this.scrollableContentEl, this.controlTabs.history, tabActive);
-
-			for (var i = 0; i < stickerPacks.length; i++) {
-				this.renderPackTab(stickerPacks[i], i, tabActive);
+			// CUSTOM TAB
+			if (this.config.enableCustomTab) {
+				this.scrollableContentEl.appendChild(this.renderControlTab(this.controlTabs.custom));
 			}
 
-			this.renderControlTab(this.scrollableContentEl, this.controlTabs.settings, tabActive);
-			this.renderControlTab(this.el, this.controlTabs.store, tabActive);
+			// HISTORY TAB
+			this.scrollableContentEl.appendChild(this.renderControlTab(this.controlTabs.history));
 
-			this.renderControlTab(this.el, this.controlTabs.nextPacks, tabActive);
-			this.controlTabs.nextPacks.el.addEventListener('click', (function() {
-				this.onClickNextPacksButton();
-			}).bind(this));
+			// PACKS TABS
+			for (var i = 0; i < stickerPacks.length; i++) {
+				this.scrollableContentEl.appendChild(this.renderPackTab(stickerPacks[i], i));
+			}
+
+			// SETTINGS BUTTON
+			this.scrollableContentEl.appendChild(this.renderControlTab(this.controlTabs.settings));
+
+			// STORE BUTTON
+			this.el.appendChild(this.renderControlTab(this.controlTabs.store));
+
+			// NEXT BUTTON
+			this.el.appendChild(this.renderControlTab(this.controlTabs.nextPacks));
+			Module.StickerHelper.setEvent('click', this.el, this.controlTabs.nextPacks.class, this.onClickNextPacksButton.bind(this));
 
 			this.onWindowResize();
 		},
-		renderControlTab: function(el, tab, tabActive) {
-			tab.el = this.renderTab(el, tab.id, [tab.class, 'sp-control-tab'], tab.number, tab.content, tabActive);
+		renderScrollableContainer: function() {
+
+			// todo + classes
+			this.scrollableContentEl = document.createElement('div');
+			this.scrollableContentEl.style.whiteSpace = 'nowrap';
+			this.scrollableContentEl.style.position = 'relative';
+			this.scrollableContentEl.style.display = 'flex';
+			this.scrollableContentEl.style.transition = '300ms';
+
+
+			this.scrollableContainerEl = document.createElement('div');
+			this.scrollableContainerEl.style.float = 'left';
+			this.scrollableContainerEl.style.width = '300px';
+			this.scrollableContainerEl.style.overflow = 'hidden';
+			this.scrollableContainerEl.style.position = 'relative';
+
+			this.scrollableContainerEl.appendChild(this.scrollableContentEl);
+			this.el.appendChild(this.scrollableContainerEl);
+		},
+		renderControlTab: function(tab) {
+			tab.el = this.renderTab(tab.id, [tab.class, 'sp-control-tab'], tab.number, tab.content);
 			return tab.el;
 		},
-		renderPackTab: function(pack, number, tabActive) {
-			var classes = ['sp-pack-tab'];
+		renderPackTab: function(pack, number) {
+			var classes = ['sp-pack-tab'],
+				attrs = {
+					'data-pack-name': pack.pack_name
+				};
 
 			if(pack.newPack) {
 				classes.push('sp-new-pack');
@@ -645,9 +662,19 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 			var content = '<img src=' + iconSrc + '>';
 
-			this.renderTab(this.scrollableContentEl, null, classes, number, content, tabActive);
+			var tabEl = this.renderTab(null, classes, number, content, attrs);
+
+			tabEl.addEventListener('click', function() {
+				tabEl.classList.remove('sp-new-pack');
+			});
+
+			this.packTabs[pack.pack_name] = tabEl;
+
+			return tabEl;
 		},
-		renderTab: function(el ,id, classes, dataTabNumber, content, tabActive) {
+		renderTab: function(id, classes, dataTabNumber, content, attrs) {
+			attrs = attrs || [];
+
 			var tabEl = document.createElement('span');
 
 			if (id) {
@@ -656,94 +683,97 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 			classes.push(this.config.tabItemClass);
 
-			if (tabActive == dataTabNumber) {
-				classes.push('active');
-			}
-
 			tabEl.classList.add.apply(tabEl.classList, classes);
-			tabEl.setAttribute('data-tab-number', dataTabNumber);
+
+			attrs['data-tab-number'] = dataTabNumber;
+			Module.StickerHelper.forEach(attrs, function(value, name) {
+				tabEl.setAttribute(name, value);
+			});
+
 			tabEl.innerHTML = content;
 
-			el.appendChild(tabEl);
+			tabEl.addEventListener('click', (function() {
+
+				Module.StickerHelper.forEach(this.packTabs, function(tabEl) {
+					tabEl.classList.remove('active');
+				});
+
+				Module.StickerHelper.forEach(this.controlTabs, function(controlTab) {
+					if (controlTab && controlTab.el) {
+						controlTab.el.classList.remove('active');
+					}
+				});
+
+				tabEl.classList.add('active');
+			}).bind(this));
 
 			return tabEl;
 		},
 
 		onClickPrevPacksButton: function() {
-			this.currentPage--;
-			this.onWindowResize();
+			var tabWidth = this.scrollableContentEl.getElementsByClassName('sp-pack-tab')[0].offsetWidth;
+			var containerWidth = parseInt(this.scrollableContainerEl.style.width, 10);
+			var contentOffset = parseInt(this.scrollableContentEl.style.marginLeft, 10) || 0;
+			var countFullShownTabs = parseInt((containerWidth / tabWidth), 10);
 
-			this.scrollableContentEl.scrollLeft = this.scrollableContentWidth * this.currentPage;
+			var offset = contentOffset + (tabWidth * countFullShownTabs);
+			this.scrollableContentEl.style.marginLeft = offset + 'px';
+			this.onWindowResize();
 		},
 		onClickNextPacksButton: function() {
-			if (this.scrollableContentWidth * (this.currentPage + 1) > this.scrollableContentEl.scrollWidth) {
-				return;
-			}
-			this.currentPage++;
-			this.scrollableContentEl.scrollLeft = this.scrollableContentWidth * this.currentPage;
+			var tabWidth = this.scrollableContentEl.getElementsByClassName('sp-pack-tab')[0].offsetWidth;
+			var containerWidth = parseInt(this.scrollableContainerEl.style.width, 10);
+			var contentOffset = parseInt(this.scrollableContentEl.style.marginLeft, 10) || 0;
+			var countFullShownTabs = parseInt((containerWidth / tabWidth), 10);
+
+			var offset = -(tabWidth * countFullShownTabs) + contentOffset;
+			this.scrollableContentEl.style.marginLeft = offset + 'px';
 			this.onWindowResize();
+		},
+
+		handleClickOnCustomTab: function(callback) {
+			Module.StickerHelper.setEvent('click', this.el, this.controlTabs.custom.class, callback);
+		},
+		handleClickOnLastUsedPacksTab: function(callback) {
+			Module.StickerHelper.setEvent('click', this.el, this.controlTabs.history.class, callback);
+		},
+		handleClickOnPackTab: function(callback) {
+			Module.StickerHelper.setEvent('click', this.el, 'sp-pack-tab', callback);
 		},
 
 		onWindowResize: function() {
 
+			if (!this.el.parentElement) {
+				return;
+			}
+
 			if (this.controlTabs.prevPacks.el) {
-				if (this.currentPage > 0) {
+				if (parseInt(this.scrollableContentEl.style.marginLeft, 10) < 0) {
 					this.controlTabs.prevPacks.el.style.display = 'inline-block';
 				} else {
 					this.controlTabs.prevPacks.el.style.display = 'none';
 				}
 			}
 
+
 			if (this.controlTabs.nextPacks.el) {
-				if (this.scrollableContentEl.scrollWidth > this.scrollableContentEl.offsetWidth) {
+				var contentOffset = parseInt(this.scrollableContentEl.style.marginLeft, 10) || 0;
+
+				if ((contentOffset * -1) < this.scrollableContainerEl.offsetWidth) {
 					this.controlTabs.nextPacks.el.style.display = 'inline-block';
 				} else {
 					this.controlTabs.nextPacks.el.style.display = 'none';
 				}
 			}
 
-			this.scrollableContentWidth = this.el.parentElement.offsetWidth
+			this.scrollableContainerEl.style.width = this.el.parentElement.offsetWidth
 				- this.controlTabs.store.el.offsetWidth
 				- this.controlTabs.nextPacks.el.offsetWidth
 				- this.controlTabs.prevPacks.el.offsetWidth
+				+ 'px'
 			;
-
-			this.scrollableContentEl.style.width = this.scrollableContentWidth + 'px';
 		}
 	});
-
-})(window, window.StickersModule);
-
-(function(Plugin, Module) {
-
-	var StickerHelper = Module.StickerHelper;
-
-	Plugin.StickersModule.TabsController = Module.Class({
-
-		config: null,
-		view: null,
-
-		_constructor: function(config) {
-			this.config = config;
-			this.view = new Module.TabsView(this.config);
-		},
-
-		handleClickTab: function(el, itemsClassName, callback) {
-			StickerHelper.setEvent('click', el, itemsClassName, callback);
-		}
-
-	});
-
-})(window, window.StickersModule);
-
-(function(Plugin, Module) {
-
-    Plugin.StickersModule.BaseController = Plugin.StickersModule.Class({
-
-        handleClickSticker: function(el, itemsClassName, callback) {
-            Module.StickerHelper.setEvent('click', el, itemsClassName, callback);
-        }
-    });
 
 })(window, window.StickersModule);
 
@@ -1058,63 +1088,20 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		service: null,
 
 		el: null,
-		tabsEl:  null,
 		stickersEl:  null,
 
 		controlTabs:  {},
 
-		tabsController: null,
+		tabsView: null,
 
 		_constructor: function(config, service) {
 			this.config = config;
 			this.service = service;
 
-			//this.controlTabs = {
-			//	custom: {
-			//		id: 'spTabCustom',
-			//		class: 'sp-tab-custom',
-			//		content: this.config.customTabContent,
-			//		number: -1,
-			//		el: null
-			//	},
-			//	history: {
-			//		id: 'spTabHistory',
-			//		class: 'sp-tab-history',
-			//		content: this.config.historyTabContent,
-			//		number: -2,
-			//		el: null
-			//	},
-			//	settings: {
-			//		id: 'spTabSettings',
-			//		class: 'sp-tab-settings',
-			//		content: this.config.settingsTabContent,
-			//		number: -3,
-			//		el: null
-			//	},
-			//	store: {
-			//		id: 'spTabSettings',
-			//		class: 'sp-tab-store',
-			//		content: this.config.storeTabContent,
-			//		number: -4,
-			//		el: null
-			//	},
-			//	prevPacks: {
-			//		id: 'spTabPrevPacks',
-			//		class: 'sp-tab-prev-packs',
-			//		content: this.config.prevPacksTabContent,
-			//		number: -5,
-			//		el: null
-			//	},
-			//	nextPacks: {
-			//		id: 'spTabNextPacks',
-			//		class: 'sp-tab-next-packs',
-			//		content: this.config.nextPacksTabContent,
-			//		number: -6,
-			//		el: null
-			//	}
-			//};
+			this.tabsView = new Module.TabsView(this.config);
 
-			this.tabsController = new Module.TabsController(this.config);
+			this.el = document.getElementById(this.config.elId);
+			this.stickersEl = document.createElement('div');
 		},
 
 		clearBlock: function(el) {
@@ -1122,87 +1109,23 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			el.innerHTML = '';
 		},
 
-		render: function(elId) {
+		render: function(stickerPacks) {
+			this.tabsView.render(stickerPacks);
 
-			this.el = document.getElementById(elId);
-
-			this.clearBlock(this.el);
+			this.el.innerHTML = '';
 
 			this.el.classList.add('sticker-pipe');
 
-			this.tabsEl = document.createElement('div');
-			this.tabsEl.classList.add('sp-tabs');
-
-			this.stickersEl = document.createElement('div');
 			this.stickersEl.classList.add('sp-stickers');
 
-			this.el.appendChild(this.tabsEl);
+			this.el.appendChild(this.tabsView.el);
 			this.el.appendChild(this.stickersEl);
+
+			// todo resize --> flex
+			window.dispatchEvent(new Event('resize'));
 		},
 
-		renderTabs: function(stickerPacks, tabActive) {
-
-			this.tabsController.view.render(this.tabsEl, stickerPacks, tabActive);
-
-			//this.clearBlock(this.tabsEl);
-			//
-			//this.renderControlTab(this.controlTabs.prevPacks, tabActive);
-			//this.config.enableCustomTab && this.renderControlTab(this.controlTabs.custom, tabActive);
-			//this.renderControlTab(this.controlTabs.history, tabActive);
-			//
-			//for (var j = 0; j < 1; j++) {
-			//	for (var i = 0; i < stickerPacks.length; i++) {
-			//		this.renderPackTab(stickerPacks[i], i, tabActive);
-			//	}
-			//}
-			//
-			//this.renderControlTab(this.controlTabs.settings, tabActive);
-			//this.renderControlTab(this.controlTabs.store, tabActive);
-			//this.renderControlTab(this.controlTabs.nextPacks, tabActive);
-		},
-		//renderPackTab: function(pack, number, tabActive) {
-		//	var classes = ['sp-pack-tab'];
-		//
-		//	if(pack.newPack) {
-		//		classes.push('stnewtab');
-		//	}
-		//
-		//	var iconSrc = this.config.domain + '/' +
-		//		this.config.baseFolder + '/' +
-		//		pack.pack_name + '/tab_icon_' +
-		//		this.config.tabResolutionType + '.png';
-		//
-		//	var content = '<img src=' + iconSrc + '>';
-		//
-		//	this.renderTab(null, classes, number, content, tabActive);
-		//},
-		//renderControlTab: function(tab, tabActive) {
-		//	tab.el = this.renderTab(tab.id, [tab.class, 'sp-control-tab'], tab.number, tab.content, tabActive);
-		//	return tab.el;
-		//},
-		//renderTab: function(id, classes, dataTabNumber, content, tabActive) {
-		//	var tabEl = document.createElement('span');
-		//
-		//	if (id) {
-		//		tabEl.id = id;
-		//	}
-		//
-		//	classes.push(this.config.tabItemClass);
-		//
-		//	if (tabActive == dataTabNumber) {
-		//		classes.push('active');
-		//	}
-		//
-		//	tabEl.classList.add.apply(tabEl.classList, classes);
-		//	tabEl.setAttribute('data-tab-number', dataTabNumber);
-		//	tabEl.innerHTML = content;
-		//
-		//	this.tabsEl.appendChild(tabEl);
-		//
-		//	return tabEl;
-		//},
-
-		renderUseStickers: function(latesUseSticker, stickerItemClass) {
+		renderUseStickers: function(latesUseSticker) {
 			var self = this;
 
 			this.clearBlock(self.stickersEl);
@@ -1220,7 +1143,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 				var icon_src = this.service.parseStickerFromText("[[" + sticker.code + "]]"),
 					packItem;
 
-				packItem = "<span data-sticker-string=" + sticker.code +" class=" + stickerItemClass + "> <img src=" + icon_src.url + "></span>";
+				packItem = "<span data-sticker-string=" + sticker.code +" class=" + self.config.stickerItemClass + "> <img src=" + icon_src.url + "></span>";
 
 				self.stickersEl.innerHTML += packItem;
 			}).bind(this));
@@ -1231,35 +1154,21 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			this.clearBlock(this.stickersEl);
 		},
 
-		renderStickers: function(stickerPacks, tabActive, stickerItemClass) {
-			var self = this,
-				tabNumber = 0;
+		renderStickers: function(pack) {
+			var self = this;
 
 			this.clearBlock(this.stickersEl);
 
-			StickerHelper.forEach(stickerPacks, function(pack) {
+			StickerHelper.forEach(pack.stickers, function(sticker) {
 
-				if (tabNumber == tabActive) {
-					StickerHelper.forEach(pack.stickers, function(sticker) {
+				var icon_src = self.config.domain + '/' +
+					self.config.baseFolder + '/' +
+					pack.pack_name + '/' +
+					sticker.name + '_' + self.config.stickerResolutionType +
+					'.png';
 
-						var icon_src = self.config.domain +
-								"/" +
-								self.config.baseFolder +
-								"/" +
-								pack.pack_name +
-								"/" +
-								sticker.name +
-								"_" +
-								self.config.stickerResolutionType +
-								".png",
-
-							packItem = "<span data-sticker-string=" + pack.pack_name + "_" + sticker.name +" class=" + stickerItemClass + "> <img src=" + icon_src + "></span>";
-
-						self.stickersEl.innerHTML += packItem;
-					});
-				}
-
-				tabNumber++;
+				self.stickersEl.innerHTML +=
+					'<span data-sticker-string=' + pack.pack_name + '_' + sticker.name +' class=' + self.config.stickerItemClass + '> <img src=' + icon_src + '></span>';
 			});
 		},
 
@@ -1293,6 +1202,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			// todo
 			//iframe.src = 'http://work.stk.908.vc/api/v1/web?' + urlSerialize(urlParams) + '#/packs/' + packName;
 			iframe.src = 'http://localhost/stickerpipe/store/build?' + urlSerialize(urlParams) + '#/packs/' + packName;
+		},
+
+		handleClickSticker: function(callback) {
+			Module.StickerHelper.setEvent('click', this.stickersEl, this.config.stickerItemClass, callback);
 		}
 	});
 
@@ -1341,22 +1254,68 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 	var helper = Modules.StickerHelper;
 
-    function Stickers(configObj) {
+	Plugin.Stickers = Modules.Class({
 
-		this.init = function() {
-			this.initConfigs(configObj);
+		_constructor: function(config) {
+			this.config = helper.mergeOptions(Modules.Config, config);
+
+			this.configResolution();
 
 			this.stService = new Modules.BaseService(this.config);
-			this.stView = new Modules.BaseView(this.config, this.stService);
-			this.stController = new Modules.BaseController(this.config);
 			this.stickersModel = {};
-			this.tabActive = 0;
+			this.stView = new Modules.BaseView(this.config, this.stService);
 
 			Plugin.JsApiInterface && Plugin.JsApiInterface._setConfigs(this.config);
-		};
 
-		this.initConfigs = function(configObj) {
-			this.config = helper.mergeOptions(Modules.Config, configObj);
+			this.delegateEvents();
+		},
+
+		delegateEvents: function() {
+
+			this.stView.tabsView.handleClickOnLastUsedPacksTab((function() {
+				this.stView.renderUseStickers(this.stService.getLatestUse());
+			}).bind(this));
+
+			this.stView.tabsView.handleClickOnPackTab((function(el) {
+				var pack = null,
+					packName = el.getAttribute('data-pack-name');
+
+				for (var i = 0; i < this.stickersModel.length; i++) {
+					if (this.stickersModel[i].pack_name == packName) {
+
+						// set newPack - false
+						this.stickersModel[i].newPack = false;
+						this.stService.setPacksToStorage(this.stickersModel);
+
+						pack = this.stickersModel[i];
+
+						break;
+					}
+				}
+
+				pack && this.stView.renderStickers(pack);
+			}).bind(this));
+
+			this.stView.handleClickSticker((function(el) {
+
+				var stickerAttribute = el.getAttribute('data-sticker-string'),
+					nowDate = new Date().getTime() / 1000|0;
+
+
+				helper.ajaxPost(this.config.trackStatUrl, this.config.apikey, [{
+					action: 'use',
+					category: 'sticker',
+					label: '[[' + stickerAttribute + ']]',
+					time: nowDate
+				}]);
+
+				ga('stickerTracker.send', 'event', 'sticker', stickerAttribute.split('_')[0], stickerAttribute.split('_')[1], 1);
+
+				this.stService.addToLatestUse(stickerAttribute);
+			}).bind(this));
+		},
+
+		configResolution: function() {
 			this.config = helper.mergeOptions(this.config, {
 				stickerResolutionType : 'mdpi',
 				tabResolutionType: 'hdpi'
@@ -1368,203 +1327,111 @@ document.addEventListener("DOMContentLoaded", function(event) {
 					tabResolutionType: 'xxhdpi'
 				});
 			}
-		};
+		},
 
-        this._renderAll = function() {
+		start: function(callback) {
+			var onPacksLoadCallback = (function() {
+				callback && callback();
 
-			this.stView.renderTabs(this.stickersModel, this.tabActive);
+				this.stView.render(this.stickersModel);
+				this.stView.renderUseStickers(this.stService.getLatestUse());
+			}).bind(this);
 
-			switch (this.tabActive) {
-				case this.stView.tabsController.view.controlTabs.custom.number:
-					this.stView.renderCustomBlock();
-					break;
-				case this.stView.tabsController.view.controlTabs.history.number:
-					this.stView.renderUseStickers(this.stService.getLatestUse(), this.config.stickerItemClass);
-					break;
-				case this.stView.tabsController.view.controlTabs.settings.number:
-					console.log('click on settings tab');
-					break;
-				case this.stView.tabsController.view.controlTabs.store.number:
-					console.log('click on store tab');
-					break;
-				case this.stView.tabsController.view.controlTabs.nextPacks.number:
-					console.log('click on nextPacks tab');
-					break;
-				case this.stView.tabsController.view.controlTabs.prevPacks.number:
-					console.log('click on prevPacks tab');
-					break;
-				default:
-					this.stView.renderStickers(this.stickersModel, this.tabActive, this.config.stickerItemClass);
-					break;
+			var storageStickerData =  this.stService.getPacksFromStorage();
+
+			if (storageStickerData.actual) {
+
+				this.stickersModel = storageStickerData.packs;
+
+				onPacksLoadCallback.apply();
+			} else {
+
+				this.fetchPacks({
+					callback: onPacksLoadCallback
+				});
 			}
-        };
 
-        this._init = function() {
+		},
 
-            this._renderAll();
-
-			this.stView.tabsController.handleClickTab(this.stView.tabsEl, this.config.tabItemClass, (function(el) {
-				switch(+el.getAttribute('data-tab-number')) {
-					case this.stView.tabsController.view.controlTabs.settings.number:
-					case this.stView.tabsController.view.controlTabs.store.number:
-					case this.stView.tabsController.view.controlTabs.nextPacks.number:
-					case this.stView.tabsController.view.controlTabs.prevPacks.number:
-						return;
-						break;
-					default:
-						break;
-				}
-
-				this.tabActive = +el.getAttribute('data-tab-number');
-
-                if(this.tabActive >= 0) this.stickersModel[this.tabActive].newPack = false;
-				this.stService.setPacksToStorage(this.stickersModel);
-
-                this._renderAll();
-            }).bind(this));
-
-			this.stController.handleClickSticker(this.stView.stickersEl, this.config.stickerItemClass, (function(el) {
-
-                var stickerAttribute = el.getAttribute('data-sticker-string'),
-                    nowDate = new Date().getTime()/1000|0;
-
-
-				helper.ajaxPost(this.config.trackStatUrl, this.config.apikey, [
-                    {
-                        action: 'use',
-                        category: 'sticker',
-                        label: '[[' + stickerAttribute + ']]',
-                        time: nowDate
-                    }
-
-                ]);
-
-                ga('stickerTracker.send', 'event', 'sticker', stickerAttribute.split("_")[0], stickerAttribute.split("_")[1], 1);
-
-				this.stService.addToLatestUse(stickerAttribute);
-                this._renderAll();
-
-            }).bind(this));
-
-        };
-
-        this.fetchPacks = function(attrs) {
+		fetchPacks: function(attrs) {
 			this.stService.updatePacks((function(stickerPacks) {
 				this.stickersModel = stickerPacks;
 
-                if(!attrs.onlyFetch){
-                    this._init();
-                }
+				if(attrs.callback) {
+					attrs.callback.apply();
+				}
+			}).bind(this));
+		},
 
+		onClickSticker: function(callback, context) {
 
-                if(attrs.callback) attrs.callback.apply();
-            }).bind(this));
-        };
+			this.stView.handleClickSticker(function(el) {
+				callback.call(context, '[[' + el.getAttribute('data-sticker-string') + ']]');
+			});
 
-        this.start = function(callback) {
-            var storageStickerData;
+		},
 
-			//this.tabActive = this.stView.controlTabs.history.number;
-			this.tabActive = this.stView.tabsController.view.controlTabs.history.number;
+		onClickCustomTab: function(callback, context) {
+			this.stView.tabsView.handleClickOnCustomTab((function(el) {
+				callback.call(context, el);
+			}).bind(this));
+		},
 
-            storageStickerData =  this.stService.getPacksFromStorage();
+		onClickTab: function(callback, context) {
 
-			this.stView.render(this.config.elId);
+			this.stView.tabsView.handleClickOnPackTab(function(el) {
+				callback.call(context, el);
+			});
 
-            if(storageStickerData.actual) {
+		},
 
-				this.stickersModel = storageStickerData.packs;
-                this._init();
+		getNewStickersFlag: function() {
+			return this.stService.getNewStickersFlag(this.stService.getPacksFromStorage().packs || []);
+		},
 
-                if(callback) callback.apply();
-            } else {
+		resetNewStickersFlag: function() {
+			return this.stService.resetNewStickersFlag();
+		},
 
-                this.fetchPacks({
-                    callback: callback
-                });
-            }
+		parseStickerFromText: function(text) {
+			return this.stService.parseStickerFromText(text);
+		},
 
+		// todo
+		renderCurrentTab: function(tabName) {
+			var obj = this.stService.getPacksFromStorage();
 
-        };
-
-        this.onClickSticker = function(callback, context) {
-
-			this.stController.handleClickSticker(this.stView.stickersEl, this.config.stickerItemClass, function(el) {
-                callback.call(context, '[[' + el.getAttribute('data-sticker-string') + ']]');
-            });
-
-        };
-
-        this.onClickCustomTab = function(callback, context) {
-
-			this.stView.tabsController.handleClickTab(this.stView.tabsEl, this.config.tabItemClass, function(el) {
-
-                if (el.getAttribute('id') == 'spTabCustom' ) {
-                    callback.call(context, el);
-                }
-
-            });
-
-        };
-
-        this.onClickTab = function(callback, context) {
-
-			this.stView.tabsController.handleClickTab(this.stView.tabsEl, this.config.tabItemClass, function(el) {
-                callback.call(context, el);
-            });
-
-        };
-
-        this.getNewStickersFlag = function() {
-            return this.stService.getNewStickersFlag(this.stService.getPacksFromStorage().packs || []);
-        };
-
-        this.resetNewStickersFlag = function() {
-            return this.stService.resetNewStickersFlag();
-        };
-
-        this.parseStickerFromText = function(text) {
-            return this.stService.parseStickerFromText(text);
-        };
-
-        this.renderCurrentTab = function(tabName) {
-            var obj = this.stService.getPacksFromStorage();
-
-            //this.start(); // todo
+			//this.start(); // todo
 
 			helper.forEach(obj.packs, (function(pack, key) {
 
-                if(pack.pack_name.toLowerCase() == tabName.toLowerCase()) {
+				if(pack.pack_name.toLowerCase() == tabName.toLowerCase()) {
 					this.tabActive = +key;
-                }
+				}
 
-            }).bind(this));
+			}).bind(this));
 
-            //this.stickersModel[this.tabActive].newPack = false;
-            //this.stService.setPacksToStorage(this.stickersModel);
+			//this.stickersModel[this.tabActive].newPack = false;
+			//this.stService.setPacksToStorage(this.stickersModel);
 
-            this._renderAll();
-        };
+			//this._renderAll();
+		},
 
-        this.isNewPack = function(packName) {
-            return this.stService.isNewPack(this.stickersModel, packName);
-        };
+		isNewPack: function(packName) {
+			return this.stService.isNewPack(this.stickersModel, packName);
+		},
 
-        this.onUserMessageSent = function(isSticker) {
-            return this.stService.onUserMessageSent(isSticker);
-        };
+		onUserMessageSent: function(isSticker) {
+			return this.stService.onUserMessageSent(isSticker);
+		},
 
-        this.renderPack = function(pack) {
+		renderPack: function(pack) {
 			this.stView.renderStorePack(pack);
-        };
+		},
 
-        this.purchaseSuccess = function(packName) {
+		purchaseSuccess: function(packName) {
 			this.stService.purchaseSuccess(packName);
-        };
-
-		this.init();
-    }
-
-    Plugin.Stickers = Stickers;
+		}
+	});
 
 })(window, StickersModule);
