@@ -619,12 +619,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			// SETTINGS BUTTON
 			this.scrollableContentEl.appendChild(this.renderControlButton(this.controlTabs.settings, false));
 
+			// STORE BUTTON
+			this.el.appendChild(this.renderControlButton(this.controlTabs.store, false));
+
 			// NEXT BUTTON
 			this.el.appendChild(this.renderControlButton(this.controlTabs.nextPacks, false));
 			Module.StickerHelper.setEvent('click', this.el, this.controlTabs.nextPacks.class, this.onClickNextPacksButton.bind(this));
-
-			// STORE BUTTON
-			this.el.appendChild(this.renderControlButton(this.controlTabs.store, false));
 
 			this.onWindowResize();
 		},
@@ -718,7 +718,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 		onClickPrevPacksButton: function() {
 			var tabWidth = this.scrollableContentEl.getElementsByClassName(this.classes.packTab)[0].offsetWidth;
-			var containerWidth = this.scrollableContainerEl.offsetWidth;
+			var containerWidth = parseInt(this.scrollableContainerEl.style.width, 10);
 			var contentOffset = parseInt(this.scrollableContentEl.style.left, 10) || 0;
 			var countFullShownTabs = parseInt((containerWidth / tabWidth), 10);
 
@@ -729,7 +729,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		},
 		onClickNextPacksButton: function() {
 			var tabWidth = this.scrollableContentEl.getElementsByClassName(this.classes.packTab)[0].offsetWidth;
-			var containerWidth = this.scrollableContainerEl.offsetWidth;
+			var containerWidth = parseInt(this.scrollableContainerEl.style.width, 10);
 			var contentOffset = parseInt(this.scrollableContentEl.style.left, 10) || 0;
 			var countFullShownTabs = parseInt((containerWidth / tabWidth), 10);
 
@@ -756,8 +756,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 			if (this.controlTabs.prevPacks.el) {
 				if (parseInt(this.scrollableContentEl.style.left, 10) < 0) {
-					//this.controlTabs.prevPacks.el.style.display = 'inline-block';
-					this.controlTabs.prevPacks.el.style.display = 'block';
+					this.controlTabs.prevPacks.el.style.display = 'inline-block';
 				} else {
 					this.controlTabs.prevPacks.el.style.display = 'none';
 				}
@@ -769,19 +768,18 @@ document.addEventListener("DOMContentLoaded", function(event) {
 				var contentOffset = parseInt(this.scrollableContentEl.style.left, 10) || 0;
 
 				if (contentWidth + contentOffset > this.scrollableContainerEl.offsetWidth) {
-					//this.controlTabs.nextPacks.el.style.display = 'inline-block';
-					this.controlTabs.nextPacks.el.style.display = 'block';
+					this.controlTabs.nextPacks.el.style.display = 'inline-block';
 				} else {
 					this.controlTabs.nextPacks.el.style.display = 'none';
 				}
 			}
 
-			//this.scrollableContainerEl.style.width = this.el.parentElement.offsetWidth
-			//	- this.controlTabs.store.el.offsetWidth
-			//	- this.controlTabs.nextPacks.el.offsetWidth
-			//	- this.controlTabs.prevPacks.el.offsetWidth
-			//	+ 'px'
-			//;
+			this.scrollableContainerEl.style.width = this.el.parentElement.offsetWidth
+				- this.controlTabs.store.el.offsetWidth
+				- this.controlTabs.nextPacks.el.offsetWidth
+				- this.controlTabs.prevPacks.el.offsetWidth
+				+ 'px'
+			;
 		}
 	});
 
@@ -1347,8 +1345,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 				callback && callback();
 
 				this.stView.render(this.stickersModel);
-
-				// todo --> active 'used' tab
 				this.stView.renderUseStickers(this.stService.getLatestUse());
 			}).bind(this);
 
