@@ -16,7 +16,7 @@
 			controlButton: 'sp-control-button',
 			newPack: 'sp-new-pack',
 			packTab: 'sp-pack-tab',
-			tabActive: 'active',
+			tabActive: 'sp-tab-active',
 			tabs: 'sp-tabs'
 		},
 
