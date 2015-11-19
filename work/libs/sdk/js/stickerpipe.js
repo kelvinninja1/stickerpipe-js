@@ -759,9 +759,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 
 			if (this.controlTabs.nextPacks.el) {
-				var _el = this.scrollableContentEl.getElementsByClassName('sp-pack-tab')[0];
-				var styles = window.getComputedStyle(_el);
-
 				var contentWidth = this.scrollableContentEl.scrollWidth;
 				var contentOffset = parseInt(this.scrollableContentEl.style.left, 10) || 0;
 
