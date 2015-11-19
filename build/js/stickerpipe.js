@@ -552,42 +552,36 @@ document.addEventListener("DOMContentLoaded", function(event) {
 					id: 'spTabCustom',
 					class: 'sp-tab-custom',
 					content: this.config.customTabContent,
-					number: -1,
 					el: null
 				},
 				history: {
 					id: 'spTabHistory',
 					class: 'sp-tab-history',
 					content: this.config.historyTabContent,
-					number: -2,
 					el: null
 				},
 				settings: {
 					id: 'spTabSettings',
 					class: 'sp-tab-settings',
 					content: this.config.settingsTabContent,
-					number: -3,
 					el: null
 				},
 				store: {
 					id: 'spTabSettings',
 					class: 'sp-tab-store',
 					content: this.config.storeTabContent,
-					number: -4,
 					el: null
 				},
 				prevPacks: {
 					id: 'spTabPrevPacks',
 					class: 'sp-tab-prev-packs',
 					content: this.config.prevPacksTabContent,
-					number: -5,
 					el: null
 				},
 				nextPacks: {
 					id: 'spTabNextPacks',
 					class: 'sp-tab-next-packs',
 					content: this.config.nextPacksTabContent,
-					number: -6,
 					el: null
 				}
 			};
@@ -651,14 +645,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			var classes = [tab.class];
 			classes.push((isTab) ? this.classes.controlTab : this.classes.controlButton);
 
-			tab.el = this.renderTab(tab.id, classes, tab.number, tab.content);
+			tab.el = this.renderTab(tab.id, classes, tab.content);
 			return tab.el;
 		},
-		renderPackTab: function(pack, number) {
-			var classes = [this.classes.packTab],
-				attrs = {
-					'data-pack-name': pack.pack_name
-				};
+		renderPackTab: function(pack) {
+			var classes = [this.classes.packTab];
 
 			if(pack.newPack) {
 				classes.push(this.classes.newPack);
@@ -671,7 +662,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 			var content = '<img src=' + iconSrc + '>';
 
-			var tabEl = this.renderTab(null, classes, number, content, attrs);
+			var tabEl = this.renderTab(null, classes, content, {
+				'data-pack-name': pack.pack_name
+			});
 
 			tabEl.addEventListener('click', (function() {
 				tabEl.classList.remove(this.classes.newPack);
@@ -681,8 +674,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 			return tabEl;
 		},
-		renderTab: function(id, classes, dataTabNumber, content, attrs) {
-			attrs = attrs || [];
+		renderTab: function(id, classes, content, attrs) {
+			classes = classes || [];
+			attrs = attrs || {};
 
 			var tabEl = document.createElement('span');
 
@@ -694,7 +688,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 			tabEl.classList.add.apply(tabEl.classList, classes);
 
-			attrs['data-tab-number'] = dataTabNumber;
 			Module.StickerHelper.forEach(attrs, function(value, name) {
 				tabEl.setAttribute(name, value);
 			});

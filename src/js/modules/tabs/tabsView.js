@@ -131,10 +131,7 @@
 			return tab.el;
 		},
 		renderPackTab: function(pack) {
-			var classes = [this.classes.packTab],
-				attrs = {
-					'data-pack-name': pack.pack_name
-				};
+			var classes = [this.classes.packTab];
 
 			if(pack.newPack) {
 				classes.push(this.classes.newPack);
@@ -147,7 +144,9 @@
 
 			var content = '<img src=' + iconSrc + '>';
 
-			var tabEl = this.renderTab(null, classes, content, attrs);
+			var tabEl = this.renderTab(null, classes, content, {
+				'data-pack-name': pack.pack_name
+			});
 
 			tabEl.addEventListener('click', (function() {
 				tabEl.classList.remove(this.classes.newPack);
@@ -158,7 +157,8 @@
 			return tabEl;
 		},
 		renderTab: function(id, classes, content, attrs) {
-			attrs = attrs || [];
+			classes = classes || [];
+			attrs = attrs || {};
 
 			var tabEl = document.createElement('span');
 
