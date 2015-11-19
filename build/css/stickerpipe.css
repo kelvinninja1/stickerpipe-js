@@ -59,6 +59,21 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   overflow-x: scroll;
   width: 100%;
   white-space: nowrap; }
+  .sticker-pipe .sp-tabs .sp-tabs-scrollable-container {
+    float: left;
+    overflow: hidden;
+    position: relative;
+    width: 300px; }
+    .sticker-pipe .sp-tabs .sp-tabs-scrollable-container .sp-tabs-scrollable-content {
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: -ms-flexbox;
+      display: flex;
+      left: 0;
+      position: relative;
+      -webkit-transition: 300ms;
+      transition: 300ms;
+      white-space: nowrap; }
   .sticker-pipe .sp-tabs .sp-tab-item {
     display: inline-table;
     cursor: pointer;

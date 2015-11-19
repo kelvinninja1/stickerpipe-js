@@ -12,6 +12,8 @@
 		packTabs: {},
 
 		classes: {
+			scrollableContainer: 'sp-tabs-scrollable-container',
+			scrollableContent: 'sp-tabs-scrollable-content',
 			controlTab: 'sp-control-tab',
 			controlButton: 'sp-control-button',
 			newPack: 'sp-new-pack',
@@ -116,20 +118,11 @@
 		},
 		renderScrollableContainer: function() {
 
-			// todo + classes
 			this.scrollableContentEl = document.createElement('div');
-			this.scrollableContentEl.style.whiteSpace = 'nowrap';
-			this.scrollableContentEl.style.position = 'relative';
-			this.scrollableContentEl.style.display = 'flex';
-			this.scrollableContentEl.style.transition = '300ms';
-			this.scrollableContentEl.style.left = '0';
-
+			this.scrollableContentEl.className = this.classes.scrollableContent;
 
 			this.scrollableContainerEl = document.createElement('div');
-			this.scrollableContainerEl.style.float = 'left';
-			this.scrollableContainerEl.style.width = '300px';
-			this.scrollableContainerEl.style.overflow = 'hidden';
-			this.scrollableContainerEl.style.position = 'relative';
+			this.scrollableContainerEl.className = this.classes.scrollableContainer;
 
 			this.scrollableContainerEl.appendChild(this.scrollableContentEl);
 			this.el.appendChild(this.scrollableContainerEl);

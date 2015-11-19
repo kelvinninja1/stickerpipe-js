@@ -14,9 +14,23 @@ $tabContentSize: 36px;
 		width: 100%;
 		white-space: nowrap;
 
+		.sp-tabs-scrollable-container {
+			float: left;
+			overflow: hidden;
+			position: relative;
+			width: 300px;
+
+			.sp-tabs-scrollable-content {
+				display: flex;
+				left: 0;
+				position: relative;
+				transition: 300ms;
+				white-space: nowrap;
+			}
+		}
+
 		.sp-tab-item {
 			display: inline-table;
-			//float: left;
 			cursor: pointer;
 			padding: 6px 10px;
 
