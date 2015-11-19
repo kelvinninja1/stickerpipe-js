@@ -98,6 +98,8 @@
 				callback && callback();
 
 				this.stView.render(this.stickersModel);
+
+				// todo --> active 'used' tab
 				this.stView.renderUseStickers(this.stService.getLatestUse());
 			}).bind(this);
 
