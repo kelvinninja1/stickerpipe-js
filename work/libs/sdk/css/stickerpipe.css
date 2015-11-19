@@ -55,12 +55,29 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   background: white; }
 
 .sticker-pipe .sp-tabs {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
   background-color: #fff;
   overflow-x: scroll;
   width: 100%;
   white-space: nowrap; }
+  .sticker-pipe .sp-tabs .sp-tabs-scrollable-container {
+    float: left;
+    overflow: hidden;
+    position: relative; }
+    .sticker-pipe .sp-tabs .sp-tabs-scrollable-container .sp-tabs-scrollable-content {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: -webkit-flex;
+      display: flex;
+      left: 0;
+      position: relative;
+      -webkit-transition: 300ms;
+      transition: 300ms;
+      white-space: nowrap; }
   .sticker-pipe .sp-tabs .sp-tab-item {
-    display: inline-table;
     cursor: pointer;
     padding: 6px 10px; }
     @media (max-width: 544px) {
@@ -75,33 +92,32 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
       filter: grayscale(100%); }
       .sticker-pipe .sp-tabs .sp-tab-item img:hover {
         opacity: .7; }
-    .sticker-pipe .sp-tabs .sp-tab-item.active {
+    .sticker-pipe .sp-tabs .sp-tab-item.sp-tab-active {
       background-color: white;
       color: orange; }
-      .sticker-pipe .sp-tabs .sp-tab-item.active img {
+      .sticker-pipe .sp-tabs .sp-tab-item.sp-tab-active img {
         opacity: 1;
         -webkit-filter: grayscale(0%);
         filter: grayscale(0%); }
-    .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab {
+      .sticker-pipe .sp-tabs .sp-tab-item.sp-tab-active.sp-control-tab > span, .sticker-pipe .sp-tabs .sp-tab-item.sp-tab-active.sp-control-button > span {
+        opacity: 0.9; }
+    .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button {
       margin: 0;
       padding: 12px 16px; }
       @media (max-width: 544px) {
-        .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab {
+        .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button {
           padding: 12px 12px; } }
-      .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab:hover > span {
+      .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab:hover > span, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button:hover > span {
         opacity: .7; }
-      .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab > span {
+      .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab > span, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button > span {
         display: table;
         opacity: .5; }
-      .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-prev-packs {
-        float: left; }
-      .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-next-packs, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-store {
-        float: right;
+      .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-next-packs, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-store, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-next-packs, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-store {
         border-left: 1px solid #c8c8c8;
         border-radius: 0; }
-      .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-prev-packs, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-history {
+      .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-prev-packs, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-history, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-prev-packs, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-history {
         border-right: 1px solid #c8c8c8; }
-      .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-prev-packs, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-next-packs {
+      .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-prev-packs, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-next-packs, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-prev-packs, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-next-packs {
         padding-left: 6px;
         padding-right: 6px; }
     .sticker-pipe .sp-tabs .sp-tab-item.sp-pack-tab.sp-new-pack::after {

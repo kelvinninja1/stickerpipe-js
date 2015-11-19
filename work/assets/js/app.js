@@ -96,6 +96,9 @@ var App = _makeClass(function(options) {
 			userPackUrl: 'http://work.stk.908.vc/api/v1/user/pack',
 			trackStatUrl: 'http://work.stk.908.vc/api/v1/track-statistic',
 
+			storeUrl: 'http://work.stk.908.vc/api/v1/web',
+			//storeUrl: 'http://localhost/stickerpipe/store/build',
+
 			//userId: '12345678901234567890123456789012',
 
 			callbacks: {

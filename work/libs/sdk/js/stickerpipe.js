@@ -43,6 +43,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		userPacksUrl: 'http://api.stickerpipe.com/api/v1/user/packs',
 		userPackUrl: 'http://api.stickerpipe.com/api/v1/user/pack',
 		trackStatUrl: 'http://api.stickerpipe.com/api/v1/track-statistic',
+		storeUrl: 'http://api.stickerpipe.com/api/v1/web',
 
 		storagePrefix: 'stickerPipe',
 		enableCustomTab: false,
@@ -528,6 +529,17 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		controlTabs: null,
 		packTabs: {},
 
+		classes: {
+			scrollableContainer: 'sp-tabs-scrollable-container',
+			scrollableContent: 'sp-tabs-scrollable-content',
+			controlTab: 'sp-control-tab',
+			controlButton: 'sp-control-button',
+			newPack: 'sp-new-pack',
+			packTab: 'sp-pack-tab',
+			tabActive: 'sp-tab-active',
+			tabs: 'sp-tabs'
+		},
+
 		config: null,
 
 		_constructor: function(config) {
@@ -540,42 +552,36 @@ document.addEventListener("DOMContentLoaded", function(event) {
 					id: 'spTabCustom',
 					class: 'sp-tab-custom',
 					content: this.config.customTabContent,
-					number: -1,
 					el: null
 				},
 				history: {
 					id: 'spTabHistory',
 					class: 'sp-tab-history',
 					content: this.config.historyTabContent,
-					number: -2,
 					el: null
 				},
 				settings: {
 					id: 'spTabSettings',
 					class: 'sp-tab-settings',
 					content: this.config.settingsTabContent,
-					number: -3,
 					el: null
 				},
 				store: {
 					id: 'spTabSettings',
 					class: 'sp-tab-store',
 					content: this.config.storeTabContent,
-					number: -4,
 					el: null
 				},
 				prevPacks: {
 					id: 'spTabPrevPacks',
 					class: 'sp-tab-prev-packs',
 					content: this.config.prevPacksTabContent,
-					number: -5,
 					el: null
 				},
 				nextPacks: {
 					id: 'spTabNextPacks',
 					class: 'sp-tab-next-packs',
 					content: this.config.nextPacksTabContent,
-					number: -6,
 					el: null
 				}
 			};
@@ -587,11 +593,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 		render: function(stickerPacks) {
 
-			this.el.classList.add('sp-tabs');
+			this.el.classList.add(this.classes.tabs);
 			this.el.innerHTML = '';
 
 			// PREV BUTTON
-			this.el.appendChild(this.renderControlTab(this.controlTabs.prevPacks));
+			this.el.appendChild(this.renderControlButton(this.controlTabs.prevPacks, false));
 			Module.StickerHelper.setEvent('click', this.el, this.controlTabs.prevPacks.class, this.onClickPrevPacksButton.bind(this));
 
 			// SCROLLABLE CONTAINER
@@ -599,11 +605,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 			// CUSTOM TAB
 			if (this.config.enableCustomTab) {
-				this.scrollableContentEl.appendChild(this.renderControlTab(this.controlTabs.custom));
+				this.scrollableContentEl.appendChild(this.renderControlButton(this.controlTabs.custom, true));
 			}
 
 			// HISTORY TAB
-			this.scrollableContentEl.appendChild(this.renderControlTab(this.controlTabs.history));
+			this.scrollableContentEl.appendChild(this.renderControlButton(this.controlTabs.history, true));
 
 			// PACKS TABS
 			for (var i = 0; i < stickerPacks.length; i++) {
@@ -611,49 +617,42 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			}
 
 			// SETTINGS BUTTON
-			this.scrollableContentEl.appendChild(this.renderControlTab(this.controlTabs.settings));
-
-			// STORE BUTTON
-			this.el.appendChild(this.renderControlTab(this.controlTabs.store));
+			this.scrollableContentEl.appendChild(this.renderControlButton(this.controlTabs.settings, false));
 
 			// NEXT BUTTON
-			this.el.appendChild(this.renderControlTab(this.controlTabs.nextPacks));
+			this.el.appendChild(this.renderControlButton(this.controlTabs.nextPacks, false));
 			Module.StickerHelper.setEvent('click', this.el, this.controlTabs.nextPacks.class, this.onClickNextPacksButton.bind(this));
+
+			// STORE BUTTON
+			this.el.appendChild(this.renderControlButton(this.controlTabs.store, false));
 
 			this.onWindowResize();
 		},
 		renderScrollableContainer: function() {
 
-			// todo + classes
 			this.scrollableContentEl = document.createElement('div');
-			this.scrollableContentEl.style.whiteSpace = 'nowrap';
-			this.scrollableContentEl.style.position = 'relative';
-			this.scrollableContentEl.style.display = 'flex';
-			this.scrollableContentEl.style.transition = '300ms';
-			this.scrollableContentEl.style.left = '0';
-
+			this.scrollableContentEl.className = this.classes.scrollableContent;
 
 			this.scrollableContainerEl = document.createElement('div');
-			this.scrollableContainerEl.style.float = 'left';
-			this.scrollableContainerEl.style.width = '300px';
-			this.scrollableContainerEl.style.overflow = 'hidden';
-			this.scrollableContainerEl.style.position = 'relative';
+			this.scrollableContainerEl.className = this.classes.scrollableContainer;
 
 			this.scrollableContainerEl.appendChild(this.scrollableContentEl);
 			this.el.appendChild(this.scrollableContainerEl);
 		},
-		renderControlTab: function(tab) {
-			tab.el = this.renderTab(tab.id, [tab.class, 'sp-control-tab'], tab.number, tab.content);
+		renderControlButton: function(tab, isTab) {
+			isTab = isTab || false;
+
+			var classes = [tab.class];
+			classes.push((isTab) ? this.classes.controlTab : this.classes.controlButton);
+
+			tab.el = this.renderTab(tab.id, classes, tab.content);
 			return tab.el;
 		},
-		renderPackTab: function(pack, number) {
-			var classes = ['sp-pack-tab'],
-				attrs = {
-					'data-pack-name': pack.pack_name
-				};
+		renderPackTab: function(pack) {
+			var classes = [this.classes.packTab];
 
 			if(pack.newPack) {
-				classes.push('sp-new-pack');
+				classes.push(this.classes.newPack);
 			}
 
 			var iconSrc = this.config.domain + '/' +
@@ -663,18 +662,21 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 			var content = '<img src=' + iconSrc + '>';
 
-			var tabEl = this.renderTab(null, classes, number, content, attrs);
-
-			tabEl.addEventListener('click', function() {
-				tabEl.classList.remove('sp-new-pack');
+			var tabEl = this.renderTab(null, classes, content, {
+				'data-pack-name': pack.pack_name
 			});
+
+			tabEl.addEventListener('click', (function() {
+				tabEl.classList.remove(this.classes.newPack);
+			}).bind(this));
 
 			this.packTabs[pack.pack_name] = tabEl;
 
 			return tabEl;
 		},
-		renderTab: function(id, classes, dataTabNumber, content, attrs) {
-			attrs = attrs || [];
+		renderTab: function(id, classes, content, attrs) {
+			classes = classes || [];
+			attrs = attrs || {};
 
 			var tabEl = document.createElement('span');
 
@@ -686,7 +688,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 			tabEl.classList.add.apply(tabEl.classList, classes);
 
-			attrs['data-tab-number'] = dataTabNumber;
 			Module.StickerHelper.forEach(attrs, function(value, name) {
 				tabEl.setAttribute(name, value);
 			});
@@ -694,26 +695,30 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			tabEl.innerHTML = content;
 
 			tabEl.addEventListener('click', (function() {
+				if (!tabEl.classList.contains(this.classes.controlTab) &&
+					!tabEl.classList.contains(this.classes.packTab)) {
+					return;
+				}
 
-				Module.StickerHelper.forEach(this.packTabs, function(tabEl) {
-					tabEl.classList.remove('active');
-				});
+				Module.StickerHelper.forEach(this.packTabs, (function(tabEl) {
+					tabEl.classList.remove(this.classes.tabActive);
+				}).bind(this));
 
-				Module.StickerHelper.forEach(this.controlTabs, function(controlTab) {
+				Module.StickerHelper.forEach(this.controlTabs, (function(controlTab) {
 					if (controlTab && controlTab.el) {
-						controlTab.el.classList.remove('active');
+						controlTab.el.classList.remove(this.classes.tabActive);
 					}
-				});
+				}).bind(this));
 
-				tabEl.classList.add('active');
+				tabEl.classList.add(this.classes.tabActive);
 			}).bind(this));
 
 			return tabEl;
 		},
 
 		onClickPrevPacksButton: function() {
-			var tabWidth = this.scrollableContentEl.getElementsByClassName('sp-pack-tab')[0].offsetWidth;
-			var containerWidth = parseInt(this.scrollableContainerEl.style.width, 10);
+			var tabWidth = this.scrollableContentEl.getElementsByClassName(this.classes.packTab)[0].offsetWidth;
+			var containerWidth = this.scrollableContainerEl.offsetWidth;
 			var contentOffset = parseInt(this.scrollableContentEl.style.left, 10) || 0;
 			var countFullShownTabs = parseInt((containerWidth / tabWidth), 10);
 
@@ -723,8 +728,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			this.onWindowResize();
 		},
 		onClickNextPacksButton: function() {
-			var tabWidth = this.scrollableContentEl.getElementsByClassName('sp-pack-tab')[0].offsetWidth;
-			var containerWidth = parseInt(this.scrollableContainerEl.style.width, 10);
+			var tabWidth = this.scrollableContentEl.getElementsByClassName(this.classes.packTab)[0].offsetWidth;
+			var containerWidth = this.scrollableContainerEl.offsetWidth;
 			var contentOffset = parseInt(this.scrollableContentEl.style.left, 10) || 0;
 			var countFullShownTabs = parseInt((containerWidth / tabWidth), 10);
 
@@ -740,7 +745,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			Module.StickerHelper.setEvent('click', this.el, this.controlTabs.history.class, callback);
 		},
 		handleClickOnPackTab: function(callback) {
-			Module.StickerHelper.setEvent('click', this.el, 'sp-pack-tab', callback);
+			Module.StickerHelper.setEvent('click', this.el, this.classes.packTab, callback);
 		},
 
 		onWindowResize: function() {
@@ -751,7 +756,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 			if (this.controlTabs.prevPacks.el) {
 				if (parseInt(this.scrollableContentEl.style.left, 10) < 0) {
-					this.controlTabs.prevPacks.el.style.display = 'inline-block';
+					//this.controlTabs.prevPacks.el.style.display = 'inline-block';
+					this.controlTabs.prevPacks.el.style.display = 'block';
 				} else {
 					this.controlTabs.prevPacks.el.style.display = 'none';
 				}
@@ -763,18 +769,19 @@ document.addEventListener("DOMContentLoaded", function(event) {
 				var contentOffset = parseInt(this.scrollableContentEl.style.left, 10) || 0;
 
 				if (contentWidth + contentOffset > this.scrollableContainerEl.offsetWidth) {
-					this.controlTabs.nextPacks.el.style.display = 'inline-block';
+					//this.controlTabs.nextPacks.el.style.display = 'inline-block';
+					this.controlTabs.nextPacks.el.style.display = 'block';
 				} else {
 					this.controlTabs.nextPacks.el.style.display = 'none';
 				}
 			}
 
-			this.scrollableContainerEl.style.width = this.el.parentElement.offsetWidth
-				- this.controlTabs.store.el.offsetWidth
-				- this.controlTabs.nextPacks.el.offsetWidth
-				- this.controlTabs.prevPacks.el.offsetWidth
-				+ 'px'
-			;
+			//this.scrollableContainerEl.style.width = this.el.parentElement.offsetWidth
+			//	- this.controlTabs.store.el.offsetWidth
+			//	- this.controlTabs.nextPacks.el.offsetWidth
+			//	- this.controlTabs.prevPacks.el.offsetWidth
+			//	+ 'px'
+			//;
 		}
 	});
 
@@ -1203,8 +1210,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			iframe.style.border = '0';
 
 			// todo
-			//iframe.src = 'http://work.stk.908.vc/api/v1/web?' + urlSerialize(urlParams) + '#/packs/' + packName;
-			iframe.src = 'http://localhost/stickerpipe/store/build?' + urlSerialize(urlParams) + '#/packs/' + packName;
+			iframe.src = this.config.storeUrl + '?' + urlSerialize(urlParams) + '#/packs/' + packName;
 		},
 
 		handleClickSticker: function(callback) {
@@ -1275,6 +1281,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 		delegateEvents: function() {
 
+			this.stView.tabsView.handleClickOnCustomTab((function() {
+				this.stView.renderCustomBlock();
+			}).bind(this));
+
 			this.stView.tabsView.handleClickOnLastUsedPacksTab((function() {
 				this.stView.renderUseStickers(this.stService.getLatestUse());
 			}).bind(this));
@@ -1337,6 +1347,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 				callback && callback();
 
 				this.stView.render(this.stickersModel);
+
+				// todo --> active 'used' tab
 				this.stView.renderUseStickers(this.stService.getLatestUse());
 			}).bind(this);
 
