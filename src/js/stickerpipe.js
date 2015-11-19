@@ -32,6 +32,10 @@
 
 		delegateEvents: function() {
 
+			this.stView.tabsView.handleClickOnCustomTab((function() {
+				this.stView.renderCustomBlock();
+			}).bind(this));
+
 			this.stView.tabsView.handleClickOnLastUsedPacksTab((function() {
 				this.stView.renderUseStickers(this.stService.getLatestUse());
 			}).bind(this));
