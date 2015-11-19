@@ -630,6 +630,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			this.scrollableContentEl.style.position = 'relative';
 			this.scrollableContentEl.style.display = 'flex';
 			this.scrollableContentEl.style.transition = '300ms';
+			this.scrollableContentEl.style.left = '0';
 
 
 			this.scrollableContainerEl = document.createElement('div');
@@ -713,21 +714,22 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		onClickPrevPacksButton: function() {
 			var tabWidth = this.scrollableContentEl.getElementsByClassName('sp-pack-tab')[0].offsetWidth;
 			var containerWidth = parseInt(this.scrollableContainerEl.style.width, 10);
-			var contentOffset = parseInt(this.scrollableContentEl.style.marginLeft, 10) || 0;
+			var contentOffset = parseInt(this.scrollableContentEl.style.left, 10) || 0;
 			var countFullShownTabs = parseInt((containerWidth / tabWidth), 10);
 
 			var offset = contentOffset + (tabWidth * countFullShownTabs);
-			this.scrollableContentEl.style.marginLeft = offset + 'px';
+			offset = (offset > 0) ? 0 : offset;
+			this.scrollableContentEl.style.left = offset + 'px';
 			this.onWindowResize();
 		},
 		onClickNextPacksButton: function() {
 			var tabWidth = this.scrollableContentEl.getElementsByClassName('sp-pack-tab')[0].offsetWidth;
 			var containerWidth = parseInt(this.scrollableContainerEl.style.width, 10);
-			var contentOffset = parseInt(this.scrollableContentEl.style.marginLeft, 10) || 0;
+			var contentOffset = parseInt(this.scrollableContentEl.style.left, 10) || 0;
 			var countFullShownTabs = parseInt((containerWidth / tabWidth), 10);
 
 			var offset = -(tabWidth * countFullShownTabs) + contentOffset;
-			this.scrollableContentEl.style.marginLeft = offset + 'px';
+			this.scrollableContentEl.style.left = offset + 'px';
 			this.onWindowResize();
 		},
 
@@ -748,7 +750,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			}
 
 			if (this.controlTabs.prevPacks.el) {
-				if (parseInt(this.scrollableContentEl.style.marginLeft, 10) < 0) {
+				if (parseInt(this.scrollableContentEl.style.left, 10) < 0) {
 					this.controlTabs.prevPacks.el.style.display = 'inline-block';
 				} else {
 					this.controlTabs.prevPacks.el.style.display = 'none';
@@ -757,7 +759,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 
 			if (this.controlTabs.nextPacks.el) {
-				var contentOffset = parseInt(this.scrollableContentEl.style.marginLeft, 10) || 0;
+				var _el = this.scrollableContentEl.getElementsByClassName('sp-pack-tab')[0];
+				var styles = window.getComputedStyle(_el);
+
+				var paddingRight = parseInt(styles.paddingRight, 10) / 2;
+
+				var contentOffset = parseInt(this.scrollableContentEl.style.left, 10) || 0;
 
 				if ((contentOffset * -1) < this.scrollableContainerEl.offsetWidth) {
 					this.controlTabs.nextPacks.el.style.display = 'inline-block';
