@@ -13,8 +13,6 @@
 
 		config: null,
 
-		currentPage: 0,
-
 		_constructor: function(config) {
 			this.config = config;
 
@@ -196,21 +194,23 @@
 		},
 
 		onClickPrevPacksButton: function() {
-			console.log('click on prev button');
+			var tabWidth = this.scrollableContentEl.getElementsByClassName('sp-pack-tab')[0].offsetWidth;
+			var containerWidth = parseInt(this.scrollableContainerEl.style.width, 10);
+			var contentOffset = parseInt(this.scrollableContentEl.style.marginLeft, 10) || 0;
+			var countFullShownTabs = parseInt((containerWidth / tabWidth), 10);
 
-			this.currentPage--;
+			var offset = contentOffset + (tabWidth * countFullShownTabs);
+			this.scrollableContentEl.style.marginLeft = offset + 'px';
 			this.onWindowResize();
-
-			this.scrollableContentEl.left = (this.scrollableContentWidth * this.currentPage) + 'px';
 		},
 		onClickNextPacksButton: function() {
-			console.log('click on next button');
+			var tabWidth = this.scrollableContentEl.getElementsByClassName('sp-pack-tab')[0].offsetWidth;
+			var containerWidth = parseInt(this.scrollableContainerEl.style.width, 10);
+			var contentOffset = parseInt(this.scrollableContentEl.style.marginLeft, 10) || 0;
+			var countFullShownTabs = parseInt((containerWidth / tabWidth), 10);
 
-			if (this.scrollableContentWidth * (this.currentPage + 1) > this.scrollableContainerEl.scrollWidth) {
-				return;
-			}
-			this.currentPage++;
-			this.scrollableContentEl.left = (this.scrollableContentWidth * this.currentPage) + 'px';
+			var offset = -(tabWidth * countFullShownTabs) + contentOffset;
+			this.scrollableContentEl.style.marginLeft = offset + 'px';
 			this.onWindowResize();
 		},
 
@@ -231,28 +231,30 @@
 			}
 
 			if (this.controlTabs.prevPacks.el) {
-				if (this.currentPage > 0) {
+				if (parseInt(this.scrollableContentEl.style.marginLeft, 10) < 0) {
 					this.controlTabs.prevPacks.el.style.display = 'inline-block';
 				} else {
 					this.controlTabs.prevPacks.el.style.display = 'none';
 				}
 			}
 
+
 			if (this.controlTabs.nextPacks.el) {
-				if (this.scrollableContainerEl.scrollWidth > this.scrollableContainerEl.offsetWidth) {
+				var contentOffset = parseInt(this.scrollableContentEl.style.marginLeft, 10) || 0;
+
+				if ((contentOffset * -1) < this.scrollableContainerEl.offsetWidth) {
 					this.controlTabs.nextPacks.el.style.display = 'inline-block';
 				} else {
 					this.controlTabs.nextPacks.el.style.display = 'none';
 				}
 			}
 
-			this.scrollableContentWidth = this.el.parentElement.offsetWidth
+			this.scrollableContainerEl.style.width = this.el.parentElement.offsetWidth
 				- this.controlTabs.store.el.offsetWidth
 				- this.controlTabs.nextPacks.el.offsetWidth
 				- this.controlTabs.prevPacks.el.offsetWidth
+				+ 'px'
 			;
-
-			this.scrollableContainerEl.style.width = this.scrollableContentWidth + 'px';
 		}
 	});
 

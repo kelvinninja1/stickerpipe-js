@@ -84,7 +84,10 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
         filter: grayscale(0%); }
     .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab {
       margin: 0;
-      padding: 12px; }
+      padding: 12px 16px; }
+      @media (max-width: 544px) {
+        .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab {
+          padding: 12px 12px; } }
       .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab:hover > span {
         opacity: .7; }
       .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab > span {
