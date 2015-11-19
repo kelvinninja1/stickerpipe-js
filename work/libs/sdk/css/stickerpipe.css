@@ -1,0 +1,257 @@
+/*
+SCSS variables are information about icon's compiled state, stored under its original file name
+
+.icon-home {
+  width: $icon-home-width;
+}
+
+The large array-like variables contain all information about a single icon
+$icon-home: x y offset_x offset_y width height total_width total_height image_path;
+
+At the bottom of this section, we provide information about the spritesheet itself
+$spritesheet: width height image $spritesheet-sprites;
+*/
+/*
+These "retina group" variables are mappings for the naming and pairing of normal and retina sprites.
+
+The list formatted variables are intended for mixins like `retina-sprite` and `retina-sprites`.
+*/
+/*
+The provided mixins are intended to be used with the array-like variables
+
+.icon-home {
+  @include sprite-width($icon-home);
+}
+
+.icon-email {
+  @include sprite($icon-email);
+}
+*/
+/*
+The `retina-sprite` mixin sets up rules and a media query for a sprite/retina sprite.
+  It should be used with a "retina group" variable.
+
+The media query is from CSS Tricks: https://css-tricks.com/snippets/css/retina-display-media-query/
+
+$icon-home-group: ('icon-home', $icon-home, $icon-home-2x, );
+
+.icon-home {
+  @include retina-sprite($icon-home-group);
+}
+*/
+/*
+The `sprites` mixin generates identical output to the CSS template
+  but can be overridden inside of SCSS
+
+@include sprites($spritesheet-sprites);
+*/
+/*
+The `retina-sprites` mixin generates a CSS rule and media query for retina groups
+  This yields the same output as CSS retina template but can be overridden in SCSS
+
+@include retina-sprites($retina-groups);
+*/
+.sticker-pipe .sp-store {
+  background: white; }
+
+.sticker-pipe .sp-tabs {
+  background-color: #fff;
+  overflow-x: scroll;
+  width: 100%;
+  white-space: nowrap; }
+  .sticker-pipe .sp-tabs .sp-tabs-scrollable-container {
+    float: left;
+    overflow: hidden;
+    position: relative;
+    width: 300px; }
+    .sticker-pipe .sp-tabs .sp-tabs-scrollable-container .sp-tabs-scrollable-content {
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: -ms-flexbox;
+      display: flex;
+      left: 0;
+      position: relative;
+      -webkit-transition: 300ms;
+      transition: 300ms;
+      white-space: nowrap; }
+  .sticker-pipe .sp-tabs .sp-tab-item {
+    display: inline-table;
+    cursor: pointer;
+    padding: 6px 10px; }
+    @media (max-width: 544px) {
+      .sticker-pipe .sp-tabs .sp-tab-item {
+        padding: 6px 6px; } }
+    .sticker-pipe .sp-tabs .sp-tab-item img {
+      border-radius: 50%;
+      height: 36px;
+      width: 36px;
+      opacity: .5;
+      -webkit-filter: grayscale(100%);
+      filter: grayscale(100%); }
+      .sticker-pipe .sp-tabs .sp-tab-item img:hover {
+        opacity: .7; }
+    .sticker-pipe .sp-tabs .sp-tab-item.sp-tab-active {
+      background-color: white;
+      color: orange; }
+      .sticker-pipe .sp-tabs .sp-tab-item.sp-tab-active img {
+        opacity: 1;
+        -webkit-filter: grayscale(0%);
+        filter: grayscale(0%); }
+    .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button {
+      margin: 0;
+      padding: 12px 16px; }
+      @media (max-width: 544px) {
+        .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button {
+          padding: 12px 12px; } }
+      .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab:hover > span, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button:hover > span {
+        opacity: .7; }
+      .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab > span, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button > span {
+        display: table;
+        opacity: .5; }
+      .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-prev-packs, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-prev-packs {
+        float: left; }
+      .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-next-packs, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-store, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-next-packs, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-store {
+        float: right;
+        border-left: 1px solid #c8c8c8;
+        border-radius: 0; }
+      .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-prev-packs, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-history, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-prev-packs, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-history {
+        border-right: 1px solid #c8c8c8; }
+      .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-prev-packs, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-next-packs, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-prev-packs, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-next-packs {
+        padding-left: 6px;
+        padding-right: 6px; }
+    .sticker-pipe .sp-tabs .sp-tab-item.sp-pack-tab.sp-new-pack::after {
+      content: "";
+      width: 10px;
+      height: 10px;
+      display: block;
+      position: absolute;
+      background-color: #f60;
+      border-radius: 50%;
+      margin-left: 29px;
+      margin-top: -10px; }
+
+.sticker-pipe .sp-stickers {
+  background: #fafafa;
+  border-top: 1px solid #c8c8c8;
+  height: 300px;
+  overflow-y: scroll;
+  padding: 10px; }
+  .sticker-pipe .sp-stickers .sp-sticker-item {
+    cursor: pointer;
+    display: inline-table;
+    margin: 12px; }
+    .sticker-pipe .sp-stickers .sp-sticker-item img {
+      height: 80px;
+      width: 80px; }
+
+.sp-icon-arrow-back {
+  background-image: url(../img/icons_sprite.png);
+  background-position: 0px 0px;
+  width: 24px;
+  height: 24px; }
+
+.sp-icon-arrow-forward {
+  background-image: url(../img/icons_sprite.png);
+  background-position: -24px 0px;
+  width: 24px;
+  height: 24px; }
+
+.sp-icon-clock {
+  background-image: url(../img/icons_sprite.png);
+  background-position: 0px -24px;
+  width: 24px;
+  height: 24px; }
+
+.sp-icon-face {
+  background-image: url(../img/icons_sprite.png);
+  background-position: -24px -24px;
+  width: 24px;
+  height: 24px; }
+
+.sp-icon-mall {
+  background-image: url(../img/icons_sprite.png);
+  background-position: -48px 0px;
+  width: 24px;
+  height: 24px; }
+
+.sp-icon-plus {
+  background-image: url(../img/icons_sprite.png);
+  background-position: -48px -24px;
+  width: 24px;
+  height: 24px; }
+
+.sp-icon-settings {
+  background-image: url(../img/icons_sprite.png);
+  background-position: 0px -48px;
+  width: 24px;
+  height: 24px; }
+
+.sp-icon-arrow-back {
+  background-image: url(../img/icons_sprite.png);
+  background-position: 0px 0px;
+  width: 24px;
+  height: 24px; }
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .sp-icon-arrow-back {
+      background-image: url(../img/icons_sprite@2x.png);
+      background-size: 72px 72px; } }
+
+.sp-icon-arrow-forward {
+  background-image: url(../img/icons_sprite.png);
+  background-position: -24px 0px;
+  width: 24px;
+  height: 24px; }
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .sp-icon-arrow-forward {
+      background-image: url(../img/icons_sprite@2x.png);
+      background-size: 72px 72px; } }
+
+.sp-icon-clock {
+  background-image: url(../img/icons_sprite.png);
+  background-position: 0px -24px;
+  width: 24px;
+  height: 24px; }
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .sp-icon-clock {
+      background-image: url(../img/icons_sprite@2x.png);
+      background-size: 72px 72px; } }
+
+.sp-icon-face {
+  background-image: url(../img/icons_sprite.png);
+  background-position: -24px -24px;
+  width: 24px;
+  height: 24px; }
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .sp-icon-face {
+      background-image: url(../img/icons_sprite@2x.png);
+      background-size: 72px 72px; } }
+
+.sp-icon-mall {
+  background-image: url(../img/icons_sprite.png);
+  background-position: -48px 0px;
+  width: 24px;
+  height: 24px; }
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .sp-icon-mall {
+      background-image: url(../img/icons_sprite@2x.png);
+      background-size: 72px 72px; } }
+
+.sp-icon-plus {
+  background-image: url(../img/icons_sprite.png);
+  background-position: -48px -24px;
+  width: 24px;
+  height: 24px; }
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .sp-icon-plus {
+      background-image: url(../img/icons_sprite@2x.png);
+      background-size: 72px 72px; } }
+
+.sp-icon-settings {
+  background-image: url(../img/icons_sprite.png);
+  background-position: 0px -48px;
+  width: 24px;
+  height: 24px; }
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .sp-icon-settings {
+      background-image: url(../img/icons_sprite@2x.png);
+      background-size: 72px 72px; } }
