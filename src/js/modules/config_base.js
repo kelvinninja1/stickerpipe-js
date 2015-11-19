@@ -26,6 +26,7 @@
 		userPacksUrl: 'http://api.stickerpipe.com/api/v1/user/packs',
 		userPackUrl: 'http://api.stickerpipe.com/api/v1/user/pack',
 		trackStatUrl: 'http://api.stickerpipe.com/api/v1/track-statistic',
+		storeUrl: 'http://api.stickerpipe.com/api/v1/web',
 
 		storagePrefix: 'stickerPipe',
 		enableCustomTab: false,
