@@ -1204,6 +1204,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			iframe.style.height = '100%';
 			iframe.style.border = '0';
 
+			iframe.contentWindow.JsApiInterface = window.JsApiInterface;
+
 			// todo
 			iframe.src = this.config.storeUrl + '?' + urlSerialize(urlParams) + '#/packs/' + packName;
 		},
