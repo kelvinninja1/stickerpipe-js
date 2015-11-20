@@ -675,11 +675,15 @@ appStickerPipeStore.factory('JSPlatform', [
 	'BasePlatform',
 	function(BasePlatform) {
 
-		try {
-			console.log('window.parent.JsApiInterface', window.parent.JsApiInterface);
-		} catch (e) {
-			console.error(e.message);
-		}
+		window.parent.postMessage('myMessage', 'http://remote-domain.com');
+
+		return angular.extend(BasePlatform, {
+			showPackCollections: function() { return 1; },
+			downloadPack: function() { return 1; },
+			purchasePackInStore: function() { return 1; },
+			isPackActive: function() { return 1; },
+			isPackExistsAtUserLibrary: function() { return 1; }
+		});
 
 		var platformJSProvider = window.JsApiInterface || window.parent.JsApiInterface ||  {};
 
@@ -809,6 +813,10 @@ appStickerPipeStore.directive('errorPage', function(Config,  $window, $timeout, 
 	};
 });
 
+appStickerPipeStore.controller('StoreController', function() {
+
+});
+
 appStickerPipeStore.controller('PackController', function(pack) {
 	this.pack = pack;
 });
@@ -931,10 +939,6 @@ appStickerPipeStore.factory('PacksCollection', function(HttpApi, PackModel) {
 		}
 
 	};
-});
-
-appStickerPipeStore.controller('StoreController', function() {
-
 });
 
 appStickerPipeStore.directive('packActionButton', function(PlatformAPI, Config, i18n, EnvConfig) {
