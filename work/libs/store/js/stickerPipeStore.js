@@ -814,6 +814,20 @@ appStickerPipeStore.controller('StoreController', function() {
 
 });
 
+appStickerPipeStore.value('En', {
+	download: 'Download',
+	openStickers: 'Open stickers',
+	buyPack: 'Buy pack',
+	unavailableContent: 'This content is currently unavailable'
+});
+
+appStickerPipeStore.value('Ru', {
+	download: 'Скачать',
+	openStickers: 'Открыть стикеры',
+	buyPack: 'Купить',
+	unavailableContent: 'В данный момент этот контент недоступен'
+});
+
 appStickerPipeStore.factory('AndroidPlatform', [
 	'BasePlatform',
 	function(BasePlatform) {
@@ -891,8 +905,7 @@ appStickerPipeStore.factory('JSPlatform', [
 	'BasePlatform',
 	function(BasePlatform) {
 
-		window.parent.postMessage('myMessage', 'http://localhost');
-		window.postMessage('myMessage', 'http://localhost');
+		window.parent.postMessage('testmess', 'http://localhost');
 
 		return angular.extend(BasePlatform, {
 			showPackCollections: function() { return 1; },
@@ -928,18 +941,65 @@ appStickerPipeStore.factory('JSPlatform', [
 		});
 	}]);
 
-appStickerPipeStore.value('En', {
-	download: 'Download',
-	openStickers: 'Open stickers',
-	buyPack: 'Buy pack',
-	unavailableContent: 'This content is currently unavailable'
-});
+appStickerPipeStore.directive('packActionButton', function(PlatformAPI, Config, i18n, EnvConfig) {
 
-appStickerPipeStore.value('Ru', {
-	download: 'Скачать',
-	openStickers: 'Открыть стикеры',
-	buyPack: 'Купить',
-	unavailableContent: 'В данный момент этот контент недоступен'
+	return {
+		restrict: 'AE',
+		scope: {
+			pack: '=pack'
+		},
+		templateUrl: '/modules/pack/actionButton/ActionButtonView.tpl',
+		link: function($scope, $el, attrs) {
+
+			$scope.getCoinUrl = function() {
+				return EnvConfig.coinImgUrl + 'coin_' + Config.resolutionType + '.png';
+			};
+
+
+			function renderActionButton($scope) {
+				var pack = $scope.pack;
+
+				$scope.buttonText = i18n.download;
+				$scope.buttonOnClick = function(pack) {};
+				$scope.showCoin = false;
+				$scope.show = true;
+
+				if (PlatformAPI.isPackActive(pack)) {
+					$scope.buttonText = i18n.openStickers;
+					$scope.buttonOnClick = PlatformAPI.showPackCollections;
+				} else {
+					if (PlatformAPI.isPackExistsAtUserLibrary(pack) || (pack.get('product_id') === undefined && !pack.get('price'))) {
+						$scope.buttonText = i18n.download;
+						$scope.buttonOnClick = function(pack) {
+							$scope.$emit('showSpinner');
+							PlatformAPI.downloadPack(pack).then(function() {
+								$scope.$emit('hideSpinner');
+							});
+						};
+					} else {
+						if (pack.get('product_id') !== undefined && !pack.get('price')) {
+
+							var price = pack.getPlatformPrice();
+							$scope.show = !!price;
+
+							$scope.buttonText = i18n.buyPack + ' ' + price;
+							$scope.buttonOnClick = PlatformAPI.purchasePackInPlatformStore;
+							$scope.showCoin = true;
+
+						} else { // if (pack.get('product_id') && pack.get('price'))
+
+							$scope.buttonText = i18n.buyPack + ' ' + pack.get('price');
+							$scope.buttonOnClick = PlatformAPI.purchasePackInStore;
+							$scope.showCoin = true;
+						}
+					}
+				}
+			}
+
+			renderActionButton($scope);
+		}
+
+	};
 });
 
 appStickerPipeStore.directive('packHeader', function(Config,  $window, $timeout, PlatformAPI) {
@@ -1044,66 +1104,5 @@ appStickerPipeStore.directive('packHeader', function(Config,  $window, $timeout,
 				angular.element($window).triggerHandler('resize');
 			});
 		}
-	};
-});
-
-appStickerPipeStore.directive('packActionButton', function(PlatformAPI, Config, i18n, EnvConfig) {
-
-	return {
-		restrict: 'AE',
-		scope: {
-			pack: '=pack'
-		},
-		templateUrl: '/modules/pack/actionButton/ActionButtonView.tpl',
-		link: function($scope, $el, attrs) {
-
-			$scope.getCoinUrl = function() {
-				return EnvConfig.coinImgUrl + 'coin_' + Config.resolutionType + '.png';
-			};
-
-
-			function renderActionButton($scope) {
-				var pack = $scope.pack;
-
-				$scope.buttonText = i18n.download;
-				$scope.buttonOnClick = function(pack) {};
-				$scope.showCoin = false;
-				$scope.show = true;
-
-				if (PlatformAPI.isPackActive(pack)) {
-					$scope.buttonText = i18n.openStickers;
-					$scope.buttonOnClick = PlatformAPI.showPackCollections;
-				} else {
-					if (PlatformAPI.isPackExistsAtUserLibrary(pack) || (pack.get('product_id') === undefined && !pack.get('price'))) {
-						$scope.buttonText = i18n.download;
-						$scope.buttonOnClick = function(pack) {
-							$scope.$emit('showSpinner');
-							PlatformAPI.downloadPack(pack).then(function() {
-								$scope.$emit('hideSpinner');
-							});
-						};
-					} else {
-						if (pack.get('product_id') !== undefined && !pack.get('price')) {
-
-							var price = pack.getPlatformPrice();
-							$scope.show = !!price;
-
-							$scope.buttonText = i18n.buyPack + ' ' + price;
-							$scope.buttonOnClick = PlatformAPI.purchasePackInPlatformStore;
-							$scope.showCoin = true;
-
-						} else { // if (pack.get('product_id') && pack.get('price'))
-
-							$scope.buttonText = i18n.buyPack + ' ' + pack.get('price');
-							$scope.buttonOnClick = PlatformAPI.purchasePackInStore;
-							$scope.showCoin = true;
-						}
-					}
-				}
-			}
-
-			renderActionButton($scope);
-		}
-
 	};
 });
