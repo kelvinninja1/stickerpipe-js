@@ -644,6 +644,48 @@ appStickerPipeStore.directive('pageSpinner', function($rootScope, usSpinnerServi
 	};
 });
 
+appStickerPipeStore.directive('errorPage', function(Config,  $window, $timeout, i18n, EnvConfig) {
+	
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/error/ErrorView.tpl',
+		link: function($scope, $el, attrs) {
+
+			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
+
+			var $errorPage = angular.element($el[0].getElementsByClassName('error-page')[0]);
+
+			var $mainDivBlock = angular.element(
+				$errorPage[0].getElementsByTagName('div')[0]
+			);
+
+			$mainDivBlock.find('img').bind('load', function() {
+				$scope.onWindowResize();
+			});
+
+			$scope.i18n = i18n;
+
+			$scope.onWindowResize = function() {
+
+				$errorPage.css({
+					paddingTop: (($window.innerHeight - $mainDivBlock.prop('offsetHeight')) / 2) + 'px'
+				});
+
+			};
+
+			angular.element($window).on('resize', function() {
+				$scope.onWindowResize();
+			});
+
+			// on render
+			$timeout(function () {
+				angular.element($window).triggerHandler('resize');
+			});
+		}
+
+	};
+});
+
 appStickerPipeStore.controller('PackController', function(pack) {
 	this.pack = pack;
 });
@@ -768,48 +810,6 @@ appStickerPipeStore.factory('PacksCollection', function(HttpApi, PackModel) {
 	};
 });
 
-appStickerPipeStore.directive('errorPage', function(Config,  $window, $timeout, i18n, EnvConfig) {
-	
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/error/ErrorView.tpl',
-		link: function($scope, $el, attrs) {
-
-			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
-
-			var $errorPage = angular.element($el[0].getElementsByClassName('error-page')[0]);
-
-			var $mainDivBlock = angular.element(
-				$errorPage[0].getElementsByTagName('div')[0]
-			);
-
-			$mainDivBlock.find('img').bind('load', function() {
-				$scope.onWindowResize();
-			});
-
-			$scope.i18n = i18n;
-
-			$scope.onWindowResize = function() {
-
-				$errorPage.css({
-					paddingTop: (($window.innerHeight - $mainDivBlock.prop('offsetHeight')) / 2) + 'px'
-				});
-
-			};
-
-			angular.element($window).on('resize', function() {
-				$scope.onWindowResize();
-			});
-
-			// on render
-			$timeout(function () {
-				angular.element($window).triggerHandler('resize');
-			});
-		}
-
-	};
-});
-
 appStickerPipeStore.controller('StoreController', function() {
 
 });
@@ -889,9 +889,11 @@ appStickerPipeStore.factory('BasePlatform', [function() {
 
 appStickerPipeStore.factory('JSPlatform', [
 	'BasePlatform',
-	function(BasePlatform) {
+	'$window',
+	function(BasePlatform, $window) {
 
 		window.parent.postMessage('testmess', 'http://localhost');
+		$window.parent.postMessage('testmess', 'http://localhost');
 		console.log('run');
 
 		return angular.extend(BasePlatform, {
