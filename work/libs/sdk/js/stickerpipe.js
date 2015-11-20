@@ -34,6 +34,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		prevPacksTabContent: '<span class="sp-icon-arrow-back"></span>',
 		nextPacksTabContent: '<span class="sp-icon-arrow-forward"></span>',
 
+		// todo only one API url
 		domain : 'http://api.stickerpipe.com',
 		baseFolder: 'stk',
 
@@ -1204,10 +1205,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			iframe.style.height = '100%';
 			iframe.style.border = '0';
 
-			iframe.contentWindow.JsApiInterface = window.JsApiInterface;
-
-			// todo
-			iframe.src = this.config.storeUrl + '?' + urlSerialize(urlParams) + '#/packs/' + packName;
+			// todo make Store view
+			iframe.src = this.config.storeUrl + '?' + urlSerialize(urlParams) + '#/packs/' + packName
 		},
 
 		handleClickSticker: function(callback) {
@@ -1217,23 +1216,38 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 })(window, window.StickersModule);
 
-(function(Plugin, BaseService) {
+(function(Plugin, Module) {
 
-	Plugin.JsApiInterface = {
+	Module.StoreApiInterface = Module.Class({
 
 		config: null,
+		service: null,
 
-		_setConfigs: function(Config) {
-			this.config = Config;
+		_constructor: function(config, service) {
+			this.config = config;
+			this.service = service;
+
+			window.addEventListener('message', (function(e) {
+				if (e.data.action) {
+					return;
+				}
+
+				try {
+					this[e.action].apply(this, e.data.attrs);
+				} catch(e) {
+					console.error(e.message, e);
+				}
+
+			}).bind(this));
 		},
 
 		showPackCollections: function(packName) {
+			// todo remove functions
 			this.config.functions.showPackCollection(packName);
 		},
 
 		downloadPack: function(packName, callback) {
-			var services = new BaseService(this.config);
-			services.updatePacks((function() {
+			this.service.updatePacks((function() {
 				this.config.functions.showPackCollection(packName);
 				callback && callback();
 			}).bind(this));
@@ -1248,12 +1262,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		},
 
 		isPackExistsAtUserLibrary: function(packName) {
-			var services = new BaseService(this.config);
-			return services.isExistPackInStorage(packName);
+			return this.service.isExistPackInStorage(packName);
 		}
-	};
+	});
 
-})(window, StickersModule.BaseService);
+})(window, StickersModule);
 
 
 (function(Plugin, Modules) {

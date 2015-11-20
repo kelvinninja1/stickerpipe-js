@@ -99,7 +99,7 @@ var App = _makeClass(function(options) {
 			storeUrl: 'http://work.stk.908.vc/api/v1/web',
 			//storeUrl: 'http://localhost/stickerpipe/store/build',
 
-			//userId: '12345678901234567890123456789012',
+			userId: '12345678901234567890123456789012',
 
 			callbacks: {
 				onPurchase: (function(packTitle, productId, price, packName) {
