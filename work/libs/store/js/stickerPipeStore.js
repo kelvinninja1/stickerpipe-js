@@ -584,6 +584,66 @@ appStickerPipeStore.factory('PlatformAPI', [
 
 	}]);
 
+appStickerPipeStore.directive('basePage', function() {
+
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/basePage/BasePageView.tpl',
+		link: function($scope, $el, attrs) {
+		}
+
+	};
+});
+
+appStickerPipeStore.directive('pageSpinner', function($rootScope, usSpinnerService) {
+
+	return {
+		restrict: 'AE',
+		template: '<div class="page-spinner" ng-if="showSpinner"><span us-spinner="{radius: 15, width: 4, length: 15, color: \'white\'}" spinner-key="spinner-1"></span></div>',
+		link: function($scope, $el, attrs) {
+			var bodyEl = document.getElementsByTagName('body')[0];
+
+			$rootScope.$on('$routeChangeStart', function() {
+				showSpinner();
+			});
+
+			$rootScope.$on('$routeChangeSuccess', function() {
+				hideSpinner();
+			});
+
+			$rootScope.$on('$routeChangeError', function(e, c, p, error) {
+				hideSpinner();
+			});
+
+			function showSpinner() {
+				$scope.showSpinner = true;
+				bodyEl.style.overflow = 'hidden';
+
+				setTimeout(function() {
+					usSpinnerService.spin('spinner-1');
+				}, 50);
+			}
+
+			function hideSpinner() {
+				$scope.showSpinner = false;
+				bodyEl.style.overflow = 'auto';
+
+				usSpinnerService.stop('spinner-1');
+			}
+
+			$scope.$on('showSpinner', function () {
+				showSpinner();
+			});
+
+			$scope.$on('hideSpinner', function () {
+				hideSpinner();
+			});
+
+		}
+
+	};
+});
+
 appStickerPipeStore.directive('errorPage', function(Config,  $window, $timeout, i18n, EnvConfig) {
 	
 	return {
@@ -754,66 +814,6 @@ appStickerPipeStore.controller('StoreController', function() {
 
 });
 
-appStickerPipeStore.directive('basePage', function() {
-
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/basePage/BasePageView.tpl',
-		link: function($scope, $el, attrs) {
-		}
-
-	};
-});
-
-appStickerPipeStore.directive('pageSpinner', function($rootScope, usSpinnerService) {
-
-	return {
-		restrict: 'AE',
-		template: '<div class="page-spinner" ng-if="showSpinner"><span us-spinner="{radius: 15, width: 4, length: 15, color: \'white\'}" spinner-key="spinner-1"></span></div>',
-		link: function($scope, $el, attrs) {
-			var bodyEl = document.getElementsByTagName('body')[0];
-
-			$rootScope.$on('$routeChangeStart', function() {
-				showSpinner();
-			});
-
-			$rootScope.$on('$routeChangeSuccess', function() {
-				hideSpinner();
-			});
-
-			$rootScope.$on('$routeChangeError', function(e, c, p, error) {
-				hideSpinner();
-			});
-
-			function showSpinner() {
-				$scope.showSpinner = true;
-				bodyEl.style.overflow = 'hidden';
-
-				setTimeout(function() {
-					usSpinnerService.spin('spinner-1');
-				}, 50);
-			}
-
-			function hideSpinner() {
-				$scope.showSpinner = false;
-				bodyEl.style.overflow = 'auto';
-
-				usSpinnerService.stop('spinner-1');
-			}
-
-			$scope.$on('showSpinner', function () {
-				showSpinner();
-			});
-
-			$scope.$on('hideSpinner', function () {
-				hideSpinner();
-			});
-
-		}
-
-	};
-});
-
 appStickerPipeStore.value('En', {
 	download: 'Download',
 	openStickers: 'Open stickers',
@@ -905,7 +905,7 @@ appStickerPipeStore.factory('JSPlatform', [
 	'BasePlatform',
 	function(BasePlatform) {
 
-		//test
+		console.log(123);
 		console.log('window.JsApiInterface', window.JsApiInterface);
 		console.log('window.parent.JsApiInterface', window.parent.JsApiInterface);
 
