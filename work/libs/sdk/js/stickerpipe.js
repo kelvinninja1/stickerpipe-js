@@ -1185,7 +1185,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 					platform: 'JS',
 					userId: this.config.userId,
 					density: this.config.stickerResolutionType,
-					uri: encodeURIComponent('http://localhost/stickerpipe/store/build')
+					uri: encodeURIComponent('http://demo.stickerpipe.com/work/libs/store/js/stickerPipeStore.js')
 				},
 				urlSerialize = function(obj) {
 					var str = [];
