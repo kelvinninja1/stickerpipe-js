@@ -143,6 +143,7 @@ appStickerPipeStore.config(function(envServiceProvider) {
 				apiUrl: 'http://work.stk.908.vc/api/'
 			},
 			development: {
+				cssUrl: 'http://demo.stickerpipe.com/work/libs/store/css/',
 				notAvailableImgUrl: 'http://work.stk.908.vc/static/img/notavailable.png',
 				coinImgUrl: 'http://work.stk.908.vc/libs/store/current/coins/',
 				stickersStorageUrl: 'http://work.stk.908.vc/stk/',
@@ -644,48 +645,6 @@ appStickerPipeStore.directive('pageSpinner', function($rootScope, usSpinnerServi
 	};
 });
 
-appStickerPipeStore.directive('errorPage', function(Config,  $window, $timeout, i18n, EnvConfig) {
-	
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/error/ErrorView.tpl',
-		link: function($scope, $el, attrs) {
-
-			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
-
-			var $errorPage = angular.element($el[0].getElementsByClassName('error-page')[0]);
-
-			var $mainDivBlock = angular.element(
-				$errorPage[0].getElementsByTagName('div')[0]
-			);
-
-			$mainDivBlock.find('img').bind('load', function() {
-				$scope.onWindowResize();
-			});
-
-			$scope.i18n = i18n;
-
-			$scope.onWindowResize = function() {
-
-				$errorPage.css({
-					paddingTop: (($window.innerHeight - $mainDivBlock.prop('offsetHeight')) / 2) + 'px'
-				});
-
-			};
-
-			angular.element($window).on('resize', function() {
-				$scope.onWindowResize();
-			});
-
-			// on render
-			$timeout(function () {
-				angular.element($window).triggerHandler('resize');
-			});
-		}
-
-	};
-});
-
 appStickerPipeStore.controller('PackController', function(pack) {
 	this.pack = pack;
 });
@@ -810,22 +769,50 @@ appStickerPipeStore.factory('PacksCollection', function(HttpApi, PackModel) {
 	};
 });
 
+appStickerPipeStore.directive('errorPage', function(Config,  $window, $timeout, i18n, EnvConfig) {
+	
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/error/ErrorView.tpl',
+		link: function($scope, $el, attrs) {
+
+			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
+
+			var $errorPage = angular.element($el[0].getElementsByClassName('error-page')[0]);
+
+			var $mainDivBlock = angular.element(
+				$errorPage[0].getElementsByTagName('div')[0]
+			);
+
+			$mainDivBlock.find('img').bind('load', function() {
+				$scope.onWindowResize();
+			});
+
+			$scope.i18n = i18n;
+
+			$scope.onWindowResize = function() {
+
+				$errorPage.css({
+					paddingTop: (($window.innerHeight - $mainDivBlock.prop('offsetHeight')) / 2) + 'px'
+				});
+
+			};
+
+			angular.element($window).on('resize', function() {
+				$scope.onWindowResize();
+			});
+
+			// on render
+			$timeout(function () {
+				angular.element($window).triggerHandler('resize');
+			});
+		}
+
+	};
+});
+
 appStickerPipeStore.controller('StoreController', function() {
 
-});
-
-appStickerPipeStore.value('En', {
-	download: 'Download',
-	openStickers: 'Open stickers',
-	buyPack: 'Buy pack',
-	unavailableContent: 'This content is currently unavailable'
-});
-
-appStickerPipeStore.value('Ru', {
-	download: 'Скачать',
-	openStickers: 'Открыть стикеры',
-	buyPack: 'Купить',
-	unavailableContent: 'В данный момент этот контент недоступен'
 });
 
 appStickerPipeStore.factory('AndroidPlatform', [
@@ -939,6 +926,81 @@ appStickerPipeStore.factory('JSPlatform', [
 		});
 	}]);
 
+appStickerPipeStore.value('En', {
+	download: 'Download',
+	openStickers: 'Open stickers',
+	buyPack: 'Buy pack',
+	unavailableContent: 'This content is currently unavailable'
+});
+
+appStickerPipeStore.value('Ru', {
+	download: 'Скачать',
+	openStickers: 'Открыть стикеры',
+	buyPack: 'Купить',
+	unavailableContent: 'В данный момент этот контент недоступен'
+});
+
+appStickerPipeStore.directive('packActionButton', function(PlatformAPI, Config, i18n, EnvConfig) {
+
+	return {
+		restrict: 'AE',
+		scope: {
+			pack: '=pack'
+		},
+		templateUrl: '/modules/pack/actionButton/ActionButtonView.tpl',
+		link: function($scope, $el, attrs) {
+
+			$scope.getCoinUrl = function() {
+				return EnvConfig.coinImgUrl + 'coin_' + Config.resolutionType + '.png';
+			};
+
+
+			function renderActionButton($scope) {
+				var pack = $scope.pack;
+
+				$scope.buttonText = i18n.download;
+				$scope.buttonOnClick = function(pack) {};
+				$scope.showCoin = false;
+				$scope.show = true;
+
+				if (PlatformAPI.isPackActive(pack)) {
+					$scope.buttonText = i18n.openStickers;
+					$scope.buttonOnClick = PlatformAPI.showPackCollections;
+				} else {
+					if (PlatformAPI.isPackExistsAtUserLibrary(pack) || (pack.get('product_id') === undefined && !pack.get('price'))) {
+						$scope.buttonText = i18n.download;
+						$scope.buttonOnClick = function(pack) {
+							$scope.$emit('showSpinner');
+							PlatformAPI.downloadPack(pack).then(function() {
+								$scope.$emit('hideSpinner');
+							});
+						};
+					} else {
+						if (pack.get('product_id') !== undefined && !pack.get('price')) {
+
+							var price = pack.getPlatformPrice();
+							$scope.show = !!price;
+
+							$scope.buttonText = i18n.buyPack + ' ' + price;
+							$scope.buttonOnClick = PlatformAPI.purchasePackInPlatformStore;
+							$scope.showCoin = true;
+
+						} else { // if (pack.get('product_id') && pack.get('price'))
+
+							$scope.buttonText = i18n.buyPack + ' ' + pack.get('price');
+							$scope.buttonOnClick = PlatformAPI.purchasePackInStore;
+							$scope.showCoin = true;
+						}
+					}
+				}
+			}
+
+			renderActionButton($scope);
+		}
+
+	};
+});
+
 appStickerPipeStore.directive('packHeader', function(Config,  $window, $timeout, PlatformAPI) {
 
 	var bannerSizes = {};
@@ -1041,66 +1103,5 @@ appStickerPipeStore.directive('packHeader', function(Config,  $window, $timeout,
 				angular.element($window).triggerHandler('resize');
 			});
 		}
-	};
-});
-
-appStickerPipeStore.directive('packActionButton', function(PlatformAPI, Config, i18n, EnvConfig) {
-
-	return {
-		restrict: 'AE',
-		scope: {
-			pack: '=pack'
-		},
-		templateUrl: '/modules/pack/actionButton/ActionButtonView.tpl',
-		link: function($scope, $el, attrs) {
-
-			$scope.getCoinUrl = function() {
-				return EnvConfig.coinImgUrl + 'coin_' + Config.resolutionType + '.png';
-			};
-
-
-			function renderActionButton($scope) {
-				var pack = $scope.pack;
-
-				$scope.buttonText = i18n.download;
-				$scope.buttonOnClick = function(pack) {};
-				$scope.showCoin = false;
-				$scope.show = true;
-
-				if (PlatformAPI.isPackActive(pack)) {
-					$scope.buttonText = i18n.openStickers;
-					$scope.buttonOnClick = PlatformAPI.showPackCollections;
-				} else {
-					if (PlatformAPI.isPackExistsAtUserLibrary(pack) || (pack.get('product_id') === undefined && !pack.get('price'))) {
-						$scope.buttonText = i18n.download;
-						$scope.buttonOnClick = function(pack) {
-							$scope.$emit('showSpinner');
-							PlatformAPI.downloadPack(pack).then(function() {
-								$scope.$emit('hideSpinner');
-							});
-						};
-					} else {
-						if (pack.get('product_id') !== undefined && !pack.get('price')) {
-
-							var price = pack.getPlatformPrice();
-							$scope.show = !!price;
-
-							$scope.buttonText = i18n.buyPack + ' ' + price;
-							$scope.buttonOnClick = PlatformAPI.purchasePackInPlatformStore;
-							$scope.showCoin = true;
-
-						} else { // if (pack.get('product_id') && pack.get('price'))
-
-							$scope.buttonText = i18n.buyPack + ' ' + pack.get('price');
-							$scope.buttonOnClick = PlatformAPI.purchasePackInStore;
-							$scope.showCoin = true;
-						}
-					}
-				}
-			}
-
-			renderActionButton($scope);
-		}
-
 	};
 });
