@@ -684,8 +684,6 @@ appStickerPipeStore.factory('JSPlatform', [
 			}), 'http://' + Config.clientDomain);
 		};
 
-		console.log('hello world');
-
 		return angular.extend(BasePlatform, {
 
 			showPackCollections: function(packName) {
@@ -701,7 +699,9 @@ appStickerPipeStore.factory('JSPlatform', [
 			},
 
 			isPackActive: function(packName) {
-				return api(arguments.callee.name, arguments);
+				var q = api(arguments.callee.name, arguments);
+				console.log(q);
+				return q;
 			},
 
 			isPackExistsAtUserLibrary: function(packName) {
