@@ -108,7 +108,7 @@ h1, h2, h3, h4, h5, h6 {
 .sticker-container {
   float: left;
   height: 80px;
-  margin-left: 20px;
+  margin: 20px;
   width: 80px; }
 
 .pack-banner {
