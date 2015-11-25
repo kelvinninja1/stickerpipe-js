@@ -65,8 +65,15 @@ var App = _makeClass(function(options) {
 
 		this.$messages.on('click', 'img[data-sticker]', (function(e) {
 			var $target = $(e.target);
-			this.openStickersStore($target.attr('data-sticker-pack'));
+			//this.openStickersStore($target.attr('data-sticker-pack'));
 		}).bind(this));
+
+		//this.$stickersToggle.popover({
+		//	content: '213 dfgfgdfg dfgdfgdfg dfgdfgdfgf dfgdfgdgf dfgdfgdfgd ',
+		//	placement: 'top',
+		//	html: true,
+		//	viewport: this.$messageBox
+		//});
 	},
 	initLoDash: function() {
 		// setting lo-dash template
@@ -81,7 +88,9 @@ var App = _makeClass(function(options) {
 
 			debug: true,
 
-			elId: this.$stickerPipeStickers.attr('id'),
+			//elId: this.$stickerPipeStickers.attr('id'),
+			elId: 'stickersToggle',
+
 			storeContainerId: this.$stickerPipeStore.attr('id'),
 
 			htmlForEmptyRecent: '<div class="emptyRecent">empty recent text</div>',
@@ -89,6 +98,7 @@ var App = _makeClass(function(options) {
 			apikey: '72921666b5ff8651f374747bfefaf7b2',
 			storagePrefix: 'stickerPipe',
 			enableCustomTab: true,
+			enableHistoryTab: true,
 
 			domain : 'http://work.stk.908.vc',
 			clientPacksUrl: 'http://work.stk.908.vc/api/v1/client-packs',
@@ -125,6 +135,7 @@ var App = _makeClass(function(options) {
 
 		});
 
+		console.log('ok', this.stickers.getNewStickersFlag());
 		//this.stickers.start();
 	},
 	initMessageBox: function() {
@@ -164,6 +175,14 @@ var App = _makeClass(function(options) {
 			} else {
 				this.openStickers();
 			}
+		}).bind(this));
+
+		window.addEventListener('sp:popover:shown', (function() {
+			this.$stickersToggle.addClass('active');
+		}).bind(this));
+
+		window.addEventListener('sp:popover:hidden', (function() {
+			this.$stickersToggle.removeClass('active');
 		}).bind(this));
 	},
 
@@ -218,7 +237,8 @@ var App = _makeClass(function(options) {
 		var messagesHeight = this.$messages.height();
 		this.$messages.attr('data-saved-height', messagesHeight);
 
-		this.$stickersToggle.addClass('active');
+		//this.$stickersToggle.addClass('active');
+
 		this.$stickerPipeBlock.slideDown({
 			progress: (function() {
 				this.$messages.height(messagesHeight - this.$stickerPipeBlock.height());
@@ -235,7 +255,7 @@ var App = _makeClass(function(options) {
 
 		var messagesSavedHeight = this.$messages.attr('data-saved-height');
 
-		this.$stickersToggle.removeClass('active');
+		//this.$stickersToggle.removeClass('active');
 
 		this.$stickerPipeBlock.slideUp({
 			progress: (function() {

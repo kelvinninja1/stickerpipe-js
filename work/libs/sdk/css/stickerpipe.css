@@ -51,6 +51,35 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 @include retina-sprites($retina-groups);
 */
+.sp-popover {
+  background: #fafafa;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  position: absolute;
+  height: 350px;
+  width: 320px; }
+  .sp-popover .sp-arrow,
+  .sp-popover .sp-arrow:after {
+    position: absolute;
+    display: block;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-style: solid; }
+  .sp-popover .sp-arrow {
+    bottom: -11px;
+    margin-left: 1px;
+    border-top-color: rgba(0, 0, 0, 0.25);
+    border-width: 11px;
+    border-bottom-width: 0; }
+    .sp-popover .sp-arrow:after {
+      bottom: 1px;
+      margin-left: -10px;
+      content: " ";
+      border-top-color: #fafafa;
+      border-width: 10px;
+      border-bottom-width: 0; }
+
 .sticker-pipe .sp-store {
   background: white; }
 
@@ -60,6 +89,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   display: -webkit-flex;
   display: flex;
   background-color: #fff;
+  border-radius: 3px 3px 0 0;
   overflow-x: scroll;
   width: 100%;
   white-space: nowrap; }
@@ -139,13 +169,28 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 .sticker-pipe .sp-stickers {
   background: #fafafa;
   border-top: 1px solid #c8c8c8;
+  border-radius: 0 0 3px 3px;
   height: 300px;
-  overflow-y: scroll;
-  padding: 10px; }
+  overflow-y: scroll; }
+  .sticker-pipe .sp-stickers .sp-sticker-item,
+  .sticker-pipe .sp-stickers .sp-sticker-placeholder {
+    float: left;
+    display: inline-table; }
+  .sticker-pipe .sp-stickers .sp-sticker-placeholder {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    height: 40px;
+    width: 40px;
+    margin: 32px; }
   .sticker-pipe .sp-stickers .sp-sticker-item {
     cursor: pointer;
     display: inline-table;
-    margin: 12px; }
+    float: left;
+    margin: 9px;
+    padding: 3px; }
+    .sticker-pipe .sp-stickers .sp-sticker-item:not(.sp-sticker-placeholder):hover {
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 5px; }
     .sticker-pipe .sp-stickers .sp-sticker-item img {
       height: 80px;
       width: 80px; }

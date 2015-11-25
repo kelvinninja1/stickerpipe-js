@@ -345,6 +345,17 @@ appStickerPipeStore.run(function($rootScope, $location) {
 		$location.replace();
 	});
 });
+
+appStickerPipeStore.controller('AppController', function(Config, envService) {
+
+	if (envService.is('local') || envService.is('development')) {
+		document.getElementById('css').setAttribute('href', envService.read('cssUrl') + Config.platform.toLocaleLowerCase() + '.css?v='+(+(new Date())));
+	}
+
+	this.getResolutionType = function() {
+		return Config.resolutionType;
+	};
+});
 appStickerPipeStore.factory('EnvConfig', ['envService', function(envService) {
 	return envService.read('all');
 }]);
@@ -529,7 +540,7 @@ appStickerPipeStore.factory('PlatformAPI', [
 				break;
 		}
 
-		return angular.extend(PlatformAPI, {
+		return angular.extend(PlatformAPI, PlatformInstance, {
 
 			showPackCollections: function(pack) {
 				return PlatformInstance.showPackCollections(pack.get('pack_name'));
@@ -566,148 +577,12 @@ appStickerPipeStore.factory('PlatformAPI', [
 				return PlatformInstance.getProductPrice(pack.get('product_id'));
 			},
 
-			isPackExistsAtUserLibrary: function(pack) {
-				return PlatformInstance.isPackExistsAtUserLibrary(pack.get('pack_name'));
+			isPackExistsInStorage: function(pack) {
+				return PlatformInstance.isPackExistsInStorage(pack.get('pack_name'));
 			}
 
 		});
 
-	}]);
-
-appStickerPipeStore.controller('AppController', function(Config, envService) {
-
-	if (envService.is('local') || envService.is('development')) {
-		document.getElementById('css').setAttribute('href', envService.read('cssUrl') + Config.platform.toLocaleLowerCase() + '.css?v='+(+(new Date())));
-	}
-
-	this.getResolutionType = function() {
-		return Config.resolutionType;
-	};
-});
-
-appStickerPipeStore.value('En', {
-	download: 'Download',
-	openStickers: 'Open stickers',
-	buyPack: 'Buy pack',
-	unavailableContent: 'This content is currently unavailable'
-});
-
-appStickerPipeStore.value('Ru', {
-	download: 'Скачать',
-	openStickers: 'Открыть стикеры',
-	buyPack: 'Купить',
-	unavailableContent: 'В данный момент этот контент недоступен'
-});
-
-appStickerPipeStore.factory('AndroidPlatform', [
-	'BasePlatform',
-	function(BasePlatform) {
-
-		var platformJSProvider = window.AndroidJsInterface || {};
-
-		return angular.extend(BasePlatform, {
-
-			showPackCollections: function() {
-				return platformJSProvider.showCollections();
-			},
-
-			downloadPack: function(packName) {
-				return platformJSProvider.onPackDownloaded(packName);
-			},
-
-			purchasePackInStore: function(packTitle, packProductId, packPrice) {
-				return platformJSProvider.onPurchase(packTitle, packProductId, packPrice);
-			},
-
-			purchasePackInPlatformStore: function(packProductId) {
-				return platformJSProvider.onPurchase(packProductId);
-			},
-
-			isPackActive: function(packName) {
-				return platformJSProvider.isPackActive(packName);
-			},
-
-			getProductPrice: function(packProductId) {
-				return platformJSProvider.getProductPrice(packProductId);
-			},
-
-			isPackExistsAtUserLibrary: function(packName) {
-				return platformJSProvider.isPackExistsAtUserLibrary(packName);
-			}
-		});
-	}]);
-
-appStickerPipeStore.factory('BasePlatform', [function() {
-
-	return angular.extend({}, {
-
-		showPackCollections: function(packName) {
-			return false;
-		},
-
-		downloadPack: function(packName) {
-			return false;
-		},
-
-		purchasePackInStore: function(packTitle, packProductId, packPrice) {
-			return false;
-		},
-
-		purchasePackInPlatformStore: function(packProductId) {
-			return false;
-		},
-
-		isPackActive: function(packName) {
-			return false;
-		},
-
-		getProductPrice: function(productId) {
-			return false;
-		},
-
-		isPackExistsAtUserLibrary: function(packName) {
-			return false;
-		}
-	});
-
-}]);
-
-appStickerPipeStore.factory('JSPlatform', [
-	'BasePlatform',
-	'Config',
-	function(BasePlatform, Config) {
-
-		var api = function(action, attrs) {
-			window.parent.postMessage(JSON.stringify({
-				action: action,
-				attrs: attrs
-			}), 'http://' + Config.clientDomain);
-		};
-
-		return angular.extend(BasePlatform, {
-
-			showPackCollections: function(packName) {
-				return api(arguments.callee.name, arguments);
-			},
-
-			downloadPack: function(packName) {
-				return api(arguments.callee.name, arguments);
-			},
-
-			purchasePackInStore: function(packTitle, packProductId, packPrice, packName) {
-				return api(arguments.callee.name, arguments);
-			},
-
-			isPackActive: function(packName) {
-				var q = api(arguments.callee.name, arguments);
-				console.log(q);
-				return q;
-			},
-
-			isPackExistsAtUserLibrary: function(packName) {
-				return api(arguments.callee.name, arguments);
-			}
-		});
 	}]);
 
 appStickerPipeStore.directive('basePage', function() {
@@ -810,10 +685,6 @@ appStickerPipeStore.directive('errorPage', function(Config,  $window, $timeout, 
 		}
 
 	};
-});
-
-appStickerPipeStore.controller('StoreController', function() {
-
 });
 
 appStickerPipeStore.controller('PackController', function(pack) {
@@ -940,6 +811,133 @@ appStickerPipeStore.factory('PacksCollection', function(HttpApi, PackModel) {
 	};
 });
 
+appStickerPipeStore.controller('StoreController', function() {
+
+});
+
+appStickerPipeStore.value('En', {
+	download: 'Download',
+	openStickers: 'Open stickers',
+	buyPack: 'Buy pack',
+	unavailableContent: 'This content is currently unavailable'
+});
+
+appStickerPipeStore.value('Ru', {
+	download: 'Скачать',
+	openStickers: 'Открыть стикеры',
+	buyPack: 'Купить',
+	unavailableContent: 'В данный момент этот контент недоступен'
+});
+
+appStickerPipeStore.factory('AndroidPlatform', [
+	'BasePlatform',
+	function(BasePlatform) {
+
+		var platformJSProvider = window.AndroidJsInterface || {};
+
+		return angular.extend(BasePlatform, {
+
+			showPackCollections: function() {
+				return platformJSProvider.showCollections();
+			},
+
+			downloadPack: function(packName) {
+				return platformJSProvider.onPackDownloaded(packName);
+			},
+
+			purchasePackInStore: function(packTitle, packProductId, packPrice) {
+				return platformJSProvider.onPurchase(packTitle, packProductId, packPrice);
+			},
+
+			purchasePackInPlatformStore: function(packProductId) {
+				return platformJSProvider.onPurchase(packProductId);
+			},
+
+			isPackActive: function(packName) {
+				return platformJSProvider.isPackActive(packName);
+			},
+
+			getProductPrice: function(packProductId) {
+				return platformJSProvider.getProductPrice(packProductId);
+			},
+
+			isPackExistsInStorage: function(packName) {
+				return platformJSProvider.isPackExistsAtUserLibrary(packName);
+			}
+		});
+	}]);
+
+appStickerPipeStore.factory('BasePlatform', [function() {
+
+	return angular.extend({}, {
+
+		showPackCollections: function(packName) {
+			return false;
+		},
+
+		downloadPack: function(packName) {
+			return false;
+		},
+
+		purchasePackInStore: function(packTitle, packProductId, packPrice) {
+			return false;
+		},
+
+		purchasePackInPlatformStore: function(packProductId) {
+			return false;
+		},
+
+		isPackActive: function(packName) {
+			return false;
+		},
+
+		getProductPrice: function(productId) {
+			return false;
+		},
+
+		isPackExistsInStorage: function(packName) {
+			return false;
+		}
+	});
+
+}]);
+
+appStickerPipeStore.factory('JSPlatform', [
+	'BasePlatform',
+	'Config',
+	function(BasePlatform, Config) {
+
+		var api = function(action, attrs) {
+			window.parent.postMessage(JSON.stringify({
+				action: action,
+				attrs: attrs
+			}), 'http://' + Config.clientDomain);
+		};
+
+		return angular.extend(BasePlatform, {
+
+			showPackCollections: function(packName) {
+				return api(arguments.callee.name, arguments);
+			},
+
+			downloadPack: function(packName) {
+				return api(arguments.callee.name, arguments);
+			},
+
+			purchasePackInStore: function(packTitle, packProductId, packPrice, packName) {
+				return api(arguments.callee.name, arguments);
+			},
+
+			isPackActive: function(packName) {
+				return api(arguments.callee.name, arguments);
+			},
+
+			isPackExistsInStorage: function(packName) {
+				return api(arguments.callee.name, arguments);
+			}
+		});
+	}]);
+
 appStickerPipeStore.directive('packActionButton', function(PlatformAPI, Config, i18n, EnvConfig) {
 
 	return {
@@ -967,7 +965,7 @@ appStickerPipeStore.directive('packActionButton', function(PlatformAPI, Config, 
 					$scope.buttonText = i18n.openStickers;
 					$scope.buttonOnClick = PlatformAPI.showPackCollections;
 				} else {
-					if (PlatformAPI.isPackExistsAtUserLibrary(pack) || (pack.get('product_id') === undefined && !pack.get('price'))) {
+					if (PlatformAPI.isPackExistsInStorage(pack) || (pack.get('product_id') === undefined && !pack.get('price'))) {
 						$scope.buttonText = i18n.download;
 						$scope.buttonOnClick = function(pack) {
 							$scope.$emit('showSpinner');

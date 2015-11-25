@@ -18,7 +18,8 @@ gulp.task('css', ['clean:css'], function () {
 		.pipe(sass())
 		.pipe(autoprefixer())
 		.pipe(gulp.dest('work/assets/css'))
-		.pipe(git.add());
+		//.pipe(git.add())
+		;
 });
 
 gulp.task('clean:css', function() {
