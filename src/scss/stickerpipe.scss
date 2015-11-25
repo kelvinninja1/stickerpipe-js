@@ -113,13 +113,7 @@ $borderRadius: 3px;
 			&.sp-control-button {
 
 				margin: 0;
-				padding: 12px 16px;
-
-				@media (max-width: 544px) {
-					& {
-						padding: 12px 12px;
-					}
-				}
+				padding: 12px;
 
 				&:hover > span {
 					opacity: .7;

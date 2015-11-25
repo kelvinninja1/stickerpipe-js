@@ -114,10 +114,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   .sticker-pipe .sp-tabs .sp-tab-item {
     display: inline-table;
     cursor: pointer;
-    padding: 6px 10px; }
-    @media (max-width: 544px) {
-      .sticker-pipe .sp-tabs .sp-tab-item {
-        padding: 6px 6px; } }
+    padding: 6px; }
     .sticker-pipe .sp-tabs .sp-tab-item img {
       border-radius: 50%;
       height: 36px;
@@ -138,10 +135,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
         opacity: 0.9; }
     .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button {
       margin: 0;
-      padding: 12px 16px; }
-      @media (max-width: 544px) {
-        .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button {
-          padding: 12px 12px; } }
+      padding: 12px; }
       .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab:hover > span, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button:hover > span {
         opacity: .7; }
       .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab > span, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button > span {
