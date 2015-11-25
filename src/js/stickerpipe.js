@@ -5,9 +5,11 @@
 //=include modules/Lockr.js
 //=include modules/md5.js
 //=include modules/helper.js
-//=include modules/tabs/tabsView.js
 //=include modules/base/baseService.js
-//=include modules/base/baseView.js
+//=include modules/views/BlockView.js
+//=include modules/views/PopoverView.js
+//=include modules/views/TabsView.js
+//=include modules/views/StoreView.js
 //=include modules/JsApiInterface.js
 
 (function(Plugin, Modules) {
@@ -23,7 +25,8 @@
 
 			this.stService = new Modules.BaseService(this.config);
 			this.stickersModel = {};
-			this.stView = new Modules.BaseView(this.config, this.stService);
+			this.view = new Modules.PopoverView(this.config, this.stService);
+			this.storeView = new Modules.StoreView(this.config);
 
 			Plugin.JsApiInterface && Plugin.JsApiInterface._setConfigs(this.config);
 
@@ -32,15 +35,15 @@
 
 		delegateEvents: function() {
 
-			this.stView.tabsView.handleClickOnCustomTab((function() {
-				this.stView.renderCustomBlock();
+			this.view.tabsView.handleClickOnCustomTab((function() {
+				this.view.renderCustomBlock();
 			}).bind(this));
 
-			this.stView.tabsView.handleClickOnLastUsedPacksTab((function() {
-				this.stView.renderUseStickers(this.stService.getLatestUse());
+			this.view.tabsView.handleClickOnLastUsedPacksTab((function() {
+				this.view.renderUsedStickers(this.stService.getLatestUse());
 			}).bind(this));
 
-			this.stView.tabsView.handleClickOnPackTab((function(el) {
+			this.view.tabsView.handleClickOnPackTab((function(el) {
 				var pack = null,
 					packName = el.getAttribute('data-pack-name');
 
@@ -57,10 +60,10 @@
 					}
 				}
 
-				pack && this.stView.renderStickers(pack);
+				pack && this.view.renderPack(pack);
 			}).bind(this));
 
-			this.stView.handleClickSticker((function(el) {
+			this.view.handleClickSticker((function(el) {
 
 				var stickerAttribute = el.getAttribute('data-sticker-string'),
 					nowDate = new Date().getTime() / 1000|0;
@@ -94,16 +97,17 @@
 		},
 
 		start: function(callback) {
+
 			var onPacksLoadCallback = (function() {
 				callback && callback();
 
-				this.stView.render(this.stickersModel);
+				this.view.render(this.stickersModel);
 
 				// todo --> active 'used' tab
-				this.stView.renderUseStickers(this.stService.getLatestUse());
+				this.view.renderUsedStickers(this.stService.getLatestUse());
 			}).bind(this);
 
-			var storageStickerData =  this.stService.getPacksFromStorage();
+			var storageStickerData = this.stService.getPacksFromStorage();
 
 			if (storageStickerData.actual) {
 
@@ -116,7 +120,6 @@
 					callback: onPacksLoadCallback
 				});
 			}
-
 		},
 
 		fetchPacks: function(attrs) {
@@ -131,21 +134,21 @@
 
 		onClickSticker: function(callback, context) {
 
-			this.stView.handleClickSticker(function(el) {
+			this.view.handleClickSticker(function(el) {
 				callback.call(context, '[[' + el.getAttribute('data-sticker-string') + ']]');
 			});
 
 		},
 
 		onClickCustomTab: function(callback, context) {
-			this.stView.tabsView.handleClickOnCustomTab((function(el) {
+			this.view.tabsView.handleClickOnCustomTab((function(el) {
 				callback.call(context, el);
 			}).bind(this));
 		},
 
 		onClickTab: function(callback, context) {
 
-			this.stView.tabsView.handleClickOnPackTab(function(el) {
+			this.view.tabsView.handleClickOnPackTab(function(el) {
 				callback.call(context, el);
 			});
 
@@ -192,7 +195,7 @@
 		},
 
 		renderPack: function(pack) {
-			this.stView.renderStorePack(pack);
+			this.storeView.render(pack);
 		},
 
 		purchaseSuccess: function(packName) {

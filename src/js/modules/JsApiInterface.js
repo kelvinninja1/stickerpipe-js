@@ -1,21 +1,39 @@
 
-(function(Plugin, BaseService) {
+(function(Plugin, Module) {
 
-	Plugin.JsApiInterface = {
+	Module.StoreApiInterface = Module.Class({
 
 		config: null,
+		service: null,
 
-		_setConfigs: function(Config) {
-			this.config = Config;
+		_constructor: function(config, service) {
+			this.config = config;
+			this.service = service;
+
+			window.addEventListener('message', (function(e) {
+
+				e.data = JSON.parse(e.data);
+
+				if (e.data.action) {
+					return;
+				}
+
+				try {
+					this[e.action].apply(this, e.data.attrs);
+				} catch(e) {
+					console.error(e.message, e);
+				}
+
+			}).bind(this));
 		},
 
 		showPackCollections: function(packName) {
+			// todo remove functions
 			this.config.functions.showPackCollection(packName);
 		},
 
 		downloadPack: function(packName, callback) {
-			var services = new BaseService(this.config);
-			services.updatePacks((function() {
+			this.service.updatePacks((function() {
 				this.config.functions.showPackCollection(packName);
 				callback && callback();
 			}).bind(this));
@@ -30,9 +48,8 @@
 		},
 
 		isPackExistsAtUserLibrary: function(packName) {
-			var services = new BaseService(this.config);
-			return services.isExistPackInStorage(packName);
+			return this.service.isExistPackInStorage(packName);
 		}
-	};
+	});
 
-})(window, StickersModule.BaseService);
+})(window, StickersModule);

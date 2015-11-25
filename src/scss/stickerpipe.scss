@@ -3,8 +3,46 @@
 @import "mixins";
 
 $tabContentSize: 36px;
+$borderRadius: 3px;
+
+.sp-popover {
+	background: #fafafa;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	border-radius: $borderRadius;
+	position: absolute;
+	height: 350px; // todo remove
+	width: 320px;
+
+	.sp-arrow,
+	.sp-arrow:after {
+		position: absolute;
+		display: block;
+		width: 0;
+		height: 0;
+		border-color: transparent;
+		border-style: solid;
+	}
+
+	.sp-arrow {
+		bottom: -11px;
+		margin-left: 1px;
+		border-top-color: rgba(0,0,0,.25);
+		border-width: 11px;
+		border-bottom-width: 0;
+
+		&:after {
+			bottom: 1px;
+			margin-left: -10px;
+			content: " ";
+			border-top-color: #fafafa;
+			border-width: 10px;
+			border-bottom-width: 0;
+		}
+	}
+}
 
 .sticker-pipe {
+
 	.sp-store {
 		background: white;
 	}
@@ -13,6 +51,7 @@ $tabContentSize: 36px;
 		@include flexbox();
 
 		background-color: #fff;
+		border-radius: $borderRadius $borderRadius 0 0;
 		overflow-x: scroll;
 		width: 100%;
 		white-space: nowrap;
@@ -135,17 +174,41 @@ $tabContentSize: 36px;
 	.sp-stickers {
 		background: #fafafa;
 		border-top: 1px solid rgb(200, 200, 200);
+		border-radius: 0 0 $borderRadius $borderRadius;
 		height: 300px;
 		overflow-y: scroll;
-		padding: 10px;
+
+		$size: 80px;
+
+		.sp-sticker-item,
+		.sp-sticker-placeholder {
+			float: left;
+			display: inline-table;
+		}
+
+		.sp-sticker-placeholder {
+			$placeHolderSize: 40px;
+
+			background: rgba(0, 0, 0, 0.1);
+			border-radius: 50%;
+			height: $size / 2;
+			width: $size / 2;
+			margin: (($size - $placeHolderSize) / 2) + (2 * 6px);
+		}
 
 		.sp-sticker-item {
 			cursor: pointer;
 			display: inline-table;
-			margin: 12px;
+			float: left;
+			margin: 9px;
+			padding: 3px;
+
+			&:not(.sp-sticker-placeholder):hover {
+				background: rgba(0, 0, 0, 0.1);
+				border-radius: 5px;
+			}
 
 			img {
-				$size: 80px;
 				height: $size;
 				width: $size;
 			}

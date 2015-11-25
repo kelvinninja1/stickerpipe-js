@@ -17,6 +17,7 @@
 		prevPacksTabContent: '<span class="sp-icon-arrow-back"></span>',
 		nextPacksTabContent: '<span class="sp-icon-arrow-forward"></span>',
 
+		// todo only one API url
 		domain : 'http://api.stickerpipe.com',
 		baseFolder: 'stk',
 
@@ -29,10 +30,16 @@
 		storeUrl: 'http://api.stickerpipe.com/api/v1/web',
 
 		storagePrefix: 'stickerPipe',
+
 		enableCustomTab: false,
+		enableHistoryTab: false,
+		enableSettingsTab: false,
+		enableStoreTab: false,
 
-		userId: null
+		userId: null,
 
+		display: 'block', // todo block or popover
+		width: '320px'
 	};
 
 })(window);

@@ -3,7 +3,7 @@
 
 	var StickerHelper = Module.StickerHelper;
 
-	Plugin.StickersModule.BaseView = Module.Class({
+	Plugin.StickersModule.BlockView = Module.Class({
 
 		config: null,
 		service: null,
@@ -23,6 +23,10 @@
 
 			this.el = document.getElementById(this.config.elId);
 			this.stickersEl = document.createElement('div');
+
+			window.addEventListener('resize', (function() {
+				this.onWindowResize();
+			}).bind(this));
 		},
 
 		clearBlock: function(el) {
@@ -43,31 +47,24 @@
 			this.el.appendChild(this.stickersEl);
 
 			this.tabsView.onWindowResize();
+			this.onWindowResize();
 		},
 
 		renderUsedStickers: function(latesUseSticker) {
-			var self = this;
 
-			this.clearBlock(self.stickersEl);
+			this.clearBlock(this.stickersEl);
 
 			if (latesUseSticker.length == 0) {
-
 				this.stickersEl.innerHTML += this.config.htmlForEmptyRecent;
-
 				return false;
 			}
 
+			var stickers = [];
+			StickerHelper.forEach(latesUseSticker, function(sticker) {
+				stickers.push(sticker.code);
+			});
 
-			StickerHelper.forEach(latesUseSticker, (function(sticker) {
-
-				var icon_src = this.service.parseStickerFromText("[[" + sticker.code + "]]"),
-					packItem;
-
-				packItem = "<span data-sticker-string=" + sticker.code +" class=" + self.config.stickerItemClass + "> <img src=" + icon_src.url + "></span>";
-
-				self.stickersEl.innerHTML += packItem;
-			}).bind(this));
-
+			this.renderStickers(stickers);
 		},
 
 		renderCustomBlock: function() {
@@ -75,39 +72,37 @@
 		},
 
 		renderPack: function(pack) {
-			var self = this;
 
 			this.clearBlock(this.stickersEl);
 
-			var i = -1;
+			var stickers = [];
 			StickerHelper.forEach(pack.stickers, function(sticker) {
+				stickers.push(pack.pack_name + '_' + sticker.name);
+			});
+
+			this.renderStickers(stickers);
+		},
+
+		renderStickers: function(stickers) {
+			var self = this;
+
+			StickerHelper.forEach(stickers, function(stickerCode) {
 
 				var placeHolderClass = 'sp-sticker-placeholder';
 
-				i++;
-
-				var stickerImgSrc = self.service.parseStickerFromText('[[' + pack.pack_name + '_' + sticker.name + ']]');
+				var stickerImgSrc = self.service.parseStickerFromText('[[' + stickerCode + ']]');
 
 				var stickersSpanEl = document.createElement('span');
-				stickersSpanEl.setAttribute('data-sticker-string', pack.pack_name + '_' + sticker.name);
-				stickersSpanEl.classList.add(
-					self.config.stickerItemClass,
-					placeHolderClass
-				);
-
-				if (i == 0) {
-					stickerImgSrc.url = '_' + stickerImgSrc.url;
-				}
+				stickersSpanEl.classList.add(placeHolderClass);
 
 				var image = new Image();
 				image.onload = function() {
 					stickersSpanEl.classList.remove(placeHolderClass);
+					stickersSpanEl.classList.add(self.config.stickerItemClass);
+					stickersSpanEl.setAttribute('data-sticker-string', stickerCode);
 					stickersSpanEl.appendChild(image);
-					console.log('ok load');
 				};
-				image.onerror = function() {
-					console.log('error');
-				};
+				image.onerror = function() {};
 
 				image.src = stickerImgSrc.url;
 
@@ -117,6 +112,9 @@
 
 		handleClickSticker: function(callback) {
 			Module.StickerHelper.setEvent('click', this.stickersEl, this.config.stickerItemClass, callback);
+		},
+
+		onWindowResize: function() {
 		}
 	});
 
