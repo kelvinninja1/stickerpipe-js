@@ -33,10 +33,33 @@ body {
       outline: none;
       box-shadow: none; }
 
-#stickersToggle.active, #stickersToggle.active:hover, #stickersToggle.active:focus {
-  color: orange !important;
-  background: none;
-  box-shadow: none; }
+#stickersToggle {
+  padding: 8px; }
+  #stickersToggle .icon {
+    height: 24px;
+    display: table;
+    opacity: .5;
+    width: 24px; }
+    #stickersToggle .icon, #stickersToggle .icon:hover, #stickersToggle .icon:focus {
+      background: url("../img/face.png") !important;
+      background-size: 24px !important; }
+      @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2 / 1) {
+        #stickersToggle .icon, #stickersToggle .icon:hover, #stickersToggle .icon:focus {
+          background: url("../img/face@2x.png") !important;
+          background-size: 24px !important; } }
+  #stickersToggle:hover .icon {
+    opacity: .7; }
+  #stickersToggle.active .icon {
+    opacity: .9; }
+    #stickersToggle.active .icon, #stickersToggle.active .icon:hover, #stickersToggle.active .icon:focus {
+      background: url("../img/stckr.png") !important;
+      background-size: 24px !important;
+      color: orange !important;
+      box-shadow: none; }
+      @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2 / 1) {
+        #stickersToggle.active .icon, #stickersToggle.active .icon:hover, #stickersToggle.active .icon:focus {
+          background: url("../img/stckr@2x.png") !important;
+          background-size: 24px !important; } }
 
 #stickerPipe {
   border-radius: 3px 3px 0 0;
@@ -71,5 +94,5 @@ body {
   position: absolute;
   background-color: #f60;
   border-radius: 50%;
-  margin-left: 20px;
-  margin-top: -10px; }
+  margin-left: 18px;
+  margin-top: -9px !important; }

@@ -53,14 +53,60 @@ body {
 	}
 }
 
-#stickersToggle.active {
-	&,
-	&:hover,
-	&:focus {
+#stickersToggle {
+	padding: 8px;
 
-		color: orange !important;
-		background: none;
-		box-shadow: none;
+	.icon {
+		height: 24px;
+		display: table;
+		opacity: .5;
+		width: 24px;
+
+		&,
+		&:hover,
+		&:focus {
+			background: url("../img/face.png") !important;
+			background-size: 24px !important;
+
+			@media
+			only screen and (-webkit-min-device-pixel-ratio: 2),
+			only screen and (   min--moz-device-pixel-ratio: 2),
+			only screen and (     -o-min-device-pixel-ratio: 2/1) {
+				background: url("../img/face@2x.png") !important;
+				background-size: 24px !important;
+			}
+		}
+	}
+
+	&:hover {
+		.icon {
+			opacity: .7;
+		}
+	}
+
+
+	&.active {
+		.icon {
+			opacity: .9;
+
+			&,
+			&:hover,
+			&:focus {
+				background: url("../img/stckr.png") !important;
+				background-size: 24px !important;
+
+				color: orange !important;
+				box-shadow: none;
+
+				@media
+				only screen and (-webkit-min-device-pixel-ratio: 2),
+				only screen and (   min--moz-device-pixel-ratio: 2),
+				only screen and (     -o-min-device-pixel-ratio: 2/1) {
+					background: url("../img/stckr@2x.png") !important;
+					background-size: 24px !important;
+				}
+			}
+		}
 	}
 }
 
@@ -106,6 +152,6 @@ body {
 	position: absolute;
 	background-color: #f60;
 	border-radius: 50%;
-	margin-left: 20px;
-	margin-top: -10px;
+	margin-left: 18px;
+	margin-top: -9px !important;
 }
