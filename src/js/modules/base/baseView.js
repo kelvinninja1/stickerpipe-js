@@ -118,6 +118,7 @@
 		handleClickSticker: function(callback) {
 			Module.StickerHelper.setEvent('click', this.stickersEl, this.config.stickerItemClass, callback);
 		}
+
 	});
 
 })(window, window.StickersModule);

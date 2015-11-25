@@ -34,6 +34,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		prevPacksTabContent: '<span class="sp-icon-arrow-back"></span>',
 		nextPacksTabContent: '<span class="sp-icon-arrow-forward"></span>',
 
+		// todo only one API url
 		domain : 'http://api.stickerpipe.com',
 		baseFolder: 'stk',
 
@@ -46,10 +47,16 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		storeUrl: 'http://api.stickerpipe.com/api/v1/web',
 
 		storagePrefix: 'stickerPipe',
+
 		enableCustomTab: false,
+		enableHistoryTab: false,
+		enableSettingsTab: false,
+		enableStoreTab: false,
 
-		userId: null
+		userId: null,
 
+		display: 'block', // todo block or popover
+		width: '320px'
 	};
 
 })(window);
@@ -59,21 +66,135 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 	Plugin.StickersModule = Plugin.StickersModule || {};
 
-	Plugin.StickersModule.Class = function(source) {
-		var _class = function() {
-				this._constructor && this._constructor.apply(this, arguments);
-			},
-			_prototype = _class.prototype || {};
+	/** @preserve http://github.com/easeway/js-class */
 
-		for (var property in source) {
-			_prototype[property] = source[property];
+	// Class Definition using ECMA5 prototype chain
+
+	function inherit(dest, src, noParent) {
+		while (src && src !== Object.prototype) {
+			Object.getOwnPropertyNames(src).forEach(function (name) {
+				if (name != '.class' && !dest.hasOwnProperty(name)) {
+					var desc = Object.getOwnPropertyDescriptor(src, name);
+					Object.defineProperty(dest, name, desc);
+				}
+			});
+			if (noParent) {
+				break;
+			}
+			src = src.__proto__;
+		}
+		return dest;
+	}
+
+	var Class = function (base, proto, options) {
+		if (typeof(base) != 'function') {
+			options = proto;
+			proto = base;
+			base = Object;
+		}
+		if (!proto) {
+			proto = {};
+		}
+		if (!options) {
+			options = {};
 		}
 
-		_class.prototype = _prototype;
-
-		return _class;
-
+		var meta = {
+			name: options.name,
+			base: base,
+			implements: []
+		}
+		var classProto = Class.clone(proto);
+		if (options.implements) {
+			(Array.isArray(options.implements) ? options.implements : [options.implements])
+				.forEach(function (implementedType) {
+					if (typeof(implementedType) == 'function' && implementedType.prototype) {
+						meta.implements.push(implementedType);
+						Class.extend(classProto, implementedType.prototype);
+					}
+				});
+		}
+		classProto.__proto__ = base.prototype;
+		var theClass = function () {
+			if (typeof(this._constructor) == 'function') {
+				this._constructor.apply(this, arguments);
+			}
+		};
+		meta.type = theClass;
+		theClass.prototype = classProto;
+		Object.defineProperty(theClass, '.class.meta', { value: meta, enumerable: false, configurable: false, writable: false });
+		Object.defineProperty(classProto, '.class', { value: theClass, enumerable: false, configurable: false, writable: false });
+		if (options.statics) {
+			Class.extend(theClass, options.statics);
+		}
+		return theClass;
 	};
+
+	Class.extend = inherit;
+
+	Class.clone = function (object) {
+		return inherit({}, object);
+	};
+
+	function findType(meta, type) {
+		while (meta) {
+			if (meta.type.prototype === type.prototype) {
+				return true;
+			}
+			for (var i in meta.implements) {
+				var implType = meta.implements[i];
+				var implMeta = implType['.class.meta'];
+				if (implMeta) {
+					if (findType(implMeta, type)) {
+						return true;
+					}
+				} else {
+					for (var proto = implType.prototype; proto; proto = proto.__proto__) {
+						if (proto === type.prototype) {
+							return true;
+						}
+					}
+				}
+			}
+			meta = meta.base ? meta.base['.class.meta'] : undefined;
+		}
+		return false;
+	}
+
+	var Checker = Class({
+		_constructor: function (object) {
+			this.object = object;
+		},
+
+		typeOf: function (type) {
+			if (this.object instanceof type) {
+				return true;
+			}
+			var meta = Class.typeInfo(this.object);
+			return meta && findType(meta, type);
+		}
+	});
+
+	// aliases
+	Checker.prototype.a = Checker.prototype.typeOf;
+	Checker.prototype.an = Checker.prototype.typeOf;
+
+	Class.is = function (object) {
+		return new Checker(object);
+	};
+
+	Class.typeInfo = function (object) {
+		var theClass = object.__proto__['.class'];
+		return theClass ? theClass['.class.meta'] : undefined;
+	};
+
+	Class.VERSION = [0, 0, 2];
+
+	if (typeof module !== "undefined") {
+		module.exports = Class;
+	} else {
+		Plugin.StickersModule.Class = Class;   // for browser
+	}
 
 })(window);
 
@@ -517,273 +638,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 })(window, window.StickersModule.Lockr, window.StickersModule.MD5);
 
 
-(function(Plugin, Module) {
-
-
-	Module.TabsView = Module.Class({
-
-		el: null,
-		scrollableContainerEl: null,
-		scrollableContentEl: null,
-
-		controls: null,
-		packTabs: {},
-
-		classes: {
-			scrollableContainer: 'sp-tabs-scrollable-container',
-			scrollableContent: 'sp-tabs-scrollable-content',
-			controlTab: 'sp-control-tab',
-			controlButton: 'sp-control-button',
-			newPack: 'sp-new-pack',
-			packTab: 'sp-pack-tab',
-			tabActive: 'sp-tab-active',
-			tabs: 'sp-tabs'
-		},
-
-		config: null,
-
-		_constructor: function(config) {
-			this.config = config;
-
-			this.el = document.createElement('div');
-
-			this.controls = {
-				custom: {
-					id: 'spTabCustom',
-					class: 'sp-tab-custom',
-					content: this.config.customTabContent,
-					el: null,
-					isTab: true
-				},
-				history: {
-					id: 'spTabHistory',
-					class: 'sp-tab-history',
-					content: this.config.historyTabContent,
-					el: null,
-					isTab: true
-				},
-				settings: {
-					id: 'spTabSettings',
-					class: 'sp-tab-settings',
-					content: this.config.settingsTabContent,
-					el: null,
-					isTab: false
-				},
-				store: {
-					id: 'spTabStore',
-					class: 'sp-tab-store',
-					content: this.config.storeTabContent,
-					el: null,
-					isTab: false
-				},
-				prevPacks: {
-					id: 'spTabPrevPacks',
-					class: 'sp-tab-prev-packs',
-					content: this.config.prevPacksTabContent,
-					el: null,
-					isTab: false
-				},
-				nextPacks: {
-					id: 'spTabNextPacks',
-					class: 'sp-tab-next-packs',
-					content: this.config.nextPacksTabContent,
-					el: null,
-					isTab: false
-				}
-			};
-
-			window.addEventListener('resize', (function() {
-				this.onWindowResize();
-			}).bind(this));
-		},
-
-		render: function(stickerPacks) {
-
-			this.el.classList.add(this.classes.tabs);
-			this.el.innerHTML = '';
-
-			// PREV BUTTON
-			this.el.appendChild(this.renderControlButton(this.controls.prevPacks));
-			Module.StickerHelper.setEvent('click', this.el, this.controls.prevPacks.class, this.onClickPrevPacksButton.bind(this));
-
-			// SCROLLABLE CONTAINER
-			this.renderScrollableContainer();
-
-			// CUSTOM TAB
-			if (this.config.enableCustomTab) {
-				this.scrollableContentEl.appendChild(this.renderControlButton(this.controls.custom));
-			}
-
-			// HISTORY TAB
-			this.scrollableContentEl.appendChild(this.renderControlButton(this.controls.history));
-
-			// PACKS TABS
-			for (var i = 0; i < stickerPacks.length; i++) {
-				this.scrollableContentEl.appendChild(this.renderPackTab(stickerPacks[i], i));
-			}
-
-			// SETTINGS BUTTON
-			this.scrollableContentEl.appendChild(this.renderControlButton(this.controls.settings));
-
-			// NEXT BUTTON
-			this.el.appendChild(this.renderControlButton(this.controls.nextPacks));
-			Module.StickerHelper.setEvent('click', this.el, this.controls.nextPacks.class, this.onClickNextPacksButton.bind(this));
-
-			// STORE BUTTON
-			this.el.appendChild(this.renderControlButton(this.controls.store));
-
-			this.onWindowResize();
-		},
-		renderScrollableContainer: function() {
-
-			this.scrollableContentEl = document.createElement('div');
-			this.scrollableContentEl.className = this.classes.scrollableContent;
-
-			this.scrollableContainerEl = document.createElement('div');
-			this.scrollableContainerEl.className = this.classes.scrollableContainer;
-
-			this.scrollableContainerEl.appendChild(this.scrollableContentEl);
-			this.el.appendChild(this.scrollableContainerEl);
-		},
-		renderControlButton: function(controlButton) {
-			controlButton.isTab = controlButton.isTab || false;
-
-			var classes = [controlButton.class];
-			classes.push((controlButton.isTab) ? this.classes.controlTab : this.classes.controlButton);
-
-			controlButton.el = this.renderTab(controlButton.id, classes, controlButton.content);
-			return controlButton.el;
-		},
-		renderPackTab: function(pack) {
-			var classes = [this.classes.packTab];
-
-			if(pack.newPack) {
-				classes.push(this.classes.newPack);
-			}
-
-			var iconSrc = this.config.domain + '/' +
-				this.config.baseFolder + '/' +
-				pack.pack_name + '/tab_icon_' +
-				this.config.tabResolutionType + '.png';
-
-			var content = '<img src=' + iconSrc + '>';
-
-			var tabEl = this.renderTab(null, classes, content, {
-				'data-pack-name': pack.pack_name
-			});
-
-			tabEl.addEventListener('click', (function() {
-				tabEl.classList.remove(this.classes.newPack);
-			}).bind(this));
-
-			this.packTabs[pack.pack_name] = tabEl;
-
-			return tabEl;
-		},
-		renderTab: function(id, classes, content, attrs) {
-			classes = classes || [];
-			attrs = attrs || {};
-
-			var tabEl = document.createElement('span');
-
-			if (id) {
-				tabEl.id = id;
-			}
-
-			classes.push(this.config.tabItemClass);
-
-			tabEl.classList.add.apply(tabEl.classList, classes);
-
-			Module.StickerHelper.forEach(attrs, function(value, name) {
-				tabEl.setAttribute(name, value);
-			});
-
-			tabEl.innerHTML = content;
-
-			tabEl.addEventListener('click', (function() {
-				if (!tabEl.classList.contains(this.classes.controlTab) &&
-					!tabEl.classList.contains(this.classes.packTab)) {
-					return;
-				}
-
-				Module.StickerHelper.forEach(this.packTabs, (function(tabEl) {
-					tabEl.classList.remove(this.classes.tabActive);
-				}).bind(this));
-
-				Module.StickerHelper.forEach(this.controls, (function(controlTab) {
-					if (controlTab && controlTab.el) {
-						controlTab.el.classList.remove(this.classes.tabActive);
-					}
-				}).bind(this));
-
-				tabEl.classList.add(this.classes.tabActive);
-			}).bind(this));
-
-			return tabEl;
-		},
-
-		onClickPrevPacksButton: function() {
-			var tabWidth = this.scrollableContentEl.getElementsByClassName(this.classes.packTab)[0].offsetWidth;
-			var containerWidth = this.scrollableContainerEl.offsetWidth;
-			var contentOffset = parseInt(this.scrollableContentEl.style.left, 10) || 0;
-			var countFullShownTabs = parseInt((containerWidth / tabWidth), 10);
-
-			var offset = contentOffset + (tabWidth * countFullShownTabs);
-			offset = (offset > 0) ? 0 : offset;
-			this.scrollableContentEl.style.left = offset + 'px';
-			this.onWindowResize();
-		},
-		onClickNextPacksButton: function() {
-			var tabWidth = this.scrollableContentEl.getElementsByClassName(this.classes.packTab)[0].offsetWidth;
-			var containerWidth = this.scrollableContainerEl.offsetWidth;
-			var contentOffset = parseInt(this.scrollableContentEl.style.left, 10) || 0;
-			var countFullShownTabs = parseInt((containerWidth / tabWidth), 10);
-
-			var offset = -(tabWidth * countFullShownTabs) + contentOffset;
-			this.scrollableContentEl.style.left = offset + 'px';
-			this.onWindowResize();
-		},
-
-		handleClickOnCustomTab: function(callback) {
-			Module.StickerHelper.setEvent('click', this.el, this.controls.custom.class, callback);
-		},
-		handleClickOnLastUsedPacksTab: function(callback) {
-			Module.StickerHelper.setEvent('click', this.el, this.controls.history.class, callback);
-		},
-		handleClickOnPackTab: function(callback) {
-			Module.StickerHelper.setEvent('click', this.el, this.classes.packTab, callback);
-		},
-
-		onWindowResize: function() {
-
-			if (!this.el.parentElement) {
-				return;
-			}
-
-			if (this.controls.prevPacks.el) {
-				if (parseInt(this.scrollableContentEl.style.left, 10) < 0) {
-					this.controls.prevPacks.el.style.display = 'block';
-				} else {
-					this.controls.prevPacks.el.style.display = 'none';
-				}
-			}
-
-
-			if (this.controls.nextPacks.el) {
-				var contentWidth = this.scrollableContentEl.scrollWidth;
-				var contentOffset = parseInt(this.scrollableContentEl.style.left, 10) || 0;
-
-				if (contentWidth + contentOffset > this.scrollableContainerEl.offsetWidth) {
-					this.controls.nextPacks.el.style.display = 'block';
-				} else {
-					this.controls.nextPacks.el.style.display = 'none';
-				}
-			}
-		}
-	});
-
-})(window, window.StickersModule);
-
 (function(Plugin, StickerHelper, Lockr) {
 
     Plugin.StickersModule = Plugin.StickersModule || {};
@@ -1089,7 +943,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 	var StickerHelper = Module.StickerHelper;
 
-	Plugin.StickersModule.BaseView = Module.Class({
+	Plugin.StickersModule.BlockView = Module.Class({
 
 		config: null,
 		service: null,
@@ -1109,6 +963,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 			this.el = document.getElementById(this.config.elId);
 			this.stickersEl = document.createElement('div');
+
+			window.addEventListener('resize', (function() {
+				this.onWindowResize();
+			}).bind(this));
 		},
 
 		clearBlock: function(el) {
@@ -1127,64 +985,193 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 			this.el.appendChild(this.tabsView.el);
 			this.el.appendChild(this.stickersEl);
+
+			this.tabsView.onWindowResize();
+			this.onWindowResize();
 		},
 
-		renderUseStickers: function(latesUseSticker) {
-			var self = this;
+		renderUsedStickers: function(latesUseSticker) {
 
-			this.clearBlock(self.stickersEl);
+			this.clearBlock(this.stickersEl);
 
 			if (latesUseSticker.length == 0) {
-
 				this.stickersEl.innerHTML += this.config.htmlForEmptyRecent;
-
 				return false;
 			}
 
+			var stickers = [];
+			StickerHelper.forEach(latesUseSticker, function(sticker) {
+				stickers.push(sticker.code);
+			});
 
-			StickerHelper.forEach(latesUseSticker, (function(sticker) {
-
-				var icon_src = this.service.parseStickerFromText("[[" + sticker.code + "]]"),
-					packItem;
-
-				packItem = "<span data-sticker-string=" + sticker.code +" class=" + self.config.stickerItemClass + "> <img src=" + icon_src.url + "></span>";
-
-				self.stickersEl.innerHTML += packItem;
-			}).bind(this));
-
+			this.renderStickers(stickers);
 		},
 
 		renderCustomBlock: function() {
 			this.clearBlock(this.stickersEl);
 		},
 
-		renderStickers: function(pack) {
-			var self = this;
+		renderPack: function(pack) {
 
 			this.clearBlock(this.stickersEl);
 
+			var stickers = [];
 			StickerHelper.forEach(pack.stickers, function(sticker) {
+				stickers.push(pack.pack_name + '_' + sticker.name);
+			});
 
-				var icon_src = self.config.domain + '/' +
-					self.config.baseFolder + '/' +
-					pack.pack_name + '/' +
-					sticker.name + '_' + self.config.stickerResolutionType +
-					'.png';
+			this.renderStickers(stickers);
+		},
 
-				self.stickersEl.innerHTML +=
-					'<span data-sticker-string=' + pack.pack_name + '_' + sticker.name +' class=' + self.config.stickerItemClass + '> <img src=' + icon_src + '></span>';
+		renderStickers: function(stickers) {
+			var self = this;
+
+			StickerHelper.forEach(stickers, function(stickerCode) {
+
+				var placeHolderClass = 'sp-sticker-placeholder';
+
+				var stickerImgSrc = self.service.parseStickerFromText('[[' + stickerCode + ']]');
+
+				var stickersSpanEl = document.createElement('span');
+				stickersSpanEl.classList.add(placeHolderClass);
+
+				var image = new Image();
+				image.onload = function() {
+					stickersSpanEl.classList.remove(placeHolderClass);
+					stickersSpanEl.classList.add(self.config.stickerItemClass);
+					stickersSpanEl.setAttribute('data-sticker-string', stickerCode);
+					stickersSpanEl.appendChild(image);
+				};
+				image.onerror = function() {};
+
+				image.src = stickerImgSrc.url;
+
+				self.stickersEl.appendChild(stickersSpanEl);
 			});
 		},
 
-		renderStorePack: function(packName) {
+		handleClickSticker: function(callback) {
+			Module.StickerHelper.setEvent('click', this.stickersEl, this.config.stickerItemClass, callback);
+		},
 
-			var storeEl = document.getElementById(this.config.storeContainerId),
-				iframe = document.createElement('iframe'),
+		onWindowResize: function() {
+		}
+	});
+
+})(window, window.StickersModule);
+
+(function(Plugin, Module) {
+
+	var parent = Plugin.StickersModule.BlockView;
+
+	Plugin.StickersModule.PopoverView = Module.Class(parent, {
+
+		popoverEl: null,
+		arrowEl: null,
+		toggleEl: null,
+
+		active: false,
+
+		_constructor: function(config, service) {
+			parent.prototype._constructor.call(this, config, service);
+
+			this.toggleEl = document.getElementById(this.config.elId);
+			this.toggleEl.addEventListener('click', (function() {
+				this.toggle();
+			}).bind(this));
+
+			this.popoverEl = document.createElement('div');
+			this.popoverEl.classList.add('sp-popover');
+
+			this.el = document.createElement('div');
+
+			this.arrowEl = document.createElement('div');
+			this.arrowEl.className = 'sp-arrow';
+
+			this.popoverEl.appendChild(this.el);
+			this.popoverEl.appendChild(this.arrowEl);
+
+			this.handleClickSticker((function() {
+				this.toggle();
+			}).bind(this));
+
+			document.getElementsByTagName('body')[0].addEventListener('click', (function(e) {
+				function isDescendant(parent, child) {
+					var node = child.parentNode;
+					while (node != null) {
+						if (node == parent) {
+							return true;
+						}
+						node = node.parentNode;
+					}
+					return false;
+				}
+
+				if (!this.active) {
+					return;
+				}
+
+				if (!isDescendant(this.popoverEl, e.target) && !isDescendant(this.toggleEl.parentElement, e.target)) {
+					this.toggle();
+				}
+			}).bind(this));
+		},
+
+		toggle: function() {
+			this.active = !this.active;
+
+			if (this.active) {
+				// todo render in firefox (document.getElementsByTagName('body')[0])
+				this.toggleEl.parentElement.appendChild(this.popoverEl);
+				this.positioned();
+				window.dispatchEvent(new Event('sp:popover:shown'));
+			} else {
+				this.toggleEl.parentElement.removeChild(this.popoverEl);
+				window.dispatchEvent(new Event('sp:popover:hidden'));
+			}
+		},
+
+		positioned: function() {
+
+			if (this.arrowEl) {
+				var style = this.toggleEl.currentStyle || window.getComputedStyle(this.toggleEl);
+				var marginLeft = parseInt(style.marginLeft, 10);
+
+				this.arrowEl.style.marginLeft = (this.toggleEl.clientWidth / 2) - (this.arrowEl.offsetWidth / 2) + marginLeft + 'px';
+			} else {
+				console.error('error');
+			}
+			this.popoverEl.style.top = -(this.popoverEl.offsetHeight + 15) + 'px';
+		}
+
+	});
+
+})(window, window.StickersModule);
+//=include modules/views/TabsView.js
+
+(function(Plugin, Module) {
+
+	Plugin.StickersModule.StoreView = Module.Class({
+
+		config: null,
+
+		el: null,
+
+		_constructor: function(config) {
+			this.config = config;
+
+			this.el = document.getElementById(this.config.storeContainerId);
+		},
+
+		render: function(packName) {
+
+			var iframe = document.createElement('iframe'),
 				urlParams = {
 					apiKey: this.config.apikey,
 					platform: 'JS',
 					userId: this.config.userId,
-					density: this.config.stickerResolutionType
+					density: this.config.stickerResolutionType,
+					uri: encodeURIComponent('http://demo.stickerpipe.com/work/libs/store/js/stickerPipeStore.js')
 				},
 				urlSerialize = function(obj) {
 					var str = [];
@@ -1195,42 +1182,55 @@ document.addEventListener("DOMContentLoaded", function(event) {
 					return str.join('&');
 				};
 
-			storeEl.classList.add('sp-store');
-			storeEl.innerHTML = '';
-			storeEl.appendChild(iframe);
+			this.el.classList.add('sp-store');
+			this.el.innerHTML = '';
+			this.el.appendChild(iframe);
 
 			iframe.style.width = '100%';
 			iframe.style.height = '100%';
 			iframe.style.border = '0';
 
-			// todo
-			iframe.src = this.config.storeUrl + '?' + urlSerialize(urlParams) + '#/packs/' + packName;
-		},
-
-		handleClickSticker: function(callback) {
-			Module.StickerHelper.setEvent('click', this.stickersEl, this.config.stickerItemClass, callback);
+			iframe.src = this.config.storeUrl + '?' + urlSerialize(urlParams) + '#/packs/' + packName
 		}
 	});
 
 })(window, window.StickersModule);
 
-(function(Plugin, BaseService) {
+(function(Plugin, Module) {
 
-	Plugin.JsApiInterface = {
+	Module.StoreApiInterface = Module.Class({
 
 		config: null,
+		service: null,
 
-		_setConfigs: function(Config) {
-			this.config = Config;
+		_constructor: function(config, service) {
+			this.config = config;
+			this.service = service;
+
+			window.addEventListener('message', (function(e) {
+
+				e.data = JSON.parse(e.data);
+
+				if (e.data.action) {
+					return;
+				}
+
+				try {
+					this[e.action].apply(this, e.data.attrs);
+				} catch(e) {
+					console.error(e.message, e);
+				}
+
+			}).bind(this));
 		},
 
 		showPackCollections: function(packName) {
+			// todo remove functions
 			this.config.functions.showPackCollection(packName);
 		},
 
 		downloadPack: function(packName, callback) {
-			var services = new BaseService(this.config);
-			services.updatePacks((function() {
+			this.service.updatePacks((function() {
 				this.config.functions.showPackCollection(packName);
 				callback && callback();
 			}).bind(this));
@@ -1245,12 +1245,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		},
 
 		isPackExistsAtUserLibrary: function(packName) {
-			var services = new BaseService(this.config);
-			return services.isExistPackInStorage(packName);
+			return this.service.isExistPackInStorage(packName);
 		}
-	};
+	});
 
-})(window, StickersModule.BaseService);
+})(window, StickersModule);
 
 
 (function(Plugin, Modules) {
@@ -1266,7 +1265,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 			this.stService = new Modules.BaseService(this.config);
 			this.stickersModel = {};
-			this.stView = new Modules.BaseView(this.config, this.stService);
+			this.view = new Modules.PopoverView(this.config, this.stService);
+			this.storeView = new Modules.StoreView(this.config);
 
 			Plugin.JsApiInterface && Plugin.JsApiInterface._setConfigs(this.config);
 
@@ -1275,15 +1275,15 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 		delegateEvents: function() {
 
-			this.stView.tabsView.handleClickOnCustomTab((function() {
-				this.stView.renderCustomBlock();
+			this.view.tabsView.handleClickOnCustomTab((function() {
+				this.view.renderCustomBlock();
 			}).bind(this));
 
-			this.stView.tabsView.handleClickOnLastUsedPacksTab((function() {
-				this.stView.renderUseStickers(this.stService.getLatestUse());
+			this.view.tabsView.handleClickOnLastUsedPacksTab((function() {
+				this.view.renderUsedStickers(this.stService.getLatestUse());
 			}).bind(this));
 
-			this.stView.tabsView.handleClickOnPackTab((function(el) {
+			this.view.tabsView.handleClickOnPackTab((function(el) {
 				var pack = null,
 					packName = el.getAttribute('data-pack-name');
 
@@ -1300,10 +1300,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
 					}
 				}
 
-				pack && this.stView.renderStickers(pack);
+				pack && this.view.renderPack(pack);
 			}).bind(this));
 
-			this.stView.handleClickSticker((function(el) {
+			this.view.handleClickSticker((function(el) {
 
 				var stickerAttribute = el.getAttribute('data-sticker-string'),
 					nowDate = new Date().getTime() / 1000|0;
@@ -1337,16 +1337,17 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		},
 
 		start: function(callback) {
+
 			var onPacksLoadCallback = (function() {
 				callback && callback();
 
-				this.stView.render(this.stickersModel);
+				this.view.render(this.stickersModel);
 
 				// todo --> active 'used' tab
-				this.stView.renderUseStickers(this.stService.getLatestUse());
+				this.view.renderUsedStickers(this.stService.getLatestUse());
 			}).bind(this);
 
-			var storageStickerData =  this.stService.getPacksFromStorage();
+			var storageStickerData = this.stService.getPacksFromStorage();
 
 			if (storageStickerData.actual) {
 
@@ -1359,7 +1360,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 					callback: onPacksLoadCallback
 				});
 			}
-
 		},
 
 		fetchPacks: function(attrs) {
@@ -1374,21 +1374,21 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 		onClickSticker: function(callback, context) {
 
-			this.stView.handleClickSticker(function(el) {
+			this.view.handleClickSticker(function(el) {
 				callback.call(context, '[[' + el.getAttribute('data-sticker-string') + ']]');
 			});
 
 		},
 
 		onClickCustomTab: function(callback, context) {
-			this.stView.tabsView.handleClickOnCustomTab((function(el) {
+			this.view.tabsView.handleClickOnCustomTab((function(el) {
 				callback.call(context, el);
 			}).bind(this));
 		},
 
 		onClickTab: function(callback, context) {
 
-			this.stView.tabsView.handleClickOnPackTab(function(el) {
+			this.view.tabsView.handleClickOnPackTab(function(el) {
 				callback.call(context, el);
 			});
 
@@ -1435,7 +1435,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		},
 
 		renderPack: function(pack) {
-			this.stView.renderStorePack(pack);
+			this.storeView.render(pack);
 		},
 
 		purchaseSuccess: function(packName) {
