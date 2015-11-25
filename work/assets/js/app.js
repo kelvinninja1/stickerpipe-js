@@ -135,7 +135,9 @@ var App = _makeClass(function(options) {
 
 		});
 
-		console.log('ok', this.stickers.getNewStickersFlag());
+		if (this.stickers.getNewStickersFlag()) {
+			this.$stickersToggle.addClass('has-new-content');
+		}
 		//this.stickers.start();
 	},
 	initMessageBox: function() {
