@@ -6,6 +6,80 @@ body {
   .container {
     width: 770px; } }
 
+@media (max-width: 768px) {
+  .container > .row > .col-lg-1,
+  .container > .row > .col-md-1,
+  .container > .row > .col-sm-1,
+  .container > .row > .col-xs-1 {
+    padding-right: 0;
+    padding-left: 0; }
+  .container > .row > .col-lg-2,
+  .container > .row > .col-md-2,
+  .container > .row > .col-sm-2,
+  .container > .row > .col-xs-2 {
+    padding-right: 0;
+    padding-left: 0; }
+  .container > .row > .col-lg-3,
+  .container > .row > .col-md-3,
+  .container > .row > .col-sm-3,
+  .container > .row > .col-xs-3 {
+    padding-right: 0;
+    padding-left: 0; }
+  .container > .row > .col-lg-4,
+  .container > .row > .col-md-4,
+  .container > .row > .col-sm-4,
+  .container > .row > .col-xs-4 {
+    padding-right: 0;
+    padding-left: 0; }
+  .container > .row > .col-lg-5,
+  .container > .row > .col-md-5,
+  .container > .row > .col-sm-5,
+  .container > .row > .col-xs-5 {
+    padding-right: 0;
+    padding-left: 0; }
+  .container > .row > .col-lg-6,
+  .container > .row > .col-md-6,
+  .container > .row > .col-sm-6,
+  .container > .row > .col-xs-6 {
+    padding-right: 0;
+    padding-left: 0; }
+  .container > .row > .col-lg-7,
+  .container > .row > .col-md-7,
+  .container > .row > .col-sm-7,
+  .container > .row > .col-xs-7 {
+    padding-right: 0;
+    padding-left: 0; }
+  .container > .row > .col-lg-8,
+  .container > .row > .col-md-8,
+  .container > .row > .col-sm-8,
+  .container > .row > .col-xs-8 {
+    padding-right: 0;
+    padding-left: 0; }
+  .container > .row > .col-lg-9,
+  .container > .row > .col-md-9,
+  .container > .row > .col-sm-9,
+  .container > .row > .col-xs-9 {
+    padding-right: 0;
+    padding-left: 0; }
+  .container > .row > .col-lg-10,
+  .container > .row > .col-md-10,
+  .container > .row > .col-sm-10,
+  .container > .row > .col-xs-10 {
+    padding-right: 0;
+    padding-left: 0; }
+  .container > .row > .col-lg-11,
+  .container > .row > .col-md-11,
+  .container > .row > .col-sm-11,
+  .container > .row > .col-xs-11 {
+    padding-right: 0;
+    padding-left: 0; }
+  .container > .row > .col-lg-12,
+  .container > .row > .col-md-12,
+  .container > .row > .col-sm-12,
+  .container > .row > .col-xs-12 {
+    padding-right: 0;
+    padding-left: 0; } }
+
 #messageBox {
   background: white;
   margin-bottom: 5px; }

@@ -1131,12 +1131,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		positioned: function() {
 
 			if (this.arrowEl) {
-				//this.arrowEl.style.marginLeft = (this.toggleEl.offsetWidth / 2) - (this.arrowEl.offsetWidth / 2) + 'px';
-
 				var style = this.toggleEl.currentStyle || window.getComputedStyle(this.toggleEl);
 				var marginLeft = parseInt(style.marginLeft, 10);
-				
-				console.log(marginLeft);
 
 				this.arrowEl.style.marginLeft = (this.toggleEl.clientWidth / 2) - (this.arrowEl.offsetWidth / 2) + marginLeft + 'px';
 			} else {
