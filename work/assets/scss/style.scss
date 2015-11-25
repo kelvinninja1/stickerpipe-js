@@ -45,15 +45,19 @@ body {
 		outline: none;
 
 		&:hover,
-		&:focus {
+		&:focus,
+		&:active {
 			background: #fff;
-			outline: none;
 			box-shadow: none;
+			outline: none;
 		}
 	}
 }
 
 #stickersToggle {
+	background: #fff;
+	box-shadow: none;
+	outline: none;
 	padding: 8px;
 
 	.icon {
@@ -64,7 +68,8 @@ body {
 
 		&,
 		&:hover,
-		&:focus {
+		&:focus,
+		&:active {
 			background: url("../img/face.png") !important;
 			background-size: 24px !important;
 
@@ -91,7 +96,8 @@ body {
 
 			&,
 			&:hover,
-			&:focus {
+			&:focus,
+			&:active {
 				background: url("../img/stckr.png") !important;
 				background-size: 24px !important;
 

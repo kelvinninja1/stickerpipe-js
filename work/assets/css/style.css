@@ -26,38 +26,42 @@ body {
   #messageBox .input-group-btn button {
     border: 0;
     outline: none; }
-    #messageBox textarea:hover, #messageBox textarea:focus,
+    #messageBox textarea:hover, #messageBox textarea:focus, #messageBox textarea:active,
     #messageBox .input-group-btn button:hover,
-    #messageBox .input-group-btn button:focus {
+    #messageBox .input-group-btn button:focus,
+    #messageBox .input-group-btn button:active {
       background: #fff;
-      outline: none;
-      box-shadow: none; }
+      box-shadow: none;
+      outline: none; }
 
 #stickersToggle {
+  background: #fff;
+  box-shadow: none;
+  outline: none;
   padding: 8px; }
   #stickersToggle .icon {
     height: 24px;
     display: table;
     opacity: .5;
     width: 24px; }
-    #stickersToggle .icon, #stickersToggle .icon:hover, #stickersToggle .icon:focus {
+    #stickersToggle .icon, #stickersToggle .icon:hover, #stickersToggle .icon:focus, #stickersToggle .icon:active {
       background: url("../img/face.png") !important;
       background-size: 24px !important; }
       @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2 / 1) {
-        #stickersToggle .icon, #stickersToggle .icon:hover, #stickersToggle .icon:focus {
+        #stickersToggle .icon, #stickersToggle .icon:hover, #stickersToggle .icon:focus, #stickersToggle .icon:active {
           background: url("../img/face@2x.png") !important;
           background-size: 24px !important; } }
   #stickersToggle:hover .icon {
     opacity: .7; }
   #stickersToggle.active .icon {
     opacity: .9; }
-    #stickersToggle.active .icon, #stickersToggle.active .icon:hover, #stickersToggle.active .icon:focus {
+    #stickersToggle.active .icon, #stickersToggle.active .icon:hover, #stickersToggle.active .icon:focus, #stickersToggle.active .icon:active {
       background: url("../img/stckr.png") !important;
       background-size: 24px !important;
       color: orange !important;
       box-shadow: none; }
       @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2 / 1) {
-        #stickersToggle.active .icon, #stickersToggle.active .icon:hover, #stickersToggle.active .icon:focus {
+        #stickersToggle.active .icon, #stickersToggle.active .icon:hover, #stickersToggle.active .icon:focus, #stickersToggle.active .icon:active {
           background: url("../img/stckr@2x.png") !important;
           background-size: 24px !important; } }
 
