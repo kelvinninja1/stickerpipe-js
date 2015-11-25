@@ -75,13 +75,7 @@ $borderRadius: 3px;
 		.sp-tab-item {
 			display: inline-table;
 			cursor: pointer;
-			padding: 6px 10px;
-
-			@media (max-width: 544px) {
-				& {
-					padding: 6px 6px;
-				}
-			}
+			padding: 6px;
 
 			img {
 				border-radius: 50%;
