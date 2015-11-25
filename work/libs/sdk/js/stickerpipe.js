@@ -1091,6 +1091,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			this.popoverEl.appendChild(this.el);
 			this.popoverEl.appendChild(this.arrowEl);
 
+			this.handleClickSticker((function() {
+				this.toggle();
+			}).bind(this));
 
 			document.getElementsByTagName('body')[0].addEventListener('click', (function(e) {
 				function isDescendant(parent, child) {
