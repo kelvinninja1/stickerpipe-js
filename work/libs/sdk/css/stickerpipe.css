@@ -160,9 +160,6 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
       margin-left: 29px;
       margin-top: -10px; }
 
-.sticker-pipe .sp-emojis {
-  padding: 8px; }
-
 .sticker-pipe .sp-emojis,
 .sticker-pipe .sp-stickers {
   background: #fafafa;
@@ -170,53 +167,55 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   border-radius: 0 0 3px 3px;
   height: 300px;
   overflow-y: scroll; }
-  .sticker-pipe .sp-emojis .sp-emoji,
-  .sticker-pipe .sp-stickers .sp-emoji {
+
+.sticker-pipe .sp-emojis {
+  padding: 8px; }
+  @media (max-width: 544px) {
+    .sticker-pipe .sp-emojis {
+      padding: 8px 16px; } }
+  .sticker-pipe .sp-emojis .sp-emoji {
     display: inline-table;
     float: left;
     padding: 6px;
     cursor: pointer; }
-    .sticker-pipe .sp-emojis .sp-emoji:hover,
-    .sticker-pipe .sp-stickers .sp-emoji:hover {
+    @media (max-width: 544px) {
+      .sticker-pipe .sp-emojis .sp-emoji {
+        padding: 8px; } }
+    .sticker-pipe .sp-emojis .sp-emoji:hover {
       background: rgba(0, 0, 0, 0.1);
       border-radius: 5px; }
-    .sticker-pipe .sp-emojis .sp-emoji img,
-    .sticker-pipe .sp-stickers .sp-emoji img {
+    .sticker-pipe .sp-emojis .sp-emoji img {
       height: 18px;
       width: 18px; }
       @media (max-width: 544px) {
-        .sticker-pipe .sp-emojis .sp-emoji img,
-        .sticker-pipe .sp-stickers .sp-emoji img {
-          height: 36px;
-          width: 36px; } }
-  .sticker-pipe .sp-emojis .sp-sticker-item,
-  .sticker-pipe .sp-emojis .sp-sticker-placeholder,
-  .sticker-pipe .sp-stickers .sp-sticker-item,
-  .sticker-pipe .sp-stickers .sp-sticker-placeholder {
-    float: left;
-    display: inline-table; }
-  .sticker-pipe .sp-emojis .sp-sticker-placeholder,
-  .sticker-pipe .sp-stickers .sp-sticker-placeholder {
+        .sticker-pipe .sp-emojis .sp-emoji img {
+          height: 24px;
+          width: 24px; } }
+
+.sticker-pipe .sp-stickers .sp-sticker-item,
+.sticker-pipe .sp-stickers .sp-sticker-placeholder {
+  float: left;
+  display: inline-table; }
+
+.sticker-pipe .sp-stickers .sp-sticker-placeholder {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  height: 40px;
+  width: 40px;
+  margin: 32px; }
+
+.sticker-pipe .sp-stickers .sp-sticker-item {
+  cursor: pointer;
+  display: inline-table;
+  float: left;
+  margin: 9px;
+  padding: 3px; }
+  .sticker-pipe .sp-stickers .sp-sticker-item:not(.sp-sticker-placeholder):hover {
     background: rgba(0, 0, 0, 0.1);
-    border-radius: 50%;
-    height: 40px;
-    width: 40px;
-    margin: 32px; }
-  .sticker-pipe .sp-emojis .sp-sticker-item,
-  .sticker-pipe .sp-stickers .sp-sticker-item {
-    cursor: pointer;
-    display: inline-table;
-    float: left;
-    margin: 9px;
-    padding: 3px; }
-    .sticker-pipe .sp-emojis .sp-sticker-item:not(.sp-sticker-placeholder):hover,
-    .sticker-pipe .sp-stickers .sp-sticker-item:not(.sp-sticker-placeholder):hover {
-      background: rgba(0, 0, 0, 0.1);
-      border-radius: 5px; }
-    .sticker-pipe .sp-emojis .sp-sticker-item img,
-    .sticker-pipe .sp-stickers .sp-sticker-item img {
-      height: 80px;
-      width: 80px; }
+    border-radius: 5px; }
+  .sticker-pipe .sp-stickers .sp-sticker-item img {
+    height: 80px;
+    width: 80px; }
 
 .sp-icon-arrow-back {
   background-image: url(../img/icons_sprite.png);
