@@ -184,6 +184,11 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
     .sticker-pipe .sp-stickers .sp-emoji img {
       height: 18px;
       width: 18px; }
+      @media (max-width: 544px) {
+        .sticker-pipe .sp-emojis .sp-emoji img,
+        .sticker-pipe .sp-stickers .sp-emoji img {
+          height: 36px;
+          width: 36px; } }
   .sticker-pipe .sp-emojis .sp-sticker-item,
   .sticker-pipe .sp-emojis .sp-sticker-placeholder,
   .sticker-pipe .sp-stickers .sp-sticker-item,
