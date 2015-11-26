@@ -97,7 +97,7 @@ var App = _makeClass(function(options) {
 
 			apikey: '72921666b5ff8651f374747bfefaf7b2',
 			storagePrefix: 'stickerPipe',
-			enableCustomTab: true,
+			enableEmojiTab: true,
 			enableHistoryTab: true,
 
 			domain : 'http://work.stk.908.vc',
@@ -222,11 +222,6 @@ var App = _makeClass(function(options) {
 		this.stickers.onClickSticker((function(text) {
 			this.sendMessage(true, text);
 		}).bind(this));
-
-
-		this.stickers.onClickCustomTab(function() {
-			alert('customTab');
-		});
 	},
 
 	openStickerPipeBlock: function(completeCallback) {
