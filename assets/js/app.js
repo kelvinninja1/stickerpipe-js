@@ -16,6 +16,7 @@ var App = _makeClass(function(options) {
 	this.init(options);
 }, {
 
+	// todo: rename to stickerpipe
 	stickers: null,
 	randomUsers: [],
 	currentUser: {},
@@ -28,11 +29,11 @@ var App = _makeClass(function(options) {
 	$stickerPipeStickers: null,
 	$stickerPipeStore: null,
 	$stickersToggle: null,
+	$textarea: null,
 
 	isRenderStickers: false,
 
 	init: function() {
-
 		this.$window = $(window);
 		this.$navbar = $('.navbar');
 		this.$messages = $('#messages');
@@ -41,6 +42,7 @@ var App = _makeClass(function(options) {
 		this.$stickerPipeStickers = $('#stickers');
 		this.$stickerPipeStore = $('#store');
 		this.$stickersToggle = this.$messageBox.find('#stickersToggle');
+		this.$textarea = this.$messageBox.find('.textarea');
 
 		this.fetchRandomUsers().done((function() {
 			this.sendMessage();
@@ -55,7 +57,7 @@ var App = _makeClass(function(options) {
 			this.resizeWindow();
 		}).bind(this));
 
-		this.$messageBox.find('textarea').on('autosize:resized', (function() {
+		this.$messageBox.find('.textarea').on('autosize:resized', (function() {
 			this.resizeWindow();
 		}).bind(this));
 
@@ -65,8 +67,15 @@ var App = _makeClass(function(options) {
 
 		this.$messages.on('click', 'img[data-sticker]', (function(e) {
 			var $target = $(e.target);
-			this.openStickersStore($target.attr('data-sticker-pack'));
+			//this.openStickersStore($target.attr('data-sticker-pack'));
 		}).bind(this));
+
+		//this.$stickersToggle.popover({
+		//	content: '213 dfgfgdfg dfgdfgdfg dfgdfgdfgf dfgdfgdgf dfgdfgdfgd ',
+		//	placement: 'top',
+		//	html: true,
+		//	viewport: this.$messageBox
+		//});
 	},
 	initLoDash: function() {
 		// setting lo-dash template
@@ -79,14 +88,19 @@ var App = _makeClass(function(options) {
 	initStickers: function() {
 		this.stickers = new Stickers({
 
-			elId: this.$stickerPipeStickers.attr('id'),
+			debug: true,
+
+			//elId: this.$stickerPipeStickers.attr('id'),
+			elId: 'stickersToggle',
+
 			storeContainerId: this.$stickerPipeStore.attr('id'),
 
 			htmlForEmptyRecent: '<div class="emptyRecent">empty recent text</div>',
 
 			apikey: '72921666b5ff8651f374747bfefaf7b2',
 			storagePrefix: 'stickerPipe',
-			enableCustomTab: true,
+			enableEmojiTab: true,
+			enableHistoryTab: true,
 
 			domain : 'http://work.stk.908.vc',
 			clientPacksUrl: 'http://work.stk.908.vc/api/v1/client-packs',
@@ -94,7 +108,10 @@ var App = _makeClass(function(options) {
 			userPackUrl: 'http://work.stk.908.vc/api/v1/user/pack',
 			trackStatUrl: 'http://work.stk.908.vc/api/v1/track-statistic',
 
-			//userId: '12345678901234567890123456789012',
+			storeUrl: 'http://work.stk.908.vc/api/v1/web',
+			//storeUrl: 'http://localhost/stickerpipe/store/build',
+
+			userId: '12345678901234567890123456789012',
 
 			callbacks: {
 				onPurchase: (function(packTitle, productId, price, packName) {
@@ -120,29 +137,29 @@ var App = _makeClass(function(options) {
 
 		});
 
+		if (this.stickers.getNewStickersFlag()) {
+			this.$stickersToggle.addClass('has-new-content');
+		}
 		//this.stickers.start();
 	},
 	initMessageBox: function() {
-		var $textarea = this.$messageBox.find('textarea'),
+		var self = this,
 			sendMessageHandler = (function() {
-				this.sendMessage(true, $textarea.val());
+				this.sendMessage(true, self.$textarea.html());
 
-				$textarea.val('');
-
-				autosize.update($textarea);
+				self.$textarea.html('');
 			}).bind(this);
 
-		autosize($textarea);
 
-		$textarea.on('keydown', function (e) {
+		this.$textarea.on('keydown', function (e) {
 
 			if (e.keyCode != 13) return;
 
 			e.preventDefault();
 
 			if (e.keyCode == 13 && (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)) {
-				$textarea.val($textarea.val() + '\n');
-				autosize.update($textarea);
+				self.$textarea.focus();
+				self.pasteHtmlAtCaret('<br/>');
 				return;
 			}
 
@@ -160,7 +177,54 @@ var App = _makeClass(function(options) {
 				this.openStickers();
 			}
 		}).bind(this));
+
+		window.addEventListener('sp:popover:shown', (function() {
+			this.$stickersToggle.addClass('active');
+		}).bind(this));
+
+		window.addEventListener('sp:popover:hidden', (function() {
+			this.$stickersToggle.removeClass('active');
+		}).bind(this));
 	},
+
+	pasteHtmlAtCaret: function(html) {
+		var sel, range;
+		if (window.getSelection) {
+			// IE9 and non-IE
+			sel = window.getSelection();
+			if (sel.getRangeAt && sel.rangeCount) {
+				range = sel.getRangeAt(0);
+				range.deleteContents();
+
+				// Range.createContextualFragment() would be useful here but is
+				// only relatively recently standardized and is not supported in
+				// some browsers (IE9, for one)
+				var el = document.createElement("div");
+				el.innerHTML = html;
+				var frag = document.createDocumentFragment(), node, lastNode;
+				while ( (node = el.firstChild) ) {
+					lastNode = frag.appendChild(node);
+				}
+				var firstNode = frag.firstChild;
+				range.insertNode(frag);
+
+				// Preserve the selection
+				if (lastNode) {
+					range = range.cloneRange();
+					range.setStartAfter(lastNode);
+					range.collapse(true);
+					sel.removeAllRanges();
+					sel.addRange(range);
+				}
+			}
+		} else if ( (sel = document.selection) && sel.type != "Control") {
+			// IE < 9
+			var originalRange = sel.createRange();
+			originalRange.collapse(true);
+			sel.createRange().pasteHTML(html);
+		}
+	},
+
 
 	sendMessage: function(isCurrentUser, text) {
 
@@ -197,10 +261,11 @@ var App = _makeClass(function(options) {
 			this.sendMessage(true, text);
 		}).bind(this));
 
-
-		this.stickers.onClickCustomTab(function() {
-			alert('customTab');
-		});
+		this.stickers.onClickEmoji((function(emoji) {
+			console.log('click on emoji', emoji);
+			this.$textarea.focus();
+			this.pasteHtmlAtCaret(this.stickers.parseEmojiFromText(emoji));
+		}).bind(this));
 	},
 
 	openStickerPipeBlock: function(completeCallback) {
@@ -213,7 +278,8 @@ var App = _makeClass(function(options) {
 		var messagesHeight = this.$messages.height();
 		this.$messages.attr('data-saved-height', messagesHeight);
 
-		this.$stickersToggle.addClass('active');
+		//this.$stickersToggle.addClass('active');
+
 		this.$stickerPipeBlock.slideDown({
 			progress: (function() {
 				this.$messages.height(messagesHeight - this.$stickerPipeBlock.height());
@@ -230,7 +296,7 @@ var App = _makeClass(function(options) {
 
 		var messagesSavedHeight = this.$messages.attr('data-saved-height');
 
-		this.$stickersToggle.removeClass('active');
+		//this.$stickersToggle.removeClass('active');
 
 		this.$stickerPipeBlock.slideUp({
 			progress: (function() {
