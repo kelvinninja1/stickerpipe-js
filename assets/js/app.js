@@ -88,7 +88,7 @@ var App = _makeClass(function(options) {
 	initStickers: function() {
 		this.stickers = new Stickers({
 
-			debug: true,
+			//debug: true,
 
 			//elId: this.$stickerPipeStickers.attr('id'),
 			elId: 'stickersToggle',
