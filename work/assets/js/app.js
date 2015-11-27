@@ -16,6 +16,7 @@ var App = _makeClass(function(options) {
 	this.init(options);
 }, {
 
+	// todo: rename to stickerpipe
 	stickers: null,
 	randomUsers: [],
 	currentUser: {},
@@ -28,11 +29,11 @@ var App = _makeClass(function(options) {
 	$stickerPipeStickers: null,
 	$stickerPipeStore: null,
 	$stickersToggle: null,
+	$textarea: null,
 
 	isRenderStickers: false,
 
 	init: function() {
-
 		this.$window = $(window);
 		this.$navbar = $('.navbar');
 		this.$messages = $('#messages');
@@ -41,6 +42,7 @@ var App = _makeClass(function(options) {
 		this.$stickerPipeStickers = $('#stickers');
 		this.$stickerPipeStore = $('#store');
 		this.$stickersToggle = this.$messageBox.find('#stickersToggle');
+		this.$textarea = this.$messageBox.find('.textarea');
 
 		this.fetchRandomUsers().done((function() {
 			this.sendMessage();
@@ -55,7 +57,7 @@ var App = _makeClass(function(options) {
 			this.resizeWindow();
 		}).bind(this));
 
-		this.$messageBox.find('textarea').on('autosize:resized', (function() {
+		this.$messageBox.find('.textarea').on('autosize:resized', (function() {
 			this.resizeWindow();
 		}).bind(this));
 
@@ -141,26 +143,23 @@ var App = _makeClass(function(options) {
 		//this.stickers.start();
 	},
 	initMessageBox: function() {
-		var $textarea = this.$messageBox.find('textarea'),
+		var self = this,
 			sendMessageHandler = (function() {
-				this.sendMessage(true, $textarea.val());
+				this.sendMessage(true, self.$textarea.html());
 
-				$textarea.val('');
-
-				autosize.update($textarea);
+				self.$textarea.html('');
 			}).bind(this);
 
-		autosize($textarea);
 
-		$textarea.on('keydown', function (e) {
+		this.$textarea.on('keydown', function (e) {
 
 			if (e.keyCode != 13) return;
 
 			e.preventDefault();
 
 			if (e.keyCode == 13 && (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)) {
-				$textarea.val($textarea.val() + '\n');
-				autosize.update($textarea);
+				self.$textarea.focus();
+				self.pasteHtmlAtCaret('<br/>');
 				return;
 			}
 
@@ -187,6 +186,45 @@ var App = _makeClass(function(options) {
 			this.$stickersToggle.removeClass('active');
 		}).bind(this));
 	},
+
+	pasteHtmlAtCaret: function(html) {
+		var sel, range;
+		if (window.getSelection) {
+			// IE9 and non-IE
+			sel = window.getSelection();
+			if (sel.getRangeAt && sel.rangeCount) {
+				range = sel.getRangeAt(0);
+				range.deleteContents();
+
+				// Range.createContextualFragment() would be useful here but is
+				// only relatively recently standardized and is not supported in
+				// some browsers (IE9, for one)
+				var el = document.createElement("div");
+				el.innerHTML = html;
+				var frag = document.createDocumentFragment(), node, lastNode;
+				while ( (node = el.firstChild) ) {
+					lastNode = frag.appendChild(node);
+				}
+				var firstNode = frag.firstChild;
+				range.insertNode(frag);
+
+				// Preserve the selection
+				if (lastNode) {
+					range = range.cloneRange();
+					range.setStartAfter(lastNode);
+					range.collapse(true);
+					sel.removeAllRanges();
+					sel.addRange(range);
+				}
+			}
+		} else if ( (sel = document.selection) && sel.type != "Control") {
+			// IE < 9
+			var originalRange = sel.createRange();
+			originalRange.collapse(true);
+			sel.createRange().pasteHTML(html);
+		}
+	},
+
 
 	sendMessage: function(isCurrentUser, text) {
 
@@ -221,6 +259,12 @@ var App = _makeClass(function(options) {
 
 		this.stickers.onClickSticker((function(text) {
 			this.sendMessage(true, text);
+		}).bind(this));
+
+		this.stickers.onClickEmoji((function(emoji) {
+			console.log('click on emoji', emoji);
+			this.$textarea.focus();
+			this.pasteHtmlAtCaret(this.stickers.parseEmojiFromText(emoji));
 		}).bind(this));
 	},
 

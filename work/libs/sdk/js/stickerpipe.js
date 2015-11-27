@@ -1222,6 +1222,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 		tabItemClass: 'sp-tab-item',
 		stickerItemClass: 'sp-sticker-item',
+		emojiItemClass: 'sp-emoji',
 
 		emojiTabContent: '<span class="sp-icon-face"></span>',
 		historyTabContent: '<span class="sp-icon-clock"></span>',
@@ -1263,61 +1264,857 @@ document.addEventListener("DOMContentLoaded", function(event) {
 (function(Module) {
 
 	Module.Configs.add({
-		emojiList: ["🀄","🃏","🅰","🅱","🅾","🅿","🆎","🆑","🆒","🆓","🆔","🆕","🆖","🆗","🆘",
-			"🆙","🆚","🇦","🇧","🇨🇳","🇨","🇩🇪","🇩","🇪🇸","🇪","🇫🇷","🇫","🇬🇧",
-			"🇬","🇭","🇮🇹","🇮","🇯🇵","🇯","🇰🇷","🇰","🇱","🇲","🇳","🇴","🇵","🇶",
-			"🇷🇺","🇷","🇸","🇹","🇺🇸","🇺","🇻","🇼","🇽","🇾","🇿","🈁","🈂","🈚",
-			"🈯","🈲","🈳","🈴","🈵","🈶","🈷","🈸","🈹","🈺","🉐","🉑","🌀","🌁","🌂",
-			"🌃","🌄","🌅","🌆","🌇","🌈","🌉","🌊","🌋","🌌","🌍","🌎","🌏","🌐","🌑",
-			"🌒","🌓","🌔","🌕","🌖","🌗","🌘","🌙","🌚","🌛","🌜","🌝","🌞","🌟","🌠",
-			"🌰","🌱","🌲","🌳","🌴","🌵","🌷","🌸","🌹","🌺","🌻","🌼","🌽","🌾","🌿",
-			"🍀","🍁","🍂","🍃","🍄","🍅","🍆","🍇","🍈","🍉","🍊","🍋","🍌","🍍","🍎",
-			"🍏","🍐","🍑","🍒","🍓","🍔","🍕","🍖","🍗","🍘","🍙","🍚","🍛","🍜","🍝",
-			"🍞","🍟","🍠","🍡","🍢","🍣","🍤","🍥","🍦","🍧","🍨","🍩","🍪","🍫","🍬",
-			"🍭","🍮","🍯","🍰","🍱","🍲","🍳","🍴","🍵","🍶","🍷","🍸","🍹","🍺","🍻",
-			"🍼","🎀","🎁","🎂","🎃","🎄","🎅","🎆","🎇","🎈","🎉","🎊","🎋","🎌","🎍",
-			"🎎","🎏","🎐","🎑","🎒","🎓","🎠","🎡","🎢","🎣","🎤","🎥","🎦","🎧","🎨",
-			"🎩","🎪","🎫","🎬","🎭","🎮","🎯","🎰","🎱","🎲","🎳","🎴","🎵","🎶","🎷",
-			"🎸","🎹","🎺","🎻","🎼","🎽","🎾","🎿","🏀","🏁","🏂","🏃","🏄","🏆","🏇",
-			"🏈","🏉","🏊","🏠","🏡","🏢","🏣","🏤","🏥","🏦","🏧","🏨","🏩","🏪","🏫",
-			"🏬","🏭","🏮","🏯","🏰","🐀","🐁","🐂","🐃","🐄","🐅","🐆","🐇","🐈","🐉",
-			"🐊","🐋","🐌","🐍","🐎","🐏","🐐","🐑","🐒","🐓","🐔","🐕","🐖","🐗","🐘",
-			"🐙","🐚","🐛","🐜","🐝","🐞","🐟","🐠","🐡","🐢","🐣","🐤","🐥","🐦","🐧",
-			"🐨","🐩","🐪","🐫","🐬","🐭","🐮","🐯","🐰","🐱","🐲","🐳","🐴","🐵","🐶",
-			"🐷","🐸","🐹","🐺","🐻","🐼","🐽","🐾","👀","👂","👃","👄","👅","👆","👇",
-			"👈","👉","👊","👋","👌","👍","👎","👏","👐","👑","👒","👓","👔","👕","👖",
-			"👗","👘","👙","👚","👛","👜","👝","👞","👟","👠","👡","👢","👣","👤","👥",
-			"👦","👧","👨","👩","👪","👫","👬","👭","👮","👯","👰","👱","👲","👳","👴",
-			"👵","👶","👷","👸","👹","👺","👻","👼","👽","👾","👿","💀","💁","💂","💃",
-			"💄","💅","💆","💇","💈","💉","💊","💋","💌","💍","💎","💏","💐","💑","💒",
-			"💓","💔","💕","💖","💗","💘","💙","💚","💛","💜","💝","💞","💟","💠","💡",
-			"💢","💣","💤","💥","💦","💧","💨","💩","💪","💫","💬","💭","💮","💯","💰",
-			"💱","💲","💳","💴","💵","💶","💷","💸","💹","💺","💻","💼","💽","💾","💿",
-			"📀","📁","📂","📃","📄","📅","📆","📇","📈","📉","📊","📋","📌","📍","📎",
-			"📏","📐","📑","📒","📓","📔","📕","📖","📗","📘","📙","📚","📛","📜","📝",
-			"📞","📟","📠","📡","📢","📣","📤","📥","📦","📧","📨","📩","📪","📫","📬",
-			"📭","📮","📯","📰","📱","📲","📳","📴","📵","📶","📷","📹","📺","📻","📼",
-			"🔀","🔁","🔂","🔃","🔄","🔅","🔆","🔇","🔈","🔉","🔊","🔋","🔌","🔍","🔎",
-			"🔏","🔐","🔑","🔒","🔓","🔔","🔕","🔖","🔗","🔘","🔙","🔚","🔛","🔜","🔝",
-			"🔞","🔟","🔠","🔡","🔢","🔣","🔤","🔥","🔦","🔧","🔨","🔩","🔪","🔫","🔬",
-			"🔭","🔮","🔯","🔰","🔱","🔲","🔳","🔴","🔵","🔶","🔷","🔸","🔹","🔺","🔻",
-			"🔼","🔽","🕐","🕑","🕒","🕓","🕔","🕕","🕖","🕗","🕘","🕙","🕚","🕛","🕜",
-			"🕝","🕞","🕟","🕠","🕡","🕢","🕣","🕤","🕥","🕦","🕧","🗻","🗼","🗽","🗾",
-			"🗿","😀","😁","😂","😃","😄","😅","😆","😇","😈","😉","😊","😋","😌","😍",
-			"😎","😏","😐","😑","😒","😓","😔","😕","😖","😗","😘","😙","😚","😛","😜",
-			"😝","😞","😟","😠","😡","😢","😣","😤","😥","😦","😧","😨","😩","😪","😫",
-			"😬","😭","😮","😯","😰","😱","😲","😳","😴","😵","😶","😷","😸","😹","😺",
-			"😻","😼","😽","😾","😿","🙀","🙅","🙆","🙇","🙈","🙉","🙊","🙋","🙌","🙍",
-			"🙎","🙏","🚀","🚁","🚂","🚃","🚄","🚅","🚆","🚇","🚈","🚉","🚊","🚋","🚌",
-			"🚍","🚎","🚏","🚐","🚑","🚒","🚓","🚔","🚕","🚖","🚗","🚘","🚙","🚚","🚛",
-			"🚜","🚝","🚞","🚟","🚠","🚡","🚢","🚣","🚤","🚥","🚦","🚧","🚨","🚩","🚪",
-			"🚫","🚬","🚭","🚮","🚯","🚰","🚱","🚲","🚳","🚴","🚵","🚶","🚷","🚸","🚹",
-			"🚺","🚻","🚼","🚽","🚾","🚿","🛀","🛁","🛂","🛃","🛄","🛅","‼","⁉","™","ℹ","↔",
-			"↕","↖","↗","↘","↙","↩","↪","#⃣","⌚","⌛","⏩","⏪","⏫","⏬","⏰","⏳","Ⓜ","▪","▫","▶","◀","◻","◼","◽","◾",
-			"☀","☁","☎","☑","☔","☕","☝","☺","♈","♉","♊","♋","♌","♍","♎","♏","♐","♑","♒","♓","♠","♣","♥","♦","♨","♻","♿",
-			"⚓","⚠","⚡","⚪","⚫","⚽","⚾","⛄","⛅","⛎","⛔","⛪","⛲","⛳","⛵","⛺","⛽","✂","✅","✈","✉","✊","✋","✌",
-			"✏","✒","✔","✖","✨","✳","✴","❄","❇","❌","❎","❓","❔","❕","❗","❤","➕","➖","➗","➡","➰","➿","⤴","⤵",
-			"⬅","⬆","⬇","⬛","⬜","⭐","⭕","0⃣","〰","〽","1⃣","2⃣","㊗","㊙","3⃣","4⃣","5⃣","6⃣","7⃣","8⃣","9⃣","©","®",""]
+		emojiList: [
+			// Emoticons		
+			"😊",
+			"😃",
+			"😁",
+			"😂",
+			"😀",
+			"😇",
+			"😈",
+			"😎",
+			"😐",
+			"😑",
+			"😕",
+			"😗",
+			"😙",
+			"😛",
+			"😟",
+			"😦",
+			"😧",
+			"😬",
+			"😮",
+			"😯",
+			"😴",
+			"😶",
+			"😄",
+			"😅",
+			"😆",
+			"😉",
+			"😋",
+			"😌",
+			"😍",
+			"😏",
+			"😒",
+			"😓",
+			"😔",
+			"😖",
+			"😘",
+			"😚",
+			"😜",
+			"😝",
+			"😞",
+			"😠",
+			"😡",
+			"😢",
+			"😣",
+			"😤",
+			"😥",
+			"😨",
+			"😩",
+			"😪",
+			"😫",
+			"😭",
+			"😰",
+			"😱",
+			"😲",
+			"😳",
+			"😵",
+			"😷",
+			"😸",
+			"😹",
+			"😺",
+			"😻",
+			"😼",
+			"😽",
+			"😾",
+			"😿",
+			"🙀",
+			"🙅",
+			"🙆",
+			"🙇",
+			"🙈",
+			"🙉",
+			"🙊",
+			"🙋",
+			"🙌",
+			"🙍",
+			"🙎",
+			"🙏",
+// Dingbats		
+			"✂",
+			"✅",
+			"✈",
+			"✉",
+			"✊",
+			"✋",
+			"✌",
+			"✏",
+			"✒",
+			"✔",
+			"✖",
+			"✨",
+			"✳",
+			"✴",
+			"❄",
+			"❇",
+			"❌",
+			"❎",
+			"❓",
+			"❔",
+			"❕",
+			"❗",
+			"❤",
+			"➕",
+			"➖",
+			"➗",
+			"➡",
+			"➰",
+// Transport and map symbols		
+			"🚀",
+			"🚃",
+			"🚄",
+			"🚅",
+			"🚇",
+			"🚉",
+			"🚌",
+			"🚏",
+			"🚑",
+			"🚒",
+			"🚓",
+			"🚕",
+			"🚗",
+			"🚙",
+			"🚚",
+			"🚢",
+			"🚤",
+			"🚥",
+			"🚧",
+			"🚨",
+			"🚩",
+			"🚪",
+			"🚫",
+			"🚬",
+			"🚭",
+			"🚲",
+			"🚶",
+			"🚹",
+			"🚺",
+			"🚻",
+			"🚼",
+			"🚽",
+			"🚾",
+			"🛀",
+// Enclosed characters		
+			"Ⓜ",
+			"🅰",
+			"🅱",
+			"🅾",
+			"🅿",
+			"🆎",
+			"🆑",
+			"🆒",
+			"🆓",
+			"🆔",
+			"🆕",
+			"🆖",
+			"🆗",
+			"🆘",
+			"🆙",
+			"🆚",
+			"🇩🇪",
+			"🇬🇧",
+			"🇨🇳",
+			"🇯🇵",
+			"🇰🇷",
+			"🇫🇷",
+			"🇪🇸",
+			"🇮🇹",
+			"🇺🇸",
+			"🇷🇺",
+			"🈁",
+			"🈂",
+			"🈚",
+			"🈯",
+			"🈲",
+			"🈳",
+			"🈴",
+			"🈵",
+			"🈶",
+			"🈷",
+			"🈸",
+			"🈹",
+			"🈺",
+			"🉐",
+			"🉑",
+// Uncategorized		
+			"©",
+			"®",
+			"‼",
+			"⁉",
+			"8⃣",
+			"9⃣",
+			"7⃣",
+			"6⃣",
+			"1⃣",
+			"0⃣",
+			"2⃣",
+			"3⃣",
+			"5⃣",
+			"4⃣",
+			"#⃣",
+			"™",
+			"ℹ",
+			"↔",
+			"↕",
+			"↖",
+			"↗",
+			"↘",
+			"↙",
+			"↩",
+			"↪",
+			"⌚",
+			"⌛",
+			"⏩",
+			"⏪",
+			"⏫",
+			"⏬",
+			"⏰",
+			"⏳",
+			"▪",
+			"▫",
+			"▶",
+			"◀",
+			"◻",
+			"◼",
+			"◽",
+			"◾",
+			"☀",
+			"☁",
+			"☎",
+			"☑",
+			"☔",
+			"☕",
+			"☝",
+			"☺",
+			"♈",
+			"♉",
+			"♊",
+			"♋",
+			"♌",
+			"♍",
+			"♎",
+			"♏",
+			"♐",
+			"♑",
+			"♒",
+			"♓",
+			"♠",
+			"♣",
+			"♥",
+			"♦",
+			"♨",
+			"♻",
+			"♿",
+			"⚓",
+			"⚠",
+			"⚡",
+			"⚪",
+			"⚫",
+			"⚽",
+			"⚾",
+			"⛄",
+			"⛅",
+			"⛎",
+			"⛔",
+			"⛪",
+			"⛲",
+			"⛳",
+			"⛵",
+			"⛺",
+			"⛽",
+			"⤴",
+			"⤵",
+			"⬅",
+			"⬆",
+			"⬇",
+			"⬛",
+			"⬜",
+			"⭐",
+			"⭕",
+			"〰",
+			"〽",
+			"㊗",
+			"㊙",
+			"🀄",
+			"🃏",
+			"🌀",
+			"🌁",
+			"🌂",
+			"🌃",
+			"🌄",
+			"🌅",
+			"🌆",
+			"🌇",
+			"🌈",
+			"🌉",
+			"🌊",
+			"🌋",
+			"🌌",
+			"🌏",
+			"🌑",
+			"🌓",
+			"🌔",
+			"🌕",
+			"🌙",
+			"🌛",
+			"🌟",
+			"🌠",
+			"🌰",
+			"🌱",
+			"🌴",
+			"🌵",
+			"🌷",
+			"🌸",
+			"🌹",
+			"🌺",
+			"🌻",
+			"🌼",
+			"🌽",
+			"🌾",
+			"🌿",
+			"🍀",
+			"🍁",
+			"🍂",
+			"🍃",
+			"🍄",
+			"🍅",
+			"🍆",
+			"🍇",
+			"🍈",
+			"🍉",
+			"🍊",
+			"🍌",
+			"🍍",
+			"🍎",
+			"🍏",
+			"🍑",
+			"🍒",
+			"🍓",
+			"🍔",
+			"🍕",
+			"🍖",
+			"🍗",
+			"🍘",
+			"🍙",
+			"🍚",
+			"🍛",
+			"🍜",
+			"🍝",
+			"🍞",
+			"🍟",
+			"🍠",
+			"🍡",
+			"🍢",
+			"🍣",
+			"🍤",
+			"🍥",
+			"🍦",
+			"🍧",
+			"🍨",
+			"🍩",
+			"🍪",
+			"🍫",
+			"🍬",
+			"🍭",
+			"🍮",
+			"🍯",
+			"🍰",
+			"🍱",
+			"🍲",
+			"🍳",
+			"🍴",
+			"🍵",
+			"🍶",
+			"🍷",
+			"🍸",
+			"🍹",
+			"🍺",
+			"🍻",
+			"🎀",
+			"🎁",
+			"🎂",
+			"🎃",
+			"🎄",
+			"🎅",
+			"🎆",
+			"🎇",
+			"🎈",
+			"🎉",
+			"🎊",
+			"🎋",
+			"🎌",
+			"🎍",
+			"🎎",
+			"🎏",
+			"🎐",
+			"🎑",
+			"🎒",
+			"🎓",
+			"🎠",
+			"🎡",
+			"🎢",
+			"🎣",
+			"🎤",
+			"🎥",
+			"🎦",
+			"🎧",
+			"🎨",
+			"🎩",
+			"🎪",
+			"🎫",
+			"🎬",
+			"🎭",
+			"🎮",
+			"🎯",
+			"🎰",
+			"🎱",
+			"🎲",
+			"🎳",
+			"🎴",
+			"🎵",
+			"🎶",
+			"🎷",
+			"🎸",
+			"🎹",
+			"🎺",
+			"🎻",
+			"🎼",
+			"🎽",
+			"🎾",
+			"🎿",
+			"🏀",
+			"🏁",
+			"🏂",
+			"🏃",
+			"🏄",
+			"🏆",
+			"🏈",
+			"🏊",
+			"🏠",
+			"🏡",
+			"🏢",
+			"🏣",
+			"🏥",
+			"🏦",
+			"🏧",
+			"🏨",
+			"🏩",
+			"🏪",
+			"🏫",
+			"🏬",
+			"🏭",
+			"🏮",
+			"🏯",
+			"🏰",
+			"🐌",
+			"🐍",
+			"🐎",
+			"🐑",
+			"🐒",
+			"🐔",
+			"🐗",
+			"🐘",
+			"🐙",
+			"🐚",
+			"🐛",
+			"🐜",
+			"🐝",
+			"🐞",
+			"🐟",
+			"🐠",
+			"🐡",
+			"🐢",
+			"🐣",
+			"🐤",
+			"🐥",
+			"🐦",
+			"🐧",
+			"🐨",
+			"🐩",
+			"🐫",
+			"🐬",
+			"🐭",
+			"🐮",
+			"🐯",
+			"🐰",
+			"🐱",
+			"🐲",
+			"🐳",
+			"🐴",
+			"🐵",
+			"🐶",
+			"🐷",
+			"🐸",
+			"🐹",
+			"🐺",
+			"🐻",
+			"🐼",
+			"🐽",
+			"🐾",
+			"👀",
+			"👂",
+			"👃",
+			"👄",
+			"👅",
+			"👆",
+			"👇",
+			"👈",
+			"👉",
+			"👊",
+			"👋",
+			"👌",
+			"👍",
+			"👎",
+			"👏",
+			"👐",
+			"👑",
+			"👒",
+			"👓",
+			"👔",
+			"👕",
+			"👖",
+			"👗",
+			"👘",
+			"👙",
+			"👚",
+			"👛",
+			"👜",
+			"👝",
+			"👞",
+			"👟",
+			"👠",
+			"👡",
+			"👢",
+			"👣",
+			"👤",
+			"👦",
+			"👧",
+			"👨",
+			"👩",
+			"👪",
+			"👫",
+			"👮",
+			"👯",
+			"👰",
+			"👱",
+			"👲",
+			"👳",
+			"👴",
+			"👵",
+			"👶",
+			"👷",
+			"👸",
+			"👹",
+			"👺",
+			"👻",
+			"👼",
+			"👽",
+			"👾",
+			"👿",
+			"💀",
+			"💁",
+			"💂",
+			"💃",
+			"💄",
+			"💅",
+			"💆",
+			"💇",
+			"💈",
+			"💉",
+			"💊",
+			"💋",
+			"💌",
+			"💍",
+			"💎",
+			"💏",
+			"💐",
+			"💑",
+			"💒",
+			"💓",
+			"💔",
+			"💕",
+			"💖",
+			"💗",
+			"💘",
+			"💙",
+			"💚",
+			"💛",
+			"💜",
+			"💝",
+			"💞",
+			"💟",
+			"💠",
+			"💡",
+			"💢",
+			"💣",
+			"💤",
+			"💥",
+			"💦",
+			"💧",
+			"💨",
+			"💩",
+			"💪",
+			"💫",
+			"💬",
+			"💮",
+			"💯",
+			"💰",
+			"💱",
+			"💲",
+			"💳",
+			"💴",
+			"💵",
+			"💸",
+			"💹",
+			"💺",
+			"💻",
+			"💼",
+			"💽",
+			"💾",
+			"💿",
+			"📀",
+			"📁",
+			"📂",
+			"📃",
+			"📄",
+			"📅",
+			"📆",
+			"📇",
+			"📈",
+			"📉",
+			"📊",
+			"📋",
+			"📌",
+			"📍",
+			"📎",
+			"📏",
+			"📐",
+			"📑",
+			"📒",
+			"📓",
+			"📔",
+			"📕",
+			"📖",
+			"📗",
+			"📘",
+			"📙",
+			"📚",
+			"📛",
+			"📜",
+			"📝",
+			"📞",
+			"📟",
+			"📠",
+			"📡",
+			"📢",
+			"📣",
+			"📤",
+			"📥",
+			"📦",
+			"📧",
+			"📨",
+			"📩",
+			"📪",
+			"📫",
+			"📮",
+			"📰",
+			"📱",
+			"📲",
+			"📳",
+			"📴",
+			"📶",
+			"📷",
+			"📹",
+			"📺",
+			"📻",
+			"📼",
+			"🔃",
+			"🔊",
+			"🔋",
+			"🔌",
+			"🔍",
+			"🔎",
+			"🔏",
+			"🔐",
+			"🔑",
+			"🔒",
+			"🔓",
+			"🔔",
+			"🔖",
+			"🔗",
+			"🔘",
+			"🔙",
+			"🔚",
+			"🔛",
+			"🔜",
+			"🔝",
+			"🔞",
+			"🔟",
+			"🔠",
+			"🔡",
+			"🔢",
+			"🔣",
+			"🔤",
+			"🔥",
+			"🔦",
+			"🔧",
+			"🔨",
+			"🔩",
+			"🔪",
+			"🔫",
+			"🔮",
+			"🔯",
+			"🔰",
+			"🔱",
+			"🔲",
+			"🔳",
+			"🔴",
+			"🔵",
+			"🔶",
+			"🔷",
+			"🔸",
+			"🔹",
+			"🔺",
+			"🔻",
+			"🔼",
+			"🔽",
+			"🕐",
+			"🕑",
+			"🕒",
+			"🕓",
+			"🕔",
+			"🕕",
+			"🕖",
+			"🕗",
+			"🕘",
+			"🕙",
+			"🕚",
+			"🕛",
+			"🗻",
+			"🗼",
+			"🗽",
+			"🗾",
+			"🗿",
+// Additional transport and map symbols		
+			"🚁",
+			"🚂",
+			"🚆",
+			"🚈",
+			"🚊",
+			"🚍",
+			"🚎",
+			"🚐",
+			"🚔",
+			"🚖",
+			"🚘",
+			"🚛",
+			"🚜",
+			"🚝",
+			"🚞",
+			"🚟",
+			"🚠",
+			"🚡",
+			"🚣",
+			"🚦",
+			"🚮",
+			"🚯",
+			"🚰",
+			"🚱",
+			"🚳",
+			"🚴",
+			"🚵",
+			"🚷",
+			"🚸",
+			"🚿",
+			"🛁",
+			"🛂",
+			"🛃",
+			"🛄",
+			"🛅",
+// Other additional symbols		
+			"🌍",
+			"🌎",
+			"🌐",
+			"🌒",
+			"🌖",
+			"🌗",
+			"🌘",
+			"🌚",
+			"🌜",
+			"🌝",
+			"🌞",
+			"🌲",
+			"🌳",
+			"🍋",
+			"🍐",
+			"🍼",
+			"🏇",
+			"🏉",
+			"🏤",
+			"🐀",
+			"🐁",
+			"🐂",
+			"🐃",
+			"🐄",
+			"🐅",
+			"🐆",
+			"🐇",
+			"🐈",
+			"🐉",
+			"🐊",
+			"🐋",
+			"🐏",
+			"🐐",
+			"🐓",
+			"🐕",
+			"🐖",
+			"🐪",
+			"👥",
+			"👬",
+			"👭",
+			"💭",
+			"💶",
+			"💷",
+			"📬",
+			"📭",
+			"📯",
+			"📵",
+			"🔀",
+			"🔁",
+			"🔂",
+			"🔄",
+			"🔅",
+			"🔆",
+			"🔇",
+			"🔉",
+			"🔕",
+			"🔬",
+			"🔭",
+			"🕜",
+			"🕝",
+			"🕞",
+			"🕟",
+			"🕠",
+			"🕡",
+			"🕢",
+			"🕣",
+			"🕤",
+			"🕥",
+			"🕦",
+			"🕧"
+		]
 	});
 
 })(window.StickersModule);
@@ -1619,6 +2416,39 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 (function(Module) {
 
+	Module.EmojiService = Module.Class({
+
+		emojiProvider: null,
+
+		_constructor: function(emojiProvider) {
+			this.emojiProvider = emojiProvider;
+		},
+
+		parseEmojiFromText: function(text) {
+			return this.emojiProvider.parse(text, {
+				size: (window.devicePixelRatio == 2) ? 72 : 36
+			});
+		},
+
+		parseEmojiFromHtml: function(html) {
+			var content = document.createElement('div');
+			content.innerHTML = html;
+
+			var emojisEls = content.getElementsByClassName('emoji');
+
+			for (var i = emojisEls.length - 1; i >= 0; i--) {
+				var emoji = emojisEls[i].getAttribute('alt');
+				content.replaceChild(document.createTextNode(emoji), emojisEls[i]);
+			}
+
+			return content.innerHTML;
+		}
+	});
+
+})(window.StickersModule);
+
+(function(Module) {
+
 	// todo: rewrite
 	Module.StoreApiInterface = Module.Class({
 
@@ -1761,7 +2591,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	Module.BlockView = Module.Class({
 
 		config: null,
-		service: null,
+		baseService: null,
+		emojiService: null,
 
 		el: null,
 		stickersEl:  null,
@@ -1770,9 +2601,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 		tabsView: null,
 
-		_constructor: function(config, service) {
+		_constructor: function(config, baseService, emojiService) {
 			this.config = config;
-			this.service = service;
+			this.baseService = baseService;
+			this.emojiService = emojiService;
 
 			this.tabsView = new Module.TabsView(this.config);
 
@@ -1833,11 +2665,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
 				// todo: add size dynamic 36 vs 62
 
 				var emojiEl = document.createElement('span'),
-					emojiImgHtml = Module.Twemoji.parse(emoji, {
-						size: 72
-					});
+					emojiImgHtml = this.emojiService.parseEmojiFromText(emoji);
 
-				emojiEl.className = 'sp-emoji';
+				emojiEl.className = this.config.emojiItemClass;
 				emojiEl.innerHTML = emojiImgHtml;
 
 				this.stickersEl.appendChild(emojiEl);
@@ -1863,7 +2693,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 				var placeHolderClass = 'sp-sticker-placeholder';
 
-				var stickerImgSrc = self.service.parseStickerFromText('[[' + stickerCode + ']]');
+				var stickerImgSrc = self.baseService.parseStickerFromText('[[' + stickerCode + ']]');
 
 				var stickersSpanEl = document.createElement('span');
 				stickersSpanEl.classList.add(placeHolderClass);
@@ -1885,7 +2715,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 
 		handleClickSticker: function(callback) {
+			// todo: create static this.config.stickerItemClass
 			Module.StickerHelper.setEvent('click', this.stickersEl, this.config.stickerItemClass, callback);
+		},
+		handleClickEmoji: function(callback) {
+			// todo: create static this.config.emojiItemClass
+			Module.StickerHelper.setEvent('click', this.stickersEl, this.config.emojiItemClass, callback);
 		},
 
 
@@ -1906,8 +2741,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 		active: false,
 
-		_constructor: function(config, service) {
-			parent.prototype._constructor.call(this, config, service);
+		_constructor: function() {
+			parent.prototype._constructor.apply(this, arguments);
 
 			this.toggleEl = document.getElementById(this.config.elId);
 			this.toggleEl.addEventListener('click', (function() {
@@ -2320,27 +3155,37 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 })(window.StickersModule);
 
-(function(Plugin, Modules) {
+(function(Plugin, Module) {
 
-	var helper = Modules.StickerHelper;
+	var helper = Module.StickerHelper;
 
 	// todo: rename Stickers --> StickerPipe
-	Plugin.Stickers = Modules.Class({
+	Plugin.Stickers = Module.Class({
+
+		config: null,
+		baseService: null,
+		emojiService: null,
+		stickersModel: {},
+		view: null,
+		storeView: null,
 
 		_constructor: function(config) {
 
-			Modules.Configs.add(config);
+			Module.Configs.add(config);
 
-			this.config = Modules.Configs.getAll();
+			this.config = Module.Configs.getAll();
 
 			// todo: move to Configs class
 			this.configResolution();
 
-			this.stService = new Modules.BaseService(this.config);
-			this.stickersModel = {};
-			this.view = new Modules.PopoverView(this.config, this.stService);
-			this.storeView = new Modules.StoreView(this.config);
+			// todo: rename
+			this.baseService = new Module.BaseService(this.config);
+			this.emojiService = new Module.EmojiService(Module.Twemoji);
 
+			this.view = new Module.PopoverView(this.config, this.baseService, this.emojiService);
+			this.storeView = new Module.StoreView(this.config);
+
+			// todo: remove
 			Plugin.JsApiInterface && Plugin.JsApiInterface._setConfigs(this.config);
 
 			this.delegateEvents();
@@ -2353,7 +3198,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			}).bind(this));
 
 			this.view.tabsView.handleClickOnLastUsedPacksTab((function() {
-				this.view.renderUsedStickers(this.stService.getLatestUse());
+				this.view.renderUsedStickers(this.baseService.getLatestUse());
 			}).bind(this));
 
 			this.view.tabsView.handleClickOnPackTab((function(el) {
@@ -2365,7 +3210,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 						// set newPack - false
 						this.stickersModel[i].newPack = false;
-						this.stService.setPacksToStorage(this.stickersModel);
+						this.baseService.setPacksToStorage(this.stickersModel);
 
 						pack = this.stickersModel[i];
 
@@ -2391,7 +3236,21 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 				ga('stickerTracker.send', 'event', 'sticker', stickerAttribute.split('_')[0], stickerAttribute.split('_')[1], 1);
 
-				this.stService.addToLatestUse(stickerAttribute);
+				this.baseService.addToLatestUse(stickerAttribute);
+			}).bind(this));
+
+			this.view.handleClickEmoji((function(el) {
+				var nowDate = new Date().getTime() / 1000| 0,
+					emoji = this.emojiService.parseEmojiFromHtml(el.innerHTML);
+
+				helper.ajaxPost(this.config.trackStatUrl, this.config.apikey, [{
+					action: 'use',
+					category: 'emoji',
+					label: emoji,
+					time: nowDate
+				}]);
+
+				ga('stickerTracker.send', 'event', 'emoji', 'use', emoji);
 			}).bind(this));
 		},
 
@@ -2418,10 +3277,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
 				this.view.render(this.stickersModel);
 
 				// todo --> active 'used' tab
-				this.view.renderUsedStickers(this.stService.getLatestUse());
+				this.view.renderUsedStickers(this.baseService.getLatestUse());
 			}).bind(this);
 
-			var storageStickerData = this.stService.getPacksFromStorage();
+			var storageStickerData = this.baseService.getPacksFromStorage();
 
 			if (storageStickerData.actual) {
 
@@ -2437,7 +3296,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		},
 
 		fetchPacks: function(attrs) {
-			this.stService.updatePacks((function(stickerPacks) {
+			this.baseService.updatePacks((function(stickerPacks) {
 				this.stickersModel = stickerPacks;
 
 				if(attrs.callback) {
@@ -2446,14 +3305,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			}).bind(this));
 		},
 
+		// todo: rename
 		onClickSticker: function(callback, context) {
-
 			this.view.handleClickSticker(function(el) {
 				callback.call(context, '[[' + el.getAttribute('data-sticker-string') + ']]');
 			});
-
 		},
 
+		// todo: rename or remove
 		onClickTab: function(callback, context) {
 
 			this.view.tabsView.handleClickOnPackTab(function(el) {
@@ -2462,21 +3321,37 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 		},
 
+		onClickEmoji: function(callback, context) {
+			this.view.handleClickEmoji((function(el) {
+				var emoji = this.emojiService.parseEmojiFromHtml(el.innerHTML);
+
+				callback.call(context, emoji);
+			}).bind(this));
+		},
+
 		getNewStickersFlag: function() {
-			return this.stService.getNewStickersFlag(this.stService.getPacksFromStorage().packs || []);
+			return this.baseService.getNewStickersFlag(this.baseService.getPacksFromStorage().packs || []);
 		},
 
 		resetNewStickersFlag: function() {
-			return this.stService.resetNewStickersFlag();
+			return this.baseService.resetNewStickersFlag();
 		},
 
 		parseStickerFromText: function(text) {
-			return this.stService.parseStickerFromText(text);
+			return this.baseService.parseStickerFromText(text);
 		},
 
-		// todo
+		parseEmojiFromText: function(text) {
+			return this.emojiService.parseEmojiFromText(text);
+		},
+
+		parseEmojiFromHtml: function(html) {
+			return this.emojiService.parseEmojiFromHtml(html);
+		},
+
+		// todo rewrite
 		renderCurrentTab: function(tabName) {
-			var obj = this.stService.getPacksFromStorage();
+			var obj = this.baseService.getPacksFromStorage();
 
 			//this.start(); // todo
 
@@ -2489,17 +3364,17 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			}).bind(this));
 
 			//this.stickersModel[this.tabActive].newPack = false;
-			//this.stService.setPacksToStorage(this.stickersModel);
+			//this.baseService.setPacksToStorage(this.stickersModel);
 
 			//this._renderAll();
 		},
 
 		isNewPack: function(packName) {
-			return this.stService.isNewPack(this.stickersModel, packName);
+			return this.baseService.isNewPack(this.stickersModel, packName);
 		},
 
 		onUserMessageSent: function(isSticker) {
-			return this.stService.onUserMessageSent(isSticker);
+			return this.baseService.onUserMessageSent(isSticker);
 		},
 
 		renderPack: function(pack) {
@@ -2507,7 +3382,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		},
 
 		purchaseSuccess: function(packName) {
-			this.stService.purchaseSuccess(packName);
+			this.baseService.purchaseSuccess(packName);
 		}
 	});
 

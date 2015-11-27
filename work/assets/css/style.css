@@ -80,15 +80,24 @@ body {
     padding-right: 0;
     padding-left: 0; } }
 
+[contenteditable=true]:empty:before {
+  content: attr(placeholder);
+  display: block;
+  color: #9e9e9e;
+  font-size: 14px; }
+
+.emoji {
+  height: 24px;
+  width: 24px; }
+
 #messageBox {
   background: white;
   margin-bottom: 5px; }
-  #messageBox textarea {
+  #messageBox .textarea {
     box-shadow: none;
     max-height: 300px;
-    padding-top: 10px;
-    resize: none; }
-    #messageBox textarea + .input-group-btn {
+    padding-top: 10px; }
+    #messageBox .textarea + .input-group-btn {
       padding-top: 4px; }
   #messageBox .input-group-btn {
     vertical-align: top; }
@@ -96,11 +105,11 @@ body {
       color: #646464; }
     #messageBox .input-group-btn button:active {
       color: orange; }
-  #messageBox textarea,
+  #messageBox .textarea,
   #messageBox .input-group-btn button {
     border: 0;
     outline: none; }
-    #messageBox textarea:hover, #messageBox textarea:focus, #messageBox textarea:active,
+    #messageBox .textarea:hover, #messageBox .textarea:focus, #messageBox .textarea:active,
     #messageBox .input-group-btn button:hover,
     #messageBox .input-group-btn button:focus,
     #messageBox .input-group-btn button:active {
