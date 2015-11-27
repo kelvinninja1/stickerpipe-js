@@ -1,0 +1,240 @@
+
+@import "variables";
+@import "icons";
+@import "mixins";
+
+$tabContentSize: 36px;
+$borderRadius: 3px;
+
+.sp-popover {
+	background: #fafafa;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	border-radius: $borderRadius;
+	position: absolute;
+	height: 350px; // todo remove
+	width: 320px;
+
+	-webkit-box-shadow: 1px 1px 1px 0 rgba(0,0,0,0.15);
+	-moz-box-shadow: 1px 1px 1px 0 rgba(0,0,0,0.15);
+	box-shadow: 1px 1px 1px 0 rgba(0,0,0,0.15);
+
+	.sp-arrow,
+	.sp-arrow:after {
+		position: absolute;
+		display: block;
+		width: 0;
+		height: 0;
+		border-color: transparent;
+		border-style: solid;
+	}
+
+	.sp-arrow {
+		bottom: -11px;
+		margin-left: 1px;
+		border-top-color: rgba(0,0,0,.25);
+		border-width: 11px;
+		border-bottom-width: 0;
+
+		&:after {
+			bottom: 1px;
+			margin-left: -10px;
+			content: " ";
+			border-top-color: #fafafa;
+			border-width: 10px;
+			border-bottom-width: 0;
+		}
+	}
+}
+
+.sticker-pipe {
+
+	.sp-store {
+		background: white;
+	}
+
+	.sp-tabs {
+		@include flexbox();
+
+		background-color: #fff;
+		border-radius: $borderRadius $borderRadius 0 0;
+		overflow-x: scroll;
+		width: 100%;
+		white-space: nowrap;
+
+		.sp-tabs-scrollable-container {
+			flex: 1;
+			float: left;
+			overflow: hidden;
+			position: relative;
+
+			.sp-tabs-scrollable-content {
+				@include flexbox();
+
+				left: 0;
+				position: relative;
+				transition: 300ms;
+				white-space: nowrap;
+			}
+		}
+
+		.sp-tab-item {
+			display: inline-table;
+			cursor: pointer;
+			padding: 6px;
+
+			img {
+				border-radius: 50%;
+				height: $tabContentSize;
+				width: $tabContentSize;
+
+				opacity: .5;
+				-webkit-filter: grayscale(100%);
+				filter: grayscale(100%);
+
+				&:hover {
+					opacity: .7;
+				}
+			}
+
+			&.sp-tab-active {
+				background-color: white;
+				color: orange;
+
+				img {
+					opacity: 1;
+					-webkit-filter: grayscale(0%);
+					filter: grayscale(0%);
+				}
+
+				&.sp-control-tab,
+				&.sp-control-button {
+					> span {
+						opacity: 0.9;
+					}
+				}
+			}
+
+			&.sp-control-tab,
+			&.sp-control-button {
+
+				margin: 0;
+				padding: 12px;
+
+				&:hover > span {
+					opacity: .7;
+				}
+
+				> span {
+					display: table;
+					opacity: .5;
+				}
+
+				&.sp-tab-next-packs,
+				&.sp-tab-store {
+					border-left: 1px solid #c8c8c8;
+					border-radius: 0;
+				}
+
+				&.sp-tab-prev-packs,
+				&.sp-tab-history {
+					border-right: 1px solid #c8c8c8;
+				}
+
+
+				&.sp-tab-prev-packs,
+				&.sp-tab-next-packs {
+					padding-left: 0;
+					padding-right: 0;
+				}
+			}
+
+			&.sp-pack-tab {
+				&.sp-new-pack::after {
+					content: "";
+					width: 10px;
+					height: 10px;
+					display: block;
+					position: absolute;
+					background-color: #f60;
+					border-radius: 50%;
+					margin-left: 29px;
+					margin-top: -10px;
+				}
+			}
+		}
+	}
+
+
+	.sp-emojis,
+	.sp-stickers {
+		background: #fafafa;
+		border-top: 1px solid rgb(200, 200, 200);
+		border-radius: 0 0 $borderRadius $borderRadius;
+		height: 300px;
+		overflow-y: scroll;
+	}
+
+
+	.sp-emojis {
+		padding: 8px 16px;
+
+		.sp-emoji {
+			display: inline-table;
+			float: left;
+			padding: 8px;
+			cursor: pointer;
+
+			&:hover {
+				background: rgba(0, 0, 0, 0.1);
+				border-radius: 5px;
+			}
+
+			img {
+				$emojiSize: 24px;
+				height: $emojiSize;
+				width: $emojiSize;
+			}
+		}
+	}
+
+	.sp-stickers {
+		$stickerSize: 80px;
+
+		.sp-sticker-item,
+		.sp-sticker-placeholder {
+			float: left;
+			display: inline-table;
+		}
+
+		.sp-sticker-placeholder {
+			$placeHolderSize: 40px;
+
+			background: rgba(0, 0, 0, 0.1);
+			border-radius: 50%;
+			height: $stickerSize / 2;
+			width: $stickerSize / 2;
+			margin: (($stickerSize - $placeHolderSize) / 2) + (2 * 6px);
+		}
+
+		.sp-sticker-item {
+			cursor: pointer;
+			display: inline-table;
+			float: left;
+			margin: 9px;
+			padding: 3px;
+
+			&:not(.sp-sticker-placeholder):hover {
+				background: rgba(0, 0, 0, 0.1);
+				border-radius: 5px;
+			}
+
+			img {
+				height: $stickerSize;
+				width: $stickerSize;
+			}
+		}
+	}
+}
+
+@include sprites($spritesheet-sprites);
+@include retina-sprites($retina-groups);
