@@ -57,7 +57,8 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   border-radius: 3px;
   position: absolute;
   height: 350px;
-  width: 320px; }
+  width: 320px;
+  box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.15); }
   .sp-popover .sp-arrow,
   .sp-popover .sp-arrow:after {
     position: absolute;
@@ -169,28 +170,18 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   overflow-y: scroll; }
 
 .sticker-pipe .sp-emojis {
-  padding: 8px; }
-  @media (max-width: 544px) {
-    .sticker-pipe .sp-emojis {
-      padding: 8px 16px; } }
+  padding: 8px 16px; }
   .sticker-pipe .sp-emojis .sp-emoji {
     display: inline-table;
     float: left;
-    padding: 6px;
+    padding: 8px;
     cursor: pointer; }
-    @media (max-width: 544px) {
-      .sticker-pipe .sp-emojis .sp-emoji {
-        padding: 8px; } }
     .sticker-pipe .sp-emojis .sp-emoji:hover {
       background: rgba(0, 0, 0, 0.1);
       border-radius: 5px; }
     .sticker-pipe .sp-emojis .sp-emoji img {
-      height: 18px;
-      width: 18px; }
-      @media (max-width: 544px) {
-        .sticker-pipe .sp-emojis .sp-emoji img {
-          height: 24px;
-          width: 24px; } }
+      height: 24px;
+      width: 24px; }
 
 .sticker-pipe .sp-stickers .sp-sticker-item,
 .sticker-pipe .sp-stickers .sp-sticker-placeholder {

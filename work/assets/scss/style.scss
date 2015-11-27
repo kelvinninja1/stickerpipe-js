@@ -10,7 +10,7 @@ body {
 	}
 }
 
-@media (max-width: 768px) {
+@media (max-width: 544px) {
 	.container > .row {
 		@for $i from 1 through 12 {
 			> .col-lg-#{$i},
@@ -81,7 +81,7 @@ body {
 		width: 24px;
 
 		&,
-		&:hover,
+		>:hover,
 		&:focus,
 		&:active {
 			background: url("../img/sticker.png");

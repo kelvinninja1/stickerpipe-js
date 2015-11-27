@@ -6,7 +6,7 @@ body {
   .container {
     width: 770px; } }
 
-@media (max-width: 768px) {
+@media (max-width: 544px) {
   .container > .row > .col-lg-1,
   .container > .row > .col-md-1,
   .container > .row > .col-sm-1,
@@ -118,11 +118,13 @@ body {
     display: table;
     opacity: .5;
     width: 24px; }
-    #stickersToggle .icon, #stickersToggle .icon:hover, #stickersToggle .icon:focus, #stickersToggle .icon:active {
+    #stickersToggle .icon,
+    #stickersToggle .icon > :hover, #stickersToggle .icon:focus, #stickersToggle .icon:active {
       background: url("../img/sticker.png");
       background-size: 48px 24px; }
       @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2 / 1) {
-        #stickersToggle .icon, #stickersToggle .icon:hover, #stickersToggle .icon:focus, #stickersToggle .icon:active {
+        #stickersToggle .icon,
+        #stickersToggle .icon > :hover, #stickersToggle .icon:focus, #stickersToggle .icon:active {
           background: url("../img/sticker@2x.png");
           background-size: 48px 24px; } }
   #stickersToggle:hover .icon {
