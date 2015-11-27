@@ -1,9 +1,9 @@
 
-(function(Plugin, Module) {
+(function(Module) {
 
-	var parent = Plugin.StickersModule.BlockView;
+	var parent = Module.BlockView;
 
-	Plugin.StickersModule.PopoverView = Module.Class(parent, {
+	Module.PopoverView = Module.Class(parent, {
 
 		popoverEl: null,
 		arrowEl: null,
@@ -11,8 +11,8 @@
 
 		active: false,
 
-		_constructor: function(config, service) {
-			parent.prototype._constructor.call(this, config, service);
+		_constructor: function() {
+			parent.prototype._constructor.apply(this, arguments);
 
 			this.toggleEl = document.getElementById(this.config.elId);
 			this.toggleEl.addEventListener('click', (function() {
@@ -85,4 +85,4 @@
 
 	});
 
-})(window, window.StickersModule);
+})(window.StickersModule);

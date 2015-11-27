@@ -1,33 +1,43 @@
 
-//=include modules/analytics.js
-//=include modules/config_base.js
-//=include modules/class.js
-//=include modules/Lockr.js
-//=include modules/md5.js
-//=include modules/helper.js
-//=include modules/base/baseService.js
-//=include modules/views/BlockView.js
-//=include modules/views/PopoverView.js
-//=include modules/views/TabsView.js
-//=include modules/views/StoreView.js
-//=include modules/JsApiInterface.js
+// todo: move StickersModule --> Stickers
+window.StickersModule = {};
 
-(function(Plugin, Modules) {
+//=include utils/**/*.js
+//=include configs/**/*.js
+//=include services/**/*.js
+//=include views/**/*.js
 
-	var helper = Modules.StickerHelper;
+(function(Plugin, Module) {
 
-	Plugin.Stickers = Modules.Class({
+	var helper = Module.StickerHelper;
+
+	// todo: rename Stickers --> StickerPipe
+	Plugin.Stickers = Module.Class({
+
+		config: null,
+		baseService: null,
+		emojiService: null,
+		stickersModel: {},
+		view: null,
+		storeView: null,
 
 		_constructor: function(config) {
-			this.config = helper.mergeOptions(Modules.Config, config);
 
+			Module.Configs.add(config);
+
+			this.config = Module.Configs.getAll();
+
+			// todo: move to Configs class
 			this.configResolution();
 
-			this.stService = new Modules.BaseService(this.config);
-			this.stickersModel = {};
-			this.view = new Modules.PopoverView(this.config, this.stService);
-			this.storeView = new Modules.StoreView(this.config);
+			// todo: rename
+			this.baseService = new Module.BaseService(this.config);
+			this.emojiService = new Module.EmojiService(Module.Twemoji);
 
+			this.view = new Module.PopoverView(this.config, this.baseService, this.emojiService);
+			this.storeView = new Module.StoreView(this.config);
+
+			// todo: remove
 			Plugin.JsApiInterface && Plugin.JsApiInterface._setConfigs(this.config);
 
 			this.delegateEvents();
@@ -35,12 +45,12 @@
 
 		delegateEvents: function() {
 
-			this.view.tabsView.handleClickOnCustomTab((function() {
-				this.view.renderCustomBlock();
+			this.view.tabsView.handleClickOnEmojiTab((function() {
+				this.view.renderEmojiBlock();
 			}).bind(this));
 
 			this.view.tabsView.handleClickOnLastUsedPacksTab((function() {
-				this.view.renderUsedStickers(this.stService.getLatestUse());
+				this.view.renderUsedStickers(this.baseService.getLatestUse());
 			}).bind(this));
 
 			this.view.tabsView.handleClickOnPackTab((function(el) {
@@ -52,7 +62,7 @@
 
 						// set newPack - false
 						this.stickersModel[i].newPack = false;
-						this.stService.setPacksToStorage(this.stickersModel);
+						this.baseService.setPacksToStorage(this.stickersModel);
 
 						pack = this.stickersModel[i];
 
@@ -78,10 +88,25 @@
 
 				ga('stickerTracker.send', 'event', 'sticker', stickerAttribute.split('_')[0], stickerAttribute.split('_')[1], 1);
 
-				this.stService.addToLatestUse(stickerAttribute);
+				this.baseService.addToLatestUse(stickerAttribute);
+			}).bind(this));
+
+			this.view.handleClickEmoji((function(el) {
+				var nowDate = new Date().getTime() / 1000| 0,
+					emoji = this.emojiService.parseEmojiFromHtml(el.innerHTML);
+
+				helper.ajaxPost(this.config.trackStatUrl, this.config.apikey, [{
+					action: 'use',
+					category: 'emoji',
+					label: emoji,
+					time: nowDate
+				}]);
+
+				ga('stickerTracker.send', 'event', 'emoji', 'use', emoji);
 			}).bind(this));
 		},
 
+		// todo: remove function
 		configResolution: function() {
 			this.config = helper.mergeOptions(this.config, {
 				stickerResolutionType : 'mdpi',
@@ -104,10 +129,10 @@
 				this.view.render(this.stickersModel);
 
 				// todo --> active 'used' tab
-				this.view.renderUsedStickers(this.stService.getLatestUse());
+				this.view.renderUsedStickers(this.baseService.getLatestUse());
 			}).bind(this);
 
-			var storageStickerData = this.stService.getPacksFromStorage();
+			var storageStickerData = this.baseService.getPacksFromStorage();
 
 			if (storageStickerData.actual) {
 
@@ -123,7 +148,7 @@
 		},
 
 		fetchPacks: function(attrs) {
-			this.stService.updatePacks((function(stickerPacks) {
+			this.baseService.updatePacks((function(stickerPacks) {
 				this.stickersModel = stickerPacks;
 
 				if(attrs.callback) {
@@ -132,20 +157,14 @@
 			}).bind(this));
 		},
 
+		// todo: rename
 		onClickSticker: function(callback, context) {
-
 			this.view.handleClickSticker(function(el) {
 				callback.call(context, '[[' + el.getAttribute('data-sticker-string') + ']]');
 			});
-
 		},
 
-		onClickCustomTab: function(callback, context) {
-			this.view.tabsView.handleClickOnCustomTab((function(el) {
-				callback.call(context, el);
-			}).bind(this));
-		},
-
+		// todo: rename or remove
 		onClickTab: function(callback, context) {
 
 			this.view.tabsView.handleClickOnPackTab(function(el) {
@@ -154,21 +173,37 @@
 
 		},
 
+		onClickEmoji: function(callback, context) {
+			this.view.handleClickEmoji((function(el) {
+				var emoji = this.emojiService.parseEmojiFromHtml(el.innerHTML);
+
+				callback.call(context, emoji);
+			}).bind(this));
+		},
+
 		getNewStickersFlag: function() {
-			return this.stService.getNewStickersFlag(this.stService.getPacksFromStorage().packs || []);
+			return this.baseService.getNewStickersFlag(this.baseService.getPacksFromStorage().packs || []);
 		},
 
 		resetNewStickersFlag: function() {
-			return this.stService.resetNewStickersFlag();
+			return this.baseService.resetNewStickersFlag();
 		},
 
 		parseStickerFromText: function(text) {
-			return this.stService.parseStickerFromText(text);
+			return this.baseService.parseStickerFromText(text);
 		},
 
-		// todo
+		parseEmojiFromText: function(text) {
+			return this.emojiService.parseEmojiFromText(text);
+		},
+
+		parseEmojiFromHtml: function(html) {
+			return this.emojiService.parseEmojiFromHtml(html);
+		},
+
+		// todo rewrite
 		renderCurrentTab: function(tabName) {
-			var obj = this.stService.getPacksFromStorage();
+			var obj = this.baseService.getPacksFromStorage();
 
 			//this.start(); // todo
 
@@ -181,17 +216,17 @@
 			}).bind(this));
 
 			//this.stickersModel[this.tabActive].newPack = false;
-			//this.stService.setPacksToStorage(this.stickersModel);
+			//this.baseService.setPacksToStorage(this.stickersModel);
 
 			//this._renderAll();
 		},
 
 		isNewPack: function(packName) {
-			return this.stService.isNewPack(this.stickersModel, packName);
+			return this.baseService.isNewPack(this.stickersModel, packName);
 		},
 
 		onUserMessageSent: function(isSticker) {
-			return this.stService.onUserMessageSent(isSticker);
+			return this.baseService.onUserMessageSent(isSticker);
 		},
 
 		renderPack: function(pack) {
@@ -199,8 +234,8 @@
 		},
 
 		purchaseSuccess: function(packName) {
-			this.stService.purchaseSuccess(packName);
+			this.baseService.purchaseSuccess(packName);
 		}
 	});
 
-})(window, StickersModule);
+})(window, window.StickersModule);

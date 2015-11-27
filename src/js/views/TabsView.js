@@ -1,5 +1,5 @@
 
-(function(Plugin, Module) {
+(function(Module) {
 
 
 	Module.TabsView = Module.Class({
@@ -30,10 +30,10 @@
 			this.el = document.createElement('div');
 
 			this.controls = {
-				custom: {
-					id: 'spTabCustom',
-					class: 'sp-tab-custom',
-					content: this.config.customTabContent,
+				emoji: {
+					id: 'spTabEmoji',
+					class: 'sp-tab-emoji',
+					content: this.config.emojiTabContent,
 					el: null,
 					isTab: true
 				},
@@ -78,6 +78,7 @@
 				this.onWindowResize();
 			}).bind(this));
 		},
+
 
 		render: function(stickerPacks) {
 
@@ -182,10 +183,11 @@
 			return tabEl;
 		},
 
+
 		renderPacks: function(stickerPacks) {
 			this.scrollableContentEl.innerHTML = '';
 
-			this.renderCustomTab();
+			this.renderEmojiTab();
 			this.renderHistoryTab();
 
 			for (var i = 0; i < stickerPacks.length; i++) {
@@ -194,9 +196,9 @@
 
 			this.renderSettingsTab();
 		},
-		renderCustomTab: function() {
-			if (this.config.enableCustomTab) {
-				this.scrollableContentEl.appendChild(this.renderControlButton(this.controls.custom));
+		renderEmojiTab: function() {
+			if (this.config.enableEmojiTab) {
+				this.scrollableContentEl.appendChild(this.renderControlButton(this.controls.emoji));
 			}
 		},
 		renderHistoryTab: function() {
@@ -246,8 +248,9 @@
 			this.onWindowResize();
 		},
 
-		handleClickOnCustomTab: function(callback) {
-			Module.StickerHelper.setEvent('click', this.el, this.controls.custom.class, callback);
+
+		handleClickOnEmojiTab: function(callback) {
+			Module.StickerHelper.setEvent('click', this.el, this.controls.emoji.class, callback);
 		},
 		handleClickOnLastUsedPacksTab: function(callback) {
 			Module.StickerHelper.setEvent('click', this.el, this.controls.history.class, callback);
@@ -255,6 +258,7 @@
 		handleClickOnPackTab: function(callback) {
 			Module.StickerHelper.setEvent('click', this.el, this.classes.packTab, callback);
 		},
+
 
 		onWindowResize: function() {
 
@@ -284,4 +288,4 @@
 		}
 	});
 
-})(window, window.StickersModule);
+})(window.StickersModule);

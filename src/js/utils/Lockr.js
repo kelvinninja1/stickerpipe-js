@@ -1,10 +1,8 @@
 
-(function(Plugin, Config) {
-
-    Plugin.StickersModule = Plugin.StickersModule || {};
+(function(Plugin) {
 
     Plugin.StickersModule.Lockr = {
-		prefix: Config.storagePrefix,
+		prefix: '',
 
 		_getPrefixedKey: function(key, options) {
 			options = options || {};
@@ -121,4 +119,4 @@
 		}
     };
 
-})(window, window.StickersModule.Config);
+})(window);

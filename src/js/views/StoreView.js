@@ -1,7 +1,7 @@
 
-(function(Plugin, Module) {
+(function(Module) {
 
-	Plugin.StickersModule.StoreView = Module.Class({
+	Module.StoreView = Module.Class({
 
 		config: null,
 
@@ -44,4 +44,4 @@
 		}
 	});
 
-})(window, window.StickersModule);
+})(window.StickersModule);

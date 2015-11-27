@@ -1,12 +1,13 @@
 
-(function(Plugin, Module) {
+(function(Module) {
 
 	var StickerHelper = Module.StickerHelper;
 
-	Plugin.StickersModule.BlockView = Module.Class({
+	Module.BlockView = Module.Class({
 
 		config: null,
-		service: null,
+		baseService: null,
+		emojiService: null,
 
 		el: null,
 		stickersEl:  null,
@@ -15,9 +16,10 @@
 
 		tabsView: null,
 
-		_constructor: function(config, service) {
+		_constructor: function(config, baseService, emojiService) {
 			this.config = config;
-			this.service = service;
+			this.baseService = baseService;
+			this.emojiService = emojiService;
 
 			this.tabsView = new Module.TabsView(this.config);
 
@@ -29,10 +31,13 @@
 			}).bind(this));
 		},
 
+
+		// todo: remove function
 		clearBlock: function(el) {
 			el.setAttribute('style', 'display:block');
 			el.innerHTML = '';
 		},
+
 
 		render: function(stickerPacks) {
 			this.tabsView.render(stickerPacks);
@@ -41,15 +46,12 @@
 
 			this.el.classList.add('sticker-pipe');
 
-			this.stickersEl.classList.add('sp-stickers');
-
 			this.el.appendChild(this.tabsView.el);
 			this.el.appendChild(this.stickersEl);
 
 			this.tabsView.onWindowResize();
 			this.onWindowResize();
 		},
-
 		renderUsedStickers: function(latesUseSticker) {
 
 			this.clearBlock(this.stickersEl);
@@ -66,11 +68,26 @@
 
 			this.renderStickers(stickers);
 		},
+		renderEmojiBlock: function() {
 
-		renderCustomBlock: function() {
 			this.clearBlock(this.stickersEl);
-		},
 
+			this.stickersEl.className = 'sp-emojis';
+
+
+			StickerHelper.forEach(this.config.emojiList, (function(emoji) {
+
+				// todo: add size dynamic 36 vs 62
+
+				var emojiEl = document.createElement('span'),
+					emojiImgHtml = this.emojiService.parseEmojiFromText(emoji);
+
+				emojiEl.className = this.config.emojiItemClass;
+				emojiEl.innerHTML = emojiImgHtml;
+
+				this.stickersEl.appendChild(emojiEl);
+			}).bind(this));
+		},
 		renderPack: function(pack) {
 
 			this.clearBlock(this.stickersEl);
@@ -82,15 +99,16 @@
 
 			this.renderStickers(stickers);
 		},
-
 		renderStickers: function(stickers) {
 			var self = this;
+
+			this.stickersEl.className = 'sp-stickers';
 
 			StickerHelper.forEach(stickers, function(stickerCode) {
 
 				var placeHolderClass = 'sp-sticker-placeholder';
 
-				var stickerImgSrc = self.service.parseStickerFromText('[[' + stickerCode + ']]');
+				var stickerImgSrc = self.baseService.parseStickerFromText('[[' + stickerCode + ']]');
 
 				var stickersSpanEl = document.createElement('span');
 				stickersSpanEl.classList.add(placeHolderClass);
@@ -110,12 +128,18 @@
 			});
 		},
 
+
 		handleClickSticker: function(callback) {
+			// todo: create static this.config.stickerItemClass
 			Module.StickerHelper.setEvent('click', this.stickersEl, this.config.stickerItemClass, callback);
 		},
+		handleClickEmoji: function(callback) {
+			// todo: create static this.config.emojiItemClass
+			Module.StickerHelper.setEvent('click', this.stickersEl, this.config.emojiItemClass, callback);
+		},
 
-		onWindowResize: function() {
-		}
+
+		onWindowResize: function() {}
 	});
 
-})(window, window.StickersModule);
+})(window.StickersModule);

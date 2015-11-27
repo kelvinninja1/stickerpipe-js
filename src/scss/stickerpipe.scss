@@ -1,4 +1,5 @@
 
+@import "variables";
 @import "icons";
 @import "mixins";
 
@@ -12,6 +13,10 @@ $borderRadius: 3px;
 	position: absolute;
 	height: 350px; // todo remove
 	width: 320px;
+
+	-webkit-box-shadow: 1px 1px 1px 0 rgba(0,0,0,0.15);
+	-moz-box-shadow: 1px 1px 1px 0 rgba(0,0,0,0.15);
+	box-shadow: 1px 1px 1px 0 rgba(0,0,0,0.15);
 
 	.sp-arrow,
 	.sp-arrow:after {
@@ -159,14 +164,41 @@ $borderRadius: 3px;
 		}
 	}
 
+
+	.sp-emojis,
 	.sp-stickers {
 		background: #fafafa;
 		border-top: 1px solid rgb(200, 200, 200);
 		border-radius: 0 0 $borderRadius $borderRadius;
 		height: 300px;
 		overflow-y: scroll;
+	}
 
-		$size: 80px;
+
+	.sp-emojis {
+		padding: 8px 16px;
+
+		.sp-emoji {
+			display: inline-table;
+			float: left;
+			padding: 8px;
+			cursor: pointer;
+
+			&:hover {
+				background: rgba(0, 0, 0, 0.1);
+				border-radius: 5px;
+			}
+
+			img {
+				$emojiSize: 24px;
+				height: $emojiSize;
+				width: $emojiSize;
+			}
+		}
+	}
+
+	.sp-stickers {
+		$stickerSize: 80px;
 
 		.sp-sticker-item,
 		.sp-sticker-placeholder {
@@ -179,9 +211,9 @@ $borderRadius: 3px;
 
 			background: rgba(0, 0, 0, 0.1);
 			border-radius: 50%;
-			height: $size / 2;
-			width: $size / 2;
-			margin: (($size - $placeHolderSize) / 2) + (2 * 6px);
+			height: $stickerSize / 2;
+			width: $stickerSize / 2;
+			margin: (($stickerSize - $placeHolderSize) / 2) + (2 * 6px);
 		}
 
 		.sp-sticker-item {
@@ -197,8 +229,8 @@ $borderRadius: 3px;
 			}
 
 			img {
-				height: $size;
-				width: $size;
+				height: $stickerSize;
+				width: $stickerSize;
 			}
 		}
 	}

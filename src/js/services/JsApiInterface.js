@@ -1,6 +1,7 @@
 
-(function(Plugin, Module) {
+(function(Module) {
 
+	// todo: rewrite
 	Module.StoreApiInterface = Module.Class({
 
 		config: null,
@@ -52,4 +53,4 @@
 		}
 	});
 
-})(window, StickersModule);
+})(StickersModule);
