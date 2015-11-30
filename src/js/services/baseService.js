@@ -123,9 +123,10 @@
 				});
 
 
-				if(globalNew) {
+				// todo: check & fix
+				//if (globalNew) {
 					this.storageService.setHasNewStickers(globalNew);
-				}
+				//}
 			}
 
 			return newPacks;
