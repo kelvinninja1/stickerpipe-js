@@ -42,7 +42,9 @@
 
 		// todo: block or popover
 		display: 'block',
-		width: '320px'
+		width: '320px',
+
+		lang: document.documentElement.lang.substr(0, 2) || 'en'
 	});
 
 })(window.StickersModule);

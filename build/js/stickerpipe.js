@@ -244,6 +244,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			xmlhttp.open('GET', url, true);
 			xmlhttp.setRequestHeader('Apikey', apikey);
 			xmlhttp.setRequestHeader('Platform', 'JS');
+			xmlhttp.setRequestHeader('Localization', Module.Configs.get('lang'));
 
 			this.forEach(header, function(value, name) {
 				xmlhttp.setRequestHeader(name, value);
@@ -270,6 +271,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			xmlhttp.setRequestHeader('Platform', 'JS');
 			xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 			xmlhttp.setRequestHeader('DeviceId', uniqUserId);
+			xmlhttp.setRequestHeader('Localization', Module.Configs.get('lang'));
 
 			this.forEach(header, function(value, name) {
 				xmlhttp.setRequestHeader(name, value);
@@ -1256,7 +1258,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 		// todo: block or popover
 		display: 'block',
-		width: '320px'
+		width: '320px',
+
+		lang: document.documentElement.lang.substr(0, 2) || 'en'
 	});
 
 })(window.StickersModule);
