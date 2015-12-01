@@ -98,6 +98,8 @@ var App = _makeClass(function(options) {
 			htmlForEmptyRecent: '<div class="emptyRecent">empty recent text</div>',
 
 			apikey: '72921666b5ff8651f374747bfefaf7b2',
+			//apikey: '52ed1358d7d09df5279147a5555061a9',
+
 			storagePrefix: 'stickerPipe',
 			enableEmojiTab: true,
 			enableHistoryTab: true,
@@ -107,7 +109,6 @@ var App = _makeClass(function(options) {
 			userPacksUrl: 'http://work.stk.908.vc/api/v1/user/packs',
 			userPackUrl: 'http://work.stk.908.vc/api/v1/user/pack',
 			trackStatUrl: 'http://work.stk.908.vc/api/v1/track-statistic',
-
 			storeUrl: 'http://work.stk.908.vc/api/v1/web',
 			//storeUrl: 'http://localhost/stickerpipe/store/build',
 
