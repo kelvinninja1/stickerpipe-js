@@ -801,7 +801,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
             this.contentSize = $overview['scroll'+ sizeLabelCap];
             this.contentRatio = this.viewportSize / this.contentSize;
             this.trackSize = this.options.trackSize || this.viewportSize;
-            this.trackSize -= 2;
+            this.trackSize -= 2; // bugfix (for css - top: 2px)
             this.thumbSize = Math.min(this.trackSize, Math.max(this.options.thumbSizeMin, (this.options.thumbSize || (this.trackSize * this.contentRatio))));
             this.trackRatio = (this.contentSize - this.viewportSize) / (this.trackSize - this.thumbSize);
             this.hasContentToSroll = this.contentRatio < 1;
@@ -931,6 +931,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 ,   wheelSpeedDelta = -(evntObj.deltaY || evntObj.detail || (-1 / 3 * evntObj.wheelDelta)) / 40
                 ,   multiply = (evntObj.deltaMode === 1) ? self.options.wheelSpeed : 1
                 ;
+
+                // bugfix
+                wheelSpeedDelta = wheelSpeedDelta || 0;
 
                 self.contentPosition -= wheelSpeedDelta * self.options.wheelSpeed;
                 self.contentPosition = Math.min((self.contentSize - self.viewportSize), Math.max(0, self.contentPosition));
