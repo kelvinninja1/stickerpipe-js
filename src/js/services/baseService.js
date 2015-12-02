@@ -1,4 +1,6 @@
 
+// todo: rename file baseService --> BaseService
+
 (function(Module) {
 
     var StickerHelper = Module.StickerHelper,
@@ -70,6 +72,7 @@
 
 		// todo: remove function
 		resetNewStickersFlag: function() {
+			Module.DOMEventService.changeNewContentFlag(false);
 			return this.storageService.setHasNewStickers(false);
 		},
 
@@ -103,7 +106,6 @@
 		markNewPacks: function(oldPacks, newPacks) {
 			var globalNew = false;
 
-
 			if(oldPacks.length != 0){
 
 				StickerHelper.forEach(newPacks, function(newPack, key) {
@@ -123,9 +125,15 @@
 				});
 
 
+				// todo: to other function
 				// todo: check & fix
 				//if (globalNew) {
-					this.storageService.setHasNewStickers(globalNew);
+
+				if (globalNew == false && this.getLatestUse().length == 0) {
+					globalNew = true;
+				}
+				this.storageService.setHasNewStickers(globalNew);
+				Module.DOMEventService.changeNewContentFlag(globalNew);
 				//}
 			}
 

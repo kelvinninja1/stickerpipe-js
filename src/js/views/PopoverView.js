@@ -54,6 +54,11 @@
 					this.toggle();
 				}
 			}).bind(this));
+
+			// todo: addEventListener --> DOMEventService
+			window.addEventListener(Module.DOMEventService.events.popoverShown, function() {
+				Module.DOMEventService.resize();
+			});
 		},
 
 		toggle: function() {
@@ -63,10 +68,10 @@
 				// todo render in firefox (document.getElementsByTagName('body')[0])
 				this.toggleEl.parentElement.appendChild(this.popoverEl);
 				this.positioned();
-				window.dispatchEvent(new Event('sp:popover:shown'));
+				Module.DOMEventService.popoverShown();
 			} else {
 				this.toggleEl.parentElement.removeChild(this.popoverEl);
-				window.dispatchEvent(new Event('sp:popover:hidden'));
+				Module.DOMEventService.popoverHidden();
 			}
 		},
 
