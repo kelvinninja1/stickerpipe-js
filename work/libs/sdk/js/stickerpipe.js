@@ -156,11 +156,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
 })(window);
 /*
  * classList.js: Cross-browser full element.classList implementation.
- * 1.1.20150312
+ * 2014-12-13
  *
  * By Eli Grey, http://eligrey.com
- * License: Dedicated to the public domain.
- *   See https://github.com/eligrey/classList.js/blob/master/LICENSE.md
+ * Public Domain.
+ * NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
  */
 
 /*global self, document, DOMException */
@@ -170,9 +170,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 if ("document" in self) {
 
 // Full polyfill for browsers with no classList support
-// Including IE < Edge missing SVGElement.classList
-	if (!("classList" in document.createElement("_"))
-		|| document.createElementNS && !("classList" in document.createElementNS("http://www.w3.org/2000/svg","g"))) {
+	if (!("classList" in document.createElement("_"))) {
 
 		(function (view) {
 
