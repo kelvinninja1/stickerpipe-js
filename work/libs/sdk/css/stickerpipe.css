@@ -121,6 +121,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
       height: 36px;
       width: 36px;
       opacity: .5;
+      filter: gray;
       -webkit-filter: grayscale(100%);
       filter: grayscale(100%); }
       .sticker-pipe .sp-tabs .sp-tab-item img:hover {
