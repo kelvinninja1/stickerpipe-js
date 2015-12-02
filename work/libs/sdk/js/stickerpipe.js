@@ -172,6 +172,8 @@ if ("document" in self) {
 // Full polyfill for browsers with no classList support
 	if (!("classList" in document.createElement("_"))) {
 
+		console.log('1');
+
 		(function (view) {
 
 			"use strict";
@@ -341,6 +343,8 @@ if ("document" in self) {
 	} else {
 // There is full or partial native classList support, so just check if we need
 // to normalize the add/remove and toggle APIs.
+
+		console.log('2');
 
 		(function () {
 			"use strict";
