@@ -1353,6 +1353,8 @@ var ssb = {
                 // bugfix
                 wheelSpeedDelta = wheelSpeedDelta || 0;
 
+                console.log(wheelSpeedDelta, self.options.wheelSpeed, self.contentSize, self.viewportSize, self.contentPosition);
+
                 self.contentPosition -= wheelSpeedDelta * self.options.wheelSpeed;
                 self.contentPosition = Math.min((self.contentSize - self.viewportSize), Math.max(0, self.contentPosition));
                 self.thumbPosition = self.contentPosition / self.trackRatio;
