@@ -3333,7 +3333,7 @@ var ssb = {
 				} else {
 					console.log(2);
 					var evt = document.createEvent("HTMLEvents");
-					evt.initEvent("change", true, true);
+					evt.initEvent(eventName, true, true);
 					el.dispatchEvent(evt);
 				}
 			}
