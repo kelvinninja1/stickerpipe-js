@@ -135,6 +135,47 @@
 				this.storageService.setHasNewStickers(globalNew);
 				Module.DOMEventService.changeNewContentFlag(globalNew);
 				//}
+
+
+				// *****************************************************************************************************
+				// todo: do in other function
+				// update used stickers
+
+				var used = this.getLatestUse();
+
+				for (var i = 0; i < used.length; i++) {
+					var sticker = this.parseStickerFromText('[[' + used[i].code + ']]');
+
+					var pack = null;
+					for (var j = 0; j < newPacks.length; j++) {
+						if (newPacks[j].pack_name == sticker.pack) {
+							pack = newPacks[j];
+							break;
+						}
+					}
+
+					if (pack == null) {
+						used.splice(i, 1);
+						continue;
+					}
+
+					var isset = false;
+					for (var j = 0; j < pack.stickers.length; j++) {
+						if (pack.stickers[j].name == sticker.name) {
+							isset = true;
+							break;
+						}
+					}
+
+					if (!isset) {
+						used.splice(i, 1);
+						continue;
+					}
+				}
+
+				this.storageService.setUsedStickers(used);
+
+				// *****************************************************************************************************
 			}
 
 			return newPacks;
