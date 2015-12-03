@@ -124,7 +124,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
       .sticker-pipe .sp-tabs .sp-tab-item img:hover {
         opacity: .7; }
     .sticker-pipe .sp-tabs .sp-tab-item.sp-tab-active {
-      background-color: white;
+      background: rgba(0, 0, 0, 0.1);
       color: orange; }
       .sticker-pipe .sp-tabs .sp-tab-item.sp-tab-active img {
         opacity: 1; }
