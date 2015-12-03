@@ -1364,7 +1364,7 @@ var ssb = {
                     }
                 }
 
-                console.log(wheelSpeedDelta, self.options.wheelSpeed, self.contentSize, self.viewportSize, self.contentPosition);
+                //console.log(wheelSpeedDelta, self.options.wheelSpeed, self.contentSize, self.viewportSize, self.contentPosition);
 
                 self.contentPosition -= wheelSpeedDelta * self.options.wheelSpeed;
                 self.contentPosition = Math.min((self.contentSize - self.viewportSize), Math.max(0, self.contentPosition));
