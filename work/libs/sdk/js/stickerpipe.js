@@ -3310,7 +3310,7 @@ var ssb = {
 
 			// todo: ie dispatcher (through el.fireEvent)
 			//if (typeof CustomEvent === 'function') {
-				el.dispatchEvent(new CustomEvent(eventName, {
+				el.dispatchEvent(new Event(eventName, {
 					bubbles: true,
 					cancelable: true
 				}));
