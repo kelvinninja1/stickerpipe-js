@@ -120,18 +120,14 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
       border-radius: 50%;
       height: 36px;
       width: 36px;
-      opacity: .5;
-      -webkit-filter: grayscale(100%);
-      filter: grayscale(1); }
+      opacity: .5; }
       .sticker-pipe .sp-tabs .sp-tab-item img:hover {
         opacity: .7; }
     .sticker-pipe .sp-tabs .sp-tab-item.sp-tab-active {
       background-color: white;
       color: orange; }
       .sticker-pipe .sp-tabs .sp-tab-item.sp-tab-active img {
-        opacity: 1;
-        -webkit-filter: grayscale(0%);
-        filter: grayscale(0); }
+        opacity: 1; }
       .sticker-pipe .sp-tabs .sp-tab-item.sp-tab-active.sp-control-tab > span, .sticker-pipe .sp-tabs .sp-tab-item.sp-tab-active.sp-control-button > span {
         opacity: 0.9; }
     .sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab, .sticker-pipe .sp-tabs .sp-tab-item.sp-control-button {
