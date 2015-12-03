@@ -19,17 +19,23 @@
 			el = el || window;
 
 			// todo: ie dispatcher (through el.fireEvent)
-			//if (typeof CustomEvent === 'function') {
-				el.dispatchEvent(new CustomEvent(eventName, {
+			if (typeof CustomEvent === 'function') {
+				el.dispatchEvent(new Event(eventName, {
 					bubbles: true,
 					cancelable: true
 				}));
-			//}
-			//else { // IE
-			//	element=document.documentElement;
-			//	var event=document.createEventObject();
-			//	el.fireEvent("onresize",event);
-			//}
+			}
+			else { // IE
+				var event = null;
+				if (document.createEventObject) {
+					event = document.createEventObject();
+					el.fireEvent(eventName, event);
+				} else {
+					var evt = document.createEvent("HTMLEvents");
+					evt.initEvent(eventName, true, true);
+					el.dispatchEvent(evt);
+				}
+			}
 		},
 
 		popoverShown: function() {

@@ -56,9 +56,15 @@
 			}).bind(this));
 
 			// todo: addEventListener --> DOMEventService
-			window.addEventListener(Module.DOMEventService.events.popoverShown, function() {
-				Module.DOMEventService.resize();
-			});
+			if (window.addEventListener) {
+				window.addEventListener(Module.DOMEventService.events.popoverShown, function() {
+					Module.DOMEventService.resize();
+				});
+			} else {
+				window.attachEvent('on' + Module.DOMEventService.events.popoverShown, function() {
+					Module.DOMEventService.resize();
+				});
+			}
 		},
 
 		toggle: function() {
