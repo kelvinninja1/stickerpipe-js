@@ -31,8 +31,6 @@ var App = _makeClass(function(options) {
 	$stickersToggle: null,
 	$textarea: null,
 
-	isRenderStickers: false,
-
 	init: function() {
 		this.$window = $(window);
 		this.$navbar = $('.navbar');
@@ -88,7 +86,7 @@ var App = _makeClass(function(options) {
 	initStickers: function() {
 		this.stickers = new Stickers({
 
-			//debug: true,
+			debug: true,
 
 			//elId: this.$stickerPipeStickers.attr('id'),
 			elId: 'stickersToggle',
@@ -98,6 +96,8 @@ var App = _makeClass(function(options) {
 			htmlForEmptyRecent: '<div class="emptyRecent">empty recent text</div>',
 
 			apikey: '72921666b5ff8651f374747bfefaf7b2',
+			//apikey: '52ed1358d7d09df5279147a5555061a9',
+
 			storagePrefix: 'stickerPipe',
 			enableEmojiTab: true,
 			enableHistoryTab: true,
@@ -107,7 +107,6 @@ var App = _makeClass(function(options) {
 			userPacksUrl: 'http://work.stk.908.vc/api/v1/user/packs',
 			userPackUrl: 'http://work.stk.908.vc/api/v1/user/pack',
 			trackStatUrl: 'http://work.stk.908.vc/api/v1/track-statistic',
-
 			storeUrl: 'http://work.stk.908.vc/api/v1/web',
 			//storeUrl: 'http://localhost/stickerpipe/store/build',
 
@@ -140,7 +139,28 @@ var App = _makeClass(function(options) {
 		if (this.stickers.getNewStickersFlag()) {
 			this.$stickersToggle.addClass('has-new-content');
 		}
-		//this.stickers.start();
+
+		this.resizeWindow();
+
+		// todo: events
+		this.stickers.onClickSticker((function(text) {
+			this.sendMessage(true, text);
+		}).bind(this));
+
+		// todo: events
+		this.stickers.onClickEmoji((function(emoji) {
+			console.log('click on emoji', emoji);
+			this.$textarea.focus();
+			this.pasteHtmlAtCaret(this.stickers.parseEmojiFromText(emoji));
+		}).bind(this));
+
+		this.$window.on('sp:content:highlight:show', (function() {
+			this.$stickersToggle.addClass('has-new-content');
+		}).bind(this));
+
+		this.$window.on('sp:content:highlight:hide', (function() {
+			this.$stickersToggle.removeClass('has-new-content');
+		}).bind(this));
 	},
 	initMessageBox: function() {
 		var self = this,
@@ -178,11 +198,11 @@ var App = _makeClass(function(options) {
 			}
 		}).bind(this));
 
-		window.addEventListener('sp:popover:shown', (function() {
+		window.addEventListener('sp.popover.shown', (function() {
 			this.$stickersToggle.addClass('active');
 		}).bind(this));
 
-		window.addEventListener('sp:popover:hidden', (function() {
+		window.addEventListener('sp.popover.hidden', (function() {
 			this.$stickersToggle.removeClass('active');
 		}).bind(this));
 	},
@@ -225,7 +245,6 @@ var App = _makeClass(function(options) {
 		}
 	},
 
-
 	sendMessage: function(isCurrentUser, text) {
 
 		text = (text && text.trim()) || this.getRandomMessageText();
@@ -250,22 +269,6 @@ var App = _makeClass(function(options) {
 			date: this.getDateString(0),
 			sticker: parseSticker
 		})).animate({ scrollTop: this.$messages[0].scrollHeight }, 1000);
-	},
-
-	startSticker: function() {
-		this.stickers.start();
-		this.isRenderStickers = true;
-		this.resizeWindow();
-
-		this.stickers.onClickSticker((function(text) {
-			this.sendMessage(true, text);
-		}).bind(this));
-
-		this.stickers.onClickEmoji((function(emoji) {
-			console.log('click on emoji', emoji);
-			this.$textarea.focus();
-			this.pasteHtmlAtCaret(this.stickers.parseEmojiFromText(emoji));
-		}).bind(this));
 	},
 
 	openStickerPipeBlock: function(completeCallback) {
@@ -311,9 +314,6 @@ var App = _makeClass(function(options) {
 		this.$stickerPipeStore.hide();
 
 		this.openStickerPipeBlock((function() {
-			if (!this.isRenderStickers) {
-				this.startSticker();
-			}
 			if (packName) {
 				this.stickers.renderCurrentTab(packName);
 			}
