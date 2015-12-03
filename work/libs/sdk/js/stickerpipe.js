@@ -1357,6 +1357,7 @@ var ssb = {
                 if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1 &&
                     navigator.platform.indexOf('Win') > -1) {
                     wheelSpeedDelta = 2.5;
+                    console.log('ff');
                 }
 
                 console.log(wheelSpeedDelta, self.options.wheelSpeed, self.contentSize, self.viewportSize, self.contentPosition);
