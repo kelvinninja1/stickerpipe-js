@@ -72,7 +72,7 @@
 
 		// todo: remove function
 		resetNewStickersFlag: function() {
-			Module.DOMEventService.changeNewContentFlag(false);
+			Module.DOMEventService.changeContentHighlight(false);
 			return this.storageService.setHasNewStickers(false);
 		},
 
@@ -133,7 +133,7 @@
 					globalNew = true;
 				}
 				this.storageService.setHasNewStickers(globalNew);
-				Module.DOMEventService.changeNewContentFlag(globalNew);
+				Module.DOMEventService.changeContentHighlight(globalNew);
 				//}
 
 

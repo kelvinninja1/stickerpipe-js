@@ -2840,7 +2840,7 @@ if ("document" in self) {
 
 		// todo: remove function
 		resetNewStickersFlag: function() {
-			Module.DOMEventService.changeNewContentFlag(false);
+			Module.DOMEventService.changeContentHighlight(false);
 			return this.storageService.setHasNewStickers(false);
 		},
 
@@ -2901,7 +2901,7 @@ if ("document" in self) {
 					globalNew = true;
 				}
 				this.storageService.setHasNewStickers(globalNew);
-				Module.DOMEventService.changeNewContentFlag(globalNew);
+				Module.DOMEventService.changeContentHighlight(globalNew);
 				//}
 
 
@@ -3113,24 +3113,24 @@ if ("document" in self) {
 
 		events: {
 			resize: 'resize',
-			popoverShown: 'sp.popover.shown',
-			popoverHidden: 'sp.popover.hidden',
-			newContentFlagChange: 'sp.content.change-new-flag'
+			popoverShown: 'sp:popover:shown',
+			popoverHidden: 'sp:popover:hidden',
+			showContentHighlight: 'sp:content:highlight:show',
+			hideContentHighlight: 'sp:content:highlight:hide'
 		},
 
-		_dispatch: function(eventName, eventData, el) {
+		dispatch: function(eventName, el) {
 			if (!eventName) {
 				return;
 			}
 
-			eventData = (typeof eventData != 'undefined') ? eventData : null;
 			el = el || window;
 
-			// todo: ie
+			// todo: ie dispatcher (through el.fireEvent)
 			//if (typeof CustomEvent === 'function') {
-				console.log(eventName);
 				el.dispatchEvent(new CustomEvent(eventName, {
-					detail: eventData
+					bubbles: true,
+					cancelable: true
 				}));
 			//}
 			//else { // IE
@@ -3138,22 +3138,6 @@ if ("document" in self) {
 			//	var event=document.createEventObject();
 			//	el.fireEvent("onresize",event);
 			//}
-		},
-
-		dispatch: function(eventName, eventData, el) {
-			if (!eventName) {
-				return;
-			}
-
-			eventData = (typeof eventData != 'undefined') ? eventData : null;
-			el = el || window;
-
-			// todo: ie
-
-			var event = document.createEvent('Events');
-			event.initEvent(eventName, true, true);
-			event.data = eventData;
-			el.dispatchEvent(event);
 		},
 
 		popoverShown: function() {
@@ -3164,8 +3148,8 @@ if ("document" in self) {
 			this.dispatch(this.events.popoverHidden);
 		},
 
-		changeNewContentFlag: function(value) {
-			this.dispatch(this.events.newContentFlagChange, value);
+		changeContentHighlight: function(value) {
+			this.dispatch((value) ? this.events.showContentHighlight : this.events.hideContentHighlight);
 		},
 
 		// todo: add el param
