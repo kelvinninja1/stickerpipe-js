@@ -3740,12 +3740,11 @@ var ssb = {
 
 			// todo: addEventListener --> DOMEventService
 			if (window.addEventListener) {
-				console.log('addEventListener');
 				window.addEventListener(Module.DOMEventService.events.popoverShown, function() {
+					console.log('popover shown');
 					Module.DOMEventService.resize();
 				});
 			} else {
-				console.log('attachEvent');
 				window.attachEvent('on' + Module.DOMEventService.events.popoverShown, function() {
 					Module.DOMEventService.resize();
 				});
