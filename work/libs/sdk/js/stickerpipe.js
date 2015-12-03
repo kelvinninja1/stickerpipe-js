@@ -3740,13 +3740,13 @@ var ssb = {
 
 			// todo: addEventListener --> DOMEventService
 			if (window.addEventListener) {
+				console.log('addEventListener');
 				window.addEventListener(Module.DOMEventService.events.popoverShown, function() {
-					console.log('addEventListener');
 					Module.DOMEventService.resize();
 				});
 			} else {
+				console.log('attachEvent');
 				window.attachEvent('on' + Module.DOMEventService.events.popoverShown, function() {
-					console.log('attachEvent');
 					Module.DOMEventService.resize();
 				});
 			}
