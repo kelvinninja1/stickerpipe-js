@@ -1353,7 +1353,9 @@ var ssb = {
                 // bugfix
                 wheelSpeedDelta = wheelSpeedDelta || 0;
 
-                if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+                // todo
+                if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1 &&
+                    navigator.platform.indexOf('Win') > -1) {
                     wheelSpeedDelta = 2.5;
                 }
 
