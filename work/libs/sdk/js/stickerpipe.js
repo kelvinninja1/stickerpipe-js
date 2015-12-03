@@ -1353,6 +1353,10 @@ var ssb = {
                 // bugfix
                 wheelSpeedDelta = wheelSpeedDelta || 0;
 
+                if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+                    wheelSpeedDelta = 2.5;
+                }
+
                 console.log(wheelSpeedDelta, self.options.wheelSpeed, self.contentSize, self.viewportSize, self.contentPosition);
 
                 self.contentPosition -= wheelSpeedDelta * self.options.wheelSpeed;
@@ -3317,8 +3321,18 @@ var ssb = {
 			}
 			else { // IE
 				console.log('IE event');
-				var event = document.createEventObject();
-				el.fireEvent(eventName, event);
+
+				var event = null;
+				if (document.createEventObject) {
+					console.log(1);
+					event = document.createEventObject();
+					el.fireEvent(eventName, event);
+				} else {
+					console.log(2);
+					var evt = document.createEvent("HTMLEvents");
+					evt.initEvent("change", true, true);
+					el.dispatchEvent(evt);
+				}
 			}
 		},
 
