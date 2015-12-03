@@ -1356,8 +1356,12 @@ var ssb = {
                 // todo
                 if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1 &&
                     navigator.platform.indexOf('Win') > -1) {
-                    wheelSpeedDelta = 2.5;
-                    console.log('ff');
+
+                    if (wheelSpeedDelta > 0) {
+                        wheelSpeedDelta = 2.5;
+                    } else {
+                        wheelSpeedDelta = -2.5;
+                    }
                 }
 
                 console.log(wheelSpeedDelta, self.options.wheelSpeed, self.contentSize, self.viewportSize, self.contentPosition);
@@ -3323,15 +3327,11 @@ var ssb = {
 				}));
 			}
 			else { // IE
-				console.log('IE event');
-
 				var event = null;
 				if (document.createEventObject) {
-					console.log(1);
 					event = document.createEventObject();
 					el.fireEvent(eventName, event);
 				} else {
-					console.log(2);
 					var evt = document.createEvent("HTMLEvents");
 					evt.initEvent(eventName, true, true);
 					el.dispatchEvent(evt);
@@ -3741,7 +3741,6 @@ var ssb = {
 			// todo: addEventListener --> DOMEventService
 			if (window.addEventListener) {
 				window.addEventListener(Module.DOMEventService.events.popoverShown, function() {
-					console.log('popover shown');
 					Module.DOMEventService.resize();
 				});
 			} else {
