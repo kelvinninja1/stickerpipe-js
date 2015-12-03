@@ -44,9 +44,8 @@
 			this.dispatch((value) ? this.events.showContentHighlight : this.events.hideContentHighlight);
 		},
 
-		// todo: add el param
-		resize: function() {
-			this.dispatch(this.events.resize);
+		resize: function(el) {
+			this.dispatch(this.events.resize, el);
 		}
 	};
 

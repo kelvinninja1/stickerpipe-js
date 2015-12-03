@@ -65,7 +65,6 @@
 			this.active = !this.active;
 
 			if (this.active) {
-				// todo render in firefox (document.getElementsByTagName('body')[0])
 				this.toggleEl.parentElement.appendChild(this.popoverEl);
 				this.positioned();
 				Module.DOMEventService.popoverShown();

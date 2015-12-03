@@ -3152,9 +3152,8 @@ if ("document" in self) {
 			this.dispatch((value) ? this.events.showContentHighlight : this.events.hideContentHighlight);
 		},
 
-		// todo: add el param
-		resize: function() {
-			this.dispatch(this.events.resize);
+		resize: function(el) {
+			this.dispatch(this.events.resize, el);
 		}
 	};
 
@@ -3411,9 +3410,6 @@ if ("document" in self) {
 			this.contentEl.classList.add('sp-emojis');
 
 			StickerHelper.forEach(this.config.emojiList, (function(emoji) {
-
-				// todo: add size dynamic 36 vs 62
-
 				var emojiEl = document.createElement('span'),
 					emojiImgHtml = this.emojiService.parseEmojiFromText(emoji);
 
@@ -3553,7 +3549,6 @@ if ("document" in self) {
 			this.active = !this.active;
 
 			if (this.active) {
-				// todo render in firefox (document.getElementsByTagName('body')[0])
 				this.toggleEl.parentElement.appendChild(this.popoverEl);
 				this.positioned();
 				Module.DOMEventService.popoverShown();
@@ -3616,7 +3611,6 @@ if ("document" in self) {
 			this.el.appendChild(this.scrollbarEl);
 			this.el.appendChild(this.viewportEl);
 
-			// todo: tinyscrollbar --> Module
 			this.scrollbar = Module.Tinyscrollbar(this.el);
 
 			window.addEventListener('resize', (function() {

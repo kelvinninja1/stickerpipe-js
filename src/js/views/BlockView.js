@@ -80,9 +80,6 @@
 			this.contentEl.classList.add('sp-emojis');
 
 			StickerHelper.forEach(this.config.emojiList, (function(emoji) {
-
-				// todo: add size dynamic 36 vs 62
-
 				var emojiEl = document.createElement('span'),
 					emojiImgHtml = this.emojiService.parseEmojiFromText(emoji);
 
