@@ -35,7 +35,6 @@
 			this.el.appendChild(this.scrollbarEl);
 			this.el.appendChild(this.viewportEl);
 
-			// todo: tinyscrollbar --> Module
 			this.scrollbar = Module.Tinyscrollbar(this.el);
 
 			window.addEventListener('resize', (function() {
