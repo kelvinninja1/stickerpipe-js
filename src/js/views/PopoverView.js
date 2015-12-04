@@ -81,16 +81,24 @@
 		},
 
 		positioned: function() {
+			var arrowOffset = 0;
 
 			if (this.arrowEl) {
 				var style = this.toggleEl.currentStyle || window.getComputedStyle(this.toggleEl);
 				var marginLeft = parseInt(style.marginLeft, 10);
 
 				this.arrowEl.style.marginLeft = (this.toggleEl.clientWidth / 2) - (this.arrowEl.offsetWidth / 2) + marginLeft + 'px';
+
+				var arrowStyle = this.arrowEl.currentStyle || window.getComputedStyle(this.arrowEl);
+				if (arrowStyle.display != 'none') {
+					arrowOffset = 15;
+				}
 			} else {
 				console.error('error');
 			}
-			this.popoverEl.style.top = -(this.popoverEl.offsetHeight + 15) + 'px';
+
+			if (this.arrowEl)
+			this.popoverEl.style.top = -(this.popoverEl.offsetHeight + arrowOffset) + 'px';
 		}
 
 	});

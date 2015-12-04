@@ -176,6 +176,8 @@
 				this.storageService.setUsedStickers(used);
 
 				// *****************************************************************************************************
+			} else {
+				Module.DOMEventService.changeContentHighlight(true);
 			}
 
 			return newPacks;

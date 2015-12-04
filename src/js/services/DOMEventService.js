@@ -20,7 +20,7 @@
 
 			// todo: ie dispatcher (through el.fireEvent)
 			if (typeof CustomEvent === 'function') {
-				el.dispatchEvent(new Event(eventName, {
+				el.dispatchEvent(new CustomEvent(eventName, {
 					bubbles: true,
 					cancelable: true
 				}));
