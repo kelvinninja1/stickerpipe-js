@@ -47,12 +47,12 @@
 			options.error = options.error || function() {};
 			options.complete = options.complete || function() {};
 
-			options.headers.Apikey = Module.Configs.get('apikey');
+			options.headers.Apikey = Module.Configs.apikey;
 			options.headers.Platform = 'JS';
-			options.headers.Localization = Module.Configs.get('lang');
+			options.headers.Localization = Module.Configs.lang;
 
 			if (options.type == 'POST') {
-				var storageService = new Module.StorageService(Module.Configs.get('storagePrefix'));
+				var storageService = new Module.StorageService(Module.Configs.storagePrefix);
 				options.headers['Content-Type'] = options.headers['Content-Type'] || 'application/x-www-form-urlencoded';
 				options.headers['DeviceId'] = storageService.getUniqUserId();
 			}

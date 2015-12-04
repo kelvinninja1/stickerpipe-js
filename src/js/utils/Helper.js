@@ -9,7 +9,7 @@
 			}
 		},
 
-		mergeOptions: function(obj1, obj2) {
+		merge: function(obj1, obj2) {
 			var obj3 = {};
 
 			for(var attrname in obj1) {
@@ -21,6 +21,10 @@
 			}
 
 			return obj3;
+		},
+
+		setConfig: function(config) {
+			Module.Configs = this.merge(Module.Configs || {}, config);
 		},
 
 		setEvent: function(eventType, el, className, callback) {
@@ -40,7 +44,7 @@
 		},
 
 		md5: function(string) {
-			return StickersModule.MD5(string);
+			return Module.MD5(string);
 		}
 
 	};

@@ -3,8 +3,8 @@
 window.StickersModule = {};
 
 //=include utils/**/*.js
-//=include configs/**/*.js
 //=include services/**/*.js
+//=include configs/**/*.js
 //=include views/**/*.js
 
 (function(Plugin, Module) {
@@ -23,12 +23,9 @@ window.StickersModule = {};
 
 		_constructor: function(config) {
 
-			Module.Configs.add(config);
+			Module.StickerHelper.setConfig(config);
 
-			this.config = Module.Configs.getAll();
-
-			// todo: move to Configs class
-			this.configResolution();
+			this.config = Module.Configs;
 
 			// todo: rename
 			this.baseService = new Module.BaseService(this.config);
@@ -38,7 +35,7 @@ window.StickersModule = {};
 			this.storeView = new Module.StoreView(this.config);
 
 			// todo: remove
-			Plugin.JsApiInterface && Plugin.JsApiInterface._setConfigs(this.config);
+			//Plugin.JsApiInterface && Plugin.JsApiInterface._setConfigs(this.config);
 
 			this.delegateEvents();
 
@@ -157,21 +154,6 @@ window.StickersModule = {};
 
 				ga('stickerTracker.send', 'event', 'emoji', 'use', emoji);
 			}).bind(this));
-		},
-
-		// todo: remove function
-		configResolution: function() {
-			this.config = helper.mergeOptions(this.config, {
-				stickerResolutionType : 'mdpi',
-				tabResolutionType: 'hdpi'
-			});
-
-			if (window.devicePixelRatio == 2) {
-				this.config = helper.mergeOptions(this.config, {
-					stickerResolutionType : 'xhdpi',
-					tabResolutionType: 'xxhdpi'
-				});
-			}
 		},
 
 		fetchPacks: function(attrs) {

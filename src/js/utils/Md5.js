@@ -1,6 +1,5 @@
 (function(Plugin) {
 
-	Plugin.StickersModule = Plugin.StickersModule || {};
 	Plugin.StickersModule.MD5 = function (string) {
 
 		string = string.toString();
