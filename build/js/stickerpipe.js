@@ -1787,16 +1787,10 @@ if ("document" in self) {
     var StickerHelper = Module.StickerHelper,
 		JsApiInterface = Module.StoreApiInterface;
 
-	Module.BaseService = Module.Class({
-
-		config: null,
+	Module.BaseService = {
 
 		parseCountStat: 0,
 		parseCountWithStickerStat: 0,
-
-		_constructor: function(config) {
-			this.config = config;
-		},
 
 		parseStickerStatHandle: function(is_have) {
 			var nowDate = new Date().getTime()/1000|0;
@@ -1808,8 +1802,7 @@ if ("document" in self) {
 			}
 
 			if(this.parseCountStat >= 50) {
-
-				Module.Http.post(this.config.trackStatUrl, [
+				Module.Http.post(Module.Configs.trackStatUrl, [
 					{
 						action: 'check',
 						category: 'message',
@@ -1865,7 +1858,7 @@ if ("document" in self) {
 
 			if(typeof packsObj === "undefined"
 				|| packsObj.expireDate < expireDate
-				|| this.config.debug
+				|| Module.Configs.debug
 			) {
 
 				return {
@@ -1969,13 +1962,13 @@ if ("document" in self) {
 		getPacksFromServer: function(callback) {
 
 			var options = {
-				url: this.config.clientPacksUrl,
+				url: Module.Configs.clientPacksUrl,
 				header: []
 			};
 
-			if (this.config.userId !== null) {
-				options.url = this.config.userPacksUrl;
-				options.header['UserId'] = StickerHelper.md5(this.config.userId + this.config.apikey);
+			if (Module.Configs.userId !== null) {
+				options.url = Module.Configs.userPacksUrl;
+				options.header['UserId'] = StickerHelper.md5(Module.Configs.userId + Module.Configs.apikey);
 			}
 
 			Module.Http.get(options.url, {
@@ -1994,12 +1987,12 @@ if ("document" in self) {
 
 			if (matchData) {
 				outData.isSticker = true;
-				outData.url = this.config.domain +
+				outData.url = Module.Configs.domain +
 					'/' +
-					this.config.baseFolder +
+					Module.Configs.baseFolder +
 					'/' + matchData[1] +
 					'/' + matchData[2] +
-					'_' + this.config.stickerResolutionType +
+					'_' + Module.Configs.stickerResolutionType +
 					'.png';
 
 
@@ -2034,7 +2027,7 @@ if ("document" in self) {
 				label = (isSticker) ? 'sticker' : 'text';
 
 
-			Module.Http.post(this.config.trackStatUrl, [{
+			Module.Http.post(Module.Configs.trackStatUrl, [{
 				action: action,
 				category: category,
 				label: label,
@@ -2079,9 +2072,9 @@ if ("document" in self) {
 
 		changeUserPackStatus: function(packName, status, callback) {
 			var options = {
-				url: this.config.userPackUrl + '/' + packName,
+				url: Module.Configs.userPackUrl + '/' + packName,
 				header: {
-					UserId: StickerHelper.md5(this.config.userId + this.config.apikey)
+					UserId: StickerHelper.md5(Module.Configs.userId + Module.Configs.apikey)
 				}
 			};
 
@@ -2094,8 +2087,6 @@ if ("document" in self) {
 		},
 
 		purchaseSuccess: function(packName) {
-			var self = this;
-
 			try {
 				var handler = function() {
 					if (!JsApiInterface) {
@@ -2103,22 +2094,21 @@ if ("document" in self) {
 					}
 
 					JsApiInterface.downloadPack(packName, function() {
-						self.config.callbacks.onPackStoreSuccess(packName);
+						Module.Configs.callbacks.onPackStoreSuccess(packName);
 					});
 				};
 
-				if (this.config.userId !== null) {
+				if (Module.Configs.userId !== null) {
 					this.changeUserPackStatus(packName, true, handler);
 				} else {
 					handler();
 				}
 			} catch(e) {
-				// todo: check console
-				console.error(e.message);
-				this.config.callbacks.onPackStoreFail(packName);
+				console && console.error(e.message);
+				Module.Configs.callbacks.onPackStoreFail(packName);
 			}
 		}
-	});
+	};
 
 })(window.StickersModule);
 
@@ -2318,7 +2308,7 @@ if ("document" in self) {
 				try {
 					this[e.action].apply(this, e.data.attrs);
 				} catch(e) {
-					console.error(e.message, e);
+					console && console.error(e.message, e);
 				}
 
 			}).bind(this));
@@ -3353,7 +3343,6 @@ if ("document" in self) {
 	Module.BlockView = Module.Class({
 
 		config: null,
-		baseService: null,
 		emojiService: null,
 
 		el: null,
@@ -3362,9 +3351,8 @@ if ("document" in self) {
 		tabsView: null,
 		scrollView: null,
 
-		_constructor: function(config, baseService, emojiService) {
+		_constructor: function(config, emojiService) {
 			this.config = config;
-			this.baseService = baseService;
 			this.emojiService = emojiService;
 
 			this.el = document.getElementById(this.config.elId);
@@ -3459,7 +3447,7 @@ if ("document" in self) {
 
 				var placeHolderClass = 'sp-sticker-placeholder';
 
-				var stickerImgSrc = self.baseService.parseStickerFromText('[[' + stickerCode + ']]');
+				var stickerImgSrc = Module.BaseService.parseStickerFromText('[[' + stickerCode + ']]');
 
 				var stickersSpanEl = document.createElement('span');
 				stickersSpanEl.classList.add(placeHolderClass);
@@ -3595,7 +3583,7 @@ if ("document" in self) {
 					arrowOffset = 15;
 				}
 			} else {
-				console.error('error');
+				console && console.error('error');
 			}
 
 			if (this.arrowEl)
@@ -4006,7 +3994,6 @@ if ("document" in self) {
 	Plugin.Stickers = Module.Class({
 
 		config: null,
-		baseService: null,
 		emojiService: null,
 		stickersModel: {},
 		view: null,
@@ -4019,11 +4006,9 @@ if ("document" in self) {
 
 			this.config = Module.Configs;
 
-			// todo: rename
-			this.baseService = new Module.BaseService(this.config);
 			this.emojiService = new Module.EmojiService(Module.Twemoji);
 
-			this.view = new Module.PopoverView(this.config, this.baseService, this.emojiService);
+			this.view = new Module.PopoverView(this.config, this.emojiService);
 			this.storeView = new Module.StoreView(this.config);
 
 			// todo: remove
@@ -4043,10 +4028,10 @@ if ("document" in self) {
 				this.view.render(this.stickersModel);
 
 				// todo --> active 'used' tab
-				this.view.renderUsedStickers(this.baseService.getLatestUse());
+				this.view.renderUsedStickers(Module.BaseService.getLatestUse());
 			}).bind(this);
 
-			var storageStickerData = this.baseService.getPacksFromStorage();
+			var storageStickerData = Module.BaseService.getPacksFromStorage();
 
 			if (storageStickerData.actual) {
 
@@ -4067,7 +4052,7 @@ if ("document" in self) {
 			}).bind(this));
 
 			this.view.tabsView.handleClickOnLastUsedPacksTab((function() {
-				this.view.renderUsedStickers(this.baseService.getLatestUse());
+				this.view.renderUsedStickers(Module.BaseService.getLatestUse());
 			}).bind(this));
 
 			this.view.tabsView.handleClickOnPackTab((function(el) {
@@ -4084,7 +4069,7 @@ if ("document" in self) {
 						// set newPack - false
 						changed = true;
 						this.stickersModel[i].newPack = false;
-						this.baseService.setPacksToStorage(this.stickersModel);
+						Module.BaseService.setPacksToStorage(this.stickersModel);
 
 						pack = this.stickersModel[i];
 					}
@@ -4094,7 +4079,7 @@ if ("document" in self) {
 					}
 				}
 
-				if (changed == true && this.baseService.getLatestUse().length != 0 && hasNewContent == false) {
+				if (changed == true && Module.BaseService.getLatestUse().length != 0 && hasNewContent == false) {
 					this.resetNewStickersFlag();
 				}
 
@@ -4115,7 +4100,7 @@ if ("document" in self) {
 
 				ga('stickerTracker.send', 'event', 'sticker', stickerAttribute.split('_')[0], stickerAttribute.split('_')[1], 1);
 
-				this.baseService.addToLatestUse(stickerAttribute);
+				Module.BaseService.addToLatestUse(stickerAttribute);
 
 				// todo: rewrite
 				// new content mark
@@ -4128,7 +4113,7 @@ if ("document" in self) {
 					}
 				}
 
-				if (this.baseService.getLatestUse().length != 0 && hasNewContent == false) {
+				if (Module.BaseService.getLatestUse().length != 0 && hasNewContent == false) {
 					this.resetNewStickersFlag();
 				}
 			}).bind(this));
@@ -4149,7 +4134,7 @@ if ("document" in self) {
 		},
 
 		fetchPacks: function(attrs) {
-			this.baseService.updatePacks((function(stickerPacks) {
+			Module.BaseService.updatePacks((function(stickerPacks) {
 				this.stickersModel = stickerPacks;
 
 				if(attrs.callback) {
@@ -4183,15 +4168,15 @@ if ("document" in self) {
 		},
 
 		getNewStickersFlag: function() {
-			return this.baseService.getNewStickersFlag(this.baseService.getPacksFromStorage().packs || []);
+			return Module.BaseService.getNewStickersFlag(Module.BaseService.getPacksFromStorage().packs || []);
 		},
 
 		resetNewStickersFlag: function() {
-			return this.baseService.resetNewStickersFlag();
+			return Module.BaseService.resetNewStickersFlag();
 		},
 
 		parseStickerFromText: function(text) {
-			return this.baseService.parseStickerFromText(text);
+			return Module.BaseService.parseStickerFromText(text);
 		},
 
 		parseEmojiFromText: function(text) {
@@ -4204,7 +4189,7 @@ if ("document" in self) {
 
 		// todo rewrite
 		renderCurrentTab: function(tabName) {
-			var obj = this.baseService.getPacksFromStorage();
+			var obj = Module.BaseService.getPacksFromStorage();
 
 			//this.start(); // todo
 
@@ -4217,17 +4202,17 @@ if ("document" in self) {
 			}).bind(this));
 
 			//this.stickersModel[this.tabActive].newPack = false;
-			//this.baseService.setPacksToStorage(this.stickersModel);
+			//Module.BaseService.setPacksToStorage(this.stickersModel);
 
 			//this._renderAll();
 		},
 
 		isNewPack: function(packName) {
-			return this.baseService.isNewPack(this.stickersModel, packName);
+			return Module.BaseService.isNewPack(this.stickersModel, packName);
 		},
 
 		onUserMessageSent: function(isSticker) {
-			return this.baseService.onUserMessageSent(isSticker);
+			return Module.BaseService.onUserMessageSent(isSticker);
 		},
 
 		renderPack: function(pack) {
@@ -4235,7 +4220,7 @@ if ("document" in self) {
 		},
 
 		purchaseSuccess: function(packName) {
-			this.baseService.purchaseSuccess(packName);
+			Module.BaseService.purchaseSuccess(packName);
 		}
 	});
 

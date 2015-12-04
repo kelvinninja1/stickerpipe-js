@@ -6,7 +6,6 @@
 	Module.BlockView = Module.Class({
 
 		config: null,
-		baseService: null,
 		emojiService: null,
 
 		el: null,
@@ -15,9 +14,8 @@
 		tabsView: null,
 		scrollView: null,
 
-		_constructor: function(config, baseService, emojiService) {
+		_constructor: function(config, emojiService) {
 			this.config = config;
-			this.baseService = baseService;
 			this.emojiService = emojiService;
 
 			this.el = document.getElementById(this.config.elId);
@@ -112,7 +110,7 @@
 
 				var placeHolderClass = 'sp-sticker-placeholder';
 
-				var stickerImgSrc = self.baseService.parseStickerFromText('[[' + stickerCode + ']]');
+				var stickerImgSrc = Module.BaseService.parseStickerFromText('[[' + stickerCode + ']]');
 
 				var stickersSpanEl = document.createElement('span');
 				stickersSpanEl.classList.add(placeHolderClass);

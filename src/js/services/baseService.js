@@ -6,16 +6,10 @@
     var StickerHelper = Module.StickerHelper,
 		JsApiInterface = Module.StoreApiInterface;
 
-	Module.BaseService = Module.Class({
-
-		config: null,
+	Module.BaseService = {
 
 		parseCountStat: 0,
 		parseCountWithStickerStat: 0,
-
-		_constructor: function(config) {
-			this.config = config;
-		},
 
 		parseStickerStatHandle: function(is_have) {
 			var nowDate = new Date().getTime()/1000|0;
@@ -27,8 +21,7 @@
 			}
 
 			if(this.parseCountStat >= 50) {
-
-				Module.Http.post(this.config.trackStatUrl, [
+				Module.Http.post(Module.Configs.trackStatUrl, [
 					{
 						action: 'check',
 						category: 'message',
@@ -84,7 +77,7 @@
 
 			if(typeof packsObj === "undefined"
 				|| packsObj.expireDate < expireDate
-				|| this.config.debug
+				|| Module.Configs.debug
 			) {
 
 				return {
@@ -188,13 +181,13 @@
 		getPacksFromServer: function(callback) {
 
 			var options = {
-				url: this.config.clientPacksUrl,
+				url: Module.Configs.clientPacksUrl,
 				header: []
 			};
 
-			if (this.config.userId !== null) {
-				options.url = this.config.userPacksUrl;
-				options.header['UserId'] = StickerHelper.md5(this.config.userId + this.config.apikey);
+			if (Module.Configs.userId !== null) {
+				options.url = Module.Configs.userPacksUrl;
+				options.header['UserId'] = StickerHelper.md5(Module.Configs.userId + Module.Configs.apikey);
 			}
 
 			Module.Http.get(options.url, {
@@ -213,12 +206,12 @@
 
 			if (matchData) {
 				outData.isSticker = true;
-				outData.url = this.config.domain +
+				outData.url = Module.Configs.domain +
 					'/' +
-					this.config.baseFolder +
+					Module.Configs.baseFolder +
 					'/' + matchData[1] +
 					'/' + matchData[2] +
-					'_' + this.config.stickerResolutionType +
+					'_' + Module.Configs.stickerResolutionType +
 					'.png';
 
 
@@ -253,7 +246,7 @@
 				label = (isSticker) ? 'sticker' : 'text';
 
 
-			Module.Http.post(this.config.trackStatUrl, [{
+			Module.Http.post(Module.Configs.trackStatUrl, [{
 				action: action,
 				category: category,
 				label: label,
@@ -298,9 +291,9 @@
 
 		changeUserPackStatus: function(packName, status, callback) {
 			var options = {
-				url: this.config.userPackUrl + '/' + packName,
+				url: Module.Configs.userPackUrl + '/' + packName,
 				header: {
-					UserId: StickerHelper.md5(this.config.userId + this.config.apikey)
+					UserId: StickerHelper.md5(Module.Configs.userId + Module.Configs.apikey)
 				}
 			};
 
@@ -313,8 +306,6 @@
 		},
 
 		purchaseSuccess: function(packName) {
-			var self = this;
-
 			try {
 				var handler = function() {
 					if (!JsApiInterface) {
@@ -322,21 +313,20 @@
 					}
 
 					JsApiInterface.downloadPack(packName, function() {
-						self.config.callbacks.onPackStoreSuccess(packName);
+						Module.Configs.callbacks.onPackStoreSuccess(packName);
 					});
 				};
 
-				if (this.config.userId !== null) {
+				if (Module.Configs.userId !== null) {
 					this.changeUserPackStatus(packName, true, handler);
 				} else {
 					handler();
 				}
 			} catch(e) {
-				// todo: check console
-				console.error(e.message);
-				this.config.callbacks.onPackStoreFail(packName);
+				console && console.error(e.message);
+				Module.Configs.callbacks.onPackStoreFail(packName);
 			}
 		}
-	});
+	};
 
 })(window.StickersModule);

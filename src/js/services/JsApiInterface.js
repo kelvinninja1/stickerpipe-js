@@ -22,7 +22,7 @@
 				try {
 					this[e.action].apply(this, e.data.attrs);
 				} catch(e) {
-					console.error(e.message, e);
+					console && console.error(e.message, e);
 				}
 
 			}).bind(this));

@@ -94,7 +94,7 @@
 					arrowOffset = 15;
 				}
 			} else {
-				console.error('error');
+				console && console.error('error');
 			}
 
 			if (this.arrowEl)

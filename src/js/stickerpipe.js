@@ -15,7 +15,6 @@ window.StickersModule = {};
 	Plugin.Stickers = Module.Class({
 
 		config: null,
-		baseService: null,
 		emojiService: null,
 		stickersModel: {},
 		view: null,
@@ -28,11 +27,9 @@ window.StickersModule = {};
 
 			this.config = Module.Configs;
 
-			// todo: rename
-			this.baseService = new Module.BaseService(this.config);
 			this.emojiService = new Module.EmojiService(Module.Twemoji);
 
-			this.view = new Module.PopoverView(this.config, this.baseService, this.emojiService);
+			this.view = new Module.PopoverView(this.config, this.emojiService);
 			this.storeView = new Module.StoreView(this.config);
 
 			// todo: remove
@@ -52,10 +49,10 @@ window.StickersModule = {};
 				this.view.render(this.stickersModel);
 
 				// todo --> active 'used' tab
-				this.view.renderUsedStickers(this.baseService.getLatestUse());
+				this.view.renderUsedStickers(Module.BaseService.getLatestUse());
 			}).bind(this);
 
-			var storageStickerData = this.baseService.getPacksFromStorage();
+			var storageStickerData = Module.BaseService.getPacksFromStorage();
 
 			if (storageStickerData.actual) {
 
@@ -76,7 +73,7 @@ window.StickersModule = {};
 			}).bind(this));
 
 			this.view.tabsView.handleClickOnLastUsedPacksTab((function() {
-				this.view.renderUsedStickers(this.baseService.getLatestUse());
+				this.view.renderUsedStickers(Module.BaseService.getLatestUse());
 			}).bind(this));
 
 			this.view.tabsView.handleClickOnPackTab((function(el) {
@@ -93,7 +90,7 @@ window.StickersModule = {};
 						// set newPack - false
 						changed = true;
 						this.stickersModel[i].newPack = false;
-						this.baseService.setPacksToStorage(this.stickersModel);
+						Module.BaseService.setPacksToStorage(this.stickersModel);
 
 						pack = this.stickersModel[i];
 					}
@@ -103,7 +100,7 @@ window.StickersModule = {};
 					}
 				}
 
-				if (changed == true && this.baseService.getLatestUse().length != 0 && hasNewContent == false) {
+				if (changed == true && Module.BaseService.getLatestUse().length != 0 && hasNewContent == false) {
 					this.resetNewStickersFlag();
 				}
 
@@ -124,7 +121,7 @@ window.StickersModule = {};
 
 				ga('stickerTracker.send', 'event', 'sticker', stickerAttribute.split('_')[0], stickerAttribute.split('_')[1], 1);
 
-				this.baseService.addToLatestUse(stickerAttribute);
+				Module.BaseService.addToLatestUse(stickerAttribute);
 
 				// todo: rewrite
 				// new content mark
@@ -137,7 +134,7 @@ window.StickersModule = {};
 					}
 				}
 
-				if (this.baseService.getLatestUse().length != 0 && hasNewContent == false) {
+				if (Module.BaseService.getLatestUse().length != 0 && hasNewContent == false) {
 					this.resetNewStickersFlag();
 				}
 			}).bind(this));
@@ -158,7 +155,7 @@ window.StickersModule = {};
 		},
 
 		fetchPacks: function(attrs) {
-			this.baseService.updatePacks((function(stickerPacks) {
+			Module.BaseService.updatePacks((function(stickerPacks) {
 				this.stickersModel = stickerPacks;
 
 				if(attrs.callback) {
@@ -192,15 +189,15 @@ window.StickersModule = {};
 		},
 
 		getNewStickersFlag: function() {
-			return this.baseService.getNewStickersFlag(this.baseService.getPacksFromStorage().packs || []);
+			return Module.BaseService.getNewStickersFlag(Module.BaseService.getPacksFromStorage().packs || []);
 		},
 
 		resetNewStickersFlag: function() {
-			return this.baseService.resetNewStickersFlag();
+			return Module.BaseService.resetNewStickersFlag();
 		},
 
 		parseStickerFromText: function(text) {
-			return this.baseService.parseStickerFromText(text);
+			return Module.BaseService.parseStickerFromText(text);
 		},
 
 		parseEmojiFromText: function(text) {
@@ -213,7 +210,7 @@ window.StickersModule = {};
 
 		// todo rewrite
 		renderCurrentTab: function(tabName) {
-			var obj = this.baseService.getPacksFromStorage();
+			var obj = Module.BaseService.getPacksFromStorage();
 
 			//this.start(); // todo
 
@@ -226,17 +223,17 @@ window.StickersModule = {};
 			}).bind(this));
 
 			//this.stickersModel[this.tabActive].newPack = false;
-			//this.baseService.setPacksToStorage(this.stickersModel);
+			//Module.BaseService.setPacksToStorage(this.stickersModel);
 
 			//this._renderAll();
 		},
 
 		isNewPack: function(packName) {
-			return this.baseService.isNewPack(this.stickersModel, packName);
+			return Module.BaseService.isNewPack(this.stickersModel, packName);
 		},
 
 		onUserMessageSent: function(isSticker) {
-			return this.baseService.onUserMessageSent(isSticker);
+			return Module.BaseService.onUserMessageSent(isSticker);
 		},
 
 		renderPack: function(pack) {
@@ -244,7 +241,7 @@ window.StickersModule = {};
 		},
 
 		purchaseSuccess: function(packName) {
-			this.baseService.purchaseSuccess(packName);
+			Module.BaseService.purchaseSuccess(packName);
 		}
 	});
 
