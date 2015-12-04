@@ -1,12 +1,11 @@
 
 (function(Module) {
 
-	Module.StorageService = Module.Class({
+	Module.Storage = {
 
-		lockr: null,
+		lockr: Module.Lockr,
 
-		_constructor: function(storagePrefix) {
-			this.lockr = Module.Lockr;
+		setPrefix: function(storagePrefix) {
 			this.lockr.prefix = storagePrefix;
 		},
 
@@ -73,6 +72,6 @@
 
 			return uniqUserId;
 		}
-	});
+	};
 
 })(window.StickersModule);

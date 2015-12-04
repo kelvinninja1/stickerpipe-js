@@ -1790,14 +1790,12 @@ if ("document" in self) {
 	Module.BaseService = Module.Class({
 
 		config: null,
-		storageService: null,
 
 		parseCountStat: 0,
 		parseCountWithStickerStat: 0,
 
 		_constructor: function(config) {
 			this.config = config;
-			this.storageService = new Module.StorageService(this.config.storagePrefix);
 		},
 
 		parseStickerStatHandle: function(is_have) {
@@ -1842,28 +1840,28 @@ if ("document" in self) {
 
 		// todo: remove function
 		addToLatestUse: function(code) {
-			this.storageService.addUsedSticker(code);
+			Module.Storage.addUsedSticker(code);
 		},
 
 		// todo: remove function
 		getNewStickersFlag: function() {
-			return this.storageService.hasNewStickers();
+			return Module.Storage.hasNewStickers();
 		},
 
 		// todo: remove function
 		resetNewStickersFlag: function() {
 			Module.DOMEventService.changeContentHighlight(false);
-			return this.storageService.setHasNewStickers(false);
+			return Module.Storage.setHasNewStickers(false);
 		},
 
 		// todo: remove function
 		getLatestUse: function() {
-			return this.storageService.getUsedStickers();
+			return Module.Storage.getUsedStickers();
 		},
 
 		getPacksFromStorage: function() {
 			var expireDate = (+new Date()),
-				packsObj = this.storageService.getPacks();
+				packsObj = Module.Storage.getPacks();
 
 			if(typeof packsObj === "undefined"
 				|| packsObj.expireDate < expireDate
@@ -1912,7 +1910,7 @@ if ("document" in self) {
 				if (globalNew == false && this.getLatestUse().length == 0) {
 					globalNew = true;
 				}
-				this.storageService.setHasNewStickers(globalNew);
+				Module.Storage.setHasNewStickers(globalNew);
 				Module.DOMEventService.changeContentHighlight(globalNew);
 				//}
 
@@ -1953,7 +1951,7 @@ if ("document" in self) {
 					}
 				}
 
-				this.storageService.setUsedStickers(used);
+				Module.Storage.setUsedStickers(used);
 
 				// *****************************************************************************************************
 			} else {
@@ -1965,7 +1963,7 @@ if ("document" in self) {
 
 		// todo: remove function
 		setPacksToStorage: function(packs) {
-			return this.storageService.setPacks(packs);
+			return Module.Storage.setPacks(packs);
 		},
 
 		getPacksFromServer: function(callback) {
@@ -2115,6 +2113,7 @@ if ("document" in self) {
 					handler();
 				}
 			} catch(e) {
+				// todo: check console
 				console.error(e.message);
 				this.config.callbacks.onPackStoreFail(packName);
 			}
@@ -2267,9 +2266,8 @@ if ("document" in self) {
 			options.headers.Localization = Module.Configs.lang;
 
 			if (options.type == 'POST') {
-				var storageService = new Module.StorageService(Module.Configs.storagePrefix);
 				options.headers['Content-Type'] = options.headers['Content-Type'] || 'application/x-www-form-urlencoded';
-				options.headers['DeviceId'] = storageService.getUniqUserId();
+				options.headers['DeviceId'] = Module.Storage.getUniqUserId();
 			}
 
 
@@ -2358,12 +2356,11 @@ if ("document" in self) {
 
 (function(Module) {
 
-	Module.StorageService = Module.Class({
+	Module.Storage = {
 
-		lockr: null,
+		lockr: Module.Lockr,
 
-		_constructor: function(storagePrefix) {
-			this.lockr = Module.Lockr;
+		setPrefix: function(storagePrefix) {
 			this.lockr.prefix = storagePrefix;
 		},
 
@@ -2430,7 +2427,7 @@ if ("document" in self) {
 
 			return uniqUserId;
 		}
-	});
+	};
 
 })(window.StickersModule);
 
@@ -4018,6 +4015,7 @@ if ("document" in self) {
 		_constructor: function(config) {
 
 			Module.StickerHelper.setConfig(config);
+			Module.Storage.setPrefix(Module.Configs.storagePrefix);
 
 			this.config = Module.Configs;
 

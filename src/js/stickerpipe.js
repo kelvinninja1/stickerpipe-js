@@ -24,6 +24,7 @@ window.StickersModule = {};
 		_constructor: function(config) {
 
 			Module.StickerHelper.setConfig(config);
+			Module.Storage.setPrefix(Module.Configs.storagePrefix);
 
 			this.config = Module.Configs;
 

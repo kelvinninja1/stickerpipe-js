@@ -52,9 +52,8 @@
 			options.headers.Localization = Module.Configs.lang;
 
 			if (options.type == 'POST') {
-				var storageService = new Module.StorageService(Module.Configs.storagePrefix);
 				options.headers['Content-Type'] = options.headers['Content-Type'] || 'application/x-www-form-urlencoded';
-				options.headers['DeviceId'] = storageService.getUniqUserId();
+				options.headers['DeviceId'] = Module.Storage.getUniqUserId();
 			}
 
 

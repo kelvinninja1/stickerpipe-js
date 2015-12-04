@@ -9,14 +9,12 @@
 	Module.BaseService = Module.Class({
 
 		config: null,
-		storageService: null,
 
 		parseCountStat: 0,
 		parseCountWithStickerStat: 0,
 
 		_constructor: function(config) {
 			this.config = config;
-			this.storageService = new Module.StorageService(this.config.storagePrefix);
 		},
 
 		parseStickerStatHandle: function(is_have) {
@@ -61,28 +59,28 @@
 
 		// todo: remove function
 		addToLatestUse: function(code) {
-			this.storageService.addUsedSticker(code);
+			Module.Storage.addUsedSticker(code);
 		},
 
 		// todo: remove function
 		getNewStickersFlag: function() {
-			return this.storageService.hasNewStickers();
+			return Module.Storage.hasNewStickers();
 		},
 
 		// todo: remove function
 		resetNewStickersFlag: function() {
 			Module.DOMEventService.changeContentHighlight(false);
-			return this.storageService.setHasNewStickers(false);
+			return Module.Storage.setHasNewStickers(false);
 		},
 
 		// todo: remove function
 		getLatestUse: function() {
-			return this.storageService.getUsedStickers();
+			return Module.Storage.getUsedStickers();
 		},
 
 		getPacksFromStorage: function() {
 			var expireDate = (+new Date()),
-				packsObj = this.storageService.getPacks();
+				packsObj = Module.Storage.getPacks();
 
 			if(typeof packsObj === "undefined"
 				|| packsObj.expireDate < expireDate
@@ -131,7 +129,7 @@
 				if (globalNew == false && this.getLatestUse().length == 0) {
 					globalNew = true;
 				}
-				this.storageService.setHasNewStickers(globalNew);
+				Module.Storage.setHasNewStickers(globalNew);
 				Module.DOMEventService.changeContentHighlight(globalNew);
 				//}
 
@@ -172,7 +170,7 @@
 					}
 				}
 
-				this.storageService.setUsedStickers(used);
+				Module.Storage.setUsedStickers(used);
 
 				// *****************************************************************************************************
 			} else {
@@ -184,7 +182,7 @@
 
 		// todo: remove function
 		setPacksToStorage: function(packs) {
-			return this.storageService.setPacks(packs);
+			return Module.Storage.setPacks(packs);
 		},
 
 		getPacksFromServer: function(callback) {
@@ -334,6 +332,7 @@
 					handler();
 				}
 			} catch(e) {
+				// todo: check console
 				console.error(e.message);
 				this.config.callbacks.onPackStoreFail(packName);
 			}
