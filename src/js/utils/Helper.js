@@ -46,6 +46,5 @@
 		md5: function(string) {
 			return Module.MD5(string);
 		}
-
 	};
 })(window, window.StickersModule);

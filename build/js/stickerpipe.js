@@ -437,7 +437,6 @@ if ("document" in self) {
 		md5: function(string) {
 			return Module.MD5(string);
 		}
-
 	};
 })(window, window.StickersModule);
 
@@ -3342,7 +3341,6 @@ if ("document" in self) {
 
 	Module.BlockView = Module.Class({
 
-		config: null,
 		emojiService: null,
 
 		el: null,
@@ -3351,14 +3349,13 @@ if ("document" in self) {
 		tabsView: null,
 		scrollView: null,
 
-		_constructor: function(config, emojiService) {
-			this.config = config;
+		_constructor: function(emojiService) {
 			this.emojiService = emojiService;
 
-			this.el = document.getElementById(this.config.elId);
+			this.el = document.getElementById(Module.Configs.elId);
 			this.contentEl = document.createElement('div');
 
-			this.tabsView = new Module.TabsView(this.config);
+			this.tabsView = new Module.TabsView();
 			this.scrollView = new Module.ScrollView();
 
 			window.addEventListener('resize', (function() {
@@ -3396,7 +3393,7 @@ if ("document" in self) {
 			this.clearBlock(this.contentEl);
 
 			if (latesUseSticker.length == 0) {
-				this.contentEl.innerHTML += this.config.htmlForEmptyRecent;
+				this.contentEl.innerHTML += Module.Configs.htmlForEmptyRecent;
 				return false;
 			}
 
@@ -3414,11 +3411,11 @@ if ("document" in self) {
 			this.contentEl.classList.remove('sp-stickers');
 			this.contentEl.classList.add('sp-emojis');
 
-			StickerHelper.forEach(this.config.emojiList, (function(emoji) {
+			StickerHelper.forEach(Module.Configs.emojiList, (function(emoji) {
 				var emojiEl = document.createElement('span'),
 					emojiImgHtml = this.emojiService.parseEmojiFromText(emoji);
 
-				emojiEl.className = this.config.emojiItemClass;
+				emojiEl.className = Module.Configs.emojiItemClass;
 				emojiEl.innerHTML = emojiImgHtml;
 
 				this.contentEl.appendChild(emojiEl);
@@ -3455,7 +3452,7 @@ if ("document" in self) {
 				var image = new Image();
 				image.onload = function() {
 					stickersSpanEl.classList.remove(placeHolderClass);
-					stickersSpanEl.classList.add(self.config.stickerItemClass);
+					stickersSpanEl.classList.add(Module.Configs.stickerItemClass);
 					stickersSpanEl.setAttribute('data-sticker-string', stickerCode);
 					stickersSpanEl.appendChild(image);
 				};
@@ -3472,14 +3469,14 @@ if ("document" in self) {
 
 		// todo: rename handleClickSticker --> handleClickOnSticker
 		handleClickSticker: function(callback) {
-			// todo: create static this.config.stickerItemClass
-			Module.StickerHelper.setEvent('click', this.contentEl, this.config.stickerItemClass, callback);
+			// todo: create static Module.Configs.stickerItemClass
+			Module.StickerHelper.setEvent('click', this.contentEl, Module.Configs.stickerItemClass, callback);
 		},
 
 		// todo: rename handleClickEmoji --> handleClickOnEmoji
 		handleClickEmoji: function(callback) {
-			// todo: create static this.config.emojiItemClass
-			Module.StickerHelper.setEvent('click', this.contentEl, this.config.emojiItemClass, callback);
+			// todo: create static Module.Configs.emojiItemClass
+			Module.StickerHelper.setEvent('click', this.contentEl, Module.Configs.emojiItemClass, callback);
 		},
 
 
@@ -3503,7 +3500,7 @@ if ("document" in self) {
 		_constructor: function() {
 			parent.prototype._constructor.apply(this, arguments);
 
-			this.toggleEl = document.getElementById(this.config.elId);
+			this.toggleEl = document.getElementById(Module.Configs.elId);
 			this.toggleEl.addEventListener('click', (function() {
 				this.toggle();
 			}).bind(this));
@@ -3652,24 +3649,20 @@ if ("document" in self) {
 
 	Module.StoreView = Module.Class({
 
-		config: null,
-
 		el: null,
 
-		_constructor: function(config) {
-			this.config = config;
-
-			this.el = document.getElementById(this.config.storeContainerId);
+		_constructor: function() {
+			this.el = document.getElementById(Module.Configs.storeContainerId);
 		},
 
 		render: function(packName) {
 
 			var iframe = document.createElement('iframe'),
 				urlParams = {
-					apiKey: this.config.apikey,
+					apiKey: Module.Configs.apikey,
 					platform: 'JS',
-					userId: this.config.userId,
-					density: this.config.stickerResolutionType,
+					userId: Module.Configs.userId,
+					density: Module.Configs.stickerResolutionType,
 					uri: encodeURIComponent('http://demo.stickerpipe.com/work/libs/store/js/stickerPipeStore.js')
 				},
 				urlSerialize = function(obj) {
@@ -3689,7 +3682,7 @@ if ("document" in self) {
 			iframe.style.height = '100%';
 			iframe.style.border = '0';
 
-			iframe.src = this.config.storeUrl + '?' + urlSerialize(urlParams) + '#/packs/' + packName
+			iframe.src = Module.Configs.storeUrl + '?' + urlSerialize(urlParams) + '#/packs/' + packName
 		}
 	});
 
@@ -3718,10 +3711,7 @@ if ("document" in self) {
 			tabs: 'sp-tabs'
 		},
 
-		config: null,
-
-		_constructor: function(config) {
-			this.config = config;
+		_constructor: function() {
 
 			this.el = document.createElement('div');
 
@@ -3729,42 +3719,42 @@ if ("document" in self) {
 				emoji: {
 					id: 'spTabEmoji',
 					class: 'sp-tab-emoji',
-					content: this.config.emojiTabContent,
+					content: Module.Configs.emojiTabContent,
 					el: null,
 					isTab: true
 				},
 				history: {
 					id: 'spTabHistory',
 					class: 'sp-tab-history',
-					content: this.config.historyTabContent,
+					content: Module.Configs.historyTabContent,
 					el: null,
 					isTab: true
 				},
 				settings: {
 					id: 'spTabSettings',
 					class: 'sp-tab-settings',
-					content: this.config.settingsTabContent,
+					content: Module.Configs.settingsTabContent,
 					el: null,
 					isTab: false
 				},
 				store: {
 					id: 'spTabStore',
 					class: 'sp-tab-store',
-					content: this.config.storeTabContent,
+					content: Module.Configs.storeTabContent,
 					el: null,
 					isTab: false
 				},
 				prevPacks: {
 					id: 'spTabPrevPacks',
 					class: 'sp-tab-prev-packs',
-					content: this.config.prevPacksTabContent,
+					content: Module.Configs.prevPacksTabContent,
 					el: null,
 					isTab: false
 				},
 				nextPacks: {
 					id: 'spTabNextPacks',
 					class: 'sp-tab-next-packs',
-					content: this.config.nextPacksTabContent,
+					content: Module.Configs.nextPacksTabContent,
 					el: null,
 					isTab: false
 				}
@@ -3818,10 +3808,10 @@ if ("document" in self) {
 				classes.push(this.classes.newPack);
 			}
 
-			var iconSrc = this.config.domain + '/' +
-				this.config.baseFolder + '/' +
+			var iconSrc = Module.Configs.domain + '/' +
+				Module.Configs.baseFolder + '/' +
 				pack.pack_name + '/tab_icon_' +
-				this.config.tabResolutionType + '.png';
+				Module.Configs.tabResolutionType + '.png';
 
 			var content = '<img src=' + iconSrc + '>';
 
@@ -3847,7 +3837,7 @@ if ("document" in self) {
 				tabEl.id = id;
 			}
 
-			classes.push(this.config.tabItemClass);
+			classes.push(Module.Configs.tabItemClass);
 
 			tabEl.classList.add.apply(tabEl.classList, classes);
 
@@ -3893,22 +3883,22 @@ if ("document" in self) {
 			this.renderSettingsTab();
 		},
 		renderEmojiTab: function() {
-			if (this.config.enableEmojiTab) {
+			if (Module.Configs.enableEmojiTab) {
 				this.scrollableContentEl.appendChild(this.renderControlButton(this.controls.emoji));
 			}
 		},
 		renderHistoryTab: function() {
-			if (this.config.enableHistoryTab) {
+			if (Module.Configs.enableHistoryTab) {
 				this.scrollableContentEl.appendChild(this.renderControlButton(this.controls.history));
 			}
 		},
 		renderSettingsTab: function() {
-			if (this.config.enableSettingsTab) {
+			if (Module.Configs.enableSettingsTab) {
 				this.scrollableContentEl.appendChild(this.renderControlButton(this.controls.settings));
 			}
 		},
 		renderStoreTab: function() {
-			if (this.config.enableStoreTab) {
+			if (Module.Configs.enableStoreTab) {
 				this.el.appendChild(this.renderControlButton(this.controls.store));
 			}
 		},
@@ -3993,7 +3983,6 @@ if ("document" in self) {
 	// todo: rename Stickers --> StickerPipe
 	Plugin.Stickers = Module.Class({
 
-		config: null,
 		emojiService: null,
 		stickersModel: {},
 		view: null,
@@ -4004,15 +3993,14 @@ if ("document" in self) {
 			Module.StickerHelper.setConfig(config);
 			Module.Storage.setPrefix(Module.Configs.storagePrefix);
 
-			this.config = Module.Configs;
 
 			this.emojiService = new Module.EmojiService(Module.Twemoji);
 
-			this.view = new Module.PopoverView(this.config, this.emojiService);
-			this.storeView = new Module.StoreView(this.config);
+			this.view = new Module.PopoverView(this.emojiService);
+			this.storeView = new Module.StoreView();
 
 			// todo: remove
-			//Plugin.JsApiInterface && Plugin.JsApiInterface._setConfigs(this.config);
+			//Plugin.JsApiInterface && Plugin.JsApiInterface._setConfigs(Module.Configs);
 
 			this.delegateEvents();
 
@@ -4020,7 +4008,7 @@ if ("document" in self) {
 			// todo
 			//// ***** START *******************************************************************************************
 
-			var callback = this.config.onload || null;
+			var callback = Module.Configs.onload || null;
 
 			var onPacksLoadCallback = (function() {
 				callback && callback();
@@ -4091,7 +4079,7 @@ if ("document" in self) {
 				var stickerAttribute = el.getAttribute('data-sticker-string'),
 					nowDate = new Date().getTime() / 1000|0;
 
-				Module.Http.post(this.config.trackStatUrl, [{
+				Module.Http.post(Module.Configs.trackStatUrl, [{
 					action: 'use',
 					category: 'sticker',
 					label: '[[' + stickerAttribute + ']]',
@@ -4122,7 +4110,7 @@ if ("document" in self) {
 				var nowDate = new Date().getTime() / 1000| 0,
 					emoji = this.emojiService.parseEmojiFromHtml(el.innerHTML);
 
-				Module.Http.post(this.config.trackStatUrl, [{
+				Module.Http.post(Module.Configs.trackStatUrl, [{
 					action: 'use',
 					category: 'emoji',
 					label: emoji,

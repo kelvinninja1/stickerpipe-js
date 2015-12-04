@@ -22,10 +22,7 @@
 			tabs: 'sp-tabs'
 		},
 
-		config: null,
-
-		_constructor: function(config) {
-			this.config = config;
+		_constructor: function() {
 
 			this.el = document.createElement('div');
 
@@ -33,42 +30,42 @@
 				emoji: {
 					id: 'spTabEmoji',
 					class: 'sp-tab-emoji',
-					content: this.config.emojiTabContent,
+					content: Module.Configs.emojiTabContent,
 					el: null,
 					isTab: true
 				},
 				history: {
 					id: 'spTabHistory',
 					class: 'sp-tab-history',
-					content: this.config.historyTabContent,
+					content: Module.Configs.historyTabContent,
 					el: null,
 					isTab: true
 				},
 				settings: {
 					id: 'spTabSettings',
 					class: 'sp-tab-settings',
-					content: this.config.settingsTabContent,
+					content: Module.Configs.settingsTabContent,
 					el: null,
 					isTab: false
 				},
 				store: {
 					id: 'spTabStore',
 					class: 'sp-tab-store',
-					content: this.config.storeTabContent,
+					content: Module.Configs.storeTabContent,
 					el: null,
 					isTab: false
 				},
 				prevPacks: {
 					id: 'spTabPrevPacks',
 					class: 'sp-tab-prev-packs',
-					content: this.config.prevPacksTabContent,
+					content: Module.Configs.prevPacksTabContent,
 					el: null,
 					isTab: false
 				},
 				nextPacks: {
 					id: 'spTabNextPacks',
 					class: 'sp-tab-next-packs',
-					content: this.config.nextPacksTabContent,
+					content: Module.Configs.nextPacksTabContent,
 					el: null,
 					isTab: false
 				}
@@ -122,10 +119,10 @@
 				classes.push(this.classes.newPack);
 			}
 
-			var iconSrc = this.config.domain + '/' +
-				this.config.baseFolder + '/' +
+			var iconSrc = Module.Configs.domain + '/' +
+				Module.Configs.baseFolder + '/' +
 				pack.pack_name + '/tab_icon_' +
-				this.config.tabResolutionType + '.png';
+				Module.Configs.tabResolutionType + '.png';
 
 			var content = '<img src=' + iconSrc + '>';
 
@@ -151,7 +148,7 @@
 				tabEl.id = id;
 			}
 
-			classes.push(this.config.tabItemClass);
+			classes.push(Module.Configs.tabItemClass);
 
 			tabEl.classList.add.apply(tabEl.classList, classes);
 
@@ -197,22 +194,22 @@
 			this.renderSettingsTab();
 		},
 		renderEmojiTab: function() {
-			if (this.config.enableEmojiTab) {
+			if (Module.Configs.enableEmojiTab) {
 				this.scrollableContentEl.appendChild(this.renderControlButton(this.controls.emoji));
 			}
 		},
 		renderHistoryTab: function() {
-			if (this.config.enableHistoryTab) {
+			if (Module.Configs.enableHistoryTab) {
 				this.scrollableContentEl.appendChild(this.renderControlButton(this.controls.history));
 			}
 		},
 		renderSettingsTab: function() {
-			if (this.config.enableSettingsTab) {
+			if (Module.Configs.enableSettingsTab) {
 				this.scrollableContentEl.appendChild(this.renderControlButton(this.controls.settings));
 			}
 		},
 		renderStoreTab: function() {
-			if (this.config.enableStoreTab) {
+			if (Module.Configs.enableStoreTab) {
 				this.el.appendChild(this.renderControlButton(this.controls.store));
 			}
 		},

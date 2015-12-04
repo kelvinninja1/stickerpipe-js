@@ -14,7 +14,6 @@ window.StickersModule = {};
 	// todo: rename Stickers --> StickerPipe
 	Plugin.Stickers = Module.Class({
 
-		config: null,
 		emojiService: null,
 		stickersModel: {},
 		view: null,
@@ -25,15 +24,14 @@ window.StickersModule = {};
 			Module.StickerHelper.setConfig(config);
 			Module.Storage.setPrefix(Module.Configs.storagePrefix);
 
-			this.config = Module.Configs;
 
 			this.emojiService = new Module.EmojiService(Module.Twemoji);
 
-			this.view = new Module.PopoverView(this.config, this.emojiService);
-			this.storeView = new Module.StoreView(this.config);
+			this.view = new Module.PopoverView(this.emojiService);
+			this.storeView = new Module.StoreView();
 
 			// todo: remove
-			//Plugin.JsApiInterface && Plugin.JsApiInterface._setConfigs(this.config);
+			//Plugin.JsApiInterface && Plugin.JsApiInterface._setConfigs(Module.Configs);
 
 			this.delegateEvents();
 
@@ -41,7 +39,7 @@ window.StickersModule = {};
 			// todo
 			//// ***** START *******************************************************************************************
 
-			var callback = this.config.onload || null;
+			var callback = Module.Configs.onload || null;
 
 			var onPacksLoadCallback = (function() {
 				callback && callback();
@@ -112,7 +110,7 @@ window.StickersModule = {};
 				var stickerAttribute = el.getAttribute('data-sticker-string'),
 					nowDate = new Date().getTime() / 1000|0;
 
-				Module.Http.post(this.config.trackStatUrl, [{
+				Module.Http.post(Module.Configs.trackStatUrl, [{
 					action: 'use',
 					category: 'sticker',
 					label: '[[' + stickerAttribute + ']]',
@@ -143,7 +141,7 @@ window.StickersModule = {};
 				var nowDate = new Date().getTime() / 1000| 0,
 					emoji = this.emojiService.parseEmojiFromHtml(el.innerHTML);
 
-				Module.Http.post(this.config.trackStatUrl, [{
+				Module.Http.post(Module.Configs.trackStatUrl, [{
 					action: 'use',
 					category: 'emoji',
 					label: emoji,

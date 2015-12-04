@@ -14,7 +14,7 @@
 		_constructor: function() {
 			parent.prototype._constructor.apply(this, arguments);
 
-			this.toggleEl = document.getElementById(this.config.elId);
+			this.toggleEl = document.getElementById(Module.Configs.elId);
 			this.toggleEl.addEventListener('click', (function() {
 				this.toggle();
 			}).bind(this));
