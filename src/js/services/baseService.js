@@ -30,7 +30,7 @@
 
 			if(this.parseCountStat >= 50) {
 
-				StickerHelper.ajaxPost(this.config.trackStatUrl, this.config.apikey, [
+				Module.Http.post(this.config.trackStatUrl, [
 					{
 						action: 'check',
 						category: 'message',
@@ -48,7 +48,6 @@
 					}
 
 				]);
-
 
 				ga('stickerTracker.send', 'event', 'message', 'check', 'Events count', this.parseCountStat);
 				ga('stickerTracker.send', 'event', 'message', 'check', 'Stickers count', this.parseCountWithStickerStat);
@@ -200,7 +199,9 @@
 				options.header['UserId'] = StickerHelper.md5(this.config.userId + this.config.apikey);
 			}
 
-			StickerHelper.ajaxGet(options.url, this.config.apikey, callback, options.header);
+			Module.Http.get(options.url, {
+				success: callback
+			}, options.header);
 		},
 
 		parseStickerFromText: function(text) {
@@ -253,15 +254,13 @@
 				category = 'message',
 				label = (isSticker) ? 'sticker' : 'text';
 
-			StickerHelper.ajaxPost(this.config.trackStatUrl, this.config.apikey, [
-				{
-					action: action,
-					category: category,
-					label: label,
-					time: nowDate
-				}
-			]);
 
+			Module.Http.post(this.config.trackStatUrl, [{
+				action: action,
+				category: category,
+				label: label,
+				time: nowDate
+			}]);
 
 			ga('stickerTracker.send', 'event', category, action, label);
 		},
@@ -300,7 +299,6 @@
 		},
 
 		changeUserPackStatus: function(packName, status, callback) {
-
 			var options = {
 				url: this.config.userPackUrl + '/' + packName,
 				header: {
@@ -308,9 +306,12 @@
 				}
 			};
 
-			StickerHelper.ajaxPost(options.url, this.config.apikey, {
+			// todo: rewrite callback
+			Module.Http.post(options.url, {
 				status: status
-			}, callback, options.header);
+			}, {
+				success: callback
+			}, options.header);
 		},
 
 		purchaseSuccess: function(packName) {

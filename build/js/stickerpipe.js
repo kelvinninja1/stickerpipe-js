@@ -464,60 +464,10 @@ if ("document" in self) {
 			});
 		},
 
-		ajaxGet: function(url, apikey, callback, header) {
-			header = header || {};
-
-			var xmlhttp;
-
-			xmlhttp = new XMLHttpRequest();
-
-			xmlhttp.onreadystatechange = function(){
-				if (xmlhttp.readyState == 4 && xmlhttp.status == 200){
-					callback(JSON.parse(xmlhttp.responseText));
-				}
-			};
-			xmlhttp.open('GET', url, true);
-			xmlhttp.setRequestHeader('Apikey', apikey);
-			xmlhttp.setRequestHeader('Platform', 'JS');
-			xmlhttp.setRequestHeader('Localization', Module.Configs.get('lang'));
-
-			this.forEach(header, function(value, name) {
-				xmlhttp.setRequestHeader(name, value);
-			});
-
-			xmlhttp.send();
-		},
-
-		ajaxPost: function(url, apikey, data, callback, header) {
-			var storageService = new Module.StorageService(Module.Configs.get('storagePrefix')),
-				uniqUserId = storageService.getUniqUserId(),
-				xmlhttp;
-
-			xmlhttp = new XMLHttpRequest();
-
-			xmlhttp.onreadystatechange = function() {
-				if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-					callback && callback(JSON.parse(xmlhttp.responseText));
-				}
-			};
-
-			xmlhttp.open('POST', url, true);
-			xmlhttp.setRequestHeader('Apikey', apikey);
-			xmlhttp.setRequestHeader('Platform', 'JS');
-			xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-			xmlhttp.setRequestHeader('DeviceId', uniqUserId);
-			xmlhttp.setRequestHeader('Localization', Module.Configs.get('lang'));
-
-			this.forEach(header, function(value, name) {
-				xmlhttp.setRequestHeader(name, value);
-			});
-
-			xmlhttp.send(JSON.stringify(data));
-		},
-
 		md5: function(string) {
 			return StickersModule.MD5(string);
 		}
+
 	};
 })(window, window.StickersModule);
 
@@ -2768,6 +2718,7 @@ if ("document" in self) {
 
 
 
+
 // todo: API queries (get & post & put)
 
 // todo: rename file baseService --> BaseService
@@ -2801,7 +2752,7 @@ if ("document" in self) {
 
 			if(this.parseCountStat >= 50) {
 
-				StickerHelper.ajaxPost(this.config.trackStatUrl, this.config.apikey, [
+				Module.Http.post(this.config.trackStatUrl, [
 					{
 						action: 'check',
 						category: 'message',
@@ -2819,7 +2770,6 @@ if ("document" in self) {
 					}
 
 				]);
-
 
 				ga('stickerTracker.send', 'event', 'message', 'check', 'Events count', this.parseCountStat);
 				ga('stickerTracker.send', 'event', 'message', 'check', 'Stickers count', this.parseCountWithStickerStat);
@@ -2971,7 +2921,9 @@ if ("document" in self) {
 				options.header['UserId'] = StickerHelper.md5(this.config.userId + this.config.apikey);
 			}
 
-			StickerHelper.ajaxGet(options.url, this.config.apikey, callback, options.header);
+			Module.Http.get(options.url, {
+				success: callback
+			}, options.header);
 		},
 
 		parseStickerFromText: function(text) {
@@ -3024,15 +2976,13 @@ if ("document" in self) {
 				category = 'message',
 				label = (isSticker) ? 'sticker' : 'text';
 
-			StickerHelper.ajaxPost(this.config.trackStatUrl, this.config.apikey, [
-				{
-					action: action,
-					category: category,
-					label: label,
-					time: nowDate
-				}
-			]);
 
+			Module.Http.post(this.config.trackStatUrl, [{
+				action: action,
+				category: category,
+				label: label,
+				time: nowDate
+			}]);
 
 			ga('stickerTracker.send', 'event', category, action, label);
 		},
@@ -3071,7 +3021,6 @@ if ("document" in self) {
 		},
 
 		changeUserPackStatus: function(packName, status, callback) {
-
 			var options = {
 				url: this.config.userPackUrl + '/' + packName,
 				header: {
@@ -3079,9 +3028,12 @@ if ("document" in self) {
 				}
 			};
 
-			StickerHelper.ajaxPost(options.url, this.config.apikey, {
+			// todo: rewrite callback
+			Module.Http.post(options.url, {
 				status: status
-			}, callback, options.header);
+			}, {
+				success: callback
+			}, options.header);
 		},
 
 		purchaseSuccess: function(packName) {
@@ -3202,6 +3154,89 @@ if ("document" in self) {
 	});
 
 })(window.StickersModule);
+
+(function(Plugin, Module) {
+
+	Module.Http = {
+
+		get: function(url, callbacks, headers) {
+			callbacks = callbacks || {};
+			headers = headers || {};
+
+			this.ajax({
+				type: 'GET',
+				url: url,
+				headers: headers,
+				success: callbacks.success,
+				error: callbacks.error,
+				complete: callbacks.complete
+			});
+		},
+
+		post: function(url, data, callbacks, headers) {
+			data = data || {};
+			callbacks = callbacks || {};
+			headers = headers || {};
+
+			this.ajax({
+				type: 'POST',
+				url: url,
+				data: data,
+				headers: headers,
+				success: callbacks.success,
+				error: callbacks.error,
+				complete: callbacks.complete
+			});
+		},
+
+		ajax: function(options) {
+			options = options || {};
+
+			if (!options.url) {
+				return;
+			}
+
+			options.type = (options.type && options.type.toUpperCase()) || 'GET';
+			options.headers = options.headers || {};
+			options.data = options.data || {};
+			options.success = options.success || function() {};
+			options.error = options.error || function() {};
+			options.complete = options.complete || function() {};
+
+			options.headers.Apikey = Module.Configs.get('apikey');
+			options.headers.Platform = 'JS';
+			options.headers.Localization = Module.Configs.get('lang');
+
+			if (options.type == 'POST') {
+				var storageService = new Module.StorageService(Module.Configs.get('storagePrefix'));
+				options.headers['Content-Type'] = options.headers['Content-Type'] || 'application/x-www-form-urlencoded';
+				options.headers['DeviceId'] = storageService.getUniqUserId();
+			}
+
+
+			var xmlhttp = new XMLHttpRequest();
+			xmlhttp.open(options.type, options.url, true);
+
+			Module.StickerHelper.forEach(options.headers, function(value, name) {
+				xmlhttp.setRequestHeader(name, value);
+			});
+
+			xmlhttp.onreadystatechange = function() {
+				if (xmlhttp.readyState == 4) {
+					if (xmlhttp.status == 200) {
+						options.success(JSON.parse(xmlhttp.responseText), xmlhttp);
+					} else {
+						options.error(JSON.parse(xmlhttp.responseText), xmlhttp);
+					}
+
+					options.complete(JSON.parse(xmlhttp.responseText), xmlhttp);
+				}
+			};
+
+			xmlhttp.send(JSON.stringify(options.data));
+		}
+	};
+})(window, window.StickersModule);
 
 (function(Module) {
 
@@ -4102,8 +4137,7 @@ if ("document" in self) {
 				var stickerAttribute = el.getAttribute('data-sticker-string'),
 					nowDate = new Date().getTime() / 1000|0;
 
-
-				helper.ajaxPost(this.config.trackStatUrl, this.config.apikey, [{
+				Module.Http.post(this.config.trackStatUrl, [{
 					action: 'use',
 					category: 'sticker',
 					label: '[[' + stickerAttribute + ']]',
@@ -4134,7 +4168,7 @@ if ("document" in self) {
 				var nowDate = new Date().getTime() / 1000| 0,
 					emoji = this.emojiService.parseEmojiFromHtml(el.innerHTML);
 
-				helper.ajaxPost(this.config.trackStatUrl, this.config.apikey, [{
+				Module.Http.post(this.config.trackStatUrl, [{
 					action: 'use',
 					category: 'emoji',
 					label: emoji,
