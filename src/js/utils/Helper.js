@@ -54,6 +54,7 @@
 			xmlhttp.open('GET', url, true);
 			xmlhttp.setRequestHeader('Apikey', apikey);
 			xmlhttp.setRequestHeader('Platform', 'JS');
+			xmlhttp.setRequestHeader('Localization', Module.Configs.get('lang'));
 
 			this.forEach(header, function(value, name) {
 				xmlhttp.setRequestHeader(name, value);
@@ -80,6 +81,7 @@
 			xmlhttp.setRequestHeader('Platform', 'JS');
 			xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 			xmlhttp.setRequestHeader('DeviceId', uniqUserId);
+			xmlhttp.setRequestHeader('Localization', Module.Configs.get('lang'));
 
 			this.forEach(header, function(value, name) {
 				xmlhttp.setRequestHeader(name, value);

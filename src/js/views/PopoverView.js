@@ -54,33 +54,51 @@
 					this.toggle();
 				}
 			}).bind(this));
+
+			// todo: addEventListener --> DOMEventService
+			if (window.addEventListener) {
+				window.addEventListener(Module.DOMEventService.events.popoverShown, function() {
+					Module.DOMEventService.resize();
+				});
+			} else {
+				window.attachEvent('on' + Module.DOMEventService.events.popoverShown, function() {
+					Module.DOMEventService.resize();
+				});
+			}
 		},
 
 		toggle: function() {
 			this.active = !this.active;
 
 			if (this.active) {
-				// todo render in firefox (document.getElementsByTagName('body')[0])
 				this.toggleEl.parentElement.appendChild(this.popoverEl);
 				this.positioned();
-				window.dispatchEvent(new Event('sp:popover:shown'));
+				Module.DOMEventService.popoverShown();
 			} else {
 				this.toggleEl.parentElement.removeChild(this.popoverEl);
-				window.dispatchEvent(new Event('sp:popover:hidden'));
+				Module.DOMEventService.popoverHidden();
 			}
 		},
 
 		positioned: function() {
+			var arrowOffset = 0;
 
 			if (this.arrowEl) {
 				var style = this.toggleEl.currentStyle || window.getComputedStyle(this.toggleEl);
 				var marginLeft = parseInt(style.marginLeft, 10);
 
 				this.arrowEl.style.marginLeft = (this.toggleEl.clientWidth / 2) - (this.arrowEl.offsetWidth / 2) + marginLeft + 'px';
+
+				var arrowStyle = this.arrowEl.currentStyle || window.getComputedStyle(this.arrowEl);
+				if (arrowStyle.display != 'none') {
+					arrowOffset = 15;
+				}
 			} else {
 				console.error('error');
 			}
-			this.popoverEl.style.top = -(this.popoverEl.offsetHeight + 15) + 'px';
+
+			if (this.arrowEl)
+			this.popoverEl.style.top = -(this.popoverEl.offsetHeight + arrowOffset) + 'px';
 		}
 
 	});

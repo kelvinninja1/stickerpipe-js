@@ -1,7 +1,7 @@
 
 (function(Plugin) {
 
-    Plugin.StickersModule.Lockr = {
+	Plugin.StickersModule.Lockr = {
 		prefix: '',
 
 		_getPrefixedKey: function(key, options) {
@@ -117,6 +117,6 @@
 		flush: function () {
 			localStorage.clear();
 		}
-    };
+	};
 
 })(window);

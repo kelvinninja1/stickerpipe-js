@@ -1,4 +1,6 @@
 
+// todo: rename file baseService --> BaseService
+
 (function(Module) {
 
     var StickerHelper = Module.StickerHelper,
@@ -70,6 +72,7 @@
 
 		// todo: remove function
 		resetNewStickersFlag: function() {
+			Module.DOMEventService.changeContentHighlight(false);
 			return this.storageService.setHasNewStickers(false);
 		},
 
@@ -103,7 +106,6 @@
 		markNewPacks: function(oldPacks, newPacks) {
 			var globalNew = false;
 
-
 			if(oldPacks.length != 0){
 
 				StickerHelper.forEach(newPacks, function(newPack, key) {
@@ -123,9 +125,59 @@
 				});
 
 
-				if(globalNew) {
-					this.storageService.setHasNewStickers(globalNew);
+				// todo: to other function
+				// todo: check & fix
+				//if (globalNew) {
+
+				if (globalNew == false && this.getLatestUse().length == 0) {
+					globalNew = true;
 				}
+				this.storageService.setHasNewStickers(globalNew);
+				Module.DOMEventService.changeContentHighlight(globalNew);
+				//}
+
+
+				// *****************************************************************************************************
+				// todo: do in other function
+				// update used stickers
+
+				var used = this.getLatestUse();
+
+				for (var i = 0; i < used.length; i++) {
+					var sticker = this.parseStickerFromText('[[' + used[i].code + ']]');
+
+					var pack = null;
+					for (var j = 0; j < newPacks.length; j++) {
+						if (newPacks[j].pack_name == sticker.pack) {
+							pack = newPacks[j];
+							break;
+						}
+					}
+
+					if (pack == null) {
+						used.splice(i, 1);
+						continue;
+					}
+
+					var isset = false;
+					for (var j = 0; j < pack.stickers.length; j++) {
+						if (pack.stickers[j].name == sticker.name) {
+							isset = true;
+							break;
+						}
+					}
+
+					if (!isset) {
+						used.splice(i, 1);
+						continue;
+					}
+				}
+
+				this.storageService.setUsedStickers(used);
+
+				// *****************************************************************************************************
+			} else {
+				Module.DOMEventService.changeContentHighlight(true);
 			}
 
 			return newPacks;

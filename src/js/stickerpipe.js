@@ -41,6 +41,34 @@ window.StickersModule = {};
 			Plugin.JsApiInterface && Plugin.JsApiInterface._setConfigs(this.config);
 
 			this.delegateEvents();
+
+
+			// todo
+			//// ***** START *******************************************************************************************
+
+			var callback = this.config.onload || null;
+
+			var onPacksLoadCallback = (function() {
+				callback && callback();
+
+				this.view.render(this.stickersModel);
+
+				// todo --> active 'used' tab
+				this.view.renderUsedStickers(this.baseService.getLatestUse());
+			}).bind(this);
+
+			var storageStickerData = this.baseService.getPacksFromStorage();
+
+			if (storageStickerData.actual) {
+
+				this.stickersModel = storageStickerData.packs;
+
+				onPacksLoadCallback.apply();
+			} else {
+				this.fetchPacks({
+					callback: onPacksLoadCallback
+				});
+			}
 		},
 
 		delegateEvents: function() {
@@ -57,17 +85,28 @@ window.StickersModule = {};
 				var pack = null,
 					packName = el.getAttribute('data-pack-name');
 
+				// todo rename
+				var changed = false,
+					hasNewContent = false;
+
 				for (var i = 0; i < this.stickersModel.length; i++) {
 					if (this.stickersModel[i].pack_name == packName) {
 
 						// set newPack - false
+						changed = true;
 						this.stickersModel[i].newPack = false;
 						this.baseService.setPacksToStorage(this.stickersModel);
 
 						pack = this.stickersModel[i];
-
-						break;
 					}
+
+					if (this.stickersModel[i].newPack == true) {
+						hasNewContent = true;
+					}
+				}
+
+				if (changed == true && this.baseService.getLatestUse().length != 0 && hasNewContent == false) {
+					this.resetNewStickersFlag();
 				}
 
 				pack && this.view.renderPack(pack);
@@ -89,6 +128,21 @@ window.StickersModule = {};
 				ga('stickerTracker.send', 'event', 'sticker', stickerAttribute.split('_')[0], stickerAttribute.split('_')[1], 1);
 
 				this.baseService.addToLatestUse(stickerAttribute);
+
+				// todo: rewrite
+				// new content mark
+
+				var hasNewContent = false;
+				for (var i = 0; i < this.stickersModel.length; i++) {
+					if (this.stickersModel[i].newPack == true) {
+						hasNewContent = true;
+						break;
+					}
+				}
+
+				if (this.baseService.getLatestUse().length != 0 && hasNewContent == false) {
+					this.resetNewStickersFlag();
+				}
 			}).bind(this));
 
 			this.view.handleClickEmoji((function(el) {
@@ -117,32 +171,6 @@ window.StickersModule = {};
 				this.config = helper.mergeOptions(this.config, {
 					stickerResolutionType : 'xhdpi',
 					tabResolutionType: 'xxhdpi'
-				});
-			}
-		},
-
-		start: function(callback) {
-
-			var onPacksLoadCallback = (function() {
-				callback && callback();
-
-				this.view.render(this.stickersModel);
-
-				// todo --> active 'used' tab
-				this.view.renderUsedStickers(this.baseService.getLatestUse());
-			}).bind(this);
-
-			var storageStickerData = this.baseService.getPacksFromStorage();
-
-			if (storageStickerData.actual) {
-
-				this.stickersModel = storageStickerData.packs;
-
-				onPacksLoadCallback.apply();
-			} else {
-
-				this.fetchPacks({
-					callback: onPacksLoadCallback
 				});
 			}
 		},

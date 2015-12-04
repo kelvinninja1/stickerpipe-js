@@ -1,24 +1,21 @@
 
 // todo: move StickersModule --> Stickers
 window.StickersModule = {};
-
 document.addEventListener("DOMContentLoaded", function(event) {
 
-    if(typeof window.ga === "undefined"){
+	if(typeof window.ga === "undefined"){
 
-        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    }
+	}
 
-    ga('create', 'UA-1113296-81', 'auto', {'name': 'stickerTracker'});
-    ga('stickerTracker.send', 'pageview');
+	ga('create', 'UA-1113296-81', 'auto', {'name': 'stickerTracker'});
+	ga('stickerTracker.send', 'pageview');
 
 });
-
-
 (function(Plugin) {
 
 	Plugin.StickersModule = Plugin.StickersModule || {};
@@ -155,6 +152,244 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 })(window);
 
+/*
+ * classList.js: Cross-browser full element.classList implementation.
+ * 2014-12-13
+ *
+ * By Eli Grey, http://eligrey.com
+ * Public Domain.
+ * NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
+ */
+
+/*global self, document, DOMException */
+
+/*! @source http://purl.eligrey.com/github/classList.js/blob/master/classList.js */
+
+if ("document" in self) {
+
+// Full polyfill for browsers with no classList support
+	if (!("classList" in document.createElement("_"))) {
+
+		(function (view) {
+
+			"use strict";
+
+			if (!('Element' in view)) return;
+
+			var
+				classListProp = "classList"
+				, protoProp = "prototype"
+				, elemCtrProto = view.Element[protoProp]
+				, objCtr = Object
+				, strTrim = String[protoProp].trim || function () {
+						return this.replace(/^\s+|\s+$/g, "");
+					}
+				, arrIndexOf = Array[protoProp].indexOf || function (item) {
+						var
+							i = 0
+							, len = this.length
+							;
+						for (; i < len; i++) {
+							if (i in this && this[i] === item) {
+								return i;
+							}
+						}
+						return -1;
+					}
+			// Vendors: please allow content code to instantiate DOMExceptions
+				, DOMEx = function (type, message) {
+					this.name = type;
+					this.code = DOMException[type];
+					this.message = message;
+				}
+				, checkTokenAndGetIndex = function (classList, token) {
+					if (token === "") {
+						throw new DOMEx(
+							"SYNTAX_ERR"
+							, "An invalid or illegal string was specified"
+						);
+					}
+					if (/\s/.test(token)) {
+						throw new DOMEx(
+							"INVALID_CHARACTER_ERR"
+							, "String contains an invalid character"
+						);
+					}
+					return arrIndexOf.call(classList, token);
+				}
+				, ClassList = function (elem) {
+					var
+						trimmedClasses = strTrim.call(elem.getAttribute("class") || "")
+						, classes = trimmedClasses ? trimmedClasses.split(/\s+/) : []
+						, i = 0
+						, len = classes.length
+						;
+					for (; i < len; i++) {
+						this.push(classes[i]);
+					}
+					this._updateClassName = function () {
+						elem.setAttribute("class", this.toString());
+					};
+				}
+				, classListProto = ClassList[protoProp] = []
+				, classListGetter = function () {
+					return new ClassList(this);
+				}
+				;
+// Most DOMException implementations don't allow calling DOMException's toString()
+// on non-DOMExceptions. Error's toString() is sufficient here.
+			DOMEx[protoProp] = Error[protoProp];
+			classListProto.item = function (i) {
+				return this[i] || null;
+			};
+			classListProto.contains = function (token) {
+				token += "";
+				return checkTokenAndGetIndex(this, token) !== -1;
+			};
+			classListProto.add = function () {
+				var
+					tokens = arguments
+					, i = 0
+					, l = tokens.length
+					, token
+					, updated = false
+					;
+				do {
+					token = tokens[i] + "";
+					if (checkTokenAndGetIndex(this, token) === -1) {
+						this.push(token);
+						updated = true;
+					}
+				}
+				while (++i < l);
+
+				if (updated) {
+					this._updateClassName();
+				}
+			};
+			classListProto.remove = function () {
+				var
+					tokens = arguments
+					, i = 0
+					, l = tokens.length
+					, token
+					, updated = false
+					, index
+					;
+				do {
+					token = tokens[i] + "";
+					index = checkTokenAndGetIndex(this, token);
+					while (index !== -1) {
+						this.splice(index, 1);
+						updated = true;
+						index = checkTokenAndGetIndex(this, token);
+					}
+				}
+				while (++i < l);
+
+				if (updated) {
+					this._updateClassName();
+				}
+			};
+			classListProto.toggle = function (token, force) {
+				token += "";
+
+				var
+					result = this.contains(token)
+					, method = result ?
+					force !== true && "remove"
+						:
+					force !== false && "add"
+					;
+
+				if (method) {
+					this[method](token);
+				}
+
+				if (force === true || force === false) {
+					return force;
+				} else {
+					return !result;
+				}
+			};
+			classListProto.toString = function () {
+				return this.join(" ");
+			};
+
+			if (objCtr.defineProperty) {
+				var classListPropDesc = {
+					get: classListGetter
+					, enumerable: true
+					, configurable: true
+				};
+				try {
+					objCtr.defineProperty(elemCtrProto, classListProp, classListPropDesc);
+				} catch (ex) { // IE 8 doesn't support enumerable:true
+					if (ex.number === -0x7FF5EC54) {
+						classListPropDesc.enumerable = false;
+						objCtr.defineProperty(elemCtrProto, classListProp, classListPropDesc);
+					}
+				}
+			} else if (objCtr[protoProp].__defineGetter__) {
+				elemCtrProto.__defineGetter__(classListProp, classListGetter);
+			}
+
+		}(self));
+
+	} else {
+// There is full or partial native classList support, so just check if we need
+// to normalize the add/remove and toggle APIs.
+
+		(function () {
+			"use strict";
+
+			var testElement = document.createElement("_");
+
+			testElement.classList.add("c1", "c2");
+
+			// Polyfill for IE 10/11 and Firefox <26, where classList.add and
+			// classList.remove exist but support only one argument at a time.
+			if (!testElement.classList.contains("c2")) {
+				var createMethod = function(method) {
+					var original = DOMTokenList.prototype[method];
+
+					DOMTokenList.prototype[method] = function(token) {
+						var i, len = arguments.length;
+
+						for (i = 0; i < len; i++) {
+							token = arguments[i];
+							original.call(this, token);
+						}
+					};
+				};
+				createMethod('add');
+				createMethod('remove');
+			}
+
+			testElement.classList.toggle("c3", false);
+
+			// Polyfill for IE 10 and Firefox <24, where classList.toggle does not
+			// support the second argument.
+			if (testElement.classList.contains("c3")) {
+				var _toggle = DOMTokenList.prototype.toggle;
+
+				DOMTokenList.prototype.toggle = function(token, force) {
+					if (1 in arguments && !this.contains(token) === !force) {
+						return force;
+					} else {
+						return _toggle.call(this, token);
+					}
+				};
+
+			}
+
+			testElement = null;
+		}());
+
+	}
+
+}
+
 (function(Plugin) {
 
 	Plugin.StickersModule.Configs = {
@@ -244,6 +479,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			xmlhttp.open('GET', url, true);
 			xmlhttp.setRequestHeader('Apikey', apikey);
 			xmlhttp.setRequestHeader('Platform', 'JS');
+			xmlhttp.setRequestHeader('Localization', Module.Configs.get('lang'));
 
 			this.forEach(header, function(value, name) {
 				xmlhttp.setRequestHeader(name, value);
@@ -270,6 +506,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			xmlhttp.setRequestHeader('Platform', 'JS');
 			xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 			xmlhttp.setRequestHeader('DeviceId', uniqUserId);
+			xmlhttp.setRequestHeader('Localization', Module.Configs.get('lang'));
 
 			this.forEach(header, function(value, name) {
 				xmlhttp.setRequestHeader(name, value);
@@ -284,10 +521,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	};
 })(window, window.StickersModule);
 
-
 (function(Plugin) {
 
-    Plugin.StickersModule.Lockr = {
+	Plugin.StickersModule.Lockr = {
 		prefix: '',
 
 		_getPrefixedKey: function(key, options) {
@@ -403,11 +639,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		flush: function () {
 			localStorage.clear();
 		}
-    };
+	};
 
 })(window);
-
-
 (function(Plugin) {
 
 	Plugin.StickersModule = Plugin.StickersModule || {};
@@ -615,10 +849,420 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	};
 
 })(window);
+;(function(window, undefined) {
+	"use strict";
 
+
+	function extend() {
+		for(var i=1; i < arguments.length; i++) {
+			for(var key in arguments[i]) {
+				if(arguments[i].hasOwnProperty(key)) {
+					arguments[0][key] = arguments[i][key];
+				}
+			}
+		}
+		return arguments[0];
+	}
+
+	var pluginName = "tinyscrollbar"
+		,   defaults = {
+			axis: 'y'
+			,   wheel: true
+			,   wheelSpeed: 40
+			,   wheelLock: true
+			,   touchLock: true
+			,   trackSize: false
+			,   thumbSize: false
+			,   thumbSizeMin: 20
+		}
+		;
+
+	function Plugin($container, options) {
+		/**
+		 * The options of the carousel extend with the defaults.
+		 *
+		 * @property options
+		 * @type Object
+		 * @default defaults
+		 */
+		this.options = extend({}, defaults, options);
+
+		/**
+		 * @property _defaults
+		 * @type Object
+		 * @private
+		 * @default defaults
+		 */
+		this._defaults = defaults;
+
+		/**
+		 * @property _name
+		 * @type String
+		 * @private
+		 * @final
+		 * @default 'tinyscrollbar'
+		 */
+		this._name = pluginName;
+
+		var self = this
+			,   $body = document.querySelectorAll("body")[0]
+			,   $viewport = $container.querySelectorAll(".viewport")[0]
+			,   $overview = $container.querySelectorAll(".overview")[0]
+			,   $scrollbar = $container.querySelectorAll(".scrollbar")[0]
+			,   $track = $scrollbar.querySelectorAll(".track")[0]
+			,   $thumb = $scrollbar.querySelectorAll(".thumb")[0]
+
+			,   mousePosition = 0
+			,   isHorizontal = this.options.axis === 'x'
+			,   hasTouchEvents = ("ontouchstart" in document.documentElement)
+			,   wheelEvent = "onwheel" in document.createElement("div") ? "wheel" : // Modern browsers support "wheel"
+				document.onmousewheel !== undefined ? "mousewheel" : // Webkit and IE support at least "mousewheel"
+					"DOMMouseScroll" // let's assume that remaining browsers are older Firefox
+
+			,   sizeLabel = isHorizontal ? "width" : "height"
+			,   posiLabel = isHorizontal ? "left" : "top"
+			,   moveEvent = document.createEvent("HTMLEvents")
+			;
+
+		moveEvent.initEvent("move", true, true);
+
+		/**
+		 * The position of the content relative to the viewport.
+		 *
+		 * @property contentPosition
+		 * @type Number
+		 * @default 0
+		 */
+		this.contentPosition = 0;
+
+		/**
+		 * The height or width of the viewport.
+		 *
+		 * @property viewportSize
+		 * @type Number
+		 * @default 0
+		 */
+		this.viewportSize = 0;
+
+		/**
+		 * The height or width of the content.
+		 *
+		 * @property contentSize
+		 * @type Number
+		 * @default 0
+		 */
+		this.contentSize = 0;
+
+		/**
+		 * The ratio of the content size relative to the viewport size.
+		 *
+		 * @property contentRatio
+		 * @type Number
+		 * @default 0
+		 */
+		this.contentRatio = 0;
+
+		/**
+		 * The height or width of the content.
+		 *
+		 * @property trackSize
+		 * @type Number
+		 * @default 0
+		 */
+		this.trackSize = 0;
+
+		/**
+		 * The size of the track relative to the size of the content.
+		 *
+		 * @property trackRatio
+		 * @type Number
+		 * @default 0
+		 */
+		this.trackRatio = 0;
+
+		/**
+		 * The height or width of the thumb.
+		 *
+		 * @property thumbSize
+		 * @type Number
+		 * @default 0
+		 */
+		this.thumbSize = 0;
+
+		/**
+		 * The position of the thumb relative to the track.
+		 *
+		 * @property thumbPosition
+		 * @type Number
+		 * @default 0
+		 */
+		this.thumbPosition = 0;
+
+		/**
+		 * Will be true if there is content to scroll.
+		 *
+		 * @property hasContentToSroll
+		 * @type Boolean
+		 * @default false
+		 */
+		this.hasContentToSroll = false;
+
+		/**
+		 * @method _initialize
+		 * @private
+		 */
+		function _initialize() {
+			self.update();
+			_setEvents();
+
+			return self;
+		}
+
+		/**
+		 * You can use the update method to adjust the scrollbar to new content or to move the scrollbar to a certain point.
+		 *
+		 * @method update
+		 * @chainable
+		 * @param {Number|String} [scrollTo] Number in pixels or the values "relative" or "bottom". If you dont specify a parameter it will default to top
+		 */
+		this.update = function(scrollTo) {
+			var sizeLabelCap = sizeLabel.charAt(0).toUpperCase() + sizeLabel.slice(1).toLowerCase();
+			var scrcls = $scrollbar.className;
+
+			this.viewportSize = $viewport['offset'+ sizeLabelCap];
+			this.contentSize = $overview['scroll'+ sizeLabelCap];
+			this.contentRatio = this.viewportSize / this.contentSize;
+			this.trackSize = this.options.trackSize || this.viewportSize;
+			this.trackSize -= 2; // bugfix (for css - top: 2px)
+			this.thumbSize = Math.min(this.trackSize, Math.max(this.options.thumbSizeMin, (this.options.thumbSize || (this.trackSize * this.contentRatio))));
+			this.trackRatio = (this.contentSize - this.viewportSize) / (this.trackSize - this.thumbSize);
+			this.hasContentToSroll = this.contentRatio < 1;
+
+			$scrollbar.className = this.hasContentToSroll ? scrcls.replace(/disable/g, "") : scrcls.replace(/ disable/g, "") + " disable";
+
+			switch (scrollTo) {
+				case "bottom":
+					this.contentPosition = Math.max(this.contentSize - this.viewportSize, 0);
+					break;
+
+				case "relative":
+					this.contentPosition = Math.min(Math.max(this.contentSize - this.viewportSize, 0), Math.max(0, this.contentPosition));
+					break;
+
+				default:
+					this.contentPosition = parseInt(scrollTo, 10) || 0;
+			}
+
+			this.thumbPosition = self.contentPosition / self.trackRatio;
+
+			_setCss();
+
+			return self;
+		};
+
+		/**
+		 * @method _setCss
+		 * @private
+		 */
+		function _setCss() {
+			$thumb.style[posiLabel] = self.thumbPosition + "px";
+			$overview.style[posiLabel] = -self.contentPosition + "px";
+			$scrollbar.style[sizeLabel] = self.trackSize + "px";
+			$track.style[sizeLabel] = self.trackSize + "px";
+			$thumb.style[sizeLabel] = self.thumbSize + "px";
+		}
+
+		/**
+		 * @method _setEvents
+		 * @private
+		 */
+		function _setEvents() {
+			if(hasTouchEvents) {
+				$viewport.ontouchstart = function(event) {
+					if(1 === event.touches.length) {
+						_start(event.touches[0]);
+						event.stopPropagation();
+					}
+				};
+			}
+			else {
+				$thumb.onmousedown = function(event) {
+					event.stopPropagation();
+					_start(event);
+				};
+
+				$track.onmousedown = function(event) {
+					_start(event, true);
+				};
+			}
+
+			window.addEventListener("resize", function() {
+				self.update("relative");
+			}, true);
+
+			if(self.options.wheel && window.addEventListener) {
+				$container.addEventListener(wheelEvent, _wheel, false );
+			}
+			else if(self.options.wheel) {
+				$container.onmousewheel = _wheel;
+			}
+		}
+
+		/**
+		 * @method _isAtBegin
+		 * @private
+		 */
+		function _isAtBegin() {
+			return self.contentPosition > 0;
+		}
+
+		/**
+		 * @method _isAtEnd
+		 * @private
+		 */
+		function _isAtEnd() {
+			return self.contentPosition <= (self.contentSize - self.viewportSize) - 5;
+		}
+
+		/**
+		 * @method _start
+		 * @private
+		 */
+		function _start(event, gotoMouse) {
+			if(self.hasContentToSroll) {
+				var posiLabelCap = posiLabel.charAt(0).toUpperCase() + posiLabel.slice(1).toLowerCase();
+				mousePosition = gotoMouse ? $thumb.getBoundingClientRect()[posiLabel] : (isHorizontal ? event.clientX : event.clientY);
+
+				$body.className += " noSelect";
+
+				if(hasTouchEvents) {
+					document.ontouchmove = function(event) {
+						if(self.options.touchLock || _isAtBegin() && _isAtEnd()) {
+							event.preventDefault();
+						}
+						_drag(event.touches[0]);
+					};
+					document.ontouchend = _end;
+				}
+				else {
+					document.onmousemove = _drag;
+					document.onmouseup = $thumb.onmouseup = _end;
+				}
+
+				_drag(event);
+			}
+		}
+
+		/**
+		 * @method _wheel
+		 * @private
+		 */
+		function _wheel(event) {
+			if(self.hasContentToSroll) {
+				var evntObj = event || window.event
+					,   wheelSpeedDelta = -(evntObj.deltaY || evntObj.detail || (-1 / 3 * evntObj.wheelDelta)) / 40
+					,   multiply = (evntObj.deltaMode === 1) ? self.options.wheelSpeed : 1
+					;
+
+				// bugfix
+				wheelSpeedDelta = wheelSpeedDelta || 0;
+
+				// todo
+				if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1 &&
+					navigator.platform.indexOf('Win') > -1) {
+
+					if (wheelSpeedDelta > 0) {
+						wheelSpeedDelta = 2.5;
+					} else {
+						wheelSpeedDelta = -2.5;
+					}
+				}
+
+				//console.log(wheelSpeedDelta, self.options.wheelSpeed, self.contentSize, self.viewportSize, self.contentPosition);
+
+				self.contentPosition -= wheelSpeedDelta * self.options.wheelSpeed;
+				self.contentPosition = Math.min((self.contentSize - self.viewportSize), Math.max(0, self.contentPosition));
+				self.thumbPosition = self.contentPosition / self.trackRatio;
+
+				$container.dispatchEvent(moveEvent);
+
+				$thumb.style[posiLabel] = self.thumbPosition + "px";
+				$overview.style[posiLabel] = -self.contentPosition + "px";
+
+				if(self.options.wheelLock || _isAtBegin() && _isAtEnd()) {
+					evntObj.preventDefault();
+				}
+			}
+		}
+
+		/**
+		 * @method _drag
+		 * @private
+		 */
+		function _drag(event) {
+			if(self.hasContentToSroll)
+			{
+				var mousePositionNew = isHorizontal ? event.clientX : event.clientY
+					,   thumbPositionDelta = hasTouchEvents ? (mousePosition - mousePositionNew) : (mousePositionNew - mousePosition)
+					,   thumbPositionNew = Math.min((self.trackSize - self.thumbSize), Math.max(0, self.thumbPosition + thumbPositionDelta))
+					;
+
+				self.contentPosition = thumbPositionNew * self.trackRatio;
+
+				$container.dispatchEvent(moveEvent);
+
+				$thumb.style[posiLabel] = thumbPositionNew + "px";
+				$overview.style[posiLabel] = -self.contentPosition + "px";
+			}
+		}
+
+
+		/**
+		 * @method _end
+		 * @private
+		 */
+		function _end() {
+			self.thumbPosition = parseInt($thumb.style[posiLabel], 10) || 0;
+
+			$body.className = $body.className.replace(" noSelect", "");
+			document.onmousemove = document.onmouseup = null;
+			$thumb.onmouseup = null;
+			$track.onmouseup = null;
+			document.ontouchmove = document.ontouchend = null;
+		}
+
+		return _initialize();
+	}
+
+	/**
+	 * @class window.tinyscrollbar
+	 * @constructor
+	 * @param {Object} [$container] Element to attach scrollbar to.
+	 * @param {Object} options
+	 @param {String} [options.axis='y'] Vertical or horizontal scroller? ( x || y ).
+	 @param {Boolean} [options.wheel=true] Enable or disable the mousewheel.
+	 @param {Boolean} [options.wheelSpeed=40] How many pixels must the mouswheel scroll at a time.
+	 @param {Boolean} [options.wheelLock=true] Lock default window wheel scrolling when there is no more content to scroll.
+	 @param {Number} [options.touchLock=true] Lock default window touch scrolling when there is no more content to scroll.
+	 @param {Boolean|Number} [options.trackSize=false] Set the size of the scrollbar to auto(false) or a fixed number.
+	 @param {Boolean|Number} [options.thumbSize=false] Set the size of the thumb to auto(false) or a fixed number
+	 @param {Boolean} [options.thumbSizeMin=20] Minimum thumb size.
+	 */
+	var tinyscrollbar = function($container, options) {
+		return new Plugin($container, options);
+	};
+
+	if(typeof define == 'function' && define.amd) {
+		define(function(){ return tinyscrollbar; });
+	}
+	else if(typeof module === 'object' && module.exports) {
+		module.exports = tinyscrollbar;
+	}
+	else {
+		window.StickersModule.Tinyscrollbar = tinyscrollbar;
+	}
+})(window);
 (function(Plugin) {
-
-	Plugin.StickersModule = Plugin.StickersModule || {};
 
 	/*jslint indent: 2, browser: true, bitwise: true, plusplus: true */
 	Plugin.StickersModule.Twemoji = (function (
@@ -1256,7 +1900,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 		// todo: block or popover
 		display: 'block',
-		width: '320px'
+		width: '320px',
+
+		lang: document.documentElement.lang.substr(0, 2) || 'en'
 	});
 
 })(window.StickersModule);
@@ -2124,6 +2770,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 // todo: API queries (get & post & put)
 
+// todo: rename file baseService --> BaseService
+
 (function(Module) {
 
     var StickerHelper = Module.StickerHelper,
@@ -2195,6 +2843,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 		// todo: remove function
 		resetNewStickersFlag: function() {
+			Module.DOMEventService.changeContentHighlight(false);
 			return this.storageService.setHasNewStickers(false);
 		},
 
@@ -2228,7 +2877,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		markNewPacks: function(oldPacks, newPacks) {
 			var globalNew = false;
 
-
 			if(oldPacks.length != 0){
 
 				StickerHelper.forEach(newPacks, function(newPack, key) {
@@ -2248,9 +2896,59 @@ document.addEventListener("DOMContentLoaded", function(event) {
 				});
 
 
-				if(globalNew) {
-					this.storageService.setHasNewStickers(globalNew);
+				// todo: to other function
+				// todo: check & fix
+				//if (globalNew) {
+
+				if (globalNew == false && this.getLatestUse().length == 0) {
+					globalNew = true;
 				}
+				this.storageService.setHasNewStickers(globalNew);
+				Module.DOMEventService.changeContentHighlight(globalNew);
+				//}
+
+
+				// *****************************************************************************************************
+				// todo: do in other function
+				// update used stickers
+
+				var used = this.getLatestUse();
+
+				for (var i = 0; i < used.length; i++) {
+					var sticker = this.parseStickerFromText('[[' + used[i].code + ']]');
+
+					var pack = null;
+					for (var j = 0; j < newPacks.length; j++) {
+						if (newPacks[j].pack_name == sticker.pack) {
+							pack = newPacks[j];
+							break;
+						}
+					}
+
+					if (pack == null) {
+						used.splice(i, 1);
+						continue;
+					}
+
+					var isset = false;
+					for (var j = 0; j < pack.stickers.length; j++) {
+						if (pack.stickers[j].name == sticker.name) {
+							isset = true;
+							break;
+						}
+					}
+
+					if (!isset) {
+						used.splice(i, 1);
+						continue;
+					}
+				}
+
+				this.storageService.setUsedStickers(used);
+
+				// *****************************************************************************************************
+			} else {
+				Module.DOMEventService.changeContentHighlight(true);
 			}
 
 			return newPacks;
@@ -2411,6 +3109,64 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			}
 		}
 	});
+
+})(window.StickersModule);
+
+(function(Module) {
+
+	Module.DOMEventService = {
+
+		events: {
+			resize: 'resize',
+			popoverShown: 'sp:popover:shown',
+			popoverHidden: 'sp:popover:hidden',
+			showContentHighlight: 'sp:content:highlight:show',
+			hideContentHighlight: 'sp:content:highlight:hide'
+		},
+
+		dispatch: function(eventName, el) {
+			if (!eventName) {
+				return;
+			}
+
+			el = el || window;
+
+			// todo: ie dispatcher (through el.fireEvent)
+			if (typeof CustomEvent === 'function') {
+				el.dispatchEvent(new CustomEvent(eventName, {
+					bubbles: true,
+					cancelable: true
+				}));
+			}
+			else { // IE
+				var event = null;
+				if (document.createEventObject) {
+					event = document.createEventObject();
+					el.fireEvent(eventName, event);
+				} else {
+					var evt = document.createEvent("HTMLEvents");
+					evt.initEvent(eventName, true, true);
+					el.dispatchEvent(evt);
+				}
+			}
+		},
+
+		popoverShown: function() {
+			this.dispatch(this.events.popoverShown);
+		},
+
+		popoverHidden: function() {
+			this.dispatch(this.events.popoverHidden);
+		},
+
+		changeContentHighlight: function(value) {
+			this.dispatch((value) ? this.events.showContentHighlight : this.events.hideContentHighlight);
+		},
+
+		resize: function(el) {
+			this.dispatch(this.events.resize, el);
+		}
+	};
 
 })(window.StickersModule);
 
@@ -2595,21 +3351,21 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		emojiService: null,
 
 		el: null,
-		stickersEl:  null,
-
-		controlTabs:  {},
+		contentEl: null,
 
 		tabsView: null,
+		scrollView: null,
 
 		_constructor: function(config, baseService, emojiService) {
 			this.config = config;
 			this.baseService = baseService;
 			this.emojiService = emojiService;
 
-			this.tabsView = new Module.TabsView(this.config);
-
 			this.el = document.getElementById(this.config.elId);
-			this.stickersEl = document.createElement('div');
+			this.contentEl = document.createElement('div');
+
+			this.tabsView = new Module.TabsView(this.config);
+			this.scrollView = new Module.ScrollView();
 
 			window.addEventListener('resize', (function() {
 				this.onWindowResize();
@@ -2628,21 +3384,25 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			this.tabsView.render(stickerPacks);
 
 			this.el.innerHTML = '';
-
 			this.el.classList.add('sticker-pipe');
 
+			this.scrollView.el.setAttribute('class', 'sp-scroll-content');
+			this.scrollView.getOverview().appendChild(this.contentEl);
+
+			this.contentEl.classList.add('sp-content');
+
 			this.el.appendChild(this.tabsView.el);
-			this.el.appendChild(this.stickersEl);
+			this.el.appendChild(this.scrollView.el);
 
 			this.tabsView.onWindowResize();
 			this.onWindowResize();
 		},
 		renderUsedStickers: function(latesUseSticker) {
 
-			this.clearBlock(this.stickersEl);
+			this.clearBlock(this.contentEl);
 
 			if (latesUseSticker.length == 0) {
-				this.stickersEl.innerHTML += this.config.htmlForEmptyRecent;
+				this.contentEl.innerHTML += this.config.htmlForEmptyRecent;
 				return false;
 			}
 
@@ -2655,27 +3415,26 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		},
 		renderEmojiBlock: function() {
 
-			this.clearBlock(this.stickersEl);
+			this.clearBlock(this.contentEl);
 
-			this.stickersEl.className = 'sp-emojis';
-
+			this.contentEl.classList.remove('sp-stickers');
+			this.contentEl.classList.add('sp-emojis');
 
 			StickerHelper.forEach(this.config.emojiList, (function(emoji) {
-
-				// todo: add size dynamic 36 vs 62
-
 				var emojiEl = document.createElement('span'),
 					emojiImgHtml = this.emojiService.parseEmojiFromText(emoji);
 
 				emojiEl.className = this.config.emojiItemClass;
 				emojiEl.innerHTML = emojiImgHtml;
 
-				this.stickersEl.appendChild(emojiEl);
+				this.contentEl.appendChild(emojiEl);
 			}).bind(this));
+
+			this.scrollView.update();
 		},
 		renderPack: function(pack) {
 
-			this.clearBlock(this.stickersEl);
+			this.clearBlock(this.contentEl);
 
 			var stickers = [];
 			StickerHelper.forEach(pack.stickers, function(sticker) {
@@ -2687,7 +3446,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 		renderStickers: function(stickers) {
 			var self = this;
 
-			this.stickersEl.className = 'sp-stickers';
+			this.contentEl.classList.remove('sp-emojis');
+			this.contentEl.classList.add('sp-stickers');
 
 			StickerHelper.forEach(stickers, function(stickerCode) {
 
@@ -2709,18 +3469,23 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 				image.src = stickerImgSrc.url;
 
-				self.stickersEl.appendChild(stickersSpanEl);
+				self.contentEl.appendChild(stickersSpanEl);
 			});
+
+			this.scrollView.update();
 		},
 
 
+		// todo: rename handleClickSticker --> handleClickOnSticker
 		handleClickSticker: function(callback) {
 			// todo: create static this.config.stickerItemClass
-			Module.StickerHelper.setEvent('click', this.stickersEl, this.config.stickerItemClass, callback);
+			Module.StickerHelper.setEvent('click', this.contentEl, this.config.stickerItemClass, callback);
 		},
+
+		// todo: rename handleClickEmoji --> handleClickOnEmoji
 		handleClickEmoji: function(callback) {
 			// todo: create static this.config.emojiItemClass
-			Module.StickerHelper.setEvent('click', this.stickersEl, this.config.emojiItemClass, callback);
+			Module.StickerHelper.setEvent('click', this.contentEl, this.config.emojiItemClass, callback);
 		},
 
 
@@ -2784,35 +3549,107 @@ document.addEventListener("DOMContentLoaded", function(event) {
 					this.toggle();
 				}
 			}).bind(this));
+
+			// todo: addEventListener --> DOMEventService
+			if (window.addEventListener) {
+				window.addEventListener(Module.DOMEventService.events.popoverShown, function() {
+					Module.DOMEventService.resize();
+				});
+			} else {
+				window.attachEvent('on' + Module.DOMEventService.events.popoverShown, function() {
+					Module.DOMEventService.resize();
+				});
+			}
 		},
 
 		toggle: function() {
 			this.active = !this.active;
 
 			if (this.active) {
-				// todo render in firefox (document.getElementsByTagName('body')[0])
 				this.toggleEl.parentElement.appendChild(this.popoverEl);
 				this.positioned();
-				window.dispatchEvent(new Event('sp:popover:shown'));
+				Module.DOMEventService.popoverShown();
 			} else {
 				this.toggleEl.parentElement.removeChild(this.popoverEl);
-				window.dispatchEvent(new Event('sp:popover:hidden'));
+				Module.DOMEventService.popoverHidden();
 			}
 		},
 
 		positioned: function() {
+			var arrowOffset = 0;
 
 			if (this.arrowEl) {
 				var style = this.toggleEl.currentStyle || window.getComputedStyle(this.toggleEl);
 				var marginLeft = parseInt(style.marginLeft, 10);
 
 				this.arrowEl.style.marginLeft = (this.toggleEl.clientWidth / 2) - (this.arrowEl.offsetWidth / 2) + marginLeft + 'px';
+
+				var arrowStyle = this.arrowEl.currentStyle || window.getComputedStyle(this.arrowEl);
+				if (arrowStyle.display != 'none') {
+					arrowOffset = 15;
+				}
 			} else {
 				console.error('error');
 			}
-			this.popoverEl.style.top = -(this.popoverEl.offsetHeight + 15) + 'px';
+
+			if (this.arrowEl)
+			this.popoverEl.style.top = -(this.popoverEl.offsetHeight + arrowOffset) + 'px';
 		}
 
+	});
+
+})(window.StickersModule);
+
+(function(Module) {
+
+	Module.ScrollView = Module.Class({
+
+		el: null,
+
+		scrollbarEl: null,
+		trackEl: null,
+		thumbEl: null,
+		viewportEl: null,
+		overviewEl: null,
+
+		scrollbar: null,
+
+		_constructor: function() {
+			this.el = document.createElement('div');
+			this.scrollbarEl = document.createElement('div');
+			this.trackEl = document.createElement('div');
+			this.thumbEl = document.createElement('div');
+			this.viewportEl = document.createElement('div');
+			this.overviewEl = document.createElement('div');
+
+			this.scrollbarEl.className = 'scrollbar';
+			this.trackEl.className = 'track';
+			this.thumbEl.className = 'thumb';
+			this.viewportEl.className = 'viewport';
+			this.overviewEl.className = 'overview';
+
+			this.trackEl.appendChild(this.thumbEl);
+			this.scrollbarEl.appendChild(this.trackEl);
+
+			this.viewportEl.appendChild(this.overviewEl);
+
+			this.el.appendChild(this.scrollbarEl);
+			this.el.appendChild(this.viewportEl);
+
+			this.scrollbar = Module.Tinyscrollbar(this.el);
+
+			window.addEventListener('resize', (function() {
+				this.update();
+			}).bind(this));
+		},
+
+		getOverview: function() {
+			return this.overviewEl;
+		},
+
+		update: function() {
+			this.scrollbar.update();
+		}
 	});
 
 })(window.StickersModule);
@@ -3189,6 +4026,34 @@ document.addEventListener("DOMContentLoaded", function(event) {
 			Plugin.JsApiInterface && Plugin.JsApiInterface._setConfigs(this.config);
 
 			this.delegateEvents();
+
+
+			// todo
+			//// ***** START *******************************************************************************************
+
+			var callback = this.config.onload || null;
+
+			var onPacksLoadCallback = (function() {
+				callback && callback();
+
+				this.view.render(this.stickersModel);
+
+				// todo --> active 'used' tab
+				this.view.renderUsedStickers(this.baseService.getLatestUse());
+			}).bind(this);
+
+			var storageStickerData = this.baseService.getPacksFromStorage();
+
+			if (storageStickerData.actual) {
+
+				this.stickersModel = storageStickerData.packs;
+
+				onPacksLoadCallback.apply();
+			} else {
+				this.fetchPacks({
+					callback: onPacksLoadCallback
+				});
+			}
 		},
 
 		delegateEvents: function() {
@@ -3205,17 +4070,28 @@ document.addEventListener("DOMContentLoaded", function(event) {
 				var pack = null,
 					packName = el.getAttribute('data-pack-name');
 
+				// todo rename
+				var changed = false,
+					hasNewContent = false;
+
 				for (var i = 0; i < this.stickersModel.length; i++) {
 					if (this.stickersModel[i].pack_name == packName) {
 
 						// set newPack - false
+						changed = true;
 						this.stickersModel[i].newPack = false;
 						this.baseService.setPacksToStorage(this.stickersModel);
 
 						pack = this.stickersModel[i];
-
-						break;
 					}
+
+					if (this.stickersModel[i].newPack == true) {
+						hasNewContent = true;
+					}
+				}
+
+				if (changed == true && this.baseService.getLatestUse().length != 0 && hasNewContent == false) {
+					this.resetNewStickersFlag();
 				}
 
 				pack && this.view.renderPack(pack);
@@ -3237,6 +4113,21 @@ document.addEventListener("DOMContentLoaded", function(event) {
 				ga('stickerTracker.send', 'event', 'sticker', stickerAttribute.split('_')[0], stickerAttribute.split('_')[1], 1);
 
 				this.baseService.addToLatestUse(stickerAttribute);
+
+				// todo: rewrite
+				// new content mark
+
+				var hasNewContent = false;
+				for (var i = 0; i < this.stickersModel.length; i++) {
+					if (this.stickersModel[i].newPack == true) {
+						hasNewContent = true;
+						break;
+					}
+				}
+
+				if (this.baseService.getLatestUse().length != 0 && hasNewContent == false) {
+					this.resetNewStickersFlag();
+				}
 			}).bind(this));
 
 			this.view.handleClickEmoji((function(el) {
@@ -3265,32 +4156,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 				this.config = helper.mergeOptions(this.config, {
 					stickerResolutionType : 'xhdpi',
 					tabResolutionType: 'xxhdpi'
-				});
-			}
-		},
-
-		start: function(callback) {
-
-			var onPacksLoadCallback = (function() {
-				callback && callback();
-
-				this.view.render(this.stickersModel);
-
-				// todo --> active 'used' tab
-				this.view.renderUsedStickers(this.baseService.getLatestUse());
-			}).bind(this);
-
-			var storageStickerData = this.baseService.getPacksFromStorage();
-
-			if (storageStickerData.actual) {
-
-				this.stickersModel = storageStickerData.packs;
-
-				onPacksLoadCallback.apply();
-			} else {
-
-				this.fetchPacks({
-					callback: onPacksLoadCallback
 				});
 			}
 		},

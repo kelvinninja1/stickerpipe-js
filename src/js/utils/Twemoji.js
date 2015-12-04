@@ -1,7 +1,4 @@
-
 (function(Plugin) {
-
-	Plugin.StickersModule = Plugin.StickersModule || {};
 
 	/*jslint indent: 2, browser: true, bitwise: true, plusplus: true */
 	Plugin.StickersModule.Twemoji = (function (

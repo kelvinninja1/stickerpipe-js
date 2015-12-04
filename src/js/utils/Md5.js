@@ -1,4 +1,3 @@
-
 (function(Plugin) {
 
 	Plugin.StickersModule = Plugin.StickersModule || {};
