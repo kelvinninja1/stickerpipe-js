@@ -57,8 +57,6 @@ js
         userId: MD5('<YOUR_USER_ID>')
 
     });
-    
-    sticker.start();
 ```
 
 html
@@ -71,19 +69,36 @@ html
 
 ## Methods
 
--  render stickers and tabs
-```js
-    sticker.start();
-```
-
 -  parse text and return img url if text is sticker
 ```js
     sticker.parseStickerFromText(text);
 ```
 
+-  parse text and return text with replaced emoji to html
+```js
+    sticker.parseEmojiFromText(text);
+```
+
+-  parse html and return text with replaced html to emoji text
+```js
+    sticker.parseEmojiFromHtml(html);
+```
+
 -  open current tab
 ```js
     sticker.renderCurrentTab(tabName);
+```
+
+- return - are the new content flag
+
+```js
+    sticker.getNewStickersFlag();
+```
+
+- when message send (for statistic)
+
+```js
+    sticker.onUserMessageSent(isSticker );
 ```
 
 
@@ -94,6 +109,12 @@ html
     
 ```js
     sticker.onClickSticker(function(text) { {...}, context );
+```
+
+- when user click on emoji
+
+```js
+    sticker.onClickEmoji(function(text) { {...}, context );
 ```
 
 - when user click on tab
@@ -108,23 +129,31 @@ html
     sticker.onClickCustomTab(function(el) { {...}, context );
 ```
 
+| Name                      |  description                                                        |
+| ------------------------- | ------------------------------------------------------------------- |
+| sp:popover:shown          | fire on popover was shown                                           |
+| sp:popover:hidden         | fire on popover was hidden                                          |
+| sp:content:highlight:show | fire on getting new content (unseen or when stickers history empty) |
+| sp:content:highlight:hide | fire on have not new contend and stickers history not empty         |
+
 
 ## Options
 
 
-| Name | value |  description  |
-| ------------- | ----------- | -----------|
-| tabContainerId      |id name string|  name of container id where will render tabs  |
-| tabItemClass     | class name string |Will set in tab block  |
-| stickersContainerId | id name string|name of container id where will render tabs |
-| stickerItemClass |class name string | Will set in sticker block |
-| stickerResolutionType | "mdpi", "hdpi", "xhdpi", "xxhdpi" | stickers size |
-| tabResolutionType | "mdpi", "hdpi", "xhdpi", "xxhdpi" | tab icon size |
-| htmlForEmptyRecent | html code | insert in empty recent block |
-| apikey | api key your account | if you wont use custom tabs |
-| storagePrefix | string | prefix for LocalStorage |
-| enableCustomTab | boolean| if your wont use something other like a twitter emoji|
-| userId | md5 of user id - string | client user id hash |
+| Name                  | value                             |  description                                  |
+| --------------------- | --------------------------------- | --------------------------------------------- |
+| elId                  | id name string                    | name of container id where will render plugin |
+| tabItemClass          | class name string                 | Will set in tab block                         |
+| stickerItemClass      | class name string                 | Will set in sticker block                     |
+| emojiItemClass        | class name string                 | Will set in emoji block                       |
+| stickerResolutionType | "mdpi", "hdpi", "xhdpi", "xxhdpi" | stickers size                                 |
+| tabResolutionType     | "mdpi", "hdpi", "xhdpi", "xxhdpi" | tab icon size                                 |
+| htmlForEmptyRecent    | html code                         | insert in empty recent block                  |
+| apikey                | api key your account              | if you wont use custom tabs                   |
+| storagePrefix         | string                            | prefix for LocalStorage                       |
+| enableEmojiTab        | boolean                           | if your wont use emoji                        |
+| userId                | md5 of user id - string           | client user id hash                           |
+| lang                  | "en", "ru" ...                    | language ISO 2                                |
 
 
 ## Credits
