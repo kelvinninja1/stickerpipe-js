@@ -1,24 +1,21 @@
 
 // todo: move StickersModule --> Stickers
 window.StickersModule = {};
-
 document.addEventListener("DOMContentLoaded", function(event) {
 
-    if(typeof window.ga === "undefined"){
+	if(typeof window.ga === "undefined"){
 
-        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    }
+	}
 
-    ga('create', 'UA-1113296-81', 'auto', {'name': 'stickerTracker'});
-    ga('stickerTracker.send', 'pageview');
+	ga('create', 'UA-1113296-81', 'auto', {'name': 'stickerTracker'});
+	ga('stickerTracker.send', 'pageview');
 
 });
-
-
 (function(Plugin) {
 
 	Plugin.StickersModule = Plugin.StickersModule || {};
@@ -154,6 +151,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	}
 
 })(window);
+
 /*
  * classList.js: Cross-browser full element.classList implementation.
  * 2014-12-13
@@ -392,221 +390,6 @@ if ("document" in self) {
 
 }
 
-
-(function(Plugin) {
-
-	Plugin.StickersModule.Configs = {
-		configs: {},
-
-		add: function(data) {
-			var configs = {};
-
-			for(var name in this.configs) {
-				configs[name] = this.configs[name];
-			}
-
-			for(var name in data) {
-				configs[name] = data[name];
-			}
-
-			this.configs = configs;
-		},
-
-		set: function(name, value) {
-			this.configs[name] = value;
-		},
-
-		get: function(name) {
-			return this.configs[name];
-		},
-
-		getAll: function() {
-			return this.configs;
-		}
-	};
-
-})(window);
-var ssb = {
-	aConts  : [],
-	mouseY : 0,
-	N  : 0,
-	asd : 0, /*active scrollbar element*/
-	sc : 0,
-	sp : 0,
-	to : 0,
-
-	// constructor
-	scrollbar : function (cont) {
-
-		// perform initialization
-		if (! ssb.init()) return false;
-
-		var cont_clone = cont.cloneNode(false);
-		cont_clone.style.overflow = "hidden";
-		cont.parentNode.appendChild(cont_clone);
-		cont_clone.appendChild(cont);
-		cont.style.position = 'absolute';
-		cont.style.left = cont.style.top = '0px';
-		cont.style.width = cont.style.height = '100%';
-
-		// adding new container into array
-		ssb.aConts[ssb.N++] = cont;
-
-		cont.sg = false;
-
-		//creating scrollbar child elements
-		cont.st = this.create_div('ssb_st', cont, cont_clone);
-		cont.sb = this.create_div('ssb_sb', cont, cont_clone);
-		cont.su = this.create_div('ssb_up', cont, cont_clone);
-		cont.sd = this.create_div('ssb_down', cont, cont_clone);
-
-		// on mouse down processing
-		cont.sb.onmousedown = function (e) {
-			if (! this.cont.sg) {
-				if (! e) e = window.event;
-
-				ssb.asd = this.cont;
-				this.cont.yZ = e.screenY;
-				this.cont.sZ = cont.scrollTop;
-				this.cont.sg = true;
-
-				// new class name
-				this.className = 'ssb_sb ssb_sb_down';
-			}
-			return false;
-		}
-		// on mouse down on free track area - move our scroll element too
-		cont.st.onmousedown = function (e) {
-			if (! e) e = window.event;
-			ssb.asd = this.cont;
-
-			ssb.mouseY = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
-			for (var o = this.cont, y = 0; o != null; o = o.offsetParent) y += o.offsetTop;
-			this.cont.scrollTop = (ssb.mouseY - y - (this.cont.ratio * this.cont.offsetHeight / 2) - this.cont.sw) / this.cont.ratio;
-			this.cont.sb.onmousedown(e);
-		}
-
-		// onmousedown events
-		cont.su.onmousedown = cont.su.ondblclick = function (e) { ssb.mousedown(this, -1); return false; }
-		cont.sd.onmousedown = cont.sd.ondblclick = function (e) { ssb.mousedown(this,  1); return false; }
-
-		//onmouseout events
-		cont.su.onmouseout = cont.su.onmouseup = ssb.clear;
-		cont.sd.onmouseout = cont.sd.onmouseup = ssb.clear;
-
-		// on mouse over - apply custom class name: ssb_sb_over
-		cont.sb.onmouseover = function (e) {
-			if (! this.cont.sg) this.className = 'ssb_sb ssb_sb_over';
-			return false;
-		}
-
-		// on mouse out - revert back our usual class name 'ssb_sb'
-		cont.sb.onmouseout  = function (e) {
-			if (! this.cont.sg) this.className = 'ssb_sb';
-			return false;
-		}
-
-		// onscroll - change positions of scroll element
-		cont.ssb_onscroll = function () {
-			this.ratio = (this.offsetHeight - 2 * this.sw) / this.scrollHeight;
-			this.sb.style.top = Math.floor(this.sw + this.scrollTop * this.ratio) + 'px';
-		}
-
-		// scrollbar width
-		cont.sw = 20;
-
-		// start scrolling
-		cont.ssb_onscroll();
-		ssb.refresh();
-
-		// binding own onscroll event
-		cont.onscroll = cont.ssb_onscroll;
-		return cont;
-	},
-
-	// initialization
-	init : function () {
-		if (window.oper || (! window.addEventListener && ! window.attachEvent)) { return false; }
-
-		// temp inner function for event registration
-		function addEvent (o, e, f) {
-			if (window.addEventListener) { o.addEventListener(e, f, false); ssb.w3c = true; return true; }
-			if (window.attachEvent) return o.attachEvent('on' + e, f);
-			return false;
-		}
-
-		// binding events
-		addEvent(window.document, 'mousemove', ssb.onmousemove);
-		addEvent(window.document, 'mouseup', ssb.onmouseup);
-		addEvent(window, 'resize', ssb.refresh);
-		return true;
-	},
-
-	// create and append div finc
-	create_div : function(c, cont, cont_clone) {
-		var o = document.createElement('div');
-		o.cont = cont;
-		o.className = c;
-		cont_clone.appendChild(o);
-		return o;
-	},
-	// do clear of controls
-	clear : function () {
-		clearTimeout(ssb.to);
-		ssb.sc = 0;
-		return false;
-	},
-	// refresh scrollbar
-	refresh : function () {
-		for (var i = 0, N = ssb.N; i < N; i++) {
-			var o = ssb.aConts[i];
-			o.ssb_onscroll();
-			o.sb.style.width = o.st.style.width = o.su.style.width = o.su.style.height = o.sd.style.width = o.sd.style.height = o.sw + 'px';
-			o.sb.style.height = Math.ceil(Math.max(o.sw * .5, o.ratio * o.offsetHeight) + 1) + 'px';
-		}
-	},
-	// arrow scrolling
-	arrow_scroll : function () {
-		if (ssb.sc != 0) {
-			ssb.asd.scrollTop += 6 * ssb.sc / ssb.asd.ratio;
-			ssb.to = setTimeout(ssb.arrow_scroll, ssb.sp);
-			ssb.sp = 32;
-		}
-	},
-
-	/* event binded functions : */
-	// scroll on mouse down
-	mousedown : function (o, s) {
-		if (ssb.sc == 0) {
-			// new class name
-			o.cont.sb.className = 'ssb_sb ssb_sb_down';
-			ssb.asd = o.cont;
-			ssb.sc = s;
-			ssb.sp = 400;
-			ssb.arrow_scroll();
-		}
-	},
-	// on mouseMove binded event
-	onmousemove : function(e) {
-		if (! e) e = window.event;
-		// get vertical mouse position
-		ssb.mouseY = e.screenY;
-		if (ssb.asd.sg) ssb.asd.scrollTop = ssb.asd.sZ + (ssb.mouseY - ssb.asd.yZ) / ssb.asd.ratio;
-	},
-	// on mouseUp binded event
-	onmouseup : function (e) {
-		if (! e) e = window.event;
-		var tg = (e.target) ? e.target : e.srcElement;
-		if (ssb.asd && document.releaseCapture) ssb.asd.releaseCapture();
-
-		// new class name
-		if (ssb.asd) ssb.asd.sb.className = (tg.className.indexOf('scrollbar') > 0) ? 'ssb_sb ssb_sb_over' : 'ssb_sb';
-		document.onselectstart = '';
-		ssb.clear();
-		ssb.asd.sg = false;
-	}
-};
-
 (function(Plugin, Module) {
 
 	Module.StickerHelper = {
@@ -617,7 +400,7 @@ var ssb = {
 			}
 		},
 
-		mergeOptions: function(obj1, obj2) {
+		merge: function(obj1, obj2) {
 			var obj3 = {};
 
 			for(var attrname in obj1) {
@@ -629,6 +412,10 @@ var ssb = {
 			}
 
 			return obj3;
+		},
+
+		setConfig: function(config) {
+			Module.Configs = this.merge(Module.Configs || {}, config);
 		},
 
 		setEvent: function(eventType, el, className, callback) {
@@ -647,67 +434,15 @@ var ssb = {
 			});
 		},
 
-		ajaxGet: function(url, apikey, callback, header) {
-			header = header || {};
-
-			var xmlhttp;
-
-			xmlhttp = new XMLHttpRequest();
-
-			xmlhttp.onreadystatechange = function(){
-				if (xmlhttp.readyState == 4 && xmlhttp.status == 200){
-					callback(JSON.parse(xmlhttp.responseText));
-				}
-			};
-			xmlhttp.open('GET', url, true);
-			xmlhttp.setRequestHeader('Apikey', apikey);
-			xmlhttp.setRequestHeader('Platform', 'JS');
-			xmlhttp.setRequestHeader('Localization', Module.Configs.get('lang'));
-
-			this.forEach(header, function(value, name) {
-				xmlhttp.setRequestHeader(name, value);
-			});
-
-			xmlhttp.send();
-		},
-
-		ajaxPost: function(url, apikey, data, callback, header) {
-			var storageService = new Module.StorageService(Module.Configs.get('storagePrefix')),
-				uniqUserId = storageService.getUniqUserId(),
-				xmlhttp;
-
-			xmlhttp = new XMLHttpRequest();
-
-			xmlhttp.onreadystatechange = function() {
-				if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-					callback && callback(JSON.parse(xmlhttp.responseText));
-				}
-			};
-
-			xmlhttp.open('POST', url, true);
-			xmlhttp.setRequestHeader('Apikey', apikey);
-			xmlhttp.setRequestHeader('Platform', 'JS');
-			xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-			xmlhttp.setRequestHeader('DeviceId', uniqUserId);
-			xmlhttp.setRequestHeader('Localization', Module.Configs.get('lang'));
-
-			this.forEach(header, function(value, name) {
-				xmlhttp.setRequestHeader(name, value);
-			});
-
-			xmlhttp.send(JSON.stringify(data));
-		},
-
 		md5: function(string) {
-			return StickersModule.MD5(string);
+			return Module.MD5(string);
 		}
 	};
 })(window, window.StickersModule);
 
-
 (function(Plugin) {
 
-    Plugin.StickersModule.Lockr = {
+	Plugin.StickersModule.Lockr = {
 		prefix: '',
 
 		_getPrefixedKey: function(key, options) {
@@ -823,14 +558,11 @@ var ssb = {
 		flush: function () {
 			localStorage.clear();
 		}
-    };
+	};
 
 })(window);
-
-
 (function(Plugin) {
 
-	Plugin.StickersModule = Plugin.StickersModule || {};
 	Plugin.StickersModule.MD5 = function (string) {
 
 		string = string.toString();
@@ -1036,423 +768,419 @@ var ssb = {
 
 })(window);
 ;(function(window, undefined) {
-    "use strict";
+	"use strict";
 
 
-    function extend() {
-        for(var i=1; i < arguments.length; i++) {
-            for(var key in arguments[i]) {
-                if(arguments[i].hasOwnProperty(key)) {
-                    arguments[0][key] = arguments[i][key];
-                }
-            }
-        }
-        return arguments[0];
-    }
+	function extend() {
+		for(var i=1; i < arguments.length; i++) {
+			for(var key in arguments[i]) {
+				if(arguments[i].hasOwnProperty(key)) {
+					arguments[0][key] = arguments[i][key];
+				}
+			}
+		}
+		return arguments[0];
+	}
 
-    var pluginName = "tinyscrollbar"
-    ,   defaults = {
-            axis: 'y'
-        ,   wheel: true
-        ,   wheelSpeed: 40
-        ,   wheelLock: true
-        ,   touchLock: true
-        ,   trackSize: false
-        ,   thumbSize: false
-        ,   thumbSizeMin: 20
-        }
-    ;
+	var pluginName = "tinyscrollbar"
+		,   defaults = {
+			axis: 'y'
+			,   wheel: true
+			,   wheelSpeed: 40
+			,   wheelLock: true
+			,   touchLock: true
+			,   trackSize: false
+			,   thumbSize: false
+			,   thumbSizeMin: 20
+		}
+		;
 
-    function Plugin($container, options) {
-        /**
-         * The options of the carousel extend with the defaults.
-         *
-         * @property options
-         * @type Object
-         * @default defaults
-         */
-        this.options = extend({}, defaults, options);
+	function Plugin($container, options) {
+		/**
+		 * The options of the carousel extend with the defaults.
+		 *
+		 * @property options
+		 * @type Object
+		 * @default defaults
+		 */
+		this.options = extend({}, defaults, options);
 
-        /**
-         * @property _defaults
-         * @type Object
-         * @private
-         * @default defaults
-         */
-        this._defaults = defaults;
+		/**
+		 * @property _defaults
+		 * @type Object
+		 * @private
+		 * @default defaults
+		 */
+		this._defaults = defaults;
 
-        /**
-         * @property _name
-         * @type String
-         * @private
-         * @final
-         * @default 'tinyscrollbar'
-         */
-        this._name = pluginName;
+		/**
+		 * @property _name
+		 * @type String
+		 * @private
+		 * @final
+		 * @default 'tinyscrollbar'
+		 */
+		this._name = pluginName;
 
-        var self = this
-        ,   $body = document.querySelectorAll("body")[0]
-        ,   $viewport = $container.querySelectorAll(".viewport")[0]
-        ,   $overview = $container.querySelectorAll(".overview")[0]
-        ,   $scrollbar = $container.querySelectorAll(".scrollbar")[0]
-        ,   $track = $scrollbar.querySelectorAll(".track")[0]
-        ,   $thumb = $scrollbar.querySelectorAll(".thumb")[0]
+		var self = this
+			,   $body = document.querySelectorAll("body")[0]
+			,   $viewport = $container.querySelectorAll(".viewport")[0]
+			,   $overview = $container.querySelectorAll(".overview")[0]
+			,   $scrollbar = $container.querySelectorAll(".scrollbar")[0]
+			,   $track = $scrollbar.querySelectorAll(".track")[0]
+			,   $thumb = $scrollbar.querySelectorAll(".thumb")[0]
 
-        ,   mousePosition = 0
-        ,   isHorizontal = this.options.axis === 'x'
-        ,   hasTouchEvents = ("ontouchstart" in document.documentElement)
-        ,   wheelEvent = "onwheel" in document.createElement("div") ? "wheel" : // Modern browsers support "wheel"
-                             document.onmousewheel !== undefined ? "mousewheel" : // Webkit and IE support at least "mousewheel"
-                             "DOMMouseScroll" // let's assume that remaining browsers are older Firefox
+			,   mousePosition = 0
+			,   isHorizontal = this.options.axis === 'x'
+			,   hasTouchEvents = ("ontouchstart" in document.documentElement)
+			,   wheelEvent = "onwheel" in document.createElement("div") ? "wheel" : // Modern browsers support "wheel"
+				document.onmousewheel !== undefined ? "mousewheel" : // Webkit and IE support at least "mousewheel"
+					"DOMMouseScroll" // let's assume that remaining browsers are older Firefox
 
-        ,   sizeLabel = isHorizontal ? "width" : "height"
-        ,   posiLabel = isHorizontal ? "left" : "top"
-        ,   moveEvent = document.createEvent("HTMLEvents")
-        ;
+			,   sizeLabel = isHorizontal ? "width" : "height"
+			,   posiLabel = isHorizontal ? "left" : "top"
+			,   moveEvent = document.createEvent("HTMLEvents")
+			;
 
-        moveEvent.initEvent("move", true, true);
+		moveEvent.initEvent("move", true, true);
 
-        /**
-         * The position of the content relative to the viewport.
-         *
-         * @property contentPosition
-         * @type Number
-         * @default 0
-         */
-        this.contentPosition = 0;
+		/**
+		 * The position of the content relative to the viewport.
+		 *
+		 * @property contentPosition
+		 * @type Number
+		 * @default 0
+		 */
+		this.contentPosition = 0;
 
-        /**
-         * The height or width of the viewport.
-         *
-         * @property viewportSize
-         * @type Number
-         * @default 0
-         */
-        this.viewportSize = 0;
+		/**
+		 * The height or width of the viewport.
+		 *
+		 * @property viewportSize
+		 * @type Number
+		 * @default 0
+		 */
+		this.viewportSize = 0;
 
-        /**
-         * The height or width of the content.
-         *
-         * @property contentSize
-         * @type Number
-         * @default 0
-         */
-        this.contentSize = 0;
+		/**
+		 * The height or width of the content.
+		 *
+		 * @property contentSize
+		 * @type Number
+		 * @default 0
+		 */
+		this.contentSize = 0;
 
-        /**
-         * The ratio of the content size relative to the viewport size.
-         *
-         * @property contentRatio
-         * @type Number
-         * @default 0
-         */
-        this.contentRatio = 0;
+		/**
+		 * The ratio of the content size relative to the viewport size.
+		 *
+		 * @property contentRatio
+		 * @type Number
+		 * @default 0
+		 */
+		this.contentRatio = 0;
 
-        /**
-         * The height or width of the content.
-         *
-         * @property trackSize
-         * @type Number
-         * @default 0
-         */
-        this.trackSize = 0;
+		/**
+		 * The height or width of the content.
+		 *
+		 * @property trackSize
+		 * @type Number
+		 * @default 0
+		 */
+		this.trackSize = 0;
 
-        /**
-         * The size of the track relative to the size of the content.
-         *
-         * @property trackRatio
-         * @type Number
-         * @default 0
-         */
-        this.trackRatio = 0;
+		/**
+		 * The size of the track relative to the size of the content.
+		 *
+		 * @property trackRatio
+		 * @type Number
+		 * @default 0
+		 */
+		this.trackRatio = 0;
 
-        /**
-         * The height or width of the thumb.
-         *
-         * @property thumbSize
-         * @type Number
-         * @default 0
-         */
-        this.thumbSize = 0;
+		/**
+		 * The height or width of the thumb.
+		 *
+		 * @property thumbSize
+		 * @type Number
+		 * @default 0
+		 */
+		this.thumbSize = 0;
 
-        /**
-         * The position of the thumb relative to the track.
-         *
-         * @property thumbPosition
-         * @type Number
-         * @default 0
-         */
-        this.thumbPosition = 0;
+		/**
+		 * The position of the thumb relative to the track.
+		 *
+		 * @property thumbPosition
+		 * @type Number
+		 * @default 0
+		 */
+		this.thumbPosition = 0;
 
-        /**
-         * Will be true if there is content to scroll.
-         *
-         * @property hasContentToSroll
-         * @type Boolean
-         * @default false
-         */
-        this.hasContentToSroll = false;
+		/**
+		 * Will be true if there is content to scroll.
+		 *
+		 * @property hasContentToSroll
+		 * @type Boolean
+		 * @default false
+		 */
+		this.hasContentToSroll = false;
 
-        /**
-         * @method _initialize
-         * @private
-         */
-        function _initialize() {
-            self.update();
-            _setEvents();
+		/**
+		 * @method _initialize
+		 * @private
+		 */
+		function _initialize() {
+			self.update();
+			_setEvents();
 
-            return self;
-        }
+			return self;
+		}
 
-        /**
-         * You can use the update method to adjust the scrollbar to new content or to move the scrollbar to a certain point.
-         *
-         * @method update
-         * @chainable
-         * @param {Number|String} [scrollTo] Number in pixels or the values "relative" or "bottom". If you dont specify a parameter it will default to top
-         */
-        this.update = function(scrollTo) {
-            var sizeLabelCap = sizeLabel.charAt(0).toUpperCase() + sizeLabel.slice(1).toLowerCase();
-            var scrcls = $scrollbar.className;
+		/**
+		 * You can use the update method to adjust the scrollbar to new content or to move the scrollbar to a certain point.
+		 *
+		 * @method update
+		 * @chainable
+		 * @param {Number|String} [scrollTo] Number in pixels or the values "relative" or "bottom". If you dont specify a parameter it will default to top
+		 */
+		this.update = function(scrollTo) {
+			var sizeLabelCap = sizeLabel.charAt(0).toUpperCase() + sizeLabel.slice(1).toLowerCase();
+			var scrcls = $scrollbar.className;
 
-            this.viewportSize = $viewport['offset'+ sizeLabelCap];
-            this.contentSize = $overview['scroll'+ sizeLabelCap];
-            this.contentRatio = this.viewportSize / this.contentSize;
-            this.trackSize = this.options.trackSize || this.viewportSize;
-            this.trackSize -= 2; // bugfix (for css - top: 2px)
-            this.thumbSize = Math.min(this.trackSize, Math.max(this.options.thumbSizeMin, (this.options.thumbSize || (this.trackSize * this.contentRatio))));
-            this.trackRatio = (this.contentSize - this.viewportSize) / (this.trackSize - this.thumbSize);
-            this.hasContentToSroll = this.contentRatio < 1;
+			this.viewportSize = $viewport['offset'+ sizeLabelCap];
+			this.contentSize = $overview['scroll'+ sizeLabelCap];
+			this.contentRatio = this.viewportSize / this.contentSize;
+			this.trackSize = this.options.trackSize || this.viewportSize;
+			this.trackSize -= 2; // bugfix (for css - top: 2px)
+			this.thumbSize = Math.min(this.trackSize, Math.max(this.options.thumbSizeMin, (this.options.thumbSize || (this.trackSize * this.contentRatio))));
+			this.trackRatio = (this.contentSize - this.viewportSize) / (this.trackSize - this.thumbSize);
+			this.hasContentToSroll = this.contentRatio < 1;
 
-            $scrollbar.className = this.hasContentToSroll ? scrcls.replace(/disable/g, "") : scrcls.replace(/ disable/g, "") + " disable";
+			$scrollbar.className = this.hasContentToSroll ? scrcls.replace(/disable/g, "") : scrcls.replace(/ disable/g, "") + " disable";
 
-            switch (scrollTo) {
-                case "bottom":
-                    this.contentPosition = Math.max(this.contentSize - this.viewportSize, 0);
-                    break;
+			switch (scrollTo) {
+				case "bottom":
+					this.contentPosition = Math.max(this.contentSize - this.viewportSize, 0);
+					break;
 
-                case "relative":
-                    this.contentPosition = Math.min(Math.max(this.contentSize - this.viewportSize, 0), Math.max(0, this.contentPosition));
-                    break;
+				case "relative":
+					this.contentPosition = Math.min(Math.max(this.contentSize - this.viewportSize, 0), Math.max(0, this.contentPosition));
+					break;
 
-                default:
-                    this.contentPosition = parseInt(scrollTo, 10) || 0;
-            }
+				default:
+					this.contentPosition = parseInt(scrollTo, 10) || 0;
+			}
 
-            this.thumbPosition = self.contentPosition / self.trackRatio;
+			this.thumbPosition = self.contentPosition / self.trackRatio;
 
-            _setCss();
+			_setCss();
 
-            return self;
-        };
+			return self;
+		};
 
-        /**
-         * @method _setCss
-         * @private
-         */
-        function _setCss() {
-            $thumb.style[posiLabel] = self.thumbPosition + "px";
-            $overview.style[posiLabel] = -self.contentPosition + "px";
-            $scrollbar.style[sizeLabel] = self.trackSize + "px";
-            $track.style[sizeLabel] = self.trackSize + "px";
-            $thumb.style[sizeLabel] = self.thumbSize + "px";
-        }
+		/**
+		 * @method _setCss
+		 * @private
+		 */
+		function _setCss() {
+			$thumb.style[posiLabel] = self.thumbPosition + "px";
+			$overview.style[posiLabel] = -self.contentPosition + "px";
+			$scrollbar.style[sizeLabel] = self.trackSize + "px";
+			$track.style[sizeLabel] = self.trackSize + "px";
+			$thumb.style[sizeLabel] = self.thumbSize + "px";
+		}
 
-        /**
-         * @method _setEvents
-         * @private
-         */
-        function _setEvents() {
-            if(hasTouchEvents) {
-                $viewport.ontouchstart = function(event) {
-                    if(1 === event.touches.length) {
-                        _start(event.touches[0]);
-                        event.stopPropagation();
-                    }
-                };
-            }
-            else {
-                $thumb.onmousedown = function(event) {
-                    event.stopPropagation();
-                    _start(event);
-                };
+		/**
+		 * @method _setEvents
+		 * @private
+		 */
+		function _setEvents() {
+			if(hasTouchEvents) {
+				$viewport.ontouchstart = function(event) {
+					if(1 === event.touches.length) {
+						_start(event.touches[0]);
+						event.stopPropagation();
+					}
+				};
+			}
+			else {
+				$thumb.onmousedown = function(event) {
+					event.stopPropagation();
+					_start(event);
+				};
 
-                $track.onmousedown = function(event) {
-                    _start(event, true);
-                };
-            }
+				$track.onmousedown = function(event) {
+					_start(event, true);
+				};
+			}
 
-            window.addEventListener("resize", function() {
-               self.update("relative");
-            }, true);
+			window.addEventListener("resize", function() {
+				self.update("relative");
+			}, true);
 
-            if(self.options.wheel && window.addEventListener) {
-                $container.addEventListener(wheelEvent, _wheel, false );
-            }
-            else if(self.options.wheel) {
-                $container.onmousewheel = _wheel;
-            }
-        }
+			if(self.options.wheel && window.addEventListener) {
+				$container.addEventListener(wheelEvent, _wheel, false );
+			}
+			else if(self.options.wheel) {
+				$container.onmousewheel = _wheel;
+			}
+		}
 
-        /**
-         * @method _isAtBegin
-         * @private
-         */
-        function _isAtBegin() {
-            return self.contentPosition > 0;
-        }
+		/**
+		 * @method _isAtBegin
+		 * @private
+		 */
+		function _isAtBegin() {
+			return self.contentPosition > 0;
+		}
 
-        /**
-         * @method _isAtEnd
-         * @private
-         */
-        function _isAtEnd() {
-            return self.contentPosition <= (self.contentSize - self.viewportSize) - 5;
-        }
+		/**
+		 * @method _isAtEnd
+		 * @private
+		 */
+		function _isAtEnd() {
+			return self.contentPosition <= (self.contentSize - self.viewportSize) - 5;
+		}
 
-        /**
-         * @method _start
-         * @private
-         */
-        function _start(event, gotoMouse) {
-            if(self.hasContentToSroll) {
-                var posiLabelCap = posiLabel.charAt(0).toUpperCase() + posiLabel.slice(1).toLowerCase();
-                mousePosition = gotoMouse ? $thumb.getBoundingClientRect()[posiLabel] : (isHorizontal ? event.clientX : event.clientY);
+		/**
+		 * @method _start
+		 * @private
+		 */
+		function _start(event, gotoMouse) {
+			if(self.hasContentToSroll) {
+				var posiLabelCap = posiLabel.charAt(0).toUpperCase() + posiLabel.slice(1).toLowerCase();
+				mousePosition = gotoMouse ? $thumb.getBoundingClientRect()[posiLabel] : (isHorizontal ? event.clientX : event.clientY);
 
-                $body.className += " noSelect";
+				$body.className += " noSelect";
 
-                if(hasTouchEvents) {
-                    document.ontouchmove = function(event) {
-                        if(self.options.touchLock || _isAtBegin() && _isAtEnd()) {
-                            event.preventDefault();
-                        }
-                        _drag(event.touches[0]);
-                    };
-                    document.ontouchend = _end;
-                }
-                else {
-                    document.onmousemove = _drag;
-                    document.onmouseup = $thumb.onmouseup = _end;
-                }
+				if(hasTouchEvents) {
+					document.ontouchmove = function(event) {
+						if(self.options.touchLock || _isAtBegin() && _isAtEnd()) {
+							event.preventDefault();
+						}
+						_drag(event.touches[0]);
+					};
+					document.ontouchend = _end;
+				}
+				else {
+					document.onmousemove = _drag;
+					document.onmouseup = $thumb.onmouseup = _end;
+				}
 
-                _drag(event);
-            }
-        }
+				_drag(event);
+			}
+		}
 
-        /**
-         * @method _wheel
-         * @private
-         */
-        function _wheel(event) {
-            if(self.hasContentToSroll) {
-                var evntObj = event || window.event
-                ,   wheelSpeedDelta = -(evntObj.deltaY || evntObj.detail || (-1 / 3 * evntObj.wheelDelta)) / 40
-                ,   multiply = (evntObj.deltaMode === 1) ? self.options.wheelSpeed : 1
-                ;
+		/**
+		 * @method _wheel
+		 * @private
+		 */
+		function _wheel(event) {
+			if(self.hasContentToSroll) {
+				var evntObj = event || window.event
+					,   wheelSpeedDelta = -(evntObj.deltaY || evntObj.detail || (-1 / 3 * evntObj.wheelDelta)) / 40
+					,   multiply = (evntObj.deltaMode === 1) ? self.options.wheelSpeed : 1
+					;
 
-                // bugfix
-                wheelSpeedDelta = wheelSpeedDelta || 0;
+				// bugfix
+				wheelSpeedDelta = wheelSpeedDelta || 0;
 
-                // todo
-                if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1 &&
-                    navigator.platform.indexOf('Win') > -1) {
+				// todo
+				if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1 &&
+					navigator.platform.indexOf('Win') > -1) {
 
-                    if (wheelSpeedDelta > 0) {
-                        wheelSpeedDelta = 2.5;
-                    } else {
-                        wheelSpeedDelta = -2.5;
-                    }
-                }
+					if (wheelSpeedDelta > 0) {
+						wheelSpeedDelta = 2.5;
+					} else {
+						wheelSpeedDelta = -2.5;
+					}
+				}
 
-                //console.log(wheelSpeedDelta, self.options.wheelSpeed, self.contentSize, self.viewportSize, self.contentPosition);
+				//console.log(wheelSpeedDelta, self.options.wheelSpeed, self.contentSize, self.viewportSize, self.contentPosition);
 
-                self.contentPosition -= wheelSpeedDelta * self.options.wheelSpeed;
-                self.contentPosition = Math.min((self.contentSize - self.viewportSize), Math.max(0, self.contentPosition));
-                self.thumbPosition = self.contentPosition / self.trackRatio;
+				self.contentPosition -= wheelSpeedDelta * self.options.wheelSpeed;
+				self.contentPosition = Math.min((self.contentSize - self.viewportSize), Math.max(0, self.contentPosition));
+				self.thumbPosition = self.contentPosition / self.trackRatio;
 
-                $container.dispatchEvent(moveEvent);
+				$container.dispatchEvent(moveEvent);
 
-                $thumb.style[posiLabel] = self.thumbPosition + "px";
-                $overview.style[posiLabel] = -self.contentPosition + "px";
+				$thumb.style[posiLabel] = self.thumbPosition + "px";
+				$overview.style[posiLabel] = -self.contentPosition + "px";
 
-                if(self.options.wheelLock || _isAtBegin() && _isAtEnd()) {
-                    evntObj.preventDefault();
-                }
-            }
-        }
+				if(self.options.wheelLock || _isAtBegin() && _isAtEnd()) {
+					evntObj.preventDefault();
+				}
+			}
+		}
 
-        /**
-         * @method _drag
-         * @private
-         */
-        function _drag(event) {
-            if(self.hasContentToSroll)
-            {
-                var mousePositionNew = isHorizontal ? event.clientX : event.clientY
-                ,   thumbPositionDelta = hasTouchEvents ? (mousePosition - mousePositionNew) : (mousePositionNew - mousePosition)
-                ,   thumbPositionNew = Math.min((self.trackSize - self.thumbSize), Math.max(0, self.thumbPosition + thumbPositionDelta))
-                ;
+		/**
+		 * @method _drag
+		 * @private
+		 */
+		function _drag(event) {
+			if(self.hasContentToSroll)
+			{
+				var mousePositionNew = isHorizontal ? event.clientX : event.clientY
+					,   thumbPositionDelta = hasTouchEvents ? (mousePosition - mousePositionNew) : (mousePositionNew - mousePosition)
+					,   thumbPositionNew = Math.min((self.trackSize - self.thumbSize), Math.max(0, self.thumbPosition + thumbPositionDelta))
+					;
 
-                self.contentPosition = thumbPositionNew * self.trackRatio;
+				self.contentPosition = thumbPositionNew * self.trackRatio;
 
-                $container.dispatchEvent(moveEvent);
+				$container.dispatchEvent(moveEvent);
 
-                $thumb.style[posiLabel] = thumbPositionNew + "px";
-                $overview.style[posiLabel] = -self.contentPosition + "px";
-            }
-        }
+				$thumb.style[posiLabel] = thumbPositionNew + "px";
+				$overview.style[posiLabel] = -self.contentPosition + "px";
+			}
+		}
 
 
-        /**
-         * @method _end
-         * @private
-         */
-        function _end() {
-            self.thumbPosition = parseInt($thumb.style[posiLabel], 10) || 0;
+		/**
+		 * @method _end
+		 * @private
+		 */
+		function _end() {
+			self.thumbPosition = parseInt($thumb.style[posiLabel], 10) || 0;
 
-            $body.className = $body.className.replace(" noSelect", "");
-            document.onmousemove = document.onmouseup = null;
-            $thumb.onmouseup = null;
-            $track.onmouseup = null;
-            document.ontouchmove = document.ontouchend = null;
-        }
+			$body.className = $body.className.replace(" noSelect", "");
+			document.onmousemove = document.onmouseup = null;
+			$thumb.onmouseup = null;
+			$track.onmouseup = null;
+			document.ontouchmove = document.ontouchend = null;
+		}
 
-        return _initialize();
-    }
+		return _initialize();
+	}
 
-    /**
-    * @class window.tinyscrollbar
-    * @constructor
-    * @param {Object} [$container] Element to attach scrollbar to.
-    * @param {Object} options
-        @param {String} [options.axis='y'] Vertical or horizontal scroller? ( x || y ).
-        @param {Boolean} [options.wheel=true] Enable or disable the mousewheel.
-        @param {Boolean} [options.wheelSpeed=40] How many pixels must the mouswheel scroll at a time.
-        @param {Boolean} [options.wheelLock=true] Lock default window wheel scrolling when there is no more content to scroll.
-        @param {Number} [options.touchLock=true] Lock default window touch scrolling when there is no more content to scroll.
-        @param {Boolean|Number} [options.trackSize=false] Set the size of the scrollbar to auto(false) or a fixed number.
-        @param {Boolean|Number} [options.thumbSize=false] Set the size of the thumb to auto(false) or a fixed number
-        @param {Boolean} [options.thumbSizeMin=20] Minimum thumb size.
-    */
-    var tinyscrollbar = function($container, options) {
-        return new Plugin($container, options);
-    };
+	/**
+	 * @class window.tinyscrollbar
+	 * @constructor
+	 * @param {Object} [$container] Element to attach scrollbar to.
+	 * @param {Object} options
+	 @param {String} [options.axis='y'] Vertical or horizontal scroller? ( x || y ).
+	 @param {Boolean} [options.wheel=true] Enable or disable the mousewheel.
+	 @param {Boolean} [options.wheelSpeed=40] How many pixels must the mouswheel scroll at a time.
+	 @param {Boolean} [options.wheelLock=true] Lock default window wheel scrolling when there is no more content to scroll.
+	 @param {Number} [options.touchLock=true] Lock default window touch scrolling when there is no more content to scroll.
+	 @param {Boolean|Number} [options.trackSize=false] Set the size of the scrollbar to auto(false) or a fixed number.
+	 @param {Boolean|Number} [options.thumbSize=false] Set the size of the thumb to auto(false) or a fixed number
+	 @param {Boolean} [options.thumbSizeMin=20] Minimum thumb size.
+	 */
+	var tinyscrollbar = function($container, options) {
+		return new Plugin($container, options);
+	};
 
-    if(typeof define == 'function' && define.amd) {
-        define(function(){ return tinyscrollbar; });
-    }
-    else if(typeof module === 'object' && module.exports) {
-        module.exports = tinyscrollbar;
-    }
-    else {
-        window.StickersModule.Tinyscrollbar = tinyscrollbar;
-    }
+	if(typeof define == 'function' && define.amd) {
+		define(function(){ return tinyscrollbar; });
+	}
+	else if(typeof module === 'object' && module.exports) {
+		module.exports = tinyscrollbar;
+	}
+	else {
+		window.StickersModule.Tinyscrollbar = tinyscrollbar;
+	}
 })(window);
-
-
 (function(Plugin) {
-
-	Plugin.StickersModule = Plugin.StickersModule || {};
 
 	/*jslint indent: 2, browser: true, bitwise: true, plusplus: true */
 	Plugin.StickersModule.Twemoji = (function (
@@ -2047,12 +1775,660 @@ var ssb = {
 
 })(window);
 
+
+
+// todo: API queries (get & post & put)
+
+// todo: rename file baseService --> BaseService
+
 (function(Module) {
 
-	Module.Configs.add({
+    var StickerHelper = Module.StickerHelper,
+		JsApiInterface = Module.StoreApiInterface;
+
+	Module.BaseService = {
+
+		parseCountStat: 0,
+		parseCountWithStickerStat: 0,
+
+		parseStickerStatHandle: function(is_have) {
+			var nowDate = new Date().getTime()/1000|0;
+
+			this.parseCountStat++;
+
+			if(is_have) {
+				this.parseCountWithStickerStat++;
+			}
+
+			if(this.parseCountStat >= 50) {
+				Module.Http.post(Module.Configs.trackStatUrl, [
+					{
+						action: 'check',
+						category: 'message',
+						label: 'Events count',
+						time: nowDate,
+						value: this.parseCountStat
+
+					},
+					{
+						action: 'check',
+						category: 'message',
+						label: 'Stickers count',
+						time: nowDate,
+						value: this.parseCountWithStickerStat
+					}
+
+				]);
+
+				ga('stickerTracker.send', 'event', 'message', 'check', 'Events count', this.parseCountStat);
+				ga('stickerTracker.send', 'event', 'message', 'check', 'Stickers count', this.parseCountWithStickerStat);
+
+				this.parseCountWithStickerStat = 0;
+				this.parseCountStat = 0;
+
+			}
+
+			},
+
+		// todo: remove function
+		addToLatestUse: function(code) {
+			Module.Storage.addUsedSticker(code);
+		},
+
+		// todo: remove function
+		getNewStickersFlag: function() {
+			return Module.Storage.hasNewStickers();
+		},
+
+		// todo: remove function
+		resetNewStickersFlag: function() {
+			Module.DOMEventService.changeContentHighlight(false);
+			return Module.Storage.setHasNewStickers(false);
+		},
+
+		// todo: remove function
+		getLatestUse: function() {
+			return Module.Storage.getUsedStickers();
+		},
+
+		getPacksFromStorage: function() {
+			var expireDate = (+new Date()),
+				packsObj = Module.Storage.getPacks();
+
+			if(typeof packsObj === "undefined"
+				|| packsObj.expireDate < expireDate
+				|| Module.Configs.debug
+			) {
+
+				return {
+					actual: false,
+					packs: typeof packsObj == "object" && packsObj.packs ? packsObj.packs : []
+				};
+			} else {
+
+				return {
+					actual: true,
+					packs: packsObj.packs
+				};
+			}
+		},
+
+		markNewPacks: function(oldPacks, newPacks) {
+			var globalNew = false;
+
+			if(oldPacks.length != 0){
+
+				StickerHelper.forEach(newPacks, function(newPack, key) {
+					var isNewPack = true;
+
+					StickerHelper.forEach(oldPacks, function(oldPack) {
+
+
+						if(newPack.pack_name == oldPack.pack_name) {
+							isNewPack = oldPack.newPack;
+						}
+
+					});
+
+					if(isNewPack)  globalNew = true;
+					newPacks[key]['newPack'] = isNewPack;
+				});
+
+
+				// todo: to other function
+				// todo: check & fix
+				//if (globalNew) {
+
+				if (globalNew == false && this.getLatestUse().length == 0) {
+					globalNew = true;
+				}
+				Module.Storage.setHasNewStickers(globalNew);
+				Module.DOMEventService.changeContentHighlight(globalNew);
+				//}
+
+
+				// *****************************************************************************************************
+				// todo: do in other function
+				// update used stickers
+
+				var used = this.getLatestUse();
+
+				for (var i = 0; i < used.length; i++) {
+					var sticker = this.parseStickerFromText('[[' + used[i].code + ']]');
+
+					var pack = null;
+					for (var j = 0; j < newPacks.length; j++) {
+						if (newPacks[j].pack_name == sticker.pack) {
+							pack = newPacks[j];
+							break;
+						}
+					}
+
+					if (pack == null) {
+						used.splice(i, 1);
+						continue;
+					}
+
+					var isset = false;
+					for (var j = 0; j < pack.stickers.length; j++) {
+						if (pack.stickers[j].name == sticker.name) {
+							isset = true;
+							break;
+						}
+					}
+
+					if (!isset) {
+						used.splice(i, 1);
+						continue;
+					}
+				}
+
+				Module.Storage.setUsedStickers(used);
+
+				// *****************************************************************************************************
+			} else {
+				Module.DOMEventService.changeContentHighlight(true);
+			}
+
+			return newPacks;
+		},
+
+		// todo: remove function
+		setPacksToStorage: function(packs) {
+			return Module.Storage.setPacks(packs);
+		},
+
+		getPacksFromServer: function(callback) {
+
+			var options = {
+				url: Module.Configs.clientPacksUrl,
+				header: []
+			};
+
+			if (Module.Configs.userId !== null) {
+				options.url = Module.Configs.userPacksUrl;
+				options.header['UserId'] = StickerHelper.md5(Module.Configs.userId + Module.Configs.apikey);
+			}
+
+			Module.Http.get(options.url, {
+				success: callback
+			}, options.header);
+		},
+
+		parseStickerFromText: function(text) {
+			var outData = {
+					isSticker: false,
+					url: ''
+				},
+				matchData = text.match(/\[\[(\S+)_(\S+)\]\]/);
+
+			this.parseStickerStatHandle(!!matchData);
+
+			if (matchData) {
+				outData.isSticker = true;
+				outData.url = Module.Configs.domain +
+					'/' +
+					Module.Configs.baseFolder +
+					'/' + matchData[1] +
+					'/' + matchData[2] +
+					'_' + Module.Configs.stickerResolutionType +
+					'.png';
+
+
+				outData.pack = matchData[1];
+				outData.name = matchData[2];
+			}
+
+			return outData;
+		},
+
+		isNewPack: function(packs, packName)  {
+			var isNew = false;
+
+			StickerHelper.forEach(packs, function(pack) {
+
+				if(pack.pack_name &&
+					pack.pack_name.toLowerCase() == packName.toLowerCase()) {
+
+					isNew = !!pack.newPack;
+				}
+
+			});
+
+			return isNew;
+
+		},
+
+		onUserMessageSent: function(isSticker) {
+			var nowDate = new Date().getTime() / 1000 | 0,
+				action = 'send',
+				category = 'message',
+				label = (isSticker) ? 'sticker' : 'text';
+
+
+			Module.Http.post(Module.Configs.trackStatUrl, [{
+				action: action,
+				category: category,
+				label: label,
+				time: nowDate
+			}]);
+
+			ga('stickerTracker.send', 'event', category, action, label);
+		},
+
+		isExistPackInStorage: function(packName) {
+			var packs = this.getPacksFromStorage()['packs'];
+
+			for (var i = 0; i < packs.length; i++) {
+				if (packs[i].pack_name == packName) {
+					return true;
+				}
+			}
+
+			return false;
+		},
+
+		updatePacks: function(successCallback) {
+			var storageStickerData;
+
+			storageStickerData = this.getPacksFromStorage();
+
+			this.getPacksFromServer(
+				(function(response) {
+					if(response.status != 'success') {
+						return;
+					}
+
+					var stickerPacks = response.data;
+
+					stickerPacks = this.markNewPacks(storageStickerData.packs, stickerPacks);
+					this.setPacksToStorage(stickerPacks);
+
+					successCallback && successCallback(stickerPacks);
+				}).bind(this)
+			);
+		},
+
+		changeUserPackStatus: function(packName, status, callback) {
+			var options = {
+				url: Module.Configs.userPackUrl + '/' + packName,
+				header: {
+					UserId: StickerHelper.md5(Module.Configs.userId + Module.Configs.apikey)
+				}
+			};
+
+			// todo: rewrite callback
+			Module.Http.post(options.url, {
+				status: status
+			}, {
+				success: callback
+			}, options.header);
+		},
+
+		purchaseSuccess: function(packName) {
+			try {
+				var handler = function() {
+					if (!JsApiInterface) {
+						throw new Error('JSApiInterface not found!');
+					}
+
+					JsApiInterface.downloadPack(packName, function() {
+						Module.Configs.callbacks.onPackStoreSuccess(packName);
+					});
+				};
+
+				if (Module.Configs.userId !== null) {
+					this.changeUserPackStatus(packName, true, handler);
+				} else {
+					handler();
+				}
+			} catch(e) {
+				console && console.error(e.message);
+				Module.Configs.callbacks.onPackStoreFail(packName);
+			}
+		}
+	};
+
+})(window.StickersModule);
+
+(function(Module) {
+
+	Module.DOMEventService = {
+
+		events: {
+			resize: 'resize',
+			popoverShown: 'sp:popover:shown',
+			popoverHidden: 'sp:popover:hidden',
+			showContentHighlight: 'sp:content:highlight:show',
+			hideContentHighlight: 'sp:content:highlight:hide'
+		},
+
+		dispatch: function(eventName, el) {
+			if (!eventName) {
+				return;
+			}
+
+			el = el || window;
+
+			// todo: ie dispatcher (through el.fireEvent)
+			if (typeof CustomEvent === 'function') {
+				el.dispatchEvent(new CustomEvent(eventName, {
+					bubbles: true,
+					cancelable: true
+				}));
+			}
+			else { // IE
+				var event = null;
+				if (document.createEventObject) {
+					event = document.createEventObject();
+					el.fireEvent(eventName, event);
+				} else {
+					var evt = document.createEvent("HTMLEvents");
+					evt.initEvent(eventName, true, true);
+					el.dispatchEvent(evt);
+				}
+			}
+		},
+
+		popoverShown: function() {
+			this.dispatch(this.events.popoverShown);
+		},
+
+		popoverHidden: function() {
+			this.dispatch(this.events.popoverHidden);
+		},
+
+		changeContentHighlight: function(value) {
+			this.dispatch((value) ? this.events.showContentHighlight : this.events.hideContentHighlight);
+		},
+
+		resize: function(el) {
+			this.dispatch(this.events.resize, el);
+		}
+	};
+
+})(window.StickersModule);
+
+(function(Module) {
+
+	Module.EmojiService = Module.Class({
+
+		emojiProvider: null,
+
+		_constructor: function(emojiProvider) {
+			this.emojiProvider = emojiProvider;
+		},
+
+		parseEmojiFromText: function(text) {
+			return this.emojiProvider.parse(text, {
+				size: (window.devicePixelRatio == 2) ? 72 : 36
+			});
+		},
+
+		parseEmojiFromHtml: function(html) {
+			var content = document.createElement('div');
+			content.innerHTML = html;
+
+			var emojisEls = content.getElementsByClassName('emoji');
+
+			for (var i = emojisEls.length - 1; i >= 0; i--) {
+				var emoji = emojisEls[i].getAttribute('alt');
+				content.replaceChild(document.createTextNode(emoji), emojisEls[i]);
+			}
+
+			return content.innerHTML;
+		}
+	});
+
+})(window.StickersModule);
+
+(function(Plugin, Module) {
+
+	Module.Http = {
+
+		get: function(url, callbacks, headers) {
+			callbacks = callbacks || {};
+			headers = headers || {};
+
+			this.ajax({
+				type: 'GET',
+				url: url,
+				headers: headers,
+				success: callbacks.success,
+				error: callbacks.error,
+				complete: callbacks.complete
+			});
+		},
+
+		post: function(url, data, callbacks, headers) {
+			data = data || {};
+			callbacks = callbacks || {};
+			headers = headers || {};
+
+			this.ajax({
+				type: 'POST',
+				url: url,
+				data: data,
+				headers: headers,
+				success: callbacks.success,
+				error: callbacks.error,
+				complete: callbacks.complete
+			});
+		},
+
+		ajax: function(options) {
+			options = options || {};
+
+			if (!options.url) {
+				return;
+			}
+
+			options.type = (options.type && options.type.toUpperCase()) || 'GET';
+			options.headers = options.headers || {};
+			options.data = options.data || {};
+			options.success = options.success || function() {};
+			options.error = options.error || function() {};
+			options.complete = options.complete || function() {};
+
+			options.headers.Apikey = Module.Configs.apikey;
+			options.headers.Platform = 'JS';
+			options.headers.Localization = Module.Configs.lang;
+
+			if (options.type == 'POST') {
+				options.headers['Content-Type'] = options.headers['Content-Type'] || 'application/x-www-form-urlencoded';
+				options.headers['DeviceId'] = Module.Storage.getUniqUserId();
+			}
+
+
+			var xmlhttp = new XMLHttpRequest();
+			xmlhttp.open(options.type, options.url, true);
+
+			Module.StickerHelper.forEach(options.headers, function(value, name) {
+				xmlhttp.setRequestHeader(name, value);
+			});
+
+			xmlhttp.onreadystatechange = function() {
+				if (xmlhttp.readyState == 4) {
+					if (xmlhttp.status == 200) {
+						options.success(JSON.parse(xmlhttp.responseText), xmlhttp);
+					} else {
+						options.error(JSON.parse(xmlhttp.responseText), xmlhttp);
+					}
+
+					options.complete(JSON.parse(xmlhttp.responseText), xmlhttp);
+				}
+			};
+
+			xmlhttp.send(JSON.stringify(options.data));
+		}
+	};
+})(window, window.StickersModule);
+
+(function(Module) {
+
+	// todo: rewrite
+	Module.StoreApiInterface = Module.Class({
+
+		config: null,
+		service: null,
+
+		_constructor: function(config, service) {
+			this.config = config;
+			this.service = service;
+
+			window.addEventListener('message', (function(e) {
+
+				e.data = JSON.parse(e.data);
+
+				if (e.data.action) {
+					return;
+				}
+
+				try {
+					this[e.action].apply(this, e.data.attrs);
+				} catch(e) {
+					console && console.error(e.message, e);
+				}
+
+			}).bind(this));
+		},
+
+		showPackCollections: function(packName) {
+			// todo remove functions
+			this.config.functions.showPackCollection(packName);
+		},
+
+		downloadPack: function(packName, callback) {
+			this.service.updatePacks((function() {
+				this.config.functions.showPackCollection(packName);
+				callback && callback();
+			}).bind(this));
+		},
+
+		purchasePackInStore: function(packTitle, packProductId, packPrice, packName) {
+			this.config.callbacks.onPurchase(packTitle, packProductId, packPrice, packName);
+		},
+
+		isPackActive: function(packName) {
+			return this.isPackExistsAtUserLibrary(packName);
+		},
+
+		isPackExistsAtUserLibrary: function(packName) {
+			return this.service.isExistPackInStorage(packName);
+		}
+	});
+
+})(StickersModule);
+
+
+// todo: StatisticService
+
+(function(Module) {
+
+	Module.Storage = {
+
+		lockr: Module.Lockr,
+
+		setPrefix: function(storagePrefix) {
+			this.lockr.prefix = storagePrefix;
+		},
+
+		getUsedStickers: function() {
+			return this.lockr.get('sticker_latest_use') || [];
+		},
+
+		setUsedStickers: function(usedStickers) {
+			return this.lockr.set('sticker_latest_use', usedStickers);
+		},
+
+		addUsedSticker: function(stickerCode) {
+
+			var usedStickers = this.getUsedStickers(),
+				newStorageDate = [];
+
+			// todo: rewrite function as for & slice
+			Module.StickerHelper.forEach(usedStickers, function(usedSticker) {
+
+				if (usedSticker.code != stickerCode) {
+					newStorageDate.push(usedSticker);
+				}
+
+			});
+
+			usedStickers = newStorageDate;
+
+			usedStickers.unshift({
+				code : stickerCode
+			});
+
+			this.setUsedStickers(usedStickers);
+		},
+
+		hasNewStickers: function() {
+			return this.lockr.get('sticker_have_new');
+		},
+
+		setHasNewStickers: function(value) {
+			return this.lockr.set('sticker_have_new', value);
+		},
+
+		getPacks: function() {
+			return this.lockr.get('sticker_packs');
+		},
+
+		setPacks: function(packs) {
+			var expireDate = new Date(),
+				saveObj = {
+					packs: packs,
+					expireDate: ( expireDate.setDate( expireDate.getDate() + 1) )
+				};
+
+			return this.lockr.set('sticker_packs', saveObj)
+		},
+
+		getUniqUserId: function() {
+			var uniqUserId = this.lockr.get('uniqUserId');
+
+			if (typeof uniqUserId == 'undefined') {
+				uniqUserId = + new Date();
+				this.lockr.set('uniqUserId', uniqUserId);
+			}
+
+			return uniqUserId;
+		}
+	};
+
+})(window.StickersModule);
+
+(function(Module) {
+
+	Module.StickerHelper.setConfig({
 
 		elId: 'stickerPipe',
 		storeContainerId: 'stickerPipeStore',
+
+		stickerResolutionType : (window.devicePixelRatio == 2) ? 'xhdpi' : 'mdpi',
+		tabResolutionType: (window.devicePixelRatio == 2) ? 'xxhdpi' : 'hdpi',
 
 		tabItemClass: 'sp-tab-item',
 		stickerItemClass: 'sp-sticker-item',
@@ -2070,7 +2446,9 @@ var ssb = {
 		baseFolder: 'stk',
 
 		htmlForEmptyRecent: '<div class="emptyRecent">Ваши Стикеры</div>',
-		apikey: '72921666b5ff8651f374747bfefaf7b2',
+
+		// todo: rename apikey --> apiKey
+		apikey: '', // 72921666b5ff8651f374747bfefaf7b2
 
 		// todo: remove api url options
 		clientPacksUrl: 'http://api.stickerpipe.com/api/v1/client-packs',
@@ -2099,7 +2477,7 @@ var ssb = {
 
 (function(Module) {
 
-	Module.Configs.add({
+	Module.StickerHelper.setConfig({
 		emojiList: [
 			// Emoticons		
 			"😊",
@@ -2957,587 +3335,12 @@ var ssb = {
 
 
 
-
-// todo: API queries (get & post & put)
-
-// todo: rename file baseService --> BaseService
-
-(function(Module) {
-
-    var StickerHelper = Module.StickerHelper,
-		JsApiInterface = Module.StoreApiInterface;
-
-	Module.BaseService = Module.Class({
-
-		config: null,
-		storageService: null,
-
-		parseCountStat: 0,
-		parseCountWithStickerStat: 0,
-
-		_constructor: function(config) {
-			this.config = config;
-			this.storageService = new Module.StorageService(this.config.storagePrefix);
-		},
-
-		parseStickerStatHandle: function(is_have) {
-			var nowDate = new Date().getTime()/1000|0;
-
-			this.parseCountStat++;
-
-			if(is_have) {
-				this.parseCountWithStickerStat++;
-			}
-
-			if(this.parseCountStat >= 50) {
-
-				StickerHelper.ajaxPost(this.config.trackStatUrl, this.config.apikey, [
-					{
-						action: 'check',
-						category: 'message',
-						label: 'Events count',
-						time: nowDate,
-						value: this.parseCountStat
-
-					},
-					{
-						action: 'check',
-						category: 'message',
-						label: 'Stickers count',
-						time: nowDate,
-						value: this.parseCountWithStickerStat
-					}
-
-				]);
-
-
-				ga('stickerTracker.send', 'event', 'message', 'check', 'Events count', this.parseCountStat);
-				ga('stickerTracker.send', 'event', 'message', 'check', 'Stickers count', this.parseCountWithStickerStat);
-
-				this.parseCountWithStickerStat = 0;
-				this.parseCountStat = 0;
-
-			}
-
-			},
-
-		// todo: remove function
-		addToLatestUse: function(code) {
-			this.storageService.addUsedSticker(code);
-		},
-
-		// todo: remove function
-		getNewStickersFlag: function() {
-			return this.storageService.hasNewStickers();
-		},
-
-		// todo: remove function
-		resetNewStickersFlag: function() {
-			Module.DOMEventService.changeContentHighlight(false);
-			return this.storageService.setHasNewStickers(false);
-		},
-
-		// todo: remove function
-		getLatestUse: function() {
-			return this.storageService.getUsedStickers();
-		},
-
-		getPacksFromStorage: function() {
-			var expireDate = (+new Date()),
-				packsObj = this.storageService.getPacks();
-
-			if(typeof packsObj === "undefined"
-				|| packsObj.expireDate < expireDate
-				|| this.config.debug
-			) {
-
-				return {
-					actual: false,
-					packs: typeof packsObj == "object" && packsObj.packs ? packsObj.packs : []
-				};
-			} else {
-
-				return {
-					actual: true,
-					packs: packsObj.packs
-				};
-			}
-		},
-
-		markNewPacks: function(oldPacks, newPacks) {
-			var globalNew = false;
-
-			if(oldPacks.length != 0){
-
-				StickerHelper.forEach(newPacks, function(newPack, key) {
-					var isNewPack = true;
-
-					StickerHelper.forEach(oldPacks, function(oldPack) {
-
-
-						if(newPack.pack_name == oldPack.pack_name) {
-							isNewPack = oldPack.newPack;
-						}
-
-					});
-
-					if(isNewPack)  globalNew = true;
-					newPacks[key]['newPack'] = isNewPack;
-				});
-
-
-				// todo: to other function
-				// todo: check & fix
-				//if (globalNew) {
-
-				if (globalNew == false && this.getLatestUse().length == 0) {
-					globalNew = true;
-				}
-				this.storageService.setHasNewStickers(globalNew);
-				Module.DOMEventService.changeContentHighlight(globalNew);
-				//}
-
-
-				// *****************************************************************************************************
-				// todo: do in other function
-				// update used stickers
-
-				var used = this.getLatestUse();
-
-				for (var i = 0; i < used.length; i++) {
-					var sticker = this.parseStickerFromText('[[' + used[i].code + ']]');
-
-					var pack = null;
-					for (var j = 0; j < newPacks.length; j++) {
-						if (newPacks[j].pack_name == sticker.pack) {
-							pack = newPacks[j];
-							break;
-						}
-					}
-
-					if (pack == null) {
-						used.splice(i, 1);
-						continue;
-					}
-
-					var isset = false;
-					for (var j = 0; j < pack.stickers.length; j++) {
-						if (pack.stickers[j].name == sticker.name) {
-							isset = true;
-							break;
-						}
-					}
-
-					if (!isset) {
-						used.splice(i, 1);
-						continue;
-					}
-				}
-
-				this.storageService.setUsedStickers(used);
-
-				// *****************************************************************************************************
-			} else {
-				Module.DOMEventService.changeContentHighlight(true);
-			}
-
-			return newPacks;
-		},
-
-		// todo: remove function
-		setPacksToStorage: function(packs) {
-			return this.storageService.setPacks(packs);
-		},
-
-		getPacksFromServer: function(callback) {
-
-			var options = {
-				url: this.config.clientPacksUrl,
-				header: []
-			};
-
-			if (this.config.userId !== null) {
-				options.url = this.config.userPacksUrl;
-				options.header['UserId'] = StickerHelper.md5(this.config.userId + this.config.apikey);
-			}
-
-			StickerHelper.ajaxGet(options.url, this.config.apikey, callback, options.header);
-		},
-
-		parseStickerFromText: function(text) {
-			var outData = {
-					isSticker: false,
-					url: ''
-				},
-				matchData = text.match(/\[\[(\S+)_(\S+)\]\]/);
-
-			this.parseStickerStatHandle(!!matchData);
-
-			if (matchData) {
-				outData.isSticker = true;
-				outData.url = this.config.domain +
-					'/' +
-					this.config.baseFolder +
-					'/' + matchData[1] +
-					'/' + matchData[2] +
-					'_' + this.config.stickerResolutionType +
-					'.png';
-
-
-				outData.pack = matchData[1];
-				outData.name = matchData[2];
-			}
-
-			return outData;
-		},
-
-		isNewPack: function(packs, packName)  {
-			var isNew = false;
-
-			StickerHelper.forEach(packs, function(pack) {
-
-				if(pack.pack_name &&
-					pack.pack_name.toLowerCase() == packName.toLowerCase()) {
-
-					isNew = !!pack.newPack;
-				}
-
-			});
-
-			return isNew;
-
-		},
-
-		onUserMessageSent: function(isSticker) {
-			var nowDate = new Date().getTime() / 1000 | 0,
-				action = 'send',
-				category = 'message',
-				label = (isSticker) ? 'sticker' : 'text';
-
-			StickerHelper.ajaxPost(this.config.trackStatUrl, this.config.apikey, [
-				{
-					action: action,
-					category: category,
-					label: label,
-					time: nowDate
-				}
-			]);
-
-
-			ga('stickerTracker.send', 'event', category, action, label);
-		},
-
-		isExistPackInStorage: function(packName) {
-			var packs = this.getPacksFromStorage()['packs'];
-
-			for (var i = 0; i < packs.length; i++) {
-				if (packs[i].pack_name == packName) {
-					return true;
-				}
-			}
-
-			return false;
-		},
-
-		updatePacks: function(successCallback) {
-			var storageStickerData;
-
-			storageStickerData = this.getPacksFromStorage();
-
-			this.getPacksFromServer(
-				(function(response) {
-					if(response.status != 'success') {
-						return;
-					}
-
-					var stickerPacks = response.data;
-
-					stickerPacks = this.markNewPacks(storageStickerData.packs, stickerPacks);
-					this.setPacksToStorage(stickerPacks);
-
-					successCallback && successCallback(stickerPacks);
-				}).bind(this)
-			);
-		},
-
-		changeUserPackStatus: function(packName, status, callback) {
-
-			var options = {
-				url: this.config.userPackUrl + '/' + packName,
-				header: {
-					UserId: StickerHelper.md5(this.config.userId + this.config.apikey)
-				}
-			};
-
-			StickerHelper.ajaxPost(options.url, this.config.apikey, {
-				status: status
-			}, callback, options.header);
-		},
-
-		purchaseSuccess: function(packName) {
-			var self = this;
-
-			try {
-				var handler = function() {
-					if (!JsApiInterface) {
-						throw new Error('JSApiInterface not found!');
-					}
-
-					JsApiInterface.downloadPack(packName, function() {
-						self.config.callbacks.onPackStoreSuccess(packName);
-					});
-				};
-
-				if (this.config.userId !== null) {
-					this.changeUserPackStatus(packName, true, handler);
-				} else {
-					handler();
-				}
-			} catch(e) {
-				console.error(e.message);
-				this.config.callbacks.onPackStoreFail(packName);
-			}
-		}
-	});
-
-})(window.StickersModule);
-
-(function(Module) {
-
-	Module.DOMEventService = {
-
-		events: {
-			resize: 'resize',
-			popoverShown: 'sp:popover:shown',
-			popoverHidden: 'sp:popover:hidden',
-			showContentHighlight: 'sp:content:highlight:show',
-			hideContentHighlight: 'sp:content:highlight:hide'
-		},
-
-		dispatch: function(eventName, el) {
-			if (!eventName) {
-				return;
-			}
-
-			el = el || window;
-
-			// todo: ie dispatcher (through el.fireEvent)
-			if (typeof CustomEvent === 'function') {
-				el.dispatchEvent(new CustomEvent(eventName, {
-					bubbles: true,
-					cancelable: true
-				}));
-			}
-			else { // IE
-				var event = null;
-				if (document.createEventObject) {
-					event = document.createEventObject();
-					el.fireEvent(eventName, event);
-				} else {
-					var evt = document.createEvent("HTMLEvents");
-					evt.initEvent(eventName, true, true);
-					el.dispatchEvent(evt);
-				}
-			}
-		},
-
-		popoverShown: function() {
-			this.dispatch(this.events.popoverShown);
-		},
-
-		popoverHidden: function() {
-			this.dispatch(this.events.popoverHidden);
-		},
-
-		changeContentHighlight: function(value) {
-			this.dispatch((value) ? this.events.showContentHighlight : this.events.hideContentHighlight);
-		},
-
-		resize: function(el) {
-			this.dispatch(this.events.resize, el);
-		}
-	};
-
-})(window.StickersModule);
-
-(function(Module) {
-
-	Module.EmojiService = Module.Class({
-
-		emojiProvider: null,
-
-		_constructor: function(emojiProvider) {
-			this.emojiProvider = emojiProvider;
-		},
-
-		parseEmojiFromText: function(text) {
-			return this.emojiProvider.parse(text, {
-				size: (window.devicePixelRatio == 2) ? 72 : 36
-			});
-		},
-
-		parseEmojiFromHtml: function(html) {
-			var content = document.createElement('div');
-			content.innerHTML = html;
-
-			var emojisEls = content.getElementsByClassName('emoji');
-
-			for (var i = emojisEls.length - 1; i >= 0; i--) {
-				var emoji = emojisEls[i].getAttribute('alt');
-				content.replaceChild(document.createTextNode(emoji), emojisEls[i]);
-			}
-
-			return content.innerHTML;
-		}
-	});
-
-})(window.StickersModule);
-
-(function(Module) {
-
-	// todo: rewrite
-	Module.StoreApiInterface = Module.Class({
-
-		config: null,
-		service: null,
-
-		_constructor: function(config, service) {
-			this.config = config;
-			this.service = service;
-
-			window.addEventListener('message', (function(e) {
-
-				e.data = JSON.parse(e.data);
-
-				if (e.data.action) {
-					return;
-				}
-
-				try {
-					this[e.action].apply(this, e.data.attrs);
-				} catch(e) {
-					console.error(e.message, e);
-				}
-
-			}).bind(this));
-		},
-
-		showPackCollections: function(packName) {
-			// todo remove functions
-			this.config.functions.showPackCollection(packName);
-		},
-
-		downloadPack: function(packName, callback) {
-			this.service.updatePacks((function() {
-				this.config.functions.showPackCollection(packName);
-				callback && callback();
-			}).bind(this));
-		},
-
-		purchasePackInStore: function(packTitle, packProductId, packPrice, packName) {
-			this.config.callbacks.onPurchase(packTitle, packProductId, packPrice, packName);
-		},
-
-		isPackActive: function(packName) {
-			return this.isPackExistsAtUserLibrary(packName);
-		},
-
-		isPackExistsAtUserLibrary: function(packName) {
-			return this.service.isExistPackInStorage(packName);
-		}
-	});
-
-})(StickersModule);
-
-
-// todo: StatisticService
-
-(function(Module) {
-
-	Module.StorageService = Module.Class({
-
-		lockr: null,
-
-		_constructor: function(storagePrefix) {
-			this.lockr = Module.Lockr;
-			this.lockr.prefix = storagePrefix;
-		},
-
-		getUsedStickers: function() {
-			return this.lockr.get('sticker_latest_use') || [];
-		},
-
-		setUsedStickers: function(usedStickers) {
-			return this.lockr.set('sticker_latest_use', usedStickers);
-		},
-
-		addUsedSticker: function(stickerCode) {
-
-			var usedStickers = this.getUsedStickers(),
-				newStorageDate = [];
-
-			// todo: rewrite function as for & slice
-			Module.StickerHelper.forEach(usedStickers, function(usedSticker) {
-
-				if (usedSticker.code != stickerCode) {
-					newStorageDate.push(usedSticker);
-				}
-
-			});
-
-			usedStickers = newStorageDate;
-
-			usedStickers.unshift({
-				code : stickerCode
-			});
-
-			this.setUsedStickers(usedStickers);
-		},
-
-		hasNewStickers: function() {
-			return this.lockr.get('sticker_have_new');
-		},
-
-		setHasNewStickers: function(value) {
-			return this.lockr.set('sticker_have_new', value);
-		},
-
-		getPacks: function() {
-			return this.lockr.get('sticker_packs');
-		},
-
-		setPacks: function(packs) {
-			var expireDate = new Date(),
-				saveObj = {
-					packs: packs,
-					expireDate: ( expireDate.setDate( expireDate.getDate() + 1) )
-				};
-
-			return this.lockr.set('sticker_packs', saveObj)
-		},
-
-		getUniqUserId: function() {
-			var uniqUserId = this.lockr.get('uniqUserId');
-
-			if (typeof uniqUserId == 'undefined') {
-				uniqUserId = + new Date();
-				this.lockr.set('uniqUserId', uniqUserId);
-			}
-
-			return uniqUserId;
-		}
-	});
-
-})(window.StickersModule);
-
 (function(Module) {
 
 	var StickerHelper = Module.StickerHelper;
 
 	Module.BlockView = Module.Class({
 
-		config: null,
-		baseService: null,
 		emojiService: null,
 
 		el: null,
@@ -3546,15 +3349,13 @@ var ssb = {
 		tabsView: null,
 		scrollView: null,
 
-		_constructor: function(config, baseService, emojiService) {
-			this.config = config;
-			this.baseService = baseService;
+		_constructor: function(emojiService) {
 			this.emojiService = emojiService;
 
-			this.el = document.getElementById(this.config.elId);
+			this.el = document.getElementById(Module.Configs.elId);
 			this.contentEl = document.createElement('div');
 
-			this.tabsView = new Module.TabsView(this.config);
+			this.tabsView = new Module.TabsView();
 			this.scrollView = new Module.ScrollView();
 
 			window.addEventListener('resize', (function() {
@@ -3592,7 +3393,7 @@ var ssb = {
 			this.clearBlock(this.contentEl);
 
 			if (latesUseSticker.length == 0) {
-				this.contentEl.innerHTML += this.config.htmlForEmptyRecent;
+				this.contentEl.innerHTML += Module.Configs.htmlForEmptyRecent;
 				return false;
 			}
 
@@ -3610,11 +3411,11 @@ var ssb = {
 			this.contentEl.classList.remove('sp-stickers');
 			this.contentEl.classList.add('sp-emojis');
 
-			StickerHelper.forEach(this.config.emojiList, (function(emoji) {
+			StickerHelper.forEach(Module.Configs.emojiList, (function(emoji) {
 				var emojiEl = document.createElement('span'),
 					emojiImgHtml = this.emojiService.parseEmojiFromText(emoji);
 
-				emojiEl.className = this.config.emojiItemClass;
+				emojiEl.className = Module.Configs.emojiItemClass;
 				emojiEl.innerHTML = emojiImgHtml;
 
 				this.contentEl.appendChild(emojiEl);
@@ -3643,7 +3444,7 @@ var ssb = {
 
 				var placeHolderClass = 'sp-sticker-placeholder';
 
-				var stickerImgSrc = self.baseService.parseStickerFromText('[[' + stickerCode + ']]');
+				var stickerImgSrc = Module.BaseService.parseStickerFromText('[[' + stickerCode + ']]');
 
 				var stickersSpanEl = document.createElement('span');
 				stickersSpanEl.classList.add(placeHolderClass);
@@ -3651,7 +3452,7 @@ var ssb = {
 				var image = new Image();
 				image.onload = function() {
 					stickersSpanEl.classList.remove(placeHolderClass);
-					stickersSpanEl.classList.add(self.config.stickerItemClass);
+					stickersSpanEl.classList.add(Module.Configs.stickerItemClass);
 					stickersSpanEl.setAttribute('data-sticker-string', stickerCode);
 					stickersSpanEl.appendChild(image);
 				};
@@ -3668,14 +3469,14 @@ var ssb = {
 
 		// todo: rename handleClickSticker --> handleClickOnSticker
 		handleClickSticker: function(callback) {
-			// todo: create static this.config.stickerItemClass
-			Module.StickerHelper.setEvent('click', this.contentEl, this.config.stickerItemClass, callback);
+			// todo: create static Module.Configs.stickerItemClass
+			Module.StickerHelper.setEvent('click', this.contentEl, Module.Configs.stickerItemClass, callback);
 		},
 
 		// todo: rename handleClickEmoji --> handleClickOnEmoji
 		handleClickEmoji: function(callback) {
-			// todo: create static this.config.emojiItemClass
-			Module.StickerHelper.setEvent('click', this.contentEl, this.config.emojiItemClass, callback);
+			// todo: create static Module.Configs.emojiItemClass
+			Module.StickerHelper.setEvent('click', this.contentEl, Module.Configs.emojiItemClass, callback);
 		},
 
 
@@ -3699,7 +3500,7 @@ var ssb = {
 		_constructor: function() {
 			parent.prototype._constructor.apply(this, arguments);
 
-			this.toggleEl = document.getElementById(this.config.elId);
+			this.toggleEl = document.getElementById(Module.Configs.elId);
 			this.toggleEl.addEventListener('click', (function() {
 				this.toggle();
 			}).bind(this));
@@ -3779,11 +3580,12 @@ var ssb = {
 					arrowOffset = 15;
 				}
 			} else {
-				console.error('error');
+				console && console.error('error');
 			}
 
-			if (this.arrowEl)
-			this.popoverEl.style.top = -(this.popoverEl.offsetHeight + arrowOffset) + 'px';
+			if (this.arrowEl) {
+				this.popoverEl.style.marginTop = -(this.popoverEl.offsetHeight + this.toggleEl.offsetHeight + arrowOffset) + 'px';
+			}
 		}
 
 	});
@@ -3848,24 +3650,20 @@ var ssb = {
 
 	Module.StoreView = Module.Class({
 
-		config: null,
-
 		el: null,
 
-		_constructor: function(config) {
-			this.config = config;
-
-			this.el = document.getElementById(this.config.storeContainerId);
+		_constructor: function() {
+			this.el = document.getElementById(Module.Configs.storeContainerId);
 		},
 
 		render: function(packName) {
 
 			var iframe = document.createElement('iframe'),
 				urlParams = {
-					apiKey: this.config.apikey,
+					apiKey: Module.Configs.apikey,
 					platform: 'JS',
-					userId: this.config.userId,
-					density: this.config.stickerResolutionType,
+					userId: Module.Configs.userId,
+					density: Module.Configs.stickerResolutionType,
 					uri: encodeURIComponent('http://demo.stickerpipe.com/work/libs/store/js/stickerPipeStore.js')
 				},
 				urlSerialize = function(obj) {
@@ -3885,7 +3683,7 @@ var ssb = {
 			iframe.style.height = '100%';
 			iframe.style.border = '0';
 
-			iframe.src = this.config.storeUrl + '?' + urlSerialize(urlParams) + '#/packs/' + packName
+			iframe.src = Module.Configs.storeUrl + '?' + urlSerialize(urlParams) + '#/packs/' + packName
 		}
 	});
 
@@ -3914,10 +3712,7 @@ var ssb = {
 			tabs: 'sp-tabs'
 		},
 
-		config: null,
-
-		_constructor: function(config) {
-			this.config = config;
+		_constructor: function() {
 
 			this.el = document.createElement('div');
 
@@ -3925,42 +3720,42 @@ var ssb = {
 				emoji: {
 					id: 'spTabEmoji',
 					class: 'sp-tab-emoji',
-					content: this.config.emojiTabContent,
+					content: Module.Configs.emojiTabContent,
 					el: null,
 					isTab: true
 				},
 				history: {
 					id: 'spTabHistory',
 					class: 'sp-tab-history',
-					content: this.config.historyTabContent,
+					content: Module.Configs.historyTabContent,
 					el: null,
 					isTab: true
 				},
 				settings: {
 					id: 'spTabSettings',
 					class: 'sp-tab-settings',
-					content: this.config.settingsTabContent,
+					content: Module.Configs.settingsTabContent,
 					el: null,
 					isTab: false
 				},
 				store: {
 					id: 'spTabStore',
 					class: 'sp-tab-store',
-					content: this.config.storeTabContent,
+					content: Module.Configs.storeTabContent,
 					el: null,
 					isTab: false
 				},
 				prevPacks: {
 					id: 'spTabPrevPacks',
 					class: 'sp-tab-prev-packs',
-					content: this.config.prevPacksTabContent,
+					content: Module.Configs.prevPacksTabContent,
 					el: null,
 					isTab: false
 				},
 				nextPacks: {
 					id: 'spTabNextPacks',
 					class: 'sp-tab-next-packs',
-					content: this.config.nextPacksTabContent,
+					content: Module.Configs.nextPacksTabContent,
 					el: null,
 					isTab: false
 				}
@@ -4014,10 +3809,10 @@ var ssb = {
 				classes.push(this.classes.newPack);
 			}
 
-			var iconSrc = this.config.domain + '/' +
-				this.config.baseFolder + '/' +
+			var iconSrc = Module.Configs.domain + '/' +
+				Module.Configs.baseFolder + '/' +
 				pack.pack_name + '/tab_icon_' +
-				this.config.tabResolutionType + '.png';
+				Module.Configs.tabResolutionType + '.png';
 
 			var content = '<img src=' + iconSrc + '>';
 
@@ -4043,7 +3838,7 @@ var ssb = {
 				tabEl.id = id;
 			}
 
-			classes.push(this.config.tabItemClass);
+			classes.push(Module.Configs.tabItemClass);
 
 			tabEl.classList.add.apply(tabEl.classList, classes);
 
@@ -4089,22 +3884,22 @@ var ssb = {
 			this.renderSettingsTab();
 		},
 		renderEmojiTab: function() {
-			if (this.config.enableEmojiTab) {
+			if (Module.Configs.enableEmojiTab) {
 				this.scrollableContentEl.appendChild(this.renderControlButton(this.controls.emoji));
 			}
 		},
 		renderHistoryTab: function() {
-			if (this.config.enableHistoryTab) {
+			if (Module.Configs.enableHistoryTab) {
 				this.scrollableContentEl.appendChild(this.renderControlButton(this.controls.history));
 			}
 		},
 		renderSettingsTab: function() {
-			if (this.config.enableSettingsTab) {
+			if (Module.Configs.enableSettingsTab) {
 				this.scrollableContentEl.appendChild(this.renderControlButton(this.controls.settings));
 			}
 		},
 		renderStoreTab: function() {
-			if (this.config.enableStoreTab) {
+			if (Module.Configs.enableStoreTab) {
 				this.el.appendChild(this.renderControlButton(this.controls.store));
 			}
 		},
@@ -4189,8 +3984,6 @@ var ssb = {
 	// todo: rename Stickers --> StickerPipe
 	Plugin.Stickers = Module.Class({
 
-		config: null,
-		baseService: null,
 		emojiService: null,
 		stickersModel: {},
 		view: null,
@@ -4198,22 +3991,17 @@ var ssb = {
 
 		_constructor: function(config) {
 
-			Module.Configs.add(config);
+			Module.StickerHelper.setConfig(config);
+			Module.Storage.setPrefix(Module.Configs.storagePrefix);
 
-			this.config = Module.Configs.getAll();
 
-			// todo: move to Configs class
-			this.configResolution();
-
-			// todo: rename
-			this.baseService = new Module.BaseService(this.config);
 			this.emojiService = new Module.EmojiService(Module.Twemoji);
 
-			this.view = new Module.PopoverView(this.config, this.baseService, this.emojiService);
-			this.storeView = new Module.StoreView(this.config);
+			this.view = new Module.PopoverView(this.emojiService);
+			this.storeView = new Module.StoreView();
 
 			// todo: remove
-			Plugin.JsApiInterface && Plugin.JsApiInterface._setConfigs(this.config);
+			//Plugin.JsApiInterface && Plugin.JsApiInterface._setConfigs(Module.Configs);
 
 			this.delegateEvents();
 
@@ -4221,7 +4009,7 @@ var ssb = {
 			// todo
 			//// ***** START *******************************************************************************************
 
-			var callback = this.config.onload || null;
+			var callback = Module.Configs.onload || null;
 
 			var onPacksLoadCallback = (function() {
 				callback && callback();
@@ -4229,10 +4017,10 @@ var ssb = {
 				this.view.render(this.stickersModel);
 
 				// todo --> active 'used' tab
-				this.view.renderUsedStickers(this.baseService.getLatestUse());
+				this.view.renderUsedStickers(Module.BaseService.getLatestUse());
 			}).bind(this);
 
-			var storageStickerData = this.baseService.getPacksFromStorage();
+			var storageStickerData = Module.BaseService.getPacksFromStorage();
 
 			if (storageStickerData.actual) {
 
@@ -4253,7 +4041,7 @@ var ssb = {
 			}).bind(this));
 
 			this.view.tabsView.handleClickOnLastUsedPacksTab((function() {
-				this.view.renderUsedStickers(this.baseService.getLatestUse());
+				this.view.renderUsedStickers(Module.BaseService.getLatestUse());
 			}).bind(this));
 
 			this.view.tabsView.handleClickOnPackTab((function(el) {
@@ -4270,7 +4058,7 @@ var ssb = {
 						// set newPack - false
 						changed = true;
 						this.stickersModel[i].newPack = false;
-						this.baseService.setPacksToStorage(this.stickersModel);
+						Module.BaseService.setPacksToStorage(this.stickersModel);
 
 						pack = this.stickersModel[i];
 					}
@@ -4280,7 +4068,7 @@ var ssb = {
 					}
 				}
 
-				if (changed == true && this.baseService.getLatestUse().length != 0 && hasNewContent == false) {
+				if (changed == true && Module.BaseService.getLatestUse().length != 0 && hasNewContent == false) {
 					this.resetNewStickersFlag();
 				}
 
@@ -4292,8 +4080,7 @@ var ssb = {
 				var stickerAttribute = el.getAttribute('data-sticker-string'),
 					nowDate = new Date().getTime() / 1000|0;
 
-
-				helper.ajaxPost(this.config.trackStatUrl, this.config.apikey, [{
+				Module.Http.post(Module.Configs.trackStatUrl, [{
 					action: 'use',
 					category: 'sticker',
 					label: '[[' + stickerAttribute + ']]',
@@ -4302,7 +4089,7 @@ var ssb = {
 
 				ga('stickerTracker.send', 'event', 'sticker', stickerAttribute.split('_')[0], stickerAttribute.split('_')[1], 1);
 
-				this.baseService.addToLatestUse(stickerAttribute);
+				Module.BaseService.addToLatestUse(stickerAttribute);
 
 				// todo: rewrite
 				// new content mark
@@ -4315,7 +4102,7 @@ var ssb = {
 					}
 				}
 
-				if (this.baseService.getLatestUse().length != 0 && hasNewContent == false) {
+				if (Module.BaseService.getLatestUse().length != 0 && hasNewContent == false) {
 					this.resetNewStickersFlag();
 				}
 			}).bind(this));
@@ -4324,7 +4111,7 @@ var ssb = {
 				var nowDate = new Date().getTime() / 1000| 0,
 					emoji = this.emojiService.parseEmojiFromHtml(el.innerHTML);
 
-				helper.ajaxPost(this.config.trackStatUrl, this.config.apikey, [{
+				Module.Http.post(Module.Configs.trackStatUrl, [{
 					action: 'use',
 					category: 'emoji',
 					label: emoji,
@@ -4335,23 +4122,8 @@ var ssb = {
 			}).bind(this));
 		},
 
-		// todo: remove function
-		configResolution: function() {
-			this.config = helper.mergeOptions(this.config, {
-				stickerResolutionType : 'mdpi',
-				tabResolutionType: 'hdpi'
-			});
-
-			if (window.devicePixelRatio == 2) {
-				this.config = helper.mergeOptions(this.config, {
-					stickerResolutionType : 'xhdpi',
-					tabResolutionType: 'xxhdpi'
-				});
-			}
-		},
-
 		fetchPacks: function(attrs) {
-			this.baseService.updatePacks((function(stickerPacks) {
+			Module.BaseService.updatePacks((function(stickerPacks) {
 				this.stickersModel = stickerPacks;
 
 				if(attrs.callback) {
@@ -4385,15 +4157,15 @@ var ssb = {
 		},
 
 		getNewStickersFlag: function() {
-			return this.baseService.getNewStickersFlag(this.baseService.getPacksFromStorage().packs || []);
+			return Module.BaseService.getNewStickersFlag(Module.BaseService.getPacksFromStorage().packs || []);
 		},
 
 		resetNewStickersFlag: function() {
-			return this.baseService.resetNewStickersFlag();
+			return Module.BaseService.resetNewStickersFlag();
 		},
 
 		parseStickerFromText: function(text) {
-			return this.baseService.parseStickerFromText(text);
+			return Module.BaseService.parseStickerFromText(text);
 		},
 
 		parseEmojiFromText: function(text) {
@@ -4406,7 +4178,7 @@ var ssb = {
 
 		// todo rewrite
 		renderCurrentTab: function(tabName) {
-			var obj = this.baseService.getPacksFromStorage();
+			var obj = Module.BaseService.getPacksFromStorage();
 
 			//this.start(); // todo
 
@@ -4419,17 +4191,17 @@ var ssb = {
 			}).bind(this));
 
 			//this.stickersModel[this.tabActive].newPack = false;
-			//this.baseService.setPacksToStorage(this.stickersModel);
+			//Module.BaseService.setPacksToStorage(this.stickersModel);
 
 			//this._renderAll();
 		},
 
 		isNewPack: function(packName) {
-			return this.baseService.isNewPack(this.stickersModel, packName);
+			return Module.BaseService.isNewPack(this.stickersModel, packName);
 		},
 
 		onUserMessageSent: function(isSticker) {
-			return this.baseService.onUserMessageSent(isSticker);
+			return Module.BaseService.onUserMessageSent(isSticker);
 		},
 
 		renderPack: function(pack) {
@@ -4437,7 +4209,7 @@ var ssb = {
 		},
 
 		purchaseSuccess: function(packName) {
-			this.baseService.purchaseSuccess(packName);
+			Module.BaseService.purchaseSuccess(packName);
 		}
 	});
 
