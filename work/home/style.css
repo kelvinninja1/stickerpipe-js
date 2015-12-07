@@ -1,0 +1,86 @@
+/* Move down content because we have a fixed navbar that is 50px tall */
+body {
+	padding-top: 50px;
+	padding-bottom: 20px;
+}
+
+.navbar-custom .navbar-brand {
+	color: rgba(255, 255, 255, 1);
+}
+.navbar-custom {
+	font-size: 14px;
+	background-color: rgba(102, 7, 181, 1);
+	border-width: 0;
+	border-radius: 0;
+}
+.navbar-custom .navbar-nav>li>a {
+	color: rgba(255, 255, 255, 1);
+	background-color: rgba(102, 7, 181, 1);
+}
+.navbar-custom .navbar-nav>li>a:hover,
+.navbar-custom .navbar-nav>li>a:focus {
+	color: rgba(255, 255, 255, 1);
+	background-color: rgba(102, 7, 181, 1);
+}
+.navbar-custom .navbar-nav>.active>a,
+.navbar-custom .navbar-nav>.active>a:hover,
+.navbar-custom .navbar-nav>.active>a:focus {
+	color: rgba(255, 255, 255, 1);
+	background-color: rgba(102, 7, 181, 1);
+}
+.navbar-custom .navbar-toggle {
+	border-color: #6607b5;
+}
+.navbar-custom .navbar-toggle:hover,
+.navbar-custom .navbar-toggle:focus {
+	background-color: #6607b5;
+}
+.navbar-custom .navbar-toggle .icon-bar {
+	background-color: #6607b5;
+}
+.navbar-custom .navbar-toggle:hover .icon-bar,
+.navbar-custom .navbar-toggle:focus .icon-bar {
+	background-color: #6607b5;
+}
+
+.jumbotron {
+	padding-top: 0;
+	padding-bottom: 0;
+}
+
+.jumbotron p {
+	font-size: 14px;
+}
+
+.jumbotron-1 {
+	background: rgb(226, 243, 243);
+	margin-bottom: 0;
+	padding: 30px 0;
+}
+
+.jumbotron-2 {
+	background: rgb(240, 250, 236);
+	padding: 10px 0;
+}
+
+.navbar-brand {
+	padding: 5px;
+}
+
+footer {
+	margin-top: 30px;
+}
+
+.email-form .form-group {
+	background: rgb(204, 204, 204);
+	padding: 10px;
+}
+
+.email-form .form-group input {
+	width: 250px;
+}
+
+.email-form .form-group input,
+.email-form .form-group button {
+	border-radius: 0;
+}
