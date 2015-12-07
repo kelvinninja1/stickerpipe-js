@@ -154,6 +154,7 @@ html
 | enableEmojiTab        | boolean                           | if your wont use emoji                        |
 | userId                | md5 of user id - string           | client user id hash                           |
 | lang                  | "en", "ru" ...                    | language ISO 2                                |
+| onload                | function                          | callback when plugin load                     |
 
 
 ## Credits

@@ -6,18 +6,10 @@
     var StickerHelper = Module.StickerHelper,
 		JsApiInterface = Module.StoreApiInterface;
 
-	Module.BaseService = Module.Class({
-
-		config: null,
-		storageService: null,
+	Module.BaseService = {
 
 		parseCountStat: 0,
 		parseCountWithStickerStat: 0,
-
-		_constructor: function(config) {
-			this.config = config;
-			this.storageService = new Module.StorageService(this.config.storagePrefix);
-		},
 
 		parseStickerStatHandle: function(is_have) {
 			var nowDate = new Date().getTime()/1000|0;
@@ -29,8 +21,7 @@
 			}
 
 			if(this.parseCountStat >= 50) {
-
-				StickerHelper.ajaxPost(this.config.trackStatUrl, this.config.apikey, [
+				Module.Http.post(Module.Configs.trackStatUrl, [
 					{
 						action: 'check',
 						category: 'message',
@@ -49,7 +40,6 @@
 
 				]);
 
-
 				ga('stickerTracker.send', 'event', 'message', 'check', 'Events count', this.parseCountStat);
 				ga('stickerTracker.send', 'event', 'message', 'check', 'Stickers count', this.parseCountWithStickerStat);
 
@@ -62,32 +52,32 @@
 
 		// todo: remove function
 		addToLatestUse: function(code) {
-			this.storageService.addUsedSticker(code);
+			Module.Storage.addUsedSticker(code);
 		},
 
 		// todo: remove function
 		getNewStickersFlag: function() {
-			return this.storageService.hasNewStickers();
+			return Module.Storage.hasNewStickers();
 		},
 
 		// todo: remove function
 		resetNewStickersFlag: function() {
 			Module.DOMEventService.changeContentHighlight(false);
-			return this.storageService.setHasNewStickers(false);
+			return Module.Storage.setHasNewStickers(false);
 		},
 
 		// todo: remove function
 		getLatestUse: function() {
-			return this.storageService.getUsedStickers();
+			return Module.Storage.getUsedStickers();
 		},
 
 		getPacksFromStorage: function() {
 			var expireDate = (+new Date()),
-				packsObj = this.storageService.getPacks();
+				packsObj = Module.Storage.getPacks();
 
 			if(typeof packsObj === "undefined"
 				|| packsObj.expireDate < expireDate
-				|| this.config.debug
+				|| Module.Configs.debug
 			) {
 
 				return {
@@ -132,7 +122,7 @@
 				if (globalNew == false && this.getLatestUse().length == 0) {
 					globalNew = true;
 				}
-				this.storageService.setHasNewStickers(globalNew);
+				Module.Storage.setHasNewStickers(globalNew);
 				Module.DOMEventService.changeContentHighlight(globalNew);
 				//}
 
@@ -173,7 +163,7 @@
 					}
 				}
 
-				this.storageService.setUsedStickers(used);
+				Module.Storage.setUsedStickers(used);
 
 				// *****************************************************************************************************
 			} else {
@@ -185,22 +175,24 @@
 
 		// todo: remove function
 		setPacksToStorage: function(packs) {
-			return this.storageService.setPacks(packs);
+			return Module.Storage.setPacks(packs);
 		},
 
 		getPacksFromServer: function(callback) {
 
 			var options = {
-				url: this.config.clientPacksUrl,
+				url: Module.Configs.clientPacksUrl,
 				header: []
 			};
 
-			if (this.config.userId !== null) {
-				options.url = this.config.userPacksUrl;
-				options.header['UserId'] = StickerHelper.md5(this.config.userId + this.config.apikey);
+			if (Module.Configs.userId !== null) {
+				options.url = Module.Configs.userPacksUrl;
+				options.header['UserId'] = StickerHelper.md5(Module.Configs.userId + Module.Configs.apikey);
 			}
 
-			StickerHelper.ajaxGet(options.url, this.config.apikey, callback, options.header);
+			Module.Http.get(options.url, {
+				success: callback
+			}, options.header);
 		},
 
 		parseStickerFromText: function(text) {
@@ -214,12 +206,12 @@
 
 			if (matchData) {
 				outData.isSticker = true;
-				outData.url = this.config.domain +
+				outData.url = Module.Configs.domain +
 					'/' +
-					this.config.baseFolder +
+					Module.Configs.baseFolder +
 					'/' + matchData[1] +
 					'/' + matchData[2] +
-					'_' + this.config.stickerResolutionType +
+					'_' + Module.Configs.stickerResolutionType +
 					'.png';
 
 
@@ -253,15 +245,13 @@
 				category = 'message',
 				label = (isSticker) ? 'sticker' : 'text';
 
-			StickerHelper.ajaxPost(this.config.trackStatUrl, this.config.apikey, [
-				{
-					action: action,
-					category: category,
-					label: label,
-					time: nowDate
-				}
-			]);
 
+			Module.Http.post(Module.Configs.trackStatUrl, [{
+				action: action,
+				category: category,
+				label: label,
+				time: nowDate
+			}]);
 
 			ga('stickerTracker.send', 'event', category, action, label);
 		},
@@ -300,22 +290,22 @@
 		},
 
 		changeUserPackStatus: function(packName, status, callback) {
-
 			var options = {
-				url: this.config.userPackUrl + '/' + packName,
+				url: Module.Configs.userPackUrl + '/' + packName,
 				header: {
-					UserId: StickerHelper.md5(this.config.userId + this.config.apikey)
+					UserId: StickerHelper.md5(Module.Configs.userId + Module.Configs.apikey)
 				}
 			};
 
-			StickerHelper.ajaxPost(options.url, this.config.apikey, {
+			// todo: rewrite callback
+			Module.Http.post(options.url, {
 				status: status
-			}, callback, options.header);
+			}, {
+				success: callback
+			}, options.header);
 		},
 
 		purchaseSuccess: function(packName) {
-			var self = this;
-
 			try {
 				var handler = function() {
 					if (!JsApiInterface) {
@@ -323,20 +313,20 @@
 					}
 
 					JsApiInterface.downloadPack(packName, function() {
-						self.config.callbacks.onPackStoreSuccess(packName);
+						Module.Configs.callbacks.onPackStoreSuccess(packName);
 					});
 				};
 
-				if (this.config.userId !== null) {
+				if (Module.Configs.userId !== null) {
 					this.changeUserPackStatus(packName, true, handler);
 				} else {
 					handler();
 				}
 			} catch(e) {
-				console.error(e.message);
-				this.config.callbacks.onPackStoreFail(packName);
+				console && console.error(e.message);
+				Module.Configs.callbacks.onPackStoreFail(packName);
 			}
 		}
-	});
+	};
 
 })(window.StickersModule);

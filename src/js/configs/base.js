@@ -1,10 +1,13 @@
 
 (function(Module) {
 
-	Module.Configs.add({
+	Module.StickerHelper.setConfig({
 
 		elId: 'stickerPipe',
 		storeContainerId: 'stickerPipeStore',
+
+		stickerResolutionType : (window.devicePixelRatio == 2) ? 'xhdpi' : 'mdpi',
+		tabResolutionType: (window.devicePixelRatio == 2) ? 'xxhdpi' : 'hdpi',
 
 		tabItemClass: 'sp-tab-item',
 		stickerItemClass: 'sp-sticker-item',
@@ -22,7 +25,9 @@
 		baseFolder: 'stk',
 
 		htmlForEmptyRecent: '<div class="emptyRecent">Ваши Стикеры</div>',
-		apikey: '72921666b5ff8651f374747bfefaf7b2',
+
+		// todo: rename apikey --> apiKey
+		apikey: '', // 72921666b5ff8651f374747bfefaf7b2
 
 		// todo: remove api url options
 		clientPacksUrl: 'http://api.stickerpipe.com/api/v1/client-packs',

@@ -5,8 +5,6 @@
 
 	Module.BlockView = Module.Class({
 
-		config: null,
-		baseService: null,
 		emojiService: null,
 
 		el: null,
@@ -15,15 +13,13 @@
 		tabsView: null,
 		scrollView: null,
 
-		_constructor: function(config, baseService, emojiService) {
-			this.config = config;
-			this.baseService = baseService;
+		_constructor: function(emojiService) {
 			this.emojiService = emojiService;
 
-			this.el = document.getElementById(this.config.elId);
+			this.el = document.getElementById(Module.Configs.elId);
 			this.contentEl = document.createElement('div');
 
-			this.tabsView = new Module.TabsView(this.config);
+			this.tabsView = new Module.TabsView();
 			this.scrollView = new Module.ScrollView();
 
 			window.addEventListener('resize', (function() {
@@ -61,7 +57,7 @@
 			this.clearBlock(this.contentEl);
 
 			if (latesUseSticker.length == 0) {
-				this.contentEl.innerHTML += this.config.htmlForEmptyRecent;
+				this.contentEl.innerHTML += Module.Configs.htmlForEmptyRecent;
 				return false;
 			}
 
@@ -79,11 +75,11 @@
 			this.contentEl.classList.remove('sp-stickers');
 			this.contentEl.classList.add('sp-emojis');
 
-			StickerHelper.forEach(this.config.emojiList, (function(emoji) {
+			StickerHelper.forEach(Module.Configs.emojiList, (function(emoji) {
 				var emojiEl = document.createElement('span'),
 					emojiImgHtml = this.emojiService.parseEmojiFromText(emoji);
 
-				emojiEl.className = this.config.emojiItemClass;
+				emojiEl.className = Module.Configs.emojiItemClass;
 				emojiEl.innerHTML = emojiImgHtml;
 
 				this.contentEl.appendChild(emojiEl);
@@ -112,7 +108,7 @@
 
 				var placeHolderClass = 'sp-sticker-placeholder';
 
-				var stickerImgSrc = self.baseService.parseStickerFromText('[[' + stickerCode + ']]');
+				var stickerImgSrc = Module.BaseService.parseStickerFromText('[[' + stickerCode + ']]');
 
 				var stickersSpanEl = document.createElement('span');
 				stickersSpanEl.classList.add(placeHolderClass);
@@ -120,7 +116,7 @@
 				var image = new Image();
 				image.onload = function() {
 					stickersSpanEl.classList.remove(placeHolderClass);
-					stickersSpanEl.classList.add(self.config.stickerItemClass);
+					stickersSpanEl.classList.add(Module.Configs.stickerItemClass);
 					stickersSpanEl.setAttribute('data-sticker-string', stickerCode);
 					stickersSpanEl.appendChild(image);
 				};
@@ -137,14 +133,14 @@
 
 		// todo: rename handleClickSticker --> handleClickOnSticker
 		handleClickSticker: function(callback) {
-			// todo: create static this.config.stickerItemClass
-			Module.StickerHelper.setEvent('click', this.contentEl, this.config.stickerItemClass, callback);
+			// todo: create static Module.Configs.stickerItemClass
+			Module.StickerHelper.setEvent('click', this.contentEl, Module.Configs.stickerItemClass, callback);
 		},
 
 		// todo: rename handleClickEmoji --> handleClickOnEmoji
 		handleClickEmoji: function(callback) {
-			// todo: create static this.config.emojiItemClass
-			Module.StickerHelper.setEvent('click', this.contentEl, this.config.emojiItemClass, callback);
+			// todo: create static Module.Configs.emojiItemClass
+			Module.StickerHelper.setEvent('click', this.contentEl, Module.Configs.emojiItemClass, callback);
 		},
 
 

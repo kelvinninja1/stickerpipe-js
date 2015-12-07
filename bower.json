@@ -1,6 +1,6 @@
 {
   "name": "stikers-js",
-  "version": "0.0.1",
+  "version": "0.0.7",
   "homepage": "http://stickerpipe.com",
   "authors": [
     "Dmitry Shevchuk shevchuk@908.dp.ua"
@@ -19,8 +19,7 @@
     "bower_components",
     "test",
     "tests",
-    "js",
-    "Gruntfile.js",
+    "gulpfile.js",
     "package.json",
     "README.md"
   ]

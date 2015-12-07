@@ -3,24 +3,20 @@
 
 	Module.StoreView = Module.Class({
 
-		config: null,
-
 		el: null,
 
-		_constructor: function(config) {
-			this.config = config;
-
-			this.el = document.getElementById(this.config.storeContainerId);
+		_constructor: function() {
+			this.el = document.getElementById(Module.Configs.storeContainerId);
 		},
 
 		render: function(packName) {
 
 			var iframe = document.createElement('iframe'),
 				urlParams = {
-					apiKey: this.config.apikey,
+					apiKey: Module.Configs.apikey,
 					platform: 'JS',
-					userId: this.config.userId,
-					density: this.config.stickerResolutionType,
+					userId: Module.Configs.userId,
+					density: Module.Configs.stickerResolutionType,
 					uri: encodeURIComponent('http://demo.stickerpipe.com/work/libs/store/js/stickerPipeStore.js')
 				},
 				urlSerialize = function(obj) {
@@ -40,7 +36,7 @@
 			iframe.style.height = '100%';
 			iframe.style.border = '0';
 
-			iframe.src = this.config.storeUrl + '?' + urlSerialize(urlParams) + '#/packs/' + packName
+			iframe.src = Module.Configs.storeUrl + '?' + urlSerialize(urlParams) + '#/packs/' + packName
 		}
 	});
 

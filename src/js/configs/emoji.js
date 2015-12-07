@@ -1,7 +1,7 @@
 
 (function(Module) {
 
-	Module.Configs.add({
+	Module.StickerHelper.setConfig({
 		emojiList: [
 			// Emoticons		
 			"😊",
