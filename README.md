@@ -98,7 +98,7 @@ html
 - when message send (for statistic)
 
 ```js
-    sticker.onUserMessageSent(isSticker );
+    sticker.onUserMessageSent(isSticker);
 ```
 
 
@@ -108,25 +108,25 @@ html
 - when user click on sticker
     
 ```js
-    sticker.onClickSticker(function(text) { {...}, context );
+    sticker.onClickSticker(function(text) {...}, context);
 ```
 
 - when user click on emoji
 
 ```js
-    sticker.onClickEmoji(function(text) { {...}, context );
+    sticker.onClickEmoji(function(text) {...}, context);
 ```
 
 - when user click on tab
     
 ```js
-    sticker.onClickTab(function(el) { {...}, context );
+    sticker.onClickTab(function(el) {...}, context);
 ```
 
 - when user click on custom tab
     
 ```js
-    sticker.onClickCustomTab(function(el) { {...}, context );
+    sticker.onClickCustomTab(function(el) {...}, context);
 ```
 
 | Name                      |  description                                                        |
