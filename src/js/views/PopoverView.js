@@ -90,9 +90,9 @@
 
 				this.popoverEl.style.marginLeft = marginLeft + 'px';
 
-				if (this.popoverEl.getBoundingClientRect().left + this.popoverEl.offsetWidth > window.innerWidth) {
-					this.popoverEl.style.marginLeft = marginLeft - (this.popoverEl.offsetWidth / 2) + (this.toggleEl.clientWidth / 2) + 'px';
-				}
+				//if (this.popoverEl.getBoundingClientRect().left + this.popoverEl.offsetWidth > window.innerWidth) {
+				//	this.popoverEl.style.marginLeft = marginLeft - (this.popoverEl.offsetWidth / 2) + (this.toggleEl.clientWidth / 2) + 'px';
+				//}
 
 				this.triangleEl.style.marginLeft = this.toggleEl.getBoundingClientRect().left
 					- this.popoverEl.getBoundingClientRect().left
