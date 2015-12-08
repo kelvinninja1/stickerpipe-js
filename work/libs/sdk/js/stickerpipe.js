@@ -3574,6 +3574,7 @@ if ("document" in self) {
 				var marginLeft = parseInt(style.marginLeft, 10);
 
 				this.arrowEl.style.marginLeft = (this.toggleEl.clientWidth / 2) - (this.arrowEl.offsetWidth / 2) + marginLeft + 'px';
+				this.arrowEl.style.top = (this.popoverEl.offsetHeight - 2) + 'px';
 
 				var arrowStyle = this.arrowEl.currentStyle || window.getComputedStyle(this.arrowEl);
 				if (arrowStyle.display != 'none') {
