@@ -4002,22 +4002,24 @@ if ("document" in self) {
 			Module.StickerHelper.setConfig(config);
 			Module.Storage.setPrefix(Module.Configs.storagePrefix);
 
+			// todo: remove
+			//Plugin.JsApiInterface && Plugin.JsApiInterface._setConfigs(Module.Configs);
 
 			this.emojiService = new Module.EmojiService(Module.Twemoji);
+		},
+
+		render: function(onload, elId) {
+			Module.Configs.elId = elId || Module.Configs.elId;
 
 			this.view = new Module.PopoverView(this.emojiService);
 			this.storeView = new Module.StoreView();
 
-			// todo: remove
-			//Plugin.JsApiInterface && Plugin.JsApiInterface._setConfigs(Module.Configs);
-
 			this.delegateEvents();
-
 
 			// todo
 			//// ***** START *******************************************************************************************
 
-			var callback = Module.Configs.onload || null;
+			var callback = onload || null;
 
 			var onPacksLoadCallback = (function() {
 				callback && callback();

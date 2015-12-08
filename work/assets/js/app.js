@@ -140,19 +140,33 @@ var App = _makeClass(function(options) {
 			this.$stickersToggle.addClass('has-new-content');
 		}
 
+		this.stickers.render((function() {
+			// todo: make as event
+			this.stickers.onClickSticker((function(text) {
+				this.sendMessage(true, text);
+			}).bind(this));
+
+			// todo: make as event
+			this.stickers.onClickEmoji((function(emoji) {
+				console.log('click on emoji', emoji);
+				this.$textarea.focus();
+				this.pasteHtmlAtCaret(this.stickers.parseEmojiFromText(emoji));
+			}).bind(this));
+		}).bind(this));
+
+
 		this.resizeWindow();
-
 		// todo: events
-		this.stickers.onClickSticker((function(text) {
-			this.sendMessage(true, text);
-		}).bind(this));
-
-		// todo: events
-		this.stickers.onClickEmoji((function(emoji) {
-			console.log('click on emoji', emoji);
-			this.$textarea.focus();
-			this.pasteHtmlAtCaret(this.stickers.parseEmojiFromText(emoji));
-		}).bind(this));
+		//this.stickers.onClickSticker((function(text) {
+		//	this.sendMessage(true, text);
+		//}).bind(this));
+		//
+		//// todo: events
+		//this.stickers.onClickEmoji((function(emoji) {
+		//	console.log('click on emoji', emoji);
+		//	this.$textarea.focus();
+		//	this.pasteHtmlAtCaret(this.stickers.parseEmojiFromText(emoji));
+		//}).bind(this));
 
 		this.$window.on('sp:content:highlight:show', (function() {
 			this.$stickersToggle.addClass('has-new-content');
