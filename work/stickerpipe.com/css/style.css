@@ -22,7 +22,7 @@ body {
   .navbar-custom .navbar-toggle {
     border-color: white; }
     .navbar-custom .navbar-toggle:hover, .navbar-custom .navbar-toggle:focus {
-      background-color: #673ab7; }
+      background-color: #4527a0; }
       .navbar-custom .navbar-toggle:hover .icon-bar, .navbar-custom .navbar-toggle:focus .icon-bar {
         background-color: white; }
     .navbar-custom .navbar-toggle .icon-bar {
@@ -118,7 +118,7 @@ button.get-pack {
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box; }
   button.get-pack:hover {
-    background: #673ab7;
+    background: #4527a0;
     border: 1px solid #311b92; }
 
 .social {
