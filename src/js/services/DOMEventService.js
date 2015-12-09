@@ -19,10 +19,10 @@
 			el = el || window;
 
 			var event;
-			if(document.createEvent) {
+			if (document.createEvent) {
 				event = document.createEvent('HTMLEvents');
 				event.initEvent(eventName, true, true);
-			} else if(document.createEventObject) { // IE < 9
+			} else if (document.createEventObject) { // IE < 9
 				event = document.createEventObject();
 				event.eventType = eventName;
 			}
@@ -31,11 +31,11 @@
 
 			if (el.dispatchEvent) {
 				el.dispatchEvent(event);
-			} else if(el.fireEvent) { // IE < 9
+			} else if (el.fireEvent) { // IE < 9
 				el.fireEvent('on' + event.eventType, event);// can trigger only real event (e.g. 'click')
-			} else if(el[eventName]) {
+			} else if (el[eventName]) {
 				el[eventName]();
-			} else if(el['on' + eventName]) {
+			} else if (el['on' + eventName]) {
 				el['on' + eventName]();
 			}
 		},
