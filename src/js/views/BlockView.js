@@ -143,6 +143,9 @@
 			Module.StickerHelper.setEvent('click', this.contentEl, Module.Configs.emojiItemClass, callback);
 		},
 
+		open: function() {},
+		close: function() {},
+
 
 		onWindowResize: function() {}
 	});

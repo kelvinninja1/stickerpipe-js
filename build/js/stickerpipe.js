@@ -3479,6 +3479,9 @@ if ("document" in self) {
 			Module.StickerHelper.setEvent('click', this.contentEl, Module.Configs.emojiItemClass, callback);
 		},
 
+		open: function() {},
+		close: function() {},
+
 
 		onWindowResize: function() {}
 	});
@@ -3557,13 +3560,21 @@ if ("document" in self) {
 			this.active = !this.active;
 
 			if (this.active) {
-				this.toggleEl.parentElement.appendChild(this.popoverEl);
-				this.positioned();
-				Module.DOMEventService.popoverShown();
+				this.open();
 			} else {
-				this.toggleEl.parentElement.removeChild(this.popoverEl);
-				Module.DOMEventService.popoverHidden();
+				this.close();
 			}
+		},
+
+		open: function() {
+			this.toggleEl.parentElement.appendChild(this.popoverEl);
+			this.positioned();
+			Module.DOMEventService.popoverShown();
+		},
+
+		close: function() {
+			this.toggleEl.parentElement.removeChild(this.popoverEl);
+			Module.DOMEventService.popoverHidden();
 		},
 
 		positioned: function() {
@@ -3944,6 +3955,11 @@ if ("document" in self) {
 		},
 
 
+		activeTab: function(tabName) {
+			this.packTabs[tabName].click();
+		},
+
+
 		handleClickOnEmojiTab: function(callback) {
 			Module.StickerHelper.setEvent('click', this.el, this.controls.emoji.class, callback);
 		},
@@ -4188,22 +4204,24 @@ if ("document" in self) {
 
 		// todo rewrite
 		renderCurrentTab: function(tabName) {
-			var obj = Module.BaseService.getPacksFromStorage();
+			//var obj = Module.BaseService.getPacksFromStorage();
 
 			//this.start(); // todo
 
-			helper.forEach(obj.packs, (function(pack, key) {
-
-				if(pack.pack_name.toLowerCase() == tabName.toLowerCase()) {
-					this.tabActive = +key;
-				}
-
-			}).bind(this));
+			//helper.forEach(obj.packs, (function(pack, key) {
+			//
+			//	if(pack.pack_name.toLowerCase() == tabName.toLowerCase()) {
+			//		this.tabActive = +key;
+			//	}
+			//
+			//}).bind(this));
 
 			//this.stickersModel[this.tabActive].newPack = false;
 			//Module.BaseService.setPacksToStorage(this.stickersModel);
 
 			//this._renderAll();
+
+			this.view.tabsView.activeTab(tabName);
 		},
 
 		isNewPack: function(packName) {
@@ -4220,6 +4238,14 @@ if ("document" in self) {
 
 		purchaseSuccess: function(packName) {
 			Module.BaseService.purchaseSuccess(packName);
+		},
+
+		open: function() {
+			this.view.open();
+		},
+
+		close: function() {
+			this.view.close();
 		}
 	});
 

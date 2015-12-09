@@ -246,6 +246,11 @@
 		},
 
 
+		activeTab: function(tabName) {
+			this.packTabs[tabName].click();
+		},
+
+
 		handleClickOnEmojiTab: function(callback) {
 			Module.StickerHelper.setEvent('click', this.el, this.controls.emoji.class, callback);
 		},

@@ -71,13 +71,21 @@
 			this.active = !this.active;
 
 			if (this.active) {
-				this.toggleEl.parentElement.appendChild(this.popoverEl);
-				this.positioned();
-				Module.DOMEventService.popoverShown();
+				this.open();
 			} else {
-				this.toggleEl.parentElement.removeChild(this.popoverEl);
-				Module.DOMEventService.popoverHidden();
+				this.close();
 			}
+		},
+
+		open: function() {
+			this.toggleEl.parentElement.appendChild(this.popoverEl);
+			this.positioned();
+			Module.DOMEventService.popoverShown();
+		},
+
+		close: function() {
+			this.toggleEl.parentElement.removeChild(this.popoverEl);
+			Module.DOMEventService.popoverHidden();
 		},
 
 		positioned: function() {

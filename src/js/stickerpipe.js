@@ -210,22 +210,24 @@ window.StickersModule = {};
 
 		// todo rewrite
 		renderCurrentTab: function(tabName) {
-			var obj = Module.BaseService.getPacksFromStorage();
+			//var obj = Module.BaseService.getPacksFromStorage();
 
 			//this.start(); // todo
 
-			helper.forEach(obj.packs, (function(pack, key) {
-
-				if(pack.pack_name.toLowerCase() == tabName.toLowerCase()) {
-					this.tabActive = +key;
-				}
-
-			}).bind(this));
+			//helper.forEach(obj.packs, (function(pack, key) {
+			//
+			//	if(pack.pack_name.toLowerCase() == tabName.toLowerCase()) {
+			//		this.tabActive = +key;
+			//	}
+			//
+			//}).bind(this));
 
 			//this.stickersModel[this.tabActive].newPack = false;
 			//Module.BaseService.setPacksToStorage(this.stickersModel);
 
 			//this._renderAll();
+
+			this.view.tabsView.activeTab(tabName);
 		},
 
 		isNewPack: function(packName) {
@@ -242,6 +244,14 @@ window.StickersModule = {};
 
 		purchaseSuccess: function(packName) {
 			Module.BaseService.purchaseSuccess(packName);
+		},
+
+		open: function() {
+			this.view.open();
+		},
+
+		close: function() {
+			this.view.close();
 		}
 	});
 
