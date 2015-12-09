@@ -5,6 +5,7 @@
 ## Demo
 
 http://demo.stickerpipe.com (Example)
+
 https://github.com/908Inc/stickerpipe-js/tree/gh-pages (Example sources)
 
 ## Install
