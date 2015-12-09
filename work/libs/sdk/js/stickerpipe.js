@@ -3519,6 +3519,7 @@ if ("document" in self) {
 			this.popoverEl.appendChild(this.el);
 			this.popoverEl.appendChild(this.triangleEl);
 
+			console.log('f3');
 			this.handleClickSticker((function() {
 				this.toggle();
 			}).bind(this));
@@ -4101,6 +4102,7 @@ if ("document" in self) {
 				pack && this.view.renderPack(pack);
 			}).bind(this));
 
+			console.log('f1');
 			this.view.handleClickSticker((function(el) {
 
 				var stickerAttribute = el.getAttribute('data-sticker-string'),
@@ -4160,6 +4162,7 @@ if ("document" in self) {
 
 		// todo: rename
 		onClickSticker: function(callback, context) {
+			console.log('f2');
 			this.view.handleClickSticker(function(el) {
 				callback.call(context, '[[' + el.getAttribute('data-sticker-string') + ']]');
 			});
