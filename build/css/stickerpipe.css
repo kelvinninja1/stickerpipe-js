@@ -59,11 +59,6 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   height: 350px;
   width: 320px;
   box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.15); }
-  @media (max-width: 544px) {
-    .sp-popover {
-      border: 0;
-      box-shadow: none;
-      border-radius: 0 0; } }
   .sp-popover .sp-arrow,
   .sp-popover .sp-arrow:after {
     position: absolute;
