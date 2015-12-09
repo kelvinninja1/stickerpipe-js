@@ -88,7 +88,6 @@ var App = _makeClass(function(options) {
 
 			debug: true,
 
-			//elId: this.$stickerPipeStickers.attr('id'),
 			elId: 'stickersToggle',
 
 			storeContainerId: this.$stickerPipeStore.attr('id'),
@@ -96,19 +95,10 @@ var App = _makeClass(function(options) {
 			htmlForEmptyRecent: '<div class="emptyRecent">empty recent text</div>',
 
 			apikey: '72921666b5ff8651f374747bfefaf7b2',
-			//apikey: '52ed1358d7d09df5279147a5555061a9',
 
 			storagePrefix: 'stickerPipe',
 			enableEmojiTab: true,
 			enableHistoryTab: true,
-
-			domain : 'http://work.stk.908.vc',
-			clientPacksUrl: 'http://work.stk.908.vc/api/v1/client-packs',
-			userPacksUrl: 'http://work.stk.908.vc/api/v1/user/packs',
-			userPackUrl: 'http://work.stk.908.vc/api/v1/user/pack',
-			trackStatUrl: 'http://work.stk.908.vc/api/v1/track-statistic',
-			storeUrl: 'http://work.stk.908.vc/api/v1/web',
-			//storeUrl: 'http://localhost/stickerpipe/store/build',
 
 			userId: '12345678901234567890123456789012',
 
@@ -140,19 +130,33 @@ var App = _makeClass(function(options) {
 			this.$stickersToggle.addClass('has-new-content');
 		}
 
+		this.stickers.render((function() {
+			// todo: make as event
+			this.stickers.onClickSticker((function(text) {
+				this.sendMessage(true, text);
+			}).bind(this));
+
+			// todo: make as event
+			this.stickers.onClickEmoji((function(emoji) {
+				console.log('click on emoji', emoji);
+				this.$textarea.focus();
+				this.pasteHtmlAtCaret(this.stickers.parseEmojiFromText(emoji));
+			}).bind(this));
+		}).bind(this));
+
+
 		this.resizeWindow();
-
 		// todo: events
-		this.stickers.onClickSticker((function(text) {
-			this.sendMessage(true, text);
-		}).bind(this));
-
-		// todo: events
-		this.stickers.onClickEmoji((function(emoji) {
-			console.log('click on emoji', emoji);
-			this.$textarea.focus();
-			this.pasteHtmlAtCaret(this.stickers.parseEmojiFromText(emoji));
-		}).bind(this));
+		//this.stickers.onClickSticker((function(text) {
+		//	this.sendMessage(true, text);
+		//}).bind(this));
+		//
+		//// todo: events
+		//this.stickers.onClickEmoji((function(emoji) {
+		//	console.log('click on emoji', emoji);
+		//	this.$textarea.focus();
+		//	this.pasteHtmlAtCaret(this.stickers.parseEmojiFromText(emoji));
+		//}).bind(this));
 
 		this.$window.on('sp:content:highlight:show', (function() {
 			this.$stickersToggle.addClass('has-new-content');
