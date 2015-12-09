@@ -85,10 +85,6 @@ footer {
 .pack-main-sticker {
   height: 160px;
   width: 160px; }
-  @media (max-width: 768px) {
-    .pack-main-sticker {
-      height: 80px;
-      width: 80px; } }
 
 .pack-owner:before {
   content: "@";
