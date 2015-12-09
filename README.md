@@ -70,9 +70,10 @@ js
 
 ## Methods
 
--  rendering sticker pipe block
+-  rendering sticker pipe keyboard
+
 ```js
-    sticker.render(onRender, elId);
+    sticker.render([onRender, elId]);
 ```
 
 -  parse text and return img url if text is sticker
@@ -149,15 +150,9 @@ js
     	// do something ...
     });
     
-    window.addEventListener('sp:popover:hidden', function() {
-    	// do something ...
-    });
+    // or with jQuery
     
-    window.addEventListener('sp:content:highlight:show', function() {
-    	// do something ...
-    });
-    
-    window.addEventListener('sp:content:highlight:hide', function() {
+    $(window).on('sp:popover:shown', function() {
     	// do something ...
     });
 ```
