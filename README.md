@@ -4,8 +4,8 @@
 
 ## Demo
 
-http://stickerpipe.com/demo
-
+http://demo.stickerpipe.com (Example)
+https://github.com/908Inc/stickerpipe-js/tree/gh-pages (Example sources)
 
 ## Install
 
@@ -17,9 +17,9 @@ http://stickerpipe.com/demo
 ### CDN
 
 ```js
-<script src="http://cdn.stickerpipe.com/stickerjs/lib/0.0.1/stickers.js"></script>
+<script src="http://cdnjs.stickerpipe.com/libs/sdk/0.0.3/stickers.js"></script>
 <!-- or -->
-<script src="http://cdn.stickerpipe.com/stickerjs/lib/0.0.1/stickers.min.js"></script>
+<script src="http://cdnjs.stickerpipe.com/libs/sdk/0.0.3/stickers.min.js"></script>
 ```
 
 ### Bower
@@ -37,37 +37,42 @@ demo apikey: 72921666b5ff8651f374747bfefaf7b2
 
 If you want use own apikey: http://stickerpipe.com/
 
+html
+```html
+
+    <div id="stickerPipe"></div>
+```
+
 js
 ```js
     var sticker = new Stickers({
         
-        tabContainerId: "sttab",
-        tabItemClass: "sttab_item",
+        elId: 'stickerPipe',
+        
+        enableEmojiTab: true,
+        enableHistoryTab: true,
 
-        stickersContainerId: "stitems",
-        stickerItemClass: "stitems_item",
-
-        stickerResolutionType: "mdpi",
-        tabResolutionType: "xxhdpi",
-
-        htmlForEmptyRecent: "<div class='emptyRecent'>empty recent text</div>",
-        storagePrefix: "stickerPipe",
-        apikey: "72921666b5ff8651f374747bfefaf7b2",
+        htmlForEmptyRecent: '<div class="emptyRecent">empty recent text</div>',
+        storagePrefix: 'stickerPipe_',
+        
+        apikey: '72921666b5ff8651f374747bfefaf7b2',
 
         userId: MD5('<YOUR_USER_ID>')
 
     });
-```
-
-html
-```html
-
-    <div class="sttab" id="sttab"></div>
-    <div class="stitems" id="stitems"></div>
+    
+    sticker.render(function() {
+    	// on render callback
+    });
 ```
 
 
 ## Methods
+
+-  rendering sticker pipe block
+```js
+    sticker.render(onRender, elId);
+```
 
 -  parse text and return img url if text is sticker
 ```js
@@ -101,9 +106,7 @@ html
     sticker.onUserMessageSent(isSticker);
 ```
 
-
-
-## Events
+## Callbacks
 
 - when user click on sticker
     
@@ -129,12 +132,34 @@ html
     sticker.onClickCustomTab(function(el) {...}, context);
 ```
 
+## Events
+
 | Name                      |  description                                                        |
 | ------------------------- | ------------------------------------------------------------------- |
 | sp:popover:shown          | fire on popover was shown                                           |
 | sp:popover:hidden         | fire on popover was hidden                                          |
 | sp:content:highlight:show | fire on getting new content (unseen or when stickers history empty) |
 | sp:content:highlight:hide | fire on have not new contend and stickers history not empty         |
+
+### Example
+
+```js
+    window.addEventListener('sp:popover:shown', function() {
+    	// do something ...
+    });
+    
+    window.addEventListener('sp:popover:hidden', function() {
+    	// do something ...
+    });
+    
+    window.addEventListener('sp:content:highlight:show', function() {
+    	// do something ...
+    });
+    
+    window.addEventListener('sp:content:highlight:hide', function() {
+    	// do something ...
+    });
+```
 
 
 ## Options
@@ -146,15 +171,13 @@ html
 | tabItemClass          | class name string                 | Will set in tab block                         |
 | stickerItemClass      | class name string                 | Will set in sticker block                     |
 | emojiItemClass        | class name string                 | Will set in emoji block                       |
-| stickerResolutionType | "mdpi", "hdpi", "xhdpi", "xxhdpi" | stickers size                                 |
-| tabResolutionType     | "mdpi", "hdpi", "xhdpi", "xxhdpi" | tab icon size                                 |
 | htmlForEmptyRecent    | html code                         | insert in empty recent block                  |
-| apikey                | api key your account              | if you wont use custom tabs                   |
+| apikey                | api key your account              | your api key                                  |
 | storagePrefix         | string                            | prefix for LocalStorage                       |
-| enableEmojiTab        | boolean                           | if your wont use emoji                        |
+| enableEmojiTab        | boolean                           | if your wont use emoji tab                    |
+| enableHistoryTab      | boolean                           | if your wont use history tab                  |
 | userId                | md5 of user id - string           | client user id hash                           |
 | lang                  | "en", "ru" ...                    | language ISO 2                                |
-| onload                | function                          | callback when plugin load                     |
 
 
 ## Credits
