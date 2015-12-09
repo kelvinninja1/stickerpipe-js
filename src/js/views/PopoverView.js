@@ -68,9 +68,7 @@
 		},
 
 		toggle: function() {
-			this.active = !this.active;
-
-			if (this.active) {
+			if (!this.active) {
 				this.open();
 			} else {
 				this.close();
@@ -78,12 +76,14 @@
 		},
 
 		open: function() {
+			this.active = true;
 			this.toggleEl.parentElement.appendChild(this.popoverEl);
 			this.positioned();
 			Module.DOMEventService.popoverShown();
 		},
 
 		close: function() {
+			this.active = false;
 			this.toggleEl.parentElement.removeChild(this.popoverEl);
 			Module.DOMEventService.popoverHidden();
 		},
