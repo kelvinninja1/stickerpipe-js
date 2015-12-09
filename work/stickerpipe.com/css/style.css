@@ -1,6 +1,5 @@
-/* Move down content because we have a fixed navbar that is 50px tall */
 body {
-  padding-top: 50px;
+  padding-top: 100px;
   padding-bottom: 20px; }
 
 .navbar-custom {
@@ -21,13 +20,13 @@ body {
     color: white;
     background-color: #6607b5; }
   .navbar-custom .navbar-toggle {
-    border-color: #FFF; }
+    border-color: white; }
     .navbar-custom .navbar-toggle:hover, .navbar-custom .navbar-toggle:focus {
-      background-color: #420276; }
+      background-color: #673ab7; }
       .navbar-custom .navbar-toggle:hover .icon-bar, .navbar-custom .navbar-toggle:focus .icon-bar {
-        background-color: #FFF; }
+        background-color: white; }
     .navbar-custom .navbar-toggle .icon-bar {
-      background-color: #FFF; }
+      background-color: white; }
 
 .jumbotron {
   padding-top: 0;
@@ -38,6 +37,7 @@ body {
 .jumbotron-1 {
   background: #e2f3f3;
   margin-bottom: 0;
+  margin-top: -50px;
   padding: 30px 0; }
 
 .jumbotron-2 {
@@ -60,10 +60,8 @@ footer {
   .email-form .form-group button {
     border-radius: 0; }
 
-.packs {
-  margin: 30px auto; }
-  .packs > .row > div {
-    margin-bottom: 30px; }
+.packs > .row > div {
+  margin-bottom: 30px; }
 
 .pack-preview a {
   display: block;
@@ -77,8 +75,72 @@ footer {
 .pack-preview-date {
   color: rgba(0, 0, 0, 0.3); }
 
-.pack-preview-sticker {
+.pack-preview-sticker,
+.sticker img {
   max-height: 160px;
   max-width: 160px;
   height: 100%;
   width: 100%; }
+
+.pack-main-sticker {
+  height: 160px;
+  width: 160px; }
+  @media (max-width: 768px) {
+    .pack-main-sticker {
+      height: 80px;
+      width: 80px; } }
+
+.pack-owner {
+  font-weight: bold; }
+  .pack-owner:before {
+    content: "@";
+    margin-right: 5px; }
+
+.pack-name {
+  margin-bottom: 10px; }
+
+.pack-price {
+  color: #6607b5;
+  font-size: 24px;
+  text-transform: uppercase; }
+
+.actions > * {
+  float: left; }
+
+button.get-pack {
+  background: #6607b5;
+  border: 0;
+  border-radius: 3px;
+  color: white;
+  margin-right: 10px;
+  outline: none;
+  padding: 10px;
+  width: 150px; }
+  button.get-pack:hover {
+    background: #673ab7; }
+
+.social {
+  background: url("../img/social.png");
+  background-size: 90px 80px;
+  display: table;
+  height: 40px;
+  width: 45px; }
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .social {
+      background: url("../img/social@2x.png");
+      background-size: 90px 80px; } }
+
+.social.facebook {
+  background-position: 45px 0; }
+  .social.facebook:hover {
+    background-position: 45px 40px; }
+
+.social.twitter {
+  background-position: 0 0; }
+  .social.twitter:hover {
+    background-position: 0 40px; }
+
+.pack-stickers {
+  margin-top: 30px; }
+  .pack-stickers > div {
+    margin-bottom: 30px; }
