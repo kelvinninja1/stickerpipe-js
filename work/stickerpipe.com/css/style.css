@@ -90,11 +90,9 @@ footer {
       height: 80px;
       width: 80px; } }
 
-.pack-owner {
-  font-weight: bold; }
-  .pack-owner:before {
-    content: "@";
-    margin-right: 5px; }
+.pack-owner:before {
+  content: "@";
+  margin-right: 5px; }
 
 .pack-name {
   margin-bottom: 10px; }
