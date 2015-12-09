@@ -18,23 +18,25 @@
 
 			el = el || window;
 
-			// todo: ie dispatcher (through el.fireEvent)
-			if (typeof CustomEvent === 'function') {
-				el.dispatchEvent(new CustomEvent(eventName, {
-					bubbles: true,
-					cancelable: true
-				}));
+			var event;
+			if(document.createEvent){
+				event = document.createEvent('HTMLEvents');
+				event.initEvent(eventName, true, true);
+			} else if(document.createEventObject){ // IE < 9
+				event = document.createEventObject();
+				event.eventType = eventName;
 			}
-			else { // IE
-				var event = null;
-				if (document.createEventObject) {
-					event = document.createEventObject();
-					el.fireEvent(eventName, event);
-				} else {
-					var evt = document.createEvent("HTMLEvents");
-					evt.initEvent(eventName, true, true);
-					el.dispatchEvent(evt);
-				}
+
+			event.eventName = eventName;
+
+			if (el.dispatchEvent){
+				el.dispatchEvent(event);
+			} else if(el.fireEvent){ // IE < 9
+				el.fireEvent('on' + event.eventType, event);// can trigger only real event (e.g. 'click')
+			} else if(el[eventName]){
+				el[eventName]();
+			} else if(el['on' + eventName]){
+				el['on' + eventName]();
 			}
 		},
 

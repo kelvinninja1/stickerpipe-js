@@ -20,129 +20,236 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 	Plugin.StickersModule = Plugin.StickersModule || {};
 
-	/** @preserve http://github.com/easeway/js-class */
+	/**
+	 *
+	 * Copyright (C) 2011 by crac <![[dawid.kraczkowski[at]gmail[dot]com]]>
+	 * Thanks for Hardy Keppler<![[Keppler.H[at]online.de]]> for shortened version
+	 *
+	 * Permission is hereby granted, free of charge, to any person obtaining a copy
+	 * of this software and associated documentation files (the "Software"), to deal
+	 * in the Software without restriction, including without limitation the rights
+	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	 * copies of the Software, and to permit persons to whom the Software is
+	 * furnished to do so, subject to the following conditions:
+	 *
+	 * The above copyright notice and this permission notice shall be included in
+	 * all copies or substantial portions of the Software.
+	 *
+	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	 * THE SOFTWARE.
+	 *
+	 **/
+	var Class = (function() {
 
-	// Class Definition using ECMA5 prototype chain
-
-	function inherit(dest, src, noParent) {
-		while (src && src !== Object.prototype) {
-			Object.getOwnPropertyNames(src).forEach(function (name) {
-				if (name != '.class' && !dest.hasOwnProperty(name)) {
-					var desc = Object.getOwnPropertyDescriptor(src, name);
-					Object.defineProperty(dest, name, desc);
+		function _rewriteStatics(fnc, statics) {
+			for (var prop in statics) {
+				if (prop === 'extend' || prop === 'static' || prop === 'typeOf' || prop === 'mixin' ) {
+					continue;
 				}
-			});
-			if (noParent) {
-				break;
-			}
-			src = src.__proto__;
-		}
-		return dest;
-	}
 
-	var Class = function (base, proto, options) {
-		if (typeof(base) != 'function') {
-			options = proto;
-			proto = base;
-			base = Object;
-		}
-		if (!proto) {
-			proto = {};
-		}
-		if (!options) {
-			options = {};
-		}
+				if (typeof statics[prop] === 'object' || typeof statics[prop] === 'function') {
+					fnc[prop] = statics[prop];
+					return;
+				}
 
-		var meta = {
-			name: options.name,
-			base: base,
-			implements: []
-		}
-		var classProto = Class.clone(proto);
-		if (options.implements) {
-			(Array.isArray(options.implements) ? options.implements : [options.implements])
-				.forEach(function (implementedType) {
-					if (typeof(implementedType) == 'function' && implementedType.prototype) {
-						meta.implements.push(implementedType);
-						Class.extend(classProto, implementedType.prototype);
-					}
-				});
-		}
-		classProto.__proto__ = base.prototype;
-		var theClass = function () {
-			if (typeof(this._constructor) == 'function') {
-				this._constructor.apply(this, arguments);
-			}
-		};
-		meta.type = theClass;
-		theClass.prototype = classProto;
-		Object.defineProperty(theClass, '.class.meta', { value: meta, enumerable: false, configurable: false, writable: false });
-		Object.defineProperty(classProto, '.class', { value: theClass, enumerable: false, configurable: false, writable: false });
-		if (options.statics) {
-			Class.extend(theClass, options.statics);
-		}
-		return theClass;
-	};
-
-	Class.extend = inherit;
-
-	Class.clone = function (object) {
-		return inherit({}, object);
-	};
-
-	function findType(meta, type) {
-		while (meta) {
-			if (meta.type.prototype === type.prototype) {
-				return true;
-			}
-			for (var i in meta.implements) {
-				var implType = meta.implements[i];
-				var implMeta = implType['.class.meta'];
-				if (implMeta) {
-					if (findType(implMeta, type)) {
-						return true;
-					}
+				//check if static is a constant
+				if (prop === prop.toUpperCase()) {
+					Object.defineProperty(fnc, prop, {
+						writable: false,
+						configurable: false,
+						enumerable: true,
+						value: statics[prop]
+					});
+					Object.defineProperty(fnc.prototype, prop, {
+						writable: false,
+						configurable: false,
+						enumerable: true,
+						value: statics[prop]
+					});
 				} else {
-					for (var proto = implType.prototype; proto; proto = proto.__proto__) {
-						if (proto === type.prototype) {
+					Object.defineProperty(fnc, prop, {
+						get: function() {
+							return statics[prop]
+						},
+						set: function(val) {
+							statics[prop] = val;
+						}
+					});
+					Object.defineProperty(fnc.prototype, prop, {
+						get: function() {
+							return statics[prop]
+						},
+						set: function(val) {
+							statics[prop] = val;
+						}
+					});
+				}
+			}
+		}
+
+		function _extend(base, source, overrideConstructor) {
+			overrideConstructor = overrideConstructor || false;
+
+			for (var p in source) {
+				if ((p === '_constructor' && !overrideConstructor) || p === 'typeOf' || p === 'mixin' || p === 'static' || p === 'extend') {
+					continue;
+				}
+				base[p] = source[p];
+			}
+		}
+
+		return function (classBody) {
+
+			var _preventCreateCall = false;
+
+			return (function createClass(self, classBody) {
+
+				var _mixins = [];
+				var instance;
+
+				var isSingleton = classBody.hasOwnProperty('singleton') && classBody.singleton;
+
+				var classConstructor = function () {
+					//apply constructor pattern
+					if (typeof this['_constructor'] === 'function' && _preventCreateCall === false) {
+						this._constructor.apply(this, arguments);
+					}
+
+					//apply getter pattern
+					if (classBody.hasOwnProperty('get')) {
+						for (var p in classBody.get) {
+
+							var setter = 'set' in classBody ? (p in classBody.set ? classBody.set[p] : null) : null;
+							if (setter === null) {
+								Object.defineProperty(this, p, {
+									get: classBody.get[p]
+								});
+							}
+						}
+					}
+
+					//apply setter pattern
+					if (classBody.hasOwnProperty('set')) {
+						for (var p in classBody.set) {
+
+							var getter = 'get' in classBody ? (p in classBody.get ? classBody.get[p] : null) : null;
+							if (getter !== null) {
+								Object.defineProperty(this, p, {
+									set: classBody.set[p],
+									get: classBody.get[p]
+								});
+							} else {
+								Object.defineProperty(this, p, {
+									set: classBody.set[p]
+								});
+							}
+						}
+					}
+
+					if (isSingleton && typeof this !== 'undefined') {
+						throw new Error('Singleton object cannot have more than one instance, call instance method instead');
+					}
+					this.constructor = classConstructor;
+				};
+
+				//make new class instance of extended object
+				if (self !== null) {
+					_preventCreateCall = true;
+					classConstructor.prototype = new self();
+					_preventCreateCall = false;
+				}
+
+				var classPrototype = classConstructor.prototype;
+
+				classPrototype.typeOf = function(cls) {
+					if (typeof cls === 'object') {
+						return _mixins.indexOf(cls) >= 0;
+					} else if (typeof cls === 'function') {
+						if (this instanceof cls) {
+							return true;
+						} else if (_mixins.indexOf(cls) >= 0) {
 							return true;
 						}
 					}
+
+					return false;
+				};
+				if (typeof classBody === 'function') {
+					classBody = classBody();
 				}
-			}
-			meta = meta.base ? meta.base['.class.meta'] : undefined;
+
+				_extend(classPrototype, classBody, true);
+
+				/**
+				 * Defines statics and constans in class' body.
+				 *
+				 * @param {Object} statics
+				 * @returns {Function}
+				 */
+				classConstructor.static = function(statics) {
+					_rewriteStatics(classConstructor, statics);
+					return classConstructor;
+				};
+
+				/**
+				 * Extends class body by passed other class declaration
+				 * @param {Function} *mixins
+				 * @returns {Function}
+				 */
+				classConstructor.mixin = function() {
+					for (var i = 0, l = arguments.length; i < l; i++) {
+						//check if class implements interfaces
+						var mixin = arguments[i];
+
+						if (typeof mixin === 'function') {
+							var methods = mixin.prototype;
+						} else if (typeof mixin === 'object') {
+							var methods = mixin;
+						} else {
+							throw new Error('js.class mixin method accepts only types: object, function - `' + (typeof mixin) + '` type given');
+						}
+						_extend(classPrototype, methods, false);
+						_mixins.push(mixin);
+					}
+					return classConstructor;
+				};
+
+				/**
+				 * Creates and returns new constructor function which extends
+				 * its parent
+				 *
+				 * @param {Object} classBody
+				 * @returns {Function}
+				 */
+				if (isSingleton) {
+					classConstructor.extend = function() {
+						throw new Error('Singleton class cannot be extended');
+					};
+
+					classConstructor.instance = function() {
+						if (!instance) {
+							isSingleton = false;
+							instance = new classConstructor();
+							isSingleton = true;
+						}
+						return instance;
+					}
+
+				} else {
+					classConstructor.extend = function (classBody) {
+						return createClass(this, classBody);
+					};
+				}
+
+				return classConstructor;
+			})(null, classBody);
 		}
-		return false;
-	}
-
-	var Checker = Class({
-		_constructor: function (object) {
-			this.object = object;
-		},
-
-		typeOf: function (type) {
-			if (this.object instanceof type) {
-				return true;
-			}
-			var meta = Class.typeInfo(this.object);
-			return meta && findType(meta, type);
-		}
-	});
-
-	// aliases
-	Checker.prototype.a = Checker.prototype.typeOf;
-	Checker.prototype.an = Checker.prototype.typeOf;
-
-	Class.is = function (object) {
-		return new Checker(object);
-	};
-
-	Class.typeInfo = function (object) {
-		var theClass = object.__proto__['.class'];
-		return theClass ? theClass['.class.meta'] : undefined;
-	};
-
-	Class.VERSION = [0, 0, 2];
+	})();
 
 	if (typeof module !== "undefined") {
 		module.exports = Class;
@@ -2130,23 +2237,25 @@ if ("document" in self) {
 
 			el = el || window;
 
-			// todo: ie dispatcher (through el.fireEvent)
-			if (typeof CustomEvent === 'function') {
-				el.dispatchEvent(new CustomEvent(eventName, {
-					bubbles: true,
-					cancelable: true
-				}));
+			var event;
+			if(document.createEvent){
+				event = document.createEvent('HTMLEvents');
+				event.initEvent(eventName, true, true);
+			} else if(document.createEventObject){ // IE < 9
+				event = document.createEventObject();
+				event.eventType = eventName;
 			}
-			else { // IE
-				var event = null;
-				if (document.createEventObject) {
-					event = document.createEventObject();
-					el.fireEvent(eventName, event);
-				} else {
-					var evt = document.createEvent("HTMLEvents");
-					evt.initEvent(eventName, true, true);
-					el.dispatchEvent(evt);
-				}
+
+			event.eventName = eventName;
+
+			if (el.dispatchEvent){
+				el.dispatchEvent(event);
+			} else if(el.fireEvent){ // IE < 9
+				el.fireEvent('on' + event.eventType, event);// can trigger only real event (e.g. 'click')
+			} else if(el[eventName]){
+				el[eventName]();
+			} else if(el['on' + eventName]){
+				el['on' + eventName]();
 			}
 		},
 
@@ -3492,7 +3601,7 @@ if ("document" in self) {
 
 	var parent = Module.BlockView;
 
-	Module.PopoverView = Module.Class(parent, {
+	Module.PopoverView = parent.extend({
 
 		popoverEl: null,
 		triangleEl: null,

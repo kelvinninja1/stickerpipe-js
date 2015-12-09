@@ -3,7 +3,7 @@
 
 	var parent = Module.BlockView;
 
-	Module.PopoverView = Module.Class(parent, {
+	Module.PopoverView = parent.extend({
 
 		popoverEl: null,
 		triangleEl: null,
