@@ -21,13 +21,13 @@ body {
     color: white;
     background-color: #6607b5; }
   .navbar-custom .navbar-toggle {
-    border-color: #6607b5; }
+    border-color: #FFF; }
     .navbar-custom .navbar-toggle:hover, .navbar-custom .navbar-toggle:focus {
-      background-color: #6607b5; }
+      background-color: #420276; }
       .navbar-custom .navbar-toggle:hover .icon-bar, .navbar-custom .navbar-toggle:focus .icon-bar {
-        background-color: #6607b5; }
+        background-color: #FFF; }
     .navbar-custom .navbar-toggle .icon-bar {
-      background-color: #6607b5; }
+      background-color: #FFF; }
 
 .jumbotron {
   padding-top: 0;
@@ -52,6 +52,10 @@ footer {
   padding: 10px; }
   .email-form .form-group input {
     width: 250px; }
+    @media (max-width: 768px) {
+      .email-form .form-group input {
+        width: 100%;
+        margin-bottom: 10px; } }
   .email-form .form-group input,
   .email-form .form-group button {
     border-radius: 0; }
@@ -75,4 +79,6 @@ footer {
 
 .pack-preview-sticker {
   max-height: 160px;
-  max-width: 160px; }
+  max-width: 160px;
+  height: 100%;
+  width: 100%; }
