@@ -3684,6 +3684,8 @@ if ("document" in self) {
 			this.active = false;
 			this.toggleEl.parentElement.removeChild(this.popoverEl);
 			Module.DOMEventService.popoverHidden();
+			// todo
+			this.popoverEl.style.marginTop = 0;
 		},
 
 		positioned: function() {
@@ -3710,7 +3712,10 @@ if ("document" in self) {
 					arrowOffset = 15;
 				}
 
-				this.popoverEl.style.marginTop = -(this.popoverEl.offsetHeight + this.toggleEl.offsetHeight + arrowOffset) + 'px';
+				var elOffset = this.toggleEl.getBoundingClientRect().top + this.toggleEl.offsetHeight - this.popoverEl.getBoundingClientRect().top;
+
+				// todo 5px remove
+				this.popoverEl.style.marginTop = -(this.popoverEl.offsetHeight + this.toggleEl.offsetHeight + arrowOffset - elOffset + 5) + 'px';
 			} else {
 				console && console.error('error: triangle not found');
 			}
