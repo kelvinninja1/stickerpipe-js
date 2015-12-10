@@ -11,7 +11,7 @@ var gulp = require('gulp'),
 	git = require('gulp-git'),
 	spritesmith = require('gulp.spritesmith');
 
-var exampleSrc = '../gh-pages/work/libs/sdk';
+var exampleSrc = '../gh-pages/work/demo/libs/sdk';
 
 // *** *** *** MAIN TASKS *** *** ****
 
