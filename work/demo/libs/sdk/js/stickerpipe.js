@@ -3714,7 +3714,8 @@ if ("document" in self) {
 
 				var elOffset = this.toggleEl.getBoundingClientRect().top + this.toggleEl.offsetHeight - this.popoverEl.getBoundingClientRect().top;
 
-				this.popoverEl.style.marginTop = -(this.popoverEl.offsetHeight + this.toggleEl.offsetHeight + arrowOffset - elOffset) + 'px';
+				// todo 5px remove
+				this.popoverEl.style.marginTop = -(this.popoverEl.offsetHeight + this.toggleEl.offsetHeight + arrowOffset - elOffset + 5) + 'px';
 			} else {
 				console && console.error('error: triangle not found');
 			}
