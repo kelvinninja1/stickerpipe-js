@@ -155,13 +155,12 @@ var App = _makeClass(function(options) {
 
 			var _pack = this.getUrlParameter('pack');
 			if (!!_pack) {
-				this.stickers.fetchPacks({
-					callback: (function() {
+				this.stickers.fetchPacks((function() {
 						this.stickers.resetNewStickersFlag();
 						this.stickers.open();
 						this.stickers.renderCurrentTab(_pack);
 					}).bind(this)
-				});
+				);
 			}
 
 		}).bind(this));
