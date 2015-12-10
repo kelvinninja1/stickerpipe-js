@@ -152,6 +152,18 @@ var App = _makeClass(function(options) {
 				this.$textarea.focus();
 				this.pasteHtmlAtCaret(this.stickers.parseEmojiFromText(emoji));
 			}).bind(this));
+
+			var _pack = this.getUrlParameter('pack');
+			if (!!_pack) {
+				this.stickers.fetchPacks({
+					callback: (function() {
+						this.stickers.resetNewStickersFlag();
+						this.stickers.open();
+						this.stickers.renderCurrentTab(_pack);
+					}).bind(this)
+				});
+			}
+
 		}).bind(this));
 
 
@@ -343,6 +355,13 @@ var App = _makeClass(function(options) {
 		this.resizeWindow();
 
 		this.stickers.renderPack(packName);
+	},
+
+	getUrlParameter: function(name) {
+		name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+		var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+			results = regex.exec(location.search);
+		return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 	},
 
 	fetchRandomUsers: function() {
