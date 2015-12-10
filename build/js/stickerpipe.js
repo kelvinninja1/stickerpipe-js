@@ -3450,6 +3450,9 @@ if ("document" in self) {
 
 	Module.BlockView = Module.Class({
 
+		// todo
+		isRendered: false,
+
 		emojiService: null,
 
 		el: null,
@@ -3493,6 +3496,8 @@ if ("document" in self) {
 
 			this.el.appendChild(this.tabsView.el);
 			this.el.appendChild(this.scrollView.el);
+
+			this.isRendered = true;
 
 			this.tabsView.onWindowResize();
 			this.onWindowResize();
@@ -4152,12 +4157,12 @@ if ("document" in self) {
 			var callback = onload || null;
 
 			var onPacksLoadCallback = (function() {
-				callback && callback();
-
 				this.view.render(this.stickersModel);
 
 				// todo --> active 'used' tab
 				this.view.renderUsedStickers(Module.BaseService.getLatestUse());
+
+				callback && callback();
 			}).bind(this);
 
 			var storageStickerData = Module.BaseService.getPacksFromStorage();
@@ -4168,9 +4173,7 @@ if ("document" in self) {
 
 				onPacksLoadCallback.apply();
 			} else {
-				this.fetchPacks({
-					callback: onPacksLoadCallback
-				});
+				this.fetchPacks(onPacksLoadCallback);
 			}
 		},
 
@@ -4262,13 +4265,15 @@ if ("document" in self) {
 			}).bind(this));
 		},
 
-		fetchPacks: function(attrs) {
+		fetchPacks: function(callback) {
 			Module.BaseService.updatePacks((function(stickerPacks) {
 				this.stickersModel = stickerPacks;
 
-				if(attrs.callback) {
-					attrs.callback.apply();
+				if (this.view.isRendered) {
+					this.view.tabsView.renderPacks(this.stickersModel);
 				}
+
+				callback && callback.apply();
 			}).bind(this));
 		},
 

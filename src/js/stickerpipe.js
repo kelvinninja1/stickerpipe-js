@@ -44,12 +44,12 @@ window.StickersModule = {};
 			var callback = onload || null;
 
 			var onPacksLoadCallback = (function() {
-				callback && callback();
-
 				this.view.render(this.stickersModel);
 
 				// todo --> active 'used' tab
 				this.view.renderUsedStickers(Module.BaseService.getLatestUse());
+
+				callback && callback();
 			}).bind(this);
 
 			var storageStickerData = Module.BaseService.getPacksFromStorage();
@@ -60,9 +60,7 @@ window.StickersModule = {};
 
 				onPacksLoadCallback.apply();
 			} else {
-				this.fetchPacks({
-					callback: onPacksLoadCallback
-				});
+				this.fetchPacks(onPacksLoadCallback);
 			}
 		},
 
@@ -154,13 +152,15 @@ window.StickersModule = {};
 			}).bind(this));
 		},
 
-		fetchPacks: function(attrs) {
+		fetchPacks: function(callback) {
 			Module.BaseService.updatePacks((function(stickerPacks) {
 				this.stickersModel = stickerPacks;
 
-				if(attrs.callback) {
-					attrs.callback.apply();
+				if (this.view.isRendered) {
+					this.view.tabsView.renderPacks(this.stickersModel);
 				}
+
+				callback && callback.apply();
 			}).bind(this));
 		},
 

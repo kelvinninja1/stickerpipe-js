@@ -5,6 +5,9 @@
 
 	Module.BlockView = Module.Class({
 
+		// todo
+		isRendered: false,
+
 		emojiService: null,
 
 		el: null,
@@ -48,6 +51,8 @@
 
 			this.el.appendChild(this.tabsView.el);
 			this.el.appendChild(this.scrollView.el);
+
+			this.isRendered = true;
 
 			this.tabsView.onWindowResize();
 			this.onWindowResize();
