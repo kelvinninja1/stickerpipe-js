@@ -30,6 +30,7 @@ var App = _makeClass(function(options) {
 	$stickerPipeStore: null,
 	$stickersToggle: null,
 	$textarea: null,
+	$storeButton: null,
 
 	init: function() {
 		this.$window = $(window);
@@ -41,6 +42,7 @@ var App = _makeClass(function(options) {
 		this.$stickerPipeStore = $('#store');
 		this.$stickersToggle = this.$messageBox.find('#stickersToggle');
 		this.$textarea = this.$messageBox.find('.textarea');
+		this.$storeButton = $('.store-button');
 
 		this.fetchRandomUsers().done((function() {
 			this.sendMessage();
@@ -66,6 +68,10 @@ var App = _makeClass(function(options) {
 		this.$messages.on('click', 'img[data-sticker]', (function(e) {
 			var $target = $(e.target);
 			//this.openStickersStore($target.attr('data-sticker-pack'));
+		}).bind(this));
+
+		this.$storeButton.on('click', (function() {
+			this.stickers.storeView.render2();
 		}).bind(this));
 
 		//this.$stickersToggle.popover({
@@ -107,8 +113,8 @@ var App = _makeClass(function(options) {
 			userPacksUrl: 'http://work.stk.908.vc/api/v1/user/packs',
 			userPackUrl: 'http://work.stk.908.vc/api/v1/user/pack',
 			trackStatUrl: 'http://work.stk.908.vc/api/v1/track-statistic',
-			storeUrl: 'http://work.stk.908.vc/api/v1/web',
-			//storeUrl: 'http://localhost/stickerpipe/store/build',
+			//storeUrl: 'http://work.stk.908.vc/api/v1/web',
+			storeUrl: 'http://localhost/stickerpipe/store/build',
 
 			userId: '12345678901234567890123456789012',
 

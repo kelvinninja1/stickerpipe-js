@@ -541,6 +541,15 @@ if ("document" in self) {
 			});
 		},
 
+		urlParamsSerialize: function(params) {
+			var str = [];
+			for(var p in params)
+				if (params.hasOwnProperty(p)) {
+					str.push(encodeURIComponent(p) + "=" + encodeURIComponent(params[p]));
+				}
+			return str.join('&');
+		},
+
 		md5: function(string) {
 			return Module.MD5(string);
 		}
@@ -1881,6 +1890,29 @@ if ("document" in self) {
 	}());
 
 })(window);
+
+(function(Plugin, Module) {
+
+	Module.Api = {
+
+		store: {
+			getPackUrl: function(packName) {
+				var params = {
+					apiKey: Module.Configs.apikey,
+					platform: 'JS',
+					userId: Module.Configs.userId,
+					density: Module.Configs.stickerResolutionType,
+
+					//uri: encodeURIComponent('http://demo.stickerpipe.com/work/demo/libs/store/js/stickerPipeStore.js')
+				};
+
+				return Module.Configs.storeUrl + '?'
+					+ Module.StickerHelper.urlParamsSerialize(params) + '#/packs/' + packName
+			}
+		}
+
+	};
+})(window, window.StickersModule);
 
 
 
@@ -3604,6 +3636,331 @@ if ("document" in self) {
 
 (function(Module) {
 
+	var KEY_CODE_A = 65,
+		KEY_CODE_TAB = 9,
+		KEY_CODE_ESC = 27,
+
+		oMargin = {},
+		ieBodyTopMargin = 0,
+		pluginNamespace = 'sp-modal',
+
+		classes = {
+			lock: 'sp-modal-lock',
+			overlay: 'sp-modal-overlay'
+		},
+
+		defaultOptions = {
+			closeOnEsc: true,
+			closeOnOverlayClick: true,
+
+			onBeforeClose: null,
+			onClose: null,
+			onOpen: null
+		},
+
+		isOpen = false;
+
+	function isIE() {
+		return ((navigator.appName == 'Microsoft Internet Explorer') ||
+			(navigator.userAgent.match(/MSIE\s+\d+\.\d+/)) ||
+			(navigator.userAgent.match(/Trident\/\d+\.\d+/)));
+	}
+
+	function getCss(el, property) {
+		// todo: getComputedStyle add IE 8 supporting
+
+		var style = el.style || el.currentStyle || getComputedStyle(el);
+		return style[property];
+	}
+
+	function outerWidth(el) {
+		var width = el.offsetWidth;
+		width += parseInt(getCss(el, 'marginLeft')) + parseInt(getCss(el, 'marginRight'));
+		return width;
+	}
+
+	// todo: extend --> HelperModule
+	function extend(out) {
+		out = out || {};
+
+		for (var i = 1; i < arguments.length; i++) {
+			if (!arguments[i])
+				continue;
+
+			for (var key in arguments[i]) {
+				if (arguments[i].hasOwnProperty(key))
+					out[key] = arguments[i][key];
+			}
+		}
+
+		return out;
+	}
+
+	function lockContainer(overlay) {
+		var body = document.getElementsByTagName('body')[0];
+		var bodyOuterWidth = outerWidth(body);
+		body.classList.add(classes.lock);
+		var scrollbarWidth = outerWidth(body) - bodyOuterWidth;
+
+		if (isIE()) {
+			ieBodyTopMargin = getCss(body, 'marginTop');
+			body.style.marginTop = 0;
+		}
+
+		if (scrollbarWidth != 0) {
+			var tags = ['html', 'body'];
+			for (var i = 0 ; i < tags.length; i++) {
+				var tag = tags[i],
+					tagEl = document.getElementsByTagName(tag)[0];
+
+				oMargin[tag.toLowerCase()] = parseInt(getCss(tagEl, 'marginRight'));
+			}
+
+			document.getElementsByTagName('html')[0].style.marginRight = oMargin['html'] + scrollbarWidth + 'px';
+
+			overlay.style.left = 0 - scrollbarWidth + 'px';
+		}
+	}
+
+	function unlockContainer() {
+		var body = document.getElementsByTagName('body')[0];
+
+		if (isIE()) {
+			body.style.marginTop = ieBodyTopMargin + 'px';
+		}
+
+		var bodyOuterWidth = outerWidth(body);
+		body.classList.remove(classes.lock);
+		var scrollbarWidth = outerWidth(body) - bodyOuterWidth;
+
+		if (scrollbarWidth != 0) {
+			var tags = ['html', 'body'];
+			for (var i = 0 ; i < tags.length; i++) {
+				var tag = tags[i],
+					tagEl = document.getElementsByTagName(tag)[0];
+
+				tagEl.style.marginRight = oMargin[tag.toLowerCase()] + 'px';
+			}
+		}
+	}
+
+	function initModalContainer() {
+
+		var el = document.createElement('div');
+		el.style.display = 'none';
+		el.className = 'sp-modal';
+
+		var closeEl = document.createElement('div');
+		closeEl.className = 'sp-icon-close';
+
+		el.appendChild(closeEl);
+
+		return el;
+	}
+
+
+	Module.View = Module.View || {};
+
+	Module.View.Modal = {
+
+		init: function(el, options) {
+
+			options = extend({}, defaultOptions, (options || {}));
+
+			if (!el || !el.nodeType) {
+
+				el = document.querySelector(el);
+
+				if (!el) {
+					el = initModalContainer();
+					document.body.appendChild(el);
+				}
+			}
+
+			// on Ctrl+A click fire `onSelectAll` event
+			window.addEventListener('keydown', function(e) {
+				// todo
+				//if (!(e.ctrlKey && e.keyCode == KEY_CODE_A)) {
+				//	return true;
+				//}
+				//
+				//if ( $('input:focus, textarea:focus').length > 0 ) {
+				//    return true;
+				//}
+				//
+				//var selectAllEvent = new $.Event('onSelectAll');
+				//selectAllEvent.parentEvent = e;
+				//$(window).trigger(selectAllEvent);
+				//return true;
+			});
+
+			// todo line 6
+			//els.bind('keydown',function(e) {
+			//	var modalFocusableElements = $(':focusable',$(this));
+			//	if(modalFocusableElements.filter(':last').is(':focus') && (e.which || e.keyCode) == KEY_CODE_TAB){
+			//		e.preventDefault();
+			//		modalFocusableElements.filter(':first').focus();
+			//	}
+			//});
+
+			return {
+
+				el: el,
+				options: options,
+
+				open: function() {
+
+					// close modal if opened
+					//if($('.' + classes.overlay).length) {
+					//	$.modal().close();
+					//}
+
+					// todo: check
+					// close modal if opened
+					if (document.getElementsByClassName(classes.overlay).length) {
+						this.close();
+					}
+
+					//var overlay = $('<div/>').addClass(classes.overlay).prependTo('body');
+					//overlay.data(pluginNamespace+'.options', this.options);
+
+					var overlay = document.createElement('div');
+					overlay.className = classes.overlay;
+
+					var body = document.getElementsByTagName('body')[0];
+					body.insertBefore(overlay, body.firstChild);
+
+					lockContainer(overlay);
+
+					var openedModalElement = null;
+					if (this.el) {
+						openedModalElement = this.el;
+						overlay.appendChild(openedModalElement);
+						openedModalElement.style.display = 'block';
+					}
+
+					if (this.options.closeOnEsc) {
+						window.addEventListener('keyup', (function(e) {
+							if(e.keyCode === KEY_CODE_ESC && isOpen) {
+								this.close(this.options);
+							}
+						}).bind(this));
+					}
+
+					if (this.options.closeOnOverlayClick) {
+						for (var i = overlay.children.length; i--;) {
+							if (overlay.children[i].nodeType != 8) {
+								overlay.children[i].addEventListener('click', function(e) {
+									e.stopPropagation();
+								});
+							}
+						}
+
+						document.getElementsByClassName(classes.overlay)[0]
+							.addEventListener('click', (function() {
+								this.close(this.options);
+							}).bind(this));
+					}
+
+					document.addEventListener('touchmove', (function(e) {
+						//helper function (see below)
+						function collectionHas(a, b) {
+							for(var i = 0, len = a.length; i < len; i ++) {
+								if(a[i] == b) return true;
+							}
+							return false;
+						}
+
+						function findParentBySelector(elm, selector) {
+							var all = document.querySelectorAll(selector),
+								cur = elm.parentNode;
+
+							//keep going up until you find a match
+							while (cur && !collectionHas(all, cur)) {
+								cur = cur.parentNode; //go up
+							}
+
+							//will return null if not found
+							return cur;
+						}
+
+						var selector = '.' + classes.overlay;
+						var parent = findParentBySelector(e.target, selector);
+
+						if(!parent) {
+							e.preventDefault();
+						}
+					}).bind(this));
+
+					if (this.el) {
+						window.addEventListener('onSelectAll',function(e) {
+							//e.parentEvent.preventDefault();
+
+							// todo
+							//var range = null,
+							//	selection = null,
+							//	selectionElement = openedModalElement.get(0);
+							//
+							//if (document.body.createTextRange) { //ms
+							//	range = document.body.createTextRange();
+							//	range.moveToElementText(selectionElement);
+							//	range.select();
+							//} else if (window.getSelection) { //all others
+							//	selection = window.getSelection();
+							//	range = document.createRange();
+							//	range.selectNodeContents(selectionElement);
+							//	selection.removeAllRanges();
+							//	selection.addRange(range);
+							//}
+						});
+					}
+
+					if (this.options.onOpen) {
+						this.options.onOpen(overlay, this.options);
+					}
+
+					isOpen = true;
+				},
+
+				close: function() {
+					var overlay = document.getElementsByClassName(classes.overlay)[0];
+
+					// todo
+					//if ($.isFunction(this.options.onBeforeClose)) {
+					//	if (this.options.onBeforeClose(overlay, this.options) === false) {
+					//		return;
+					//	}
+					//}
+
+					// todo
+					//if (!this.options.cloning) {
+					//	if (!el) {
+					//		el = overlay.data(pluginNamespace+'.el');
+					//	}
+					//	$(el).hide().appendTo($(el).data(pluginNamespace+'.parent'));
+					//}
+
+					overlay.parentNode.removeChild(overlay);
+					unlockContainer();
+
+					//if(this.options.onClose) {
+					//	this.options.onClose(overlay, this.options);
+					//}
+
+					isOpen = false;
+				}
+			};
+		},
+
+		setDefaultOptions: function(options) {
+			defaultOptions = extend({}, defaultOptions, options);
+		}
+	};
+
+})(window.StickersModule);
+
+(function(Module) {
+
 	var parent = Module.BlockView;
 
 	Module.PopoverView = parent.extend({
@@ -3790,8 +4147,42 @@ if ("document" in self) {
 
 		el: null,
 
+		modal: null,
+
+		preloader: null,
+
 		_constructor: function() {
 			this.el = document.getElementById(Module.Configs.storeContainerId);
+		},
+
+		render2: function() {
+			if (!this.modal) {
+				var iframe = document.createElement('iframe');
+
+				iframe.style.width = '100%';
+				iframe.style.height = '100%';
+				iframe.style.border = '0';
+
+				iframe.src = Module.Api.store.getPackUrl('pinkgorilla');
+
+				this.iframe = iframe;
+
+				this.modal = Module.View.Modal.init(null, {
+					onOpen: function(el) {
+						var mEl = el.getElementsByClassName('sp-modal')[0];
+
+						mEl.classList.add('sp-store');
+						mEl.innerHTML = '';
+						mEl.appendChild(iframe);
+
+						iframe.onload = function() {
+							mEl.style.height = iframe.contentWindow.document.body.scrollHeight + 'px'
+						};
+					}
+				});
+			}
+
+			this.modal.open();
 		},
 
 		render: function(packName) {
@@ -3802,7 +4193,7 @@ if ("document" in self) {
 					platform: 'JS',
 					userId: Module.Configs.userId,
 					density: Module.Configs.stickerResolutionType,
-					uri: encodeURIComponent('http://demo.stickerpipe.com/work/libs/store/js/stickerPipeStore.js')
+					uri: encodeURIComponent('http://demo.stickerpipe.com/work/demo/libs/store/js/stickerPipeStore.js')
 				},
 				urlSerialize = function(obj) {
 					var str = [];
@@ -3822,6 +4213,31 @@ if ("document" in self) {
 			iframe.style.border = '0';
 
 			iframe.src = Module.Configs.storeUrl + '?' + urlSerialize(urlParams) + '#/packs/' + packName
+		},
+
+		showPreloader: function() {
+			if (!this.preloader) {
+				this.preloader = document.createElement('div');
+				this.preloader.className = 'sp-preloader';
+
+				for (var i = 1; i < 9; i++) {
+					var item = document.createElement('div');
+					item.className = 'sp-preloader-item';
+					item.setAttribute('id', 'item-' + i);
+
+					this.preloader.appendChild(item);
+				}
+			}
+
+			this.preloader.style.display = 'block';
+		},
+
+		hidePreloader: function() {
+			this.preloader.style.display = 'none';
+		},
+
+		onWindowResize: function() {
+
 		}
 	});
 
