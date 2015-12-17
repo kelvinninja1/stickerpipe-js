@@ -74,8 +74,8 @@
 	cursor: pointer;
 	opacity: $modalCloseButtonOpacity;
 	position: absolute;
-	top: 10px;
-	right: 10px;
+	top: 15px;
+	right: 15px;
 
 	&:hover {
 		opacity: $modalCloseButtonOpacity + 0.2;

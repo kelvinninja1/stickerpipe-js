@@ -2,16 +2,16 @@
 (function(Module) {
 
 	function resizeModalWindow() {
-		if (parseInt(Module.El.css(this.modal.el, 'height'), 10) < window.innerHeight) {
+		if (parseInt(Module.El.css(this.modal.modalEl, 'height'), 10) < window.innerHeight) {
 			var newHeight = window.innerHeight
-				- parseInt(Module.El.css(this.modal.el, 'marginTop'), 10)
-				- parseInt(Module.El.css(this.modal.el, 'marginBottom'), 10);
+				- parseInt(Module.El.css(this.modal.modalEl, 'marginTop'), 10)
+				- parseInt(Module.El.css(this.modal.modalEl, 'marginBottom'), 10);
 
 			if (newHeight == window.innerHeight) {
 				return;
 			}
 
-			this.modal.el.style.height = newHeight + 'px';
+			this.modal.modalEl.style.height = newHeight + 'px';
 		}
 	}
 
@@ -22,8 +22,6 @@
 		modal: null,
 		iframe: null,
 
-		preloader: null,
-
 		_constructor: function() {
 			this.el = document.getElementById(Module.Configs.storeContainerId);
 
@@ -33,16 +31,10 @@
 			this.iframe.style.height = '100%';
 			this.iframe.style.border = '0';
 
-			this.modal = Module.View.Modal.init(null, {
-				onOpen: (function(el) {
-					var modalBody = el.getElementsByClassName('sp-modal-body')[0];
-
-					modalBody.innerHTML = '';
-					modalBody.appendChild(this.iframe);
-
+			this.modal = Module.View.Modal.init(this.iframe, {
+				onOpen: function() {
 					Module.DOMEventService.resize();
-
-				}).bind(this)
+				}
 			});
 
 			window.addEventListener('resize', resizeModalWindow.bind(this));

@@ -1,7 +1,10 @@
 
 (function(Module) {
 
-	var KEY_CODE_A = 65,
+	// todo: + bind & unbind methods for events (error on ESC two modals)
+
+	var modalsStack = [],
+		KEY_CODE_A = 65,
 		KEY_CODE_TAB = 9,
 		KEY_CODE_ESC = 27,
 
@@ -11,7 +14,10 @@
 
 		classes = {
 			lock: 'sp-modal-lock',
-			overlay: 'sp-modal-overlay'
+			overlay: 'sp-modal-overlay',
+			modal: 'sp-modal',
+			modalBody: 'sp-modal-body',
+			iconClose: 'sp-icon-close'
 		},
 
 		defaultOptions = {
@@ -23,7 +29,9 @@
 			onOpen: null
 		},
 
-		isOpen = false;
+		isOpen = false,
+
+		overlay = null;
 
 	// todo: extend --> HelperModule
 	function extend(out) {
@@ -42,7 +50,16 @@
 		return out;
 	}
 
-	function lockContainer(overlay) {
+	function lockContainer() {
+		if (overlay) {
+			return;
+		}
+
+		overlay = document.createElement('div');
+		overlay.className = classes.overlay;
+
+		document.body.insertBefore(overlay, document.body.firstChild);
+
 		var bodyOuterWidth = Module.El.outerWidth(document.body);
 		document.body.classList.add(classes.lock);
 		var scrollbarWidth = Module.El.outerWidth(document.body) - bodyOuterWidth;
@@ -68,6 +85,9 @@
 	}
 
 	function unlockContainer() {
+		overlay.parentNode.removeChild(overlay);
+		overlay = null;
+
 		if (Module.StickerHelper.isIE()) {
 			document.body.style.marginTop = ieBodyTopMargin + 'px';
 		}
@@ -89,26 +109,26 @@
 
 	function initModalEl(context) {
 
-		var el = document.createElement('div');
-		el.style.display = 'none';
-		el.className = 'sp-modal';
+		var modalEl = document.createElement('div');
+		modalEl.style.display = 'none';
+		modalEl.className = classes.modal;
 
 
 		var modalBody = document.createElement('div');
-		modalBody.className = 'sp-modal-body';
+		modalBody.className = classes.modalBody;
 
-		el.appendChild(modalBody);
+		modalEl.appendChild(modalBody);
 
 		var close = document.createElement('div');
-		close.className = 'sp-icon-close';
+		close.className = classes.iconClose;
 		close.addEventListener('click', (function() {
 			this.close();
 		}).bind(context));
 
 
-		el.appendChild(close);
+		modalEl.appendChild(close);
 
-		return el;
+		return modalEl;
 	}
 
 
@@ -116,21 +136,29 @@
 
 	Module.View.Modal = {
 
-		init: function(el, options) {
+		init: function(contentEl, options) {
 
 			options = extend({}, defaultOptions, (options || {}));
 
-			var modal = {};
+			var modalInstance = {};
 
-			if (!el || !el.nodeType) {
+			modalInstance.modalEl = initModalEl(modalInstance);
 
-				el = document.querySelector(el);
+			if (!contentEl || !contentEl.nodeType) {
 
-				if (!el) {
-					el = initModalEl(modal);
-					document.body.appendChild(el);
+				try {
+					contentEl = document.querySelector(contentEl);
+				} catch (e) {}
+
+				if (!contentEl) {
+					contentEl = document.createElement('div');
 				}
 			}
+
+			var modalBody = modalInstance.modalEl.getElementsByClassName(classes.modalBody)[0];
+			modalBody.appendChild(contentEl);
+
+			document.body.appendChild(modalInstance.modalEl);
 
 			// on Ctrl+A click fire `onSelectAll` event
 			window.addEventListener('keydown', function(e) {
@@ -158,37 +186,29 @@
 			//	}
 			//});
 
-			return extend(modal, {
+			return extend(modalInstance, {
 
-				el: el,
 				options: options,
+				contentEl: contentEl,
 
 				open: function() {
 
-					// close modal if opened
-					//if($('.' + classes.overlay).length) {
-					//	$.modal().close();
+					if (modalsStack.length) {
+						modalsStack[modalsStack.length - 1].modalEl.style.display = 'none';
+					}
+
+					modalsStack.push(this);
+
+					// todo: close modal if opened
+					//if (document.getElementsByClassName(classes.overlay).length) {
+					//	this.close();
 					//}
 
-					// todo: check
-					// close modal if opened
-					if (document.getElementsByClassName(classes.overlay).length) {
-						this.close();
-					}
+					lockContainer();
 
-					var overlay = document.createElement('div');
-					overlay.className = classes.overlay;
+					overlay.appendChild(this.modalEl); // openedModalElement
 
-					document.body.insertBefore(overlay, document.body.firstChild);
-
-					lockContainer(overlay);
-
-					var openedModalElement = null;
-					if (this.el) {
-						openedModalElement = this.el;
-						overlay.appendChild(openedModalElement);
-						openedModalElement.style.display = 'block';
-					}
+					this.modalEl.style.display = 'block';
 
 					if (this.options.closeOnEsc) {
 						window.addEventListener('keyup', (function(e) {
@@ -196,6 +216,15 @@
 								this.close(this.options);
 							}
 						}).bind(this));
+
+						// if iframe
+						if (this.contentEl && this.contentEl.contentWindow) {
+							this.contentEl.contentWindow.addEventListener('keyup', (function(e) {
+								if(e.keyCode === KEY_CODE_ESC && isOpen) {
+									this.close(this.options);
+								}
+							}).bind(this));
+						}
 					}
 
 					if (this.options.closeOnOverlayClick) {
@@ -243,38 +272,35 @@
 						}
 					}).bind(this));
 
-					if (this.el) {
-						window.addEventListener('onSelectAll',function(e) {
-							//e.parentEvent.preventDefault();
+					window.addEventListener('onSelectAll',function(e) {
+						//e.parentEvent.preventDefault();
 
-							// todo
-							//var range = null,
-							//	selection = null,
-							//	selectionElement = openedModalElement.get(0);
-							//
-							//if (document.body.createTextRange) { //ms
-							//	range = document.body.createTextRange();
-							//	range.moveToElementText(selectionElement);
-							//	range.select();
-							//} else if (window.getSelection) { //all others
-							//	selection = window.getSelection();
-							//	range = document.createRange();
-							//	range.selectNodeContents(selectionElement);
-							//	selection.removeAllRanges();
-							//	selection.addRange(range);
-							//}
-						});
-					}
+						// todo
+						//var range = null,
+						//	selection = null,
+						//	selectionElement = openedModalElement.get(0);
+						//
+						//if (document.body.createTextRange) { //ms
+						//	range = document.body.createTextRange();
+						//	range.moveToElementText(selectionElement);
+						//	range.select();
+						//} else if (window.getSelection) { //all others
+						//	selection = window.getSelection();
+						//	range = document.createRange();
+						//	range.selectNodeContents(selectionElement);
+						//	selection.removeAllRanges();
+						//	selection.addRange(range);
+						//}
+					});
 
 					if (this.options.onOpen) {
-						this.options.onOpen(this.el, overlay, this.options);
+						this.options.onOpen(this.contentEl, this.modalEl, overlay, this.options);
 					}
 
 					isOpen = true;
 				},
 
 				close: function() {
-					var overlay = document.getElementsByClassName(classes.overlay)[0];
 
 					// todo
 					//if ($.isFunction(this.options.onBeforeClose)) {
@@ -285,17 +311,23 @@
 
 					// todo
 					//if (!this.options.cloning) {
-					//	if (!el) {
-					//		el = overlay.data(pluginNamespace+'.el');
+					//	if (!modalEl) {
+					//		modalEl = overlay.data(pluginNamespace+'.modalEl');
 					//	}
-					//	$(el).hide().appendTo($(el).data(pluginNamespace+'.parent'));
+					//	$(modalEl).hide().appendTo($(modalEl).data(pluginNamespace+'.parent'));
 					//}
 
-					overlay.parentNode.removeChild(overlay);
-					unlockContainer();
+					if (this.options.onClose) {
+						this.options.onClose(this.contentEl, this.modalEl, overlay, this.options);
+					}
 
-					if(this.options.onClose) {
-						this.options.onClose(this.el, overlay, this.options);
+					overlay.removeChild(this.modalEl);
+					modalsStack.pop();
+
+					if (!modalsStack.length) {
+						unlockContainer();
+					} else {
+						modalsStack[modalsStack.length - 1].modalEl.style.display = 'block';
 					}
 
 					isOpen = false;
