@@ -8,48 +8,6 @@
 
 	Module.BaseService = {
 
-		parseCountStat: 0,
-		parseCountWithStickerStat: 0,
-
-		parseStickerStatHandle: function(is_have) {
-			var nowDate = new Date().getTime()/1000|0;
-
-			this.parseCountStat++;
-
-			if(is_have) {
-				this.parseCountWithStickerStat++;
-			}
-
-			if(this.parseCountStat >= 50) {
-				Module.Http.post(Module.Configs.trackStatUrl, [
-					{
-						action: 'check',
-						category: 'message',
-						label: 'Events count',
-						time: nowDate,
-						value: this.parseCountStat
-
-					},
-					{
-						action: 'check',
-						category: 'message',
-						label: 'Stickers count',
-						time: nowDate,
-						value: this.parseCountWithStickerStat
-					}
-
-				]);
-
-				ga('stickerTracker.send', 'event', 'message', 'check', 'Events count', this.parseCountStat);
-				ga('stickerTracker.send', 'event', 'message', 'check', 'Stickers count', this.parseCountWithStickerStat);
-
-				this.parseCountWithStickerStat = 0;
-				this.parseCountStat = 0;
-
-			}
-
-			},
-
 		// todo: remove function
 		addToLatestUse: function(code) {
 			Module.Storage.addUsedSticker(code);
@@ -201,8 +159,6 @@
 					url: ''
 				},
 				matchData = text.match(/\[\[(\S+)_(\S+)\]\]/);
-
-			this.parseStickerStatHandle(!!matchData);
 
 			if (matchData) {
 				outData.isSticker = true;
