@@ -437,51 +437,44 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   height: 24px;
 }
 
-.sp-icon-back {
+.sp-icon-clock {
   background-image: url("../img/icons_sprite.png");
   background-position: 0px -24px;
   width: 24px;
   height: 24px;
 }
 
-.sp-icon-clock {
+.sp-icon-close {
   background-image: url("../img/icons_sprite.png");
   background-position: -24px -24px;
   width: 24px;
   height: 24px;
 }
 
-.sp-icon-close {
+.sp-icon-face {
   background-image: url("../img/icons_sprite.png");
   background-position: -48px 0px;
   width: 24px;
   height: 24px;
 }
 
-.sp-icon-face {
+.sp-icon-mall {
   background-image: url("../img/icons_sprite.png");
   background-position: -48px -24px;
   width: 24px;
   height: 24px;
 }
 
-.sp-icon-mall {
+.sp-icon-plus {
   background-image: url("../img/icons_sprite.png");
   background-position: 0px -48px;
   width: 24px;
   height: 24px;
 }
 
-.sp-icon-plus {
-  background-image: url("../img/icons_sprite.png");
-  background-position: -24px -48px;
-  width: 24px;
-  height: 24px;
-}
-
 .sp-icon-settings {
   background-image: url("../img/icons_sprite.png");
-  background-position: -48px -48px;
+  background-position: -24px -48px;
   width: 24px;
   height: 24px;
 }
@@ -514,23 +507,9 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   }
 }
 
-.sp-icon-back {
-  background-image: url("../img/icons_sprite.png");
-  background-position: 0px -24px;
-  width: 24px;
-  height: 24px;
-}
-
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-  .sp-icon-back {
-    background-image: url("../img/icons_sprite@2x.png");
-    background-size: 72px 72px;
-  }
-}
-
 .sp-icon-clock {
   background-image: url("../img/icons_sprite.png");
-  background-position: -24px -24px;
+  background-position: 0px -24px;
   width: 24px;
   height: 24px;
 }
@@ -544,7 +523,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 .sp-icon-close {
   background-image: url("../img/icons_sprite.png");
-  background-position: -48px 0px;
+  background-position: -24px -24px;
   width: 24px;
   height: 24px;
 }
@@ -558,7 +537,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 .sp-icon-face {
   background-image: url("../img/icons_sprite.png");
-  background-position: -48px -24px;
+  background-position: -48px 0px;
   width: 24px;
   height: 24px;
 }
@@ -572,7 +551,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 .sp-icon-mall {
   background-image: url("../img/icons_sprite.png");
-  background-position: 0px -48px;
+  background-position: -48px -24px;
   width: 24px;
   height: 24px;
 }
@@ -586,7 +565,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 .sp-icon-plus {
   background-image: url("../img/icons_sprite.png");
-  background-position: -24px -48px;
+  background-position: 0px -48px;
   width: 24px;
   height: 24px;
 }
@@ -600,7 +579,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 .sp-icon-settings {
   background-image: url("../img/icons_sprite.png");
-  background-position: -48px -48px;
+  background-position: -24px -48px;
   width: 24px;
   height: 24px;
 }
