@@ -260,6 +260,9 @@
 		handleClickOnPackTab: function(callback) {
 			Module.StickerHelper.setEvent('click', this.el, this.classes.packTab, callback);
 		},
+		handleClickOnStoreTab: function(callback) {
+			Module.StickerHelper.setEvent('click', this.el, this.controls.store.class, callback);
+		},
 
 
 		onWindowResize: function() {

@@ -1,0 +1,83 @@
+
+.sp-modal-lock {
+	overflow: hidden;
+}
+
+.sp-modal-overlay {
+	background: rgba(0, 0, 0, 0.5);
+	bottom: 0;
+	left: 0;
+	position: fixed;
+	top: 0;
+	right: 0;
+	z-index: 100;
+
+	/* if modal content doesn't fit inside the overlay, display scrollbars */
+	overflow: auto;
+
+	/* allow one-finger iPad scrolling */
+	-webkit-overflow-scrolling: touch;
+
+	/* IE6–IE8 */
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = #7F000000, endColorstr = #7F000000);
+	zoom: 1;
+
+	/* fix for iPad glitches */
+	& > * {
+		-webkit-transform: translateZ(0px);
+	}
+}
+
+
+/* modal box style, can be anything you want */
+.sp-modal {
+	background: white;
+	border-radius: 3px;
+
+	-webkit-box-shadow: 1px 1px 2px 0 rgba(50, 50, 50, 0.5);
+	-moz-box-shadow:    1px 1px 2px 0 rgba(50, 50, 50, 0.5);
+	box-shadow:         1px 1px 2px 0 rgba(50, 50, 50, 0.5);
+
+	margin: 45px auto;
+	height: 606px;
+	max-width: 650px;
+	overflow: hidden;
+
+	@media (max-width: $screen-sm-min) {
+		& {
+			border-radius: 0;
+			box-sizing: border-box;
+			min-height: 100% !important;
+			margin: 0;
+			width: 100%;
+		}
+	}
+}
+
+.sp-modal-header {
+	background: rgba(255, 255, 255, 0.5);
+	display: table;
+	width: 100%;
+	padding: 10px;
+	position: absolute;
+}
+
+.sp-modal-body {
+	height: 100%;
+	width: 100%;
+}
+
+.sp-icon-close {
+
+	$modalCloseButtonOpacity: 0.5;
+
+	cursor: pointer;
+	opacity: $modalCloseButtonOpacity;
+	position: absolute;
+	top: 10px;
+	right: 10px;
+
+	&:hover {
+		opacity: $modalCloseButtonOpacity + 0.2;
+	}
+}

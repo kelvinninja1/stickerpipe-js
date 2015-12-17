@@ -43,6 +43,21 @@
 			});
 		},
 
+		urlParamsSerialize: function(params) {
+			var str = [];
+			for(var p in params)
+				if (params.hasOwnProperty(p)) {
+					str.push(encodeURIComponent(p) + "=" + encodeURIComponent(params[p]));
+				}
+			return str.join('&');
+		},
+
+		isIE: function() {
+			return ((navigator.appName == 'Microsoft Internet Explorer') ||
+			(navigator.userAgent.match(/MSIE\s+\d+\.\d+/)) ||
+			(navigator.userAgent.match(/Trident\/\d+\.\d+/)));
+		},
+
 		md5: function(string) {
 			return Module.MD5(string);
 		}

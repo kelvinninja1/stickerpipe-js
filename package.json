@@ -13,6 +13,7 @@
 		"gulp-include": "~2.0.3",
 		"gulp-git": "~1.6.0",
 		"gulp.spritesmith": "~4.3.0",
+		"gulp-concat-css": "~2.2.0",
 		"rimraf": "~2.4.3"
 	},
 	"description": "ERROR: No README data found!",

@@ -9,9 +9,11 @@ var gulp = require('gulp'),
 	clean = require('gulp-clean'),
 	include = require('gulp-include'),
 	git = require('gulp-git'),
+	concatCss = require('gulp-concat-css'),
 	spritesmith = require('gulp.spritesmith');
 
-var exampleSrc = '../gh-pages/work/demo/libs/sdk';
+var pluginName = 'stickerpipe',
+	exampleSrc = '../gh-pages/work/demo/libs/sdk';
 
 // *** *** *** MAIN TASKS *** *** ****
 
@@ -26,15 +28,18 @@ gulp.task('watcher', function () {
 });
 
 gulp.task('build:css', ['clean:css'], function () {
-	return gulp.src('src/scss/**/*.scss')
+	// todo: add .min
+	return gulp.src('src/scss/' + pluginName + '.scss')
 		.pipe(sass())
 		.pipe(autoprefixer())
+		.pipe(concatCss(pluginName + '.css'))
 		.pipe(gulp.dest('build/css'))
 		.pipe(git.add());
-}); // todo concat
+});
 
 gulp.task('build:js', ['clean:js'], function() {
-	return gulp.src(['src/js/stickerpipe.js'])
+	// todo: rename pluginName + '.js' --> app.js --> gulp.dest(... pluginName + '.js')
+	return gulp.src(['src/js/' + pluginName + '.js'])
 		.pipe(include())
 		.pipe(gulp.dest('build/js'))
 		.pipe(uglify({mangle: false}))

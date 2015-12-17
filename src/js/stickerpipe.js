@@ -74,6 +74,10 @@ window.StickersModule = {};
 				this.view.renderUsedStickers(Module.BaseService.getLatestUse());
 			}).bind(this));
 
+			this.view.tabsView.handleClickOnStoreTab((function() {
+				this.storeView.renderStore();
+			}).bind(this));
+
 			this.view.tabsView.handleClickOnPackTab((function(el) {
 				var pack = null,
 					packName = el.getAttribute('data-pack-name');
