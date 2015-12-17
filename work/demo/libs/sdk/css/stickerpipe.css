@@ -1,3 +1,5 @@
+@charset "UTF-8";
+
 /*
 SCSS variables are information about icon's compiled state, stored under its original file name
 
@@ -56,6 +58,228 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 @include retina-sprites($retina-groups);
 */
+
+.sp-preloader {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  margin: auto;
+}
+
+.sp-preloader-item {
+  position: absolute;
+  background-color: white;
+  width: 11px;
+  height: 11px;
+  border-radius: 7px;
+  -o-border-radius: 7px;
+  -ms-border-radius: 7px;
+  -webkit-border-radius: 7px;
+  -moz-border-radius: 7px;
+  animation-name: preloader_animation;
+  -o-animation-name: preloader_animation;
+  -ms-animation-name: preloader_animation;
+  -webkit-animation-name: preloader_animation;
+  -moz-animation-name: preloader_animation;
+  animation-duration: 1.1s;
+  -o-animation-duration: 1.1s;
+  -ms-animation-duration: 1.1s;
+  -webkit-animation-duration: 1.1s;
+  -moz-animation-duration: 1.1s;
+  animation-iteration-count: infinite;
+  -o-animation-iteration-count: infinite;
+  -ms-animation-iteration-count: infinite;
+  -webkit-animation-iteration-count: infinite;
+  -moz-animation-iteration-count: infinite;
+  animation-direction: normal;
+  -o-animation-direction: normal;
+  -ms-animation-direction: normal;
+  -webkit-animation-direction: normal;
+  -moz-animation-direction: normal;
+}
+
+#item-1 {
+  left: 0;
+  top: 19px;
+  animation-delay: 0.41s;
+  -o-animation-delay: 0.41s;
+  -ms-animation-delay: 0.41s;
+  -webkit-animation-delay: 0.41s;
+  -moz-animation-delay: 0.41s;
+}
+
+#item-2 {
+  left: 5px;
+  top: 5px;
+  animation-delay: 0.55s;
+  -o-animation-delay: 0.55s;
+  -ms-animation-delay: 0.55s;
+  -webkit-animation-delay: 0.55s;
+  -moz-animation-delay: 0.55s;
+}
+
+#item-3 {
+  top: 0;
+  left: 19px;
+  animation-delay: 0.69s;
+  -o-animation-delay: 0.69s;
+  -ms-animation-delay: 0.69s;
+  -webkit-animation-delay: 0.69s;
+  -moz-animation-delay: 0.69s;
+}
+
+#item-4 {
+  right: 5px;
+  top: 5px;
+  animation-delay: 0.83s;
+  -o-animation-delay: 0.83s;
+  -ms-animation-delay: 0.83s;
+  -webkit-animation-delay: 0.83s;
+  -moz-animation-delay: 0.83s;
+}
+
+#item-5 {
+  right: 0;
+  top: 19px;
+  animation-delay: 0.97s;
+  -o-animation-delay: 0.97s;
+  -ms-animation-delay: 0.97s;
+  -webkit-animation-delay: 0.97s;
+  -moz-animation-delay: 0.97s;
+}
+
+#item-6 {
+  right: 5px;
+  bottom: 5px;
+  animation-delay: 1.1s;
+  -o-animation-delay: 1.1s;
+  -ms-animation-delay: 1.1s;
+  -webkit-animation-delay: 1.1s;
+  -moz-animation-delay: 1.1s;
+}
+
+#item-7 {
+  left: 19px;
+  bottom: 0;
+  animation-delay: 1.24s;
+  -o-animation-delay: 1.24s;
+  -ms-animation-delay: 1.24s;
+  -webkit-animation-delay: 1.24s;
+  -moz-animation-delay: 1.24s;
+}
+
+#item-8 {
+  left: 5px;
+  bottom: 5px;
+  animation-delay: 1.38s;
+  -o-animation-delay: 1.38s;
+  -ms-animation-delay: 1.38s;
+  -webkit-animation-delay: 1.38s;
+  -moz-animation-delay: 1.38s;
+}
+
+@keyframes preloader_animation {
+  0% {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+  }
+
+  100% {
+    -webkit-transform: scale(0.3);
+    transform: scale(0.3);
+  }
+}
+
+@-webkit-keyframes preloader_animation {
+  0% {
+    -webkit-transform: scale(1);
+  }
+
+  100% {
+    -webkit-transform: scale(0.3);
+  }
+}
+
+.sp-modal-lock {
+  overflow: hidden;
+}
+
+.sp-modal-overlay {
+  background: rgba(0, 0, 0, 0.5);
+  bottom: 0;
+  left: 0;
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 100;
+  /* if modal content doesn't fit inside the overlay, display scrollbars */
+  overflow: auto;
+  /* allow one-finger iPad scrolling */
+  -webkit-overflow-scrolling: touch;
+  /* IE6–IE8 */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = #7F000000, endColorstr = #7F000000);
+  zoom: 1;
+  /* fix for iPad glitches */
+}
+
+.sp-modal-overlay > * {
+  -webkit-transform: translateZ(0px);
+}
+
+/* modal box style, can be anything you want */
+
+.sp-modal {
+  background: white;
+  border-radius: 3px;
+  box-shadow: 1px 1px 2px 0 rgba(50, 50, 50, 0.5);
+  margin: 45px auto;
+  height: 606px;
+  max-width: 650px;
+  overflow: hidden;
+}
+
+@media (max-width: 544px) {
+  .sp-modal {
+    border-radius: 0;
+    box-sizing: border-box;
+    min-height: 100% !important;
+    margin: 0;
+    width: 100%;
+  }
+}
+
+.sp-modal-header {
+  background: rgba(255, 255, 255, 0.5);
+  display: table;
+  width: 100%;
+  padding: 10px;
+  position: absolute;
+}
+
+.sp-modal-body {
+  height: 100%;
+  width: 100%;
+}
+
+.sp-icon-close {
+  cursor: pointer;
+  float: right;
+  opacity: 0.5;
+}
+
+.sp-icon-close:hover {
+  opacity: 0.7;
+}
+
+.sp-icon-back {
+  cursor: pointer;
+  float: left;
+  opacity: 0.5;
+}
+
+.sp-icon-back:hover {
+  opacity: 0.7;
+}
 
 .sp-popover {
   background: #fafafa;
@@ -362,44 +586,51 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   height: 24px;
 }
 
-.sp-icon-clock {
+.sp-icon-back {
   background-image: url("../img/icons_sprite.png");
   background-position: 0px -24px;
   width: 24px;
   height: 24px;
 }
 
-.sp-icon-close {
+.sp-icon-clock {
   background-image: url("../img/icons_sprite.png");
   background-position: -24px -24px;
   width: 24px;
   height: 24px;
 }
 
-.sp-icon-face {
+.sp-icon-close {
   background-image: url("../img/icons_sprite.png");
   background-position: -48px 0px;
   width: 24px;
   height: 24px;
 }
 
-.sp-icon-mall {
+.sp-icon-face {
   background-image: url("../img/icons_sprite.png");
   background-position: -48px -24px;
   width: 24px;
   height: 24px;
 }
 
-.sp-icon-plus {
+.sp-icon-mall {
   background-image: url("../img/icons_sprite.png");
   background-position: 0px -48px;
   width: 24px;
   height: 24px;
 }
 
-.sp-icon-settings {
+.sp-icon-plus {
   background-image: url("../img/icons_sprite.png");
   background-position: -24px -48px;
+  width: 24px;
+  height: 24px;
+}
+
+.sp-icon-settings {
+  background-image: url("../img/icons_sprite.png");
+  background-position: -48px -48px;
   width: 24px;
   height: 24px;
 }
@@ -432,9 +663,23 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   }
 }
 
-.sp-icon-clock {
+.sp-icon-back {
   background-image: url("../img/icons_sprite.png");
   background-position: 0px -24px;
+  width: 24px;
+  height: 24px;
+}
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .sp-icon-back {
+    background-image: url("../img/icons_sprite@2x.png");
+    background-size: 72px 72px;
+  }
+}
+
+.sp-icon-clock {
+  background-image: url("../img/icons_sprite.png");
+  background-position: -24px -24px;
   width: 24px;
   height: 24px;
 }
@@ -448,7 +693,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 .sp-icon-close {
   background-image: url("../img/icons_sprite.png");
-  background-position: -24px -24px;
+  background-position: -48px 0px;
   width: 24px;
   height: 24px;
 }
@@ -462,7 +707,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 .sp-icon-face {
   background-image: url("../img/icons_sprite.png");
-  background-position: -48px 0px;
+  background-position: -48px -24px;
   width: 24px;
   height: 24px;
 }
@@ -476,7 +721,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 .sp-icon-mall {
   background-image: url("../img/icons_sprite.png");
-  background-position: -48px -24px;
+  background-position: 0px -48px;
   width: 24px;
   height: 24px;
 }
@@ -490,7 +735,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 .sp-icon-plus {
   background-image: url("../img/icons_sprite.png");
-  background-position: 0px -48px;
+  background-position: -24px -48px;
   width: 24px;
   height: 24px;
 }
@@ -504,7 +749,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 .sp-icon-settings {
   background-image: url("../img/icons_sprite.png");
-  background-position: -24px -48px;
+  background-position: -48px -48px;
   width: 24px;
   height: 24px;
 }
@@ -513,207 +758,5 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   .sp-icon-settings {
     background-image: url("../img/icons_sprite@2x.png");
     background-size: 72px 72px;
-  }
-}
-@charset "UTF-8";
-
-.sp-modal-lock {
-  overflow: hidden;
-}
-
-.sp-modal-overlay {
-  background: rgba(0, 0, 0, 0.5);
-  bottom: 0;
-  left: 0;
-  position: fixed;
-  top: 0;
-  right: 0;
-  z-index: 100;
-  /* if modal content doesn't fit inside the overlay, display scrollbars */
-  overflow: auto;
-  /* allow one-finger iPad scrolling */
-  -webkit-overflow-scrolling: touch;
-  /* IE6–IE8 */
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = #7F000000, endColorstr = #7F000000);
-  zoom: 1;
-  /* fix for iPad glitches */
-}
-
-.sp-modal-overlay > * {
-  -webkit-transform: translateZ(0px);
-}
-
-/* modal box style, can be anything you want */
-
-.sp-modal {
-  background: #fafafa;
-  border-radius: 3px;
-  box-shadow: 1px 1px 2px 0 rgba(50, 50, 50, 0.5);
-  margin: 100px auto;
-  height: 606px;
-  width: 650px;
-  overflow: hidden;
-}
-
-@media (max-width: 650px) {
-  .sp-modal {
-    border-radius: 0;
-    box-sizing: border-box;
-    min-height: 100% !important;
-    margin: 0;
-    width: 100%;
-  }
-}
-
-.sp-icon-close {
-  cursor: pointer;
-  float: right;
-  opacity: 0.5;
-  position: absolute;
-  top: 10px;
-  right: 10px;
-}
-
-.sp-icon-close:hover {
-  opacity: 0.7;
-}
-.sp-preloader {
-  position: relative;
-  width: 46px;
-  height: 46px;
-  margin: auto;
-}
-
-.sp-preloader-item {
-  position: absolute;
-  background-color: white;
-  width: 11px;
-  height: 11px;
-  border-radius: 7px;
-  -o-border-radius: 7px;
-  -ms-border-radius: 7px;
-  -webkit-border-radius: 7px;
-  -moz-border-radius: 7px;
-  animation-name: preloader_animation;
-  -o-animation-name: preloader_animation;
-  -ms-animation-name: preloader_animation;
-  -webkit-animation-name: preloader_animation;
-  -moz-animation-name: preloader_animation;
-  animation-duration: 1.1s;
-  -o-animation-duration: 1.1s;
-  -ms-animation-duration: 1.1s;
-  -webkit-animation-duration: 1.1s;
-  -moz-animation-duration: 1.1s;
-  animation-iteration-count: infinite;
-  -o-animation-iteration-count: infinite;
-  -ms-animation-iteration-count: infinite;
-  -webkit-animation-iteration-count: infinite;
-  -moz-animation-iteration-count: infinite;
-  animation-direction: normal;
-  -o-animation-direction: normal;
-  -ms-animation-direction: normal;
-  -webkit-animation-direction: normal;
-  -moz-animation-direction: normal;
-}
-
-#item-1 {
-  left: 0;
-  top: 19px;
-  animation-delay: 0.41s;
-  -o-animation-delay: 0.41s;
-  -ms-animation-delay: 0.41s;
-  -webkit-animation-delay: 0.41s;
-  -moz-animation-delay: 0.41s;
-}
-
-#item-2 {
-  left: 5px;
-  top: 5px;
-  animation-delay: 0.55s;
-  -o-animation-delay: 0.55s;
-  -ms-animation-delay: 0.55s;
-  -webkit-animation-delay: 0.55s;
-  -moz-animation-delay: 0.55s;
-}
-
-#item-3 {
-  top: 0;
-  left: 19px;
-  animation-delay: 0.69s;
-  -o-animation-delay: 0.69s;
-  -ms-animation-delay: 0.69s;
-  -webkit-animation-delay: 0.69s;
-  -moz-animation-delay: 0.69s;
-}
-
-#item-4 {
-  right: 5px;
-  top: 5px;
-  animation-delay: 0.83s;
-  -o-animation-delay: 0.83s;
-  -ms-animation-delay: 0.83s;
-  -webkit-animation-delay: 0.83s;
-  -moz-animation-delay: 0.83s;
-}
-
-#item-5 {
-  right: 0;
-  top: 19px;
-  animation-delay: 0.97s;
-  -o-animation-delay: 0.97s;
-  -ms-animation-delay: 0.97s;
-  -webkit-animation-delay: 0.97s;
-  -moz-animation-delay: 0.97s;
-}
-
-#item-6 {
-  right: 5px;
-  bottom: 5px;
-  animation-delay: 1.1s;
-  -o-animation-delay: 1.1s;
-  -ms-animation-delay: 1.1s;
-  -webkit-animation-delay: 1.1s;
-  -moz-animation-delay: 1.1s;
-}
-
-#item-7 {
-  left: 19px;
-  bottom: 0;
-  animation-delay: 1.24s;
-  -o-animation-delay: 1.24s;
-  -ms-animation-delay: 1.24s;
-  -webkit-animation-delay: 1.24s;
-  -moz-animation-delay: 1.24s;
-}
-
-#item-8 {
-  left: 5px;
-  bottom: 5px;
-  animation-delay: 1.38s;
-  -o-animation-delay: 1.38s;
-  -ms-animation-delay: 1.38s;
-  -webkit-animation-delay: 1.38s;
-  -moz-animation-delay: 1.38s;
-}
-
-@keyframes preloader_animation {
-  0% {
-    -webkit-transform: scale(1);
-    transform: scale(1);
-  }
-
-  100% {
-    -webkit-transform: scale(0.3);
-    transform: scale(0.3);
-  }
-}
-
-@-webkit-keyframes preloader_animation {
-  0% {
-    -webkit-transform: scale(1);
-  }
-
-  100% {
-    -webkit-transform: scale(0.3);
   }
 }

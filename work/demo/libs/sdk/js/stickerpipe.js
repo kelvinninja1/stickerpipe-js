@@ -1893,21 +1893,28 @@ if ("document" in self) {
 
 (function(Plugin, Module) {
 
+	function buildStoreUrl(uri) {
+		var params = {
+			apiKey: Module.Configs.apikey,
+			platform: 'JS',
+			userId: Module.Configs.userId,
+			density: Module.Configs.stickerResolutionType,
+
+			uri: encodeURIComponent('http://demo.stickerpipe.com/work/demo/libs/store/js/stickerPipeStore.js')
+		};
+
+		return Module.Configs.storeUrl + '?'
+			+ Module.StickerHelper.urlParamsSerialize(params) + '#/' + uri;
+	}
 	Module.Api = {
 
 		store: {
+			getStoreUrl: function() {
+				return buildStoreUrl('store/');
+			},
+
 			getPackUrl: function(packName) {
-				var params = {
-					apiKey: Module.Configs.apikey,
-					platform: 'JS',
-					userId: Module.Configs.userId,
-					density: Module.Configs.stickerResolutionType,
-
-					//uri: encodeURIComponent('http://demo.stickerpipe.com/work/demo/libs/store/js/stickerPipeStore.js')
-				};
-
-				return Module.Configs.storeUrl + '?'
-					+ Module.StickerHelper.urlParamsSerialize(params) + '#/packs/' + packName
+				return buildStoreUrl('packs/' + packName);
 			}
 		}
 
@@ -3744,16 +3751,36 @@ if ("document" in self) {
 		}
 	}
 
-	function initModalContainer() {
+	function initModalContainer(context) {
 
 		var el = document.createElement('div');
 		el.style.display = 'none';
 		el.className = 'sp-modal';
 
-		var closeEl = document.createElement('div');
-		closeEl.className = 'sp-icon-close';
+		var header = document.createElement('div');
+		header.className = 'sp-modal-header';
 
-		el.appendChild(closeEl);
+
+		var modalBody = document.createElement('div');
+		modalBody.className = 'sp-modal-body';
+
+		el.appendChild(header);
+		el.appendChild(modalBody);
+
+		var back = document.createElement('div');
+		back.className = 'sp-icon-back';
+		back.addEventListener('click', (function() {
+		}).bind(context));
+
+		var close = document.createElement('div');
+		close.className = 'sp-icon-close';
+		close.addEventListener('click', (function() {
+			this.close();
+		}).bind(context));
+
+
+		header.appendChild(back);
+		header.appendChild(close);
 
 		return el;
 	}
@@ -3767,12 +3794,14 @@ if ("document" in self) {
 
 			options = extend({}, defaultOptions, (options || {}));
 
+			var modal = {};
+
 			if (!el || !el.nodeType) {
 
 				el = document.querySelector(el);
 
 				if (!el) {
-					el = initModalContainer();
+					el = initModalContainer(modal);
 					document.body.appendChild(el);
 				}
 			}
@@ -3803,7 +3832,7 @@ if ("document" in self) {
 			//	}
 			//});
 
-			return {
+			return extend(modal, {
 
 				el: el,
 				options: options,
@@ -3826,6 +3855,7 @@ if ("document" in self) {
 
 					var overlay = document.createElement('div');
 					overlay.className = classes.overlay;
+
 
 					var body = document.getElementsByTagName('body')[0];
 					body.insertBefore(overlay, body.firstChild);
@@ -3916,7 +3946,7 @@ if ("document" in self) {
 					}
 
 					if (this.options.onOpen) {
-						this.options.onOpen(overlay, this.options);
+						this.options.onOpen(this.el, overlay, this.options);
 					}
 
 					isOpen = true;
@@ -3949,7 +3979,7 @@ if ("document" in self) {
 
 					isOpen = false;
 				}
-			};
+			});
 		},
 
 		setDefaultOptions: function(options) {
@@ -4143,76 +4173,104 @@ if ("document" in self) {
 
 (function(Module) {
 
+	function resizeModalHeader(el) {
+		function getScrollBarWidth() {
+			var inner = document.createElement('p');
+			inner.style.width = "100%";
+			inner.style.height = "200px";
+
+			var outer = document.createElement('div');
+			outer.style.position = "absolute";
+			outer.style.top = "0px";
+			outer.style.left = "0px";
+			outer.style.visibility = "hidden";
+			outer.style.width = "200px";
+			outer.style.height = "150px";
+			outer.style.overflow = "hidden";
+			outer.appendChild (inner);
+
+			document.body.appendChild (outer);
+			var w1 = inner.offsetWidth;
+			outer.style.overflow = 'scroll';
+			var w2 = inner.offsetWidth;
+			if (w1 == w2) w2 = outer.clientWidth;
+
+			document.body.removeChild (outer);
+
+			var result = w1 - w2;
+
+			var isMacLike = navigator.platform.match(/(Mac|iPhone|iPod|iPad)/i)?true:false;
+			var isIOS = navigator.platform.match(/(iPhone|iPod|iPad)/i)?true:false;
+
+			if (result == 0 && (isMacLike || isIOS)) {
+				result = 15;
+			}
+
+			return result;
+		}
+
+		var modalHeader = el.getElementsByClassName('sp-modal-header')[0];
+		var scrollWidth = getScrollBarWidth();
+		modalHeader.style.width = el.offsetWidth - scrollWidth + 'px';
+
+		var close = modalHeader.getElementsByClassName('sp-icon-close')[0];
+		if (scrollWidth) {
+			close.style.marginRight = -scrollWidth + 'px';
+		}
+	}
+
 	Module.StoreView = Module.Class({
 
 		el: null,
 
 		modal: null,
+		iframe: null,
 
 		preloader: null,
 
 		_constructor: function() {
 			this.el = document.getElementById(Module.Configs.storeContainerId);
+
+			this.iframe = document.createElement('iframe');
+
+			this.iframe.style.width = '100%';
+			this.iframe.style.height = '100%';
+			this.iframe.style.border = '0';
+
+			this.modal = Module.View.Modal.init(null, {
+				onOpen: (function(el) {
+					var modalBody = el.getElementsByClassName('sp-modal-body')[0];
+
+					modalBody.innerHTML = '';
+					modalBody.appendChild(this.iframe);
+
+					resizeModalHeader(el);
+					window.addEventListener('resize', function() {
+						resizeModalHeader(el);
+					});
+
+					window.addEventListener('message', (function(e) {
+						var data = {};
+						try {
+							data = JSON.parse(e.data);
+						} catch (e) {}
+
+						if (data.action == 'routeChange') {
+							console.log('1', data, this.iframe.contentWindow.history.state);
+						}
+					}).bind(this));
+				}).bind(this)
+			});
 		},
 
-		render2: function() {
-			if (!this.modal) {
-				var iframe = document.createElement('iframe');
-
-				iframe.style.width = '100%';
-				iframe.style.height = '100%';
-				iframe.style.border = '0';
-
-				iframe.src = Module.Api.store.getPackUrl('pinkgorilla');
-
-				this.iframe = iframe;
-
-				this.modal = Module.View.Modal.init(null, {
-					onOpen: function(el) {
-						var mEl = el.getElementsByClassName('sp-modal')[0];
-
-						mEl.classList.add('sp-store');
-						mEl.innerHTML = '';
-						mEl.appendChild(iframe);
-
-						iframe.onload = function() {
-							mEl.style.height = iframe.contentWindow.document.body.scrollHeight + 'px'
-						};
-					}
-				});
-			}
-
+		renderStore: function() {
+			this.iframe.src = Module.Api.store.getStoreUrl();
 			this.modal.open();
 		},
 
-		render: function(packName) {
-
-			var iframe = document.createElement('iframe'),
-				urlParams = {
-					apiKey: Module.Configs.apikey,
-					platform: 'JS',
-					userId: Module.Configs.userId,
-					density: Module.Configs.stickerResolutionType,
-					uri: encodeURIComponent('http://demo.stickerpipe.com/work/demo/libs/store/js/stickerPipeStore.js')
-				},
-				urlSerialize = function(obj) {
-					var str = [];
-					for(var p in obj)
-						if (obj.hasOwnProperty(p)) {
-							str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
-						}
-					return str.join('&');
-				};
-
-			this.el.classList.add('sp-store');
-			this.el.innerHTML = '';
-			this.el.appendChild(iframe);
-
-			iframe.style.width = '100%';
-			iframe.style.height = '100%';
-			iframe.style.border = '0';
-
-			iframe.src = Module.Configs.storeUrl + '?' + urlSerialize(urlParams) + '#/packs/' + packName
+		renderPack: function(packName) {
+			this.iframe.src = Module.Api.store.getPackUrl(packName);
+			this.modal.open();
 		},
 
 		showPreloader: function() {
@@ -4494,7 +4552,6 @@ if ("document" in self) {
 			this.packTabs[tabName].click();
 		},
 
-
 		handleClickOnEmojiTab: function(callback) {
 			Module.StickerHelper.setEvent('click', this.el, this.controls.emoji.class, callback);
 		},
@@ -4503,6 +4560,9 @@ if ("document" in self) {
 		},
 		handleClickOnPackTab: function(callback) {
 			Module.StickerHelper.setEvent('click', this.el, this.classes.packTab, callback);
+		},
+		handleClickOnStoreTab: function(callback) {
+			Module.StickerHelper.setEvent('click', this.el, this.controls.store.class, callback);
 		},
 
 
@@ -4601,6 +4661,10 @@ if ("document" in self) {
 
 			this.view.tabsView.handleClickOnLastUsedPacksTab((function() {
 				this.view.renderUsedStickers(Module.BaseService.getLatestUse());
+			}).bind(this));
+
+			this.view.tabsView.handleClickOnStoreTab((function() {
+				this.storeView.renderStore();
 			}).bind(this));
 
 			this.view.tabsView.handleClickOnPackTab((function(el) {

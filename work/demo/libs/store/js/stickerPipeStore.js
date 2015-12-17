@@ -143,7 +143,7 @@ appStickerPipeStore.config(function(envServiceProvider) {
 				apiUrl: 'http://work.stk.908.vc/api/'
 			},
 			development: {
-				cssUrl: 'http://demo.stickerpipe.com/work/libs/store/css/',
+				cssUrl: 'http://demo.stickerpipe.com/work/demo/libs/store/css/',
 				notAvailableImgUrl: 'http://work.stk.908.vc/static/img/notavailable.png',
 				coinImgUrl: 'http://work.stk.908.vc/libs/store/current/coins/',
 				stickersStorageUrl: 'http://work.stk.908.vc/stk/',
@@ -192,6 +192,52 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/pack/PackView.tpl',
+    '<div class="container-fluid">\n' +
+    '	<div class="row">\n' +
+    '		<div class="col-md-8 col-md-offset-2">\n' +
+    '			<div class="pack-header">\n' +
+    '				<div class="pack-main-sticker">\n' +
+    '					<img data-ng-src="{{ getMainStickerUrl() }}" alt="Main sticker">\n' +
+    '				</div>\n' +
+    '\n' +
+    '				<div class="pack-header-title">\n' +
+    '					<h5 class="pack-owner">{{ pack.artist }}</h5>\n' +
+    '					<h3 class="pack-name">{{ pack.title }}</h3>\n' +
+    '				</div>\n' +
+    '\n' +
+    '				<div class="pack-header-content">\n' +
+    '					<p class="pack-description">{{ pack.description || \'\' }}</p>\n' +
+    '\n' +
+    '					<div class="pack-actions text-right">\n' +
+    '						<span class="pack-price">us $ 1.99</span>\n' +
+    '						<button class="btn-purple">GET</button>\n' +
+    '					</div>\n' +
+    '				</div>\n' +
+    '			</div>\n' +
+    '\n' +
+    '			<div class="clearfix"></div>\n' +
+    '\n' +
+    '			<div class="pack-stickers">\n' +
+    '				<div class="col" data-ng-repeat="sticker in pack.stickers">\n' +
+    '					<div class="sticker center-block">\n' +
+    '						<img data-ng-src="{{ getStickerUrl(sticker.name) }}" alt="{{ sticker.name }}" />\n' +
+    '					</div>\n' +
+    '				</div>\n' +
+    '			</div>\n' +
+    '		</div>\n' +
+    '	</div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/error/ErrorView.tpl',
     '<div class="error-page">\n' +
     '	<div class="container">\n' +
@@ -213,50 +259,23 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/pack/PackView.tpl',
+  $templateCache.put('/modules/store/StoreView.tpl',
     '<div class="container-fluid">\n' +
     '	<div class="row">\n' +
     '		<div class="col-md-8 col-md-offset-2">\n' +
-    '			<div class="pack-header">\n' +
-    '				<div class="pack-main-sticker">\n' +
-    '					<img data-ng-src="{{ getMainStickerUrl() }}" alt="Main sticker">\n' +
-    '				</div>\n' +
-    '\n' +
-    '				<div class="pack-header-title">\n' +
-    '					<h5 class="pack-owner">{{ pack.get(\'artist\') }}</h5>\n' +
-    '					<h3 class="pack-name">{{ pack.get(\'title\') }}</h3>\n' +
-    '				</div>\n' +
-    '\n' +
-    '				<div class="pack-header-content">\n' +
-    '					<p class="pack-description">{{ pack.get(\'description\') || \'\' }}</p>\n' +
-    '\n' +
-    '					<div class="pack-actions text-right">\n' +
-    '						<span class="pack-price">us $ 1.99</span>\n' +
-    '						<button class="btn-purple">GET</button>\n' +
+    '			<div class="packs">\n' +
+    '				<div class="col" data-ng-repeat="pack in packs">\n' +
+    '					<div class="pack-preview center-block">\n' +
+    '						<a href="#/packs/{{ pack.pack_name }}">\n' +
+    '							<img ng-src="{{ getPackMainIcon(pack) }}" alt="" class="pack-preview-sticker">\n' +
+    '							<h5 class="pack-preview-name">{{ pack.title }}</h5>\n' +
+    '						</a>\n' +
     '					</div>\n' +
-    '				</div>\n' +
-    '			</div>\n' +
-    '\n' +
-    '			<div class="pack-stickers">\n' +
-    '				<div class="sticker" data-ng-repeat="sticker in pack.get(\'stickers\')">\n' +
-    '					<img data-ng-src="{{ getStickerUrl(sticker.name) }}" alt="{{ sticker.name }}" />\n' +
     '				</div>\n' +
     '			</div>\n' +
     '		</div>\n' +
     '	</div>\n' +
     '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/store/StoreView.tpl',
-    '<div>StoreView</div>');
 }]);
 })();
 
@@ -318,7 +337,7 @@ module.run(['$templateCache', function($templateCache) {
 appStickerPipeStore.config(function($routeProvider) {
 
 	$routeProvider
-		.when('/', {
+		.when('/store', {
 			controller: 'StoreController as storeController',
 			templateUrl: '/modules/store/StoreView.tpl',
 			resolve: {
@@ -329,10 +348,10 @@ appStickerPipeStore.config(function($routeProvider) {
 		})
 		.when('/packs/:packName', {
 			controller: 'PackController as packController',
-			template: '<div pack-page pack="packController.pack"></div>',
+			templateUrl: '/modules/pack/PackView.tpl',
 			resolve: {
-				pack: function($route, PacksCollection) {
-					return PacksCollection.findOne($route.current.params.packName);
+				pack: function($route, HttpApi) {
+					return HttpApi.getPack($route.current.params.packName);
 				}
 			}
 		})
@@ -340,7 +359,7 @@ appStickerPipeStore.config(function($routeProvider) {
 			template: '<div error-page></div>'
 		})
 		.otherwise({
-			redirectTo: '/'
+			redirectTo: '/store'
 		});
 });
 
@@ -351,11 +370,27 @@ appStickerPipeStore.run(function($rootScope, $location) {
 	});
 });
 
-appStickerPipeStore.controller('AppController', function(Config, envService) {
+appStickerPipeStore.controller('AppController', function(Config, envService, $rootScope, $window) {
 
 	if (envService.is('local') || envService.is('development')) {
 		document.getElementById('css').setAttribute('href', envService.read('cssUrl') + Config.platform.toLocaleLowerCase() + '.css?v='+(+(new Date())));
 	}
+
+	function q() {
+		console.log($window.history);
+		window.parent.postMessage(JSON.stringify({
+			action: 'routeChange',
+			attrs: window.history.length
+		}), 'http://' + Config.clientDomain);
+	}
+
+	$rootScope.$on('$routeChangeSuccess', function() {
+		q();
+	});
+
+	$rootScope.$on('$routeChangeError', function() {
+		q();
+	});
 
 	this.getResolutionType = function() {
 		return Config.resolutionType;
@@ -490,8 +525,7 @@ appStickerPipeStore.factory('HttpApi', function(Http, EnvConfig) {
         },
 
         getPacks: function() {
-			return Http.get(getUrl('store')).then(function(response) {
-				console.log('response', response);
+			return Http.get(getUrl('shop')).then(function(response) {
 				return response.data || response;
 			});
         },
@@ -612,7 +646,7 @@ appStickerPipeStore.directive('pageSpinner', function($rootScope, usSpinnerServi
 
 	return {
 		restrict: 'AE',
-		template: '<div class="page-spinner" ng-if="showSpinner"><span us-spinner="{radius: 15, width: 4, length: 15, color: \'white\'}" spinner-key="spinner-1"></span></div>',
+		template: '<div class="page-spinner" ng-if="showSpinner"><span us-spinner="{radius: 15, width: 4, length: 15, color: \'#333\'}" spinner-key="spinner-1"></span></div>',
 		link: function($scope, $el, attrs) {
 			var bodyEl = document.getElementsByTagName('body')[0];
 
@@ -657,134 +691,20 @@ appStickerPipeStore.directive('pageSpinner', function($rootScope, usSpinnerServi
 	};
 });
 
-appStickerPipeStore.controller('PackController', function(pack) {
-	this.pack = pack;
-});
+appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, pack) {
 
-appStickerPipeStore.directive('packPage', function(Config,  $window, $timeout, EnvConfig) {
+	angular.extend($scope, {
+		pack: pack,
 
-	return {
-		restrict: 'AE',
-		scope: {
-			pack: '=pack'
-		},
-		templateUrl: '/modules/pack/PackView.tpl',
-		link: function($scope, $el, attrs) {
-
-			$scope.getStickerUrl = function(name) {
-				return EnvConfig.stickersStorageUrl + $scope.pack.get('pack_name') + '/' + name + '_' + Config.resolutionType + '.png';
-			};
-
-			$scope.getMainStickerUrl = function() {
-				return $scope.getStickerUrl('main_icon');
-			};
-
-			$scope.isTappedSticker = function(sticker) {
-				return $scope.tappedSticker == sticker;
-			};
-
-			$scope.tapSticker = function(sticker) {
-				$scope.tappedSticker = (sticker != $scope.tappedSticker) ? sticker : null;
-			};
-
-			$scope.resetTappedSticker = function() {
-				$scope.tapSticker(null);
-			};
-
-			$scope.hasTappedSticker = function() {
-				return !$scope.isTappedSticker(null);
-			};
-
-			angular.element($window).bind('scroll', function() {
-				$scope.resetTappedSticker();
-				$scope.$apply();
-			});
-
-			// ************************************************************
-
-			var $windowEl = angular.element($window);
-
-			$scope.stickerColSpan = 2;
-
-			$scope.onWindowResize = function() {
-				var windowWidth = $windowEl[0].innerWidth,
-					countStickersInRow = 6;
-
-				if (windowWidth < 330) {
-					countStickersInRow = 2;
-				} else if (windowWidth < 720) {
-					countStickersInRow = 3;
-				} else if (windowWidth < 980) {
-					countStickersInRow = 4;
-				}
-
-				$scope.stickerColSpan = 12 / countStickersInRow;
-
-				$scope.$apply();
-			};
-
-			$windowEl.on('resize', function() {
-				$scope.onWindowResize();
-			});
-
-			$timeout(function () {
-				$windowEl.triggerHandler('resize');
-			});
-		}
-
-	};
-});
-
-appStickerPipeStore.factory('PackModel', function(PlatformAPI) {
-
-	var PackModel = function(data) {
-		if (data) {
-			this.setData(data);
-		}
-	};
-
-	angular.extend(PackModel.prototype, {
-		platformPrice: null,
-
-		setData: function(data) {
-			this.data = this.data || {};
-			angular.extend(this.data, data);
+		getStickerUrl: function(name) {
+			return EnvConfig.stickersStorageUrl + this.pack.pack_name + '/' + name + '_' + Config.resolutionType + '.png';
 		},
 
-		get: function(field) {
-			this.data = this.data || {};
-			return this.data[field];
-		},
-
-		getPlatformPrice: function(fetch) {
-			fetch = fetch || false;
-
-			if (fetch || this.platformPrice === null) {
-				this.platformPrice = PlatformAPI.getProductPrice(this);
-			}
-
-			return this.platformPrice;
+		getMainStickerUrl: function() {
+			return $scope.getStickerUrl('main_icon');
 		}
 	});
 
-	return PackModel;
-});
-
-
-
-appStickerPipeStore.factory('PacksCollection', function(HttpApi, PackModel) {
-	return {
-		findOne: function (name) {
-			return HttpApi.getPack(name).then(function(data) {
-				return new PackModel(data);
-			});
-		}
-
-	};
-});
-
-appStickerPipeStore.controller('StoreController', function(packs) {
-	this.packs = packs;
 });
 
 appStickerPipeStore.directive('errorPage', function(Config,  $window, $timeout, i18n, EnvConfig) {
@@ -827,6 +747,16 @@ appStickerPipeStore.directive('errorPage', function(Config,  $window, $timeout, 
 		}
 
 	};
+});
+
+appStickerPipeStore.controller('StoreController', function($scope, packs, Config) {
+	angular.extend($scope, {
+		packs: packs.packs,
+
+		getPackMainIcon: function(pack) {
+			return pack.main_icon[Config.resolutionType];
+		}
+	});
 });
 
 appStickerPipeStore.value('En', {
@@ -916,41 +846,38 @@ appStickerPipeStore.factory('BasePlatform', [function() {
 
 }]);
 
-appStickerPipeStore.factory('JSPlatform', [
-	'BasePlatform',
-	'Config',
-	function(BasePlatform, Config) {
+appStickerPipeStore.factory('JSPlatform', function(BasePlatform, Config, $rootScope) {
 
-		var api = function(action, attrs) {
-			window.parent.postMessage(JSON.stringify({
-				action: action,
-				attrs: attrs
-			}), 'http://' + Config.clientDomain);
-		};
+	var api = function(action, attrs) {
+		window.parent.postMessage(JSON.stringify({
+			action: action,
+			attrs: attrs
+		}), 'http://' + Config.clientDomain);
+	};
 
-		return angular.extend(BasePlatform, {
+	return angular.extend(BasePlatform, {
 
-			showPackCollections: function(packName) {
-				return api(arguments.callee.name, arguments);
-			},
+		showPackCollections: function(packName) {
+			return api(arguments.callee.name, arguments);
+		},
 
-			downloadPack: function(packName) {
-				return api(arguments.callee.name, arguments);
-			},
+		downloadPack: function(packName) {
+			return api(arguments.callee.name, arguments);
+		},
 
-			purchasePackInStore: function(packTitle, packProductId, packPrice, packName) {
-				return api(arguments.callee.name, arguments);
-			},
+		purchasePackInStore: function(packTitle, packProductId, packPrice, packName) {
+			return api(arguments.callee.name, arguments);
+		},
 
-			isPackActive: function(packName) {
-				return api(arguments.callee.name, arguments);
-			},
+		isPackActive: function(packName) {
+			return api(arguments.callee.name, arguments);
+		},
 
-			isPackExistsInStorage: function(packName) {
-				return api(arguments.callee.name, arguments);
-			}
-		});
-	}]);
+		isPackExistsInStorage: function(packName) {
+			return api(arguments.callee.name, arguments);
+		}
+	});
+});
 
 appStickerPipeStore.directive('packActionButton', function(PlatformAPI, Config, i18n, EnvConfig) {
 

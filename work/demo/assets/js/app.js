@@ -13,43 +13,37 @@ var _makeClass = function(constructor, source) {
 };
 
 var App = _makeClass(function(options) {
-	this.init(options);
+	this._constructor(options);
 }, {
 
 	// todo: rename to stickerpipe
-	stickers: null,
+	stickerpipe: null,
 	randomUsers: [],
 	currentUser: {},
 
-	$window: null,
-	$navbar: null,
-	$messages: null,
-	$messageBox: null,
-	$stickerPipeBlock: null,
-	$stickerPipeStickers: null,
-	$stickerPipeStore: null,
-	$stickersToggle: null,
-	$textarea: null,
-	$storeButton: null,
+	$window: $(window),
+	$navbar: $('.navbar'),
+	$messages: $('#messages'),
+	$messageBox: $('#messageBox'),
+	$stickerPipeBlock: $('#stickerPipe'),
+	$stickerPipeStickers: $('#stickers'),
+	$stickerPipeStore: $('#store'),
+	$stickersToggle: $('#stickersToggle'),
+	$textarea: $('.textarea'),
 
-	init: function() {
-		this.$window = $(window);
-		this.$navbar = $('.navbar');
-		this.$messages = $('#messages');
-		this.$messageBox = $('#messageBox');
-		this.$stickerPipeBlock = $('#stickerPipe');
-		this.$stickerPipeStickers = $('#stickers');
-		this.$stickerPipeStore = $('#store');
-		this.$stickersToggle = this.$messageBox.find('#stickersToggle');
-		this.$textarea = this.$messageBox.find('.textarea');
-		this.$storeButton = $('.store-button');
+	_constructor: function() {
+		// setting lo-dash template
+		_.templateSettings = {
+			evaluate: /\{\[([\s\S]+?)\]\}/g,   // {[ alert() ]}
+			interpolate: /\{\{([\s\S]+?)\}\}/g, // {{ name }}
+			escape: /\{\{-([\s\S]+?)-\}\}/g // {{- html -}}
+		};
 
 		this.fetchRandomUsers().done((function() {
 			this.sendMessage();
 			this.sendMessage(true);
 			this.sendMessage();
 		}).bind(this));
-		this.initLoDash();
 		this.initMessageBox();
 		this.initStickers();
 
@@ -67,30 +61,13 @@ var App = _makeClass(function(options) {
 
 		this.$messages.on('click', 'img[data-sticker]', (function(e) {
 			var $target = $(e.target);
-			//this.openStickersStore($target.attr('data-sticker-pack'));
-		}).bind(this));
 
-		this.$storeButton.on('click', (function() {
-			this.stickers.storeView.render2();
+			this.stickerpipe.storeView.renderPack($target.attr('data-sticker-pack'));
 		}).bind(this));
+	},
 
-		//this.$stickersToggle.popover({
-		//	content: '213 dfgfgdfg dfgdfgdfg dfgdfgdfgf dfgdfgdgf dfgdfgdfgd ',
-		//	placement: 'top',
-		//	html: true,
-		//	viewport: this.$messageBox
-		//});
-	},
-	initLoDash: function() {
-		// setting lo-dash template
-		_.templateSettings = {
-			evaluate: /\{\[([\s\S]+?)\]\}/g,   // {[ alert() ]}
-			interpolate: /\{\{([\s\S]+?)\}\}/g, // {{ name }}
-			escape: /\{\{-([\s\S]+?)-\}\}/g // {{- html -}}
-		};
-	},
 	initStickers: function() {
-		this.stickers = new Stickers({
+		this.stickerpipe = new Stickers({
 
 			debug: true,
 
@@ -107,21 +84,22 @@ var App = _makeClass(function(options) {
 			storagePrefix: 'stickerPipe',
 			enableEmojiTab: true,
 			enableHistoryTab: true,
+			enableStoreTab: true,
 
 			domain : 'http://work.stk.908.vc',
 			clientPacksUrl: 'http://work.stk.908.vc/api/v1/client-packs',
 			userPacksUrl: 'http://work.stk.908.vc/api/v1/user/packs',
 			userPackUrl: 'http://work.stk.908.vc/api/v1/user/pack',
 			trackStatUrl: 'http://work.stk.908.vc/api/v1/track-statistic',
-			//storeUrl: 'http://work.stk.908.vc/api/v1/web',
-			storeUrl: 'http://localhost/stickerpipe/store/build',
+			storeUrl: 'http://work.stk.908.vc/api/v1/web',
+			//storeUrl: 'http://localhost/stickerpipe/store/build',
 
 			userId: '12345678901234567890123456789012',
 
 			callbacks: {
 				onPurchase: (function(packTitle, productId, price, packName) {
 					if (confirm('#' + productId + ' Вы действительно хотите купить пак "' + packTitle + '", за '+ price + ' UAH?')) {
-						this.stickers.purchaseSuccess(packName);
+						this.stickerpipe.purchaseSuccess(packName);
 					}
 				}).bind(this),
 
@@ -136,35 +114,35 @@ var App = _makeClass(function(options) {
 
 			functions: {
 				showPackCollection: (function(packName) {
-					this.openStickers(packName);
+					// todo
 				}).bind(this)
 			}
 
 		});
 
-		if (this.stickers.getNewStickersFlag()) {
+		if (this.stickerpipe.getNewStickersFlag()) {
 			this.$stickersToggle.addClass('has-new-content');
 		}
 
-		this.stickers.render((function() {
+		this.stickerpipe.render((function() {
 			// todo: make as event
-			this.stickers.onClickSticker((function(text) {
+			this.stickerpipe.onClickSticker((function(text) {
 				this.sendMessage(true, text);
 			}).bind(this));
 
 			// todo: make as event
-			this.stickers.onClickEmoji((function(emoji) {
+			this.stickerpipe.onClickEmoji((function(emoji) {
 				console.log('click on emoji', emoji);
 				this.$textarea.focus();
-				this.pasteHtmlAtCaret(this.stickers.parseEmojiFromText(emoji));
+				this.pasteHtmlAtCaret(this.stickerpipe.parseEmojiFromText(emoji));
 			}).bind(this));
 
 			var _pack = this.getUrlParameter('pack');
 			if (!!_pack) {
-				this.stickers.fetchPacks((function() {
-						this.stickers.resetNewStickersFlag();
-						this.stickers.open();
-						this.stickers.renderCurrentTab(_pack);
+				this.stickerpipe.fetchPacks((function() {
+						this.stickerpipe.resetNewStickersFlag();
+						this.stickerpipe.open();
+						this.stickerpipe.renderCurrentTab(_pack);
 					}).bind(this)
 				);
 			}
@@ -174,15 +152,15 @@ var App = _makeClass(function(options) {
 
 		this.resizeWindow();
 		// todo: events
-		//this.stickers.onClickSticker((function(text) {
+		//this.stickerpipe.onClickSticker((function(text) {
 		//	this.sendMessage(true, text);
 		//}).bind(this));
 		//
 		//// todo: events
-		//this.stickers.onClickEmoji((function(emoji) {
+		//this.stickerpipe.onClickEmoji((function(emoji) {
 		//	console.log('click on emoji', emoji);
 		//	this.$textarea.focus();
-		//	this.pasteHtmlAtCaret(this.stickers.parseEmojiFromText(emoji));
+		//	this.pasteHtmlAtCaret(this.stickerpipe.parseEmojiFromText(emoji));
 		//}).bind(this));
 
 		this.$window.on('sp:content:highlight:show', (function() {
@@ -191,6 +169,15 @@ var App = _makeClass(function(options) {
 
 		this.$window.on('sp:content:highlight:hide', (function() {
 			this.$stickersToggle.removeClass('has-new-content');
+		}).bind(this));
+
+
+		this.$window.on('sp:popover:shown', (function() {
+			this.$stickersToggle.addClass('active');
+		}).bind(this));
+
+		this.$window.on('sp:popover:hidden', (function() {
+			this.$stickersToggle.removeClass('active');
 		}).bind(this));
 	},
 	initMessageBox: function() {
@@ -220,14 +207,6 @@ var App = _makeClass(function(options) {
 		this.$messageBox.find('button[type=submit]').on('click', function() {
 			sendMessageHandler();
 		});
-
-		this.$stickersToggle.on('click', (function() {
-			if (this.$stickersToggle.hasClass('active')) {
-				this.closeStickerPipeBlock();
-			} else {
-				this.openStickers();
-			}
-		}).bind(this));
 
 		window.addEventListener('sp.popover.shown', (function() {
 			this.$stickersToggle.addClass('active');
@@ -287,9 +266,9 @@ var App = _makeClass(function(options) {
 			user = this.getRandomUser();
 		}
 
-		var parseSticker = this.stickers.parseStickerFromText(text);
+		var parseSticker = this.stickerpipe.parseStickerFromText(text);
 
-		this.stickers.onUserMessageSent(parseSticker.isSticker);
+		this.stickerpipe.onUserMessageSent(parseSticker.isSticker);
 
 		var messageTemplate = _.template($('#messageTemplate').html());
 
@@ -300,66 +279,6 @@ var App = _makeClass(function(options) {
 			date: this.getDateString(0),
 			sticker: parseSticker
 		})).animate({ scrollTop: this.$messages[0].scrollHeight }, 1000);
-	},
-
-	openStickerPipeBlock: function(completeCallback) {
-
-		if (this.$stickersToggle.hasClass('active')) {
-			completeCallback && completeCallback();
-			return;
-		}
-
-		var messagesHeight = this.$messages.height();
-		this.$messages.attr('data-saved-height', messagesHeight);
-
-		//this.$stickersToggle.addClass('active');
-
-		this.$stickerPipeBlock.slideDown({
-			progress: (function() {
-				this.$messages.height(messagesHeight - this.$stickerPipeBlock.height());
-			}).bind(this),
-			complete: function() {
-				completeCallback && completeCallback();
-			}
-		});
-	},
-	closeStickerPipeBlock: function() {
-		if (!this.$stickersToggle.hasClass('active')) {
-			return;
-		}
-
-		var messagesSavedHeight = this.$messages.attr('data-saved-height');
-
-		//this.$stickersToggle.removeClass('active');
-
-		this.$stickerPipeBlock.slideUp({
-			progress: (function() {
-				this.$messages.height(messagesSavedHeight - this.$stickerPipeBlock.height());
-			}).bind(this)
-		});
-	},
-
-	openStickers: function(packName) {
-
-		this.$stickerPipeStickers.show();
-		this.$stickerPipeStore.hide();
-
-		this.openStickerPipeBlock((function() {
-			if (packName) {
-				this.stickers.renderCurrentTab(packName);
-			}
-		}).bind(this));
-	},
-	openStickersStore: function(packName) {
-
-		this.$stickerPipeStickers.hide();
-		this.$stickerPipeStore.show();
-
-		this.openStickerPipeBlock();
-
-		this.resizeWindow();
-
-		this.stickers.renderPack(packName);
 	},
 
 	getUrlParameter: function(name) {

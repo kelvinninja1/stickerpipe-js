@@ -3,7 +3,7 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: 0; }
 
 .store {
-  padding: 10px; }
+  padding: 45px 0 30px 0; }
 
 .pack-main-sticker {
   float: left;
@@ -17,7 +17,7 @@ h1, h2, h3, h4, h5, h6 {
     width: 160px; }
 
 .pack-header {
-  margin-bottom: 20px; }
+  margin-bottom: 10px; }
 
 .pack-header-title {
   padding-top: 20px; }
@@ -30,9 +30,24 @@ h1, h2, h3, h4, h5, h6 {
 
 .pack-stickers {
   display: table; }
-  .pack-stickers .sticker {
+  .pack-stickers .col {
     float: left;
-    margin: 10px; }
+    width: 50%; }
+    @media screen and (min-width: 300px) {
+      .pack-stickers .col {
+        width: 33.33333%; } }
+    @media screen and (min-width: 480px) {
+      .pack-stickers .col {
+        width: 25%; } }
+    @media screen and (min-width: 600px) {
+      .pack-stickers .col {
+        width: 20%; } }
+    @media screen and (min-width: 768px) {
+      .pack-stickers .col {
+        width: 16.66667%; } }
+  .pack-stickers .sticker {
+    margin: 10px auto;
+    display: table; }
     .pack-stickers .sticker img {
       height: 80px;
       width: 80px; }
@@ -51,11 +66,49 @@ h1, h2, h3, h4, h5, h6 {
   margin-right: 10px;
   text-transform: uppercase; }
 
+.pack-preview {
+  display: table;
+  margin: 10px auto; }
+
+.pack-preview a {
+  display: block;
+  text-decoration: none; }
+  .pack-preview a:hover .pack-preview-name {
+    text-decoration: underline; }
+
+.pack-preview-name {
+  color: #333;
+  margin: 5px 0;
+  text-align: center; }
+
+.pack-preview-sticker,
+.sticker img {
+  max-height: 120px;
+  max-width: 120px;
+  height: 100%;
+  width: 100%; }
+
+.packs .col {
+  float: left;
+  width: 50%; }
+  @media screen and (min-width: 300px) {
+    .packs .col {
+      width: 50%; } }
+  @media screen and (min-width: 480px) {
+    .packs .col {
+      width: 33.33333%; } }
+  @media screen and (min-width: 600px) {
+    .packs .col {
+      width: 25%; } }
+  @media screen and (min-width: 768px) {
+    .packs .col {
+      width: 20%; } }
+
 .page-spinner {
   width: 100%;
   height: 100%;
   position: absolute;
-  background: rgba(0, 0, 0, 0.6);
+  background: white;
   z-index: 9;
   top: 0; }
 
