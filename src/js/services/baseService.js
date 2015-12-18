@@ -136,23 +136,6 @@
 			return Module.Storage.setPacks(packs);
 		},
 
-		getPacksFromServer: function(callback) {
-
-			var options = {
-				url: Module.Configs.clientPacksUrl,
-				header: []
-			};
-
-			if (Module.Configs.userId !== null) {
-				options.url = Module.Configs.userPacksUrl;
-				options.header['UserId'] = StickerHelper.md5(Module.Configs.userId + Module.Configs.apikey);
-			}
-
-			Module.Http.get(options.url, {
-				success: callback
-			}, options.header);
-		},
-
 		parseStickerFromText: function(text) {
 			var outData = {
 					isSticker: false,
@@ -196,7 +179,7 @@
 				label = (isSticker) ? 'sticker' : 'text';
 
 
-			Module.Http.post(Module.Configs.trackStatUrl, [{
+			Module.Api.sendStatistic([{
 				action: action,
 				category: category,
 				label: label,
@@ -223,7 +206,7 @@
 
 			storageStickerData = this.getPacksFromStorage();
 
-			this.getPacksFromServer(
+			Module.Api.getPacks(
 				(function(response) {
 					if(response.status != 'success') {
 						return;
@@ -252,22 +235,6 @@
 			}
 		},
 
-		changeUserPackStatus: function(packName, status, callback) {
-			var options = {
-				url: Module.Configs.userPackUrl + '/' + packName,
-				header: {
-					UserId: StickerHelper.md5(Module.Configs.userId + Module.Configs.apikey)
-				}
-			};
-
-			// todo: rewrite callback
-			Module.Http.post(options.url, {
-				status: status
-			}, {
-				success: callback
-			}, options.header);
-		},
-
 		purchaseSuccess: function(packName) {
 			try {
 				var handler = function() {
@@ -281,7 +248,7 @@
 				};
 
 				if (Module.Configs.userId !== null) {
-					this.changeUserPackStatus(packName, true, handler);
+					Module.Api.changeUserPackStatus(packName, true, handler);
 				} else {
 					handler();
 				}

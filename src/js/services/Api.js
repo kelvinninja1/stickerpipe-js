@@ -17,6 +17,10 @@
 		return Module.Configs.cdnUrl + '/' + Module.Configs.baseFolder + '/';
 	}
 
+	function getApiUrl(uri) {
+		return Module.Configs.apiUrl + '/api/v1/' + uri;
+	}
+
 	Module.Api = {
 
 		getStickerUrl: function(packName, stickerName) {
@@ -27,6 +31,41 @@
 		getPackTabIconUrl: function(packName) {
 			return getCdnUrl() + packName + '/' +
 				'tab_icon_' + Module.Configs.tabResolutionType + '.png';
+		},
+
+		getPacks: function(successCallback) {
+			var options = {
+				url: getApiUrl('client-packs'),
+				header: []
+			};
+
+			if (Module.Configs.userId !== null) {
+				options.url = getApiUrl('user/packs');
+				options.header['UserId'] = Module.StickerHelper.md5(Module.Configs.userId + Module.Configs.apikey);
+			}
+
+			Module.Http.get(options.url, {
+				success: successCallback
+			}, options.header);
+		},
+
+		sendStatistic: function(statistic) {
+			Module.Http.post(getApiUrl('track-statistic'), statistic);
+		},
+
+		changeUserPackStatus: function(packName, status, callback) {
+			var url = getApiUrl('user/pack/' + packName),
+				headers = {
+					UserId: Module.StickerHelper.md5(Module.Configs.userId + Module.Configs.apikey)
+				};
+
+			// todo: rewrite callback
+
+			Module.Http.post(url, {
+				status: status
+			}, {
+				success: callback
+			}, headers);
 		},
 
 		store: {

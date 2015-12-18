@@ -114,7 +114,7 @@ window.StickersModule = {};
 				var stickerAttribute = el.getAttribute('data-sticker-string'),
 					nowDate = new Date().getTime() / 1000|0;
 
-				Module.Http.post(Module.Configs.trackStatUrl, [{
+				Module.Api.sendStatistic([{
 					action: 'use',
 					category: 'sticker',
 					label: '[[' + stickerAttribute + ']]',
@@ -145,7 +145,7 @@ window.StickersModule = {};
 				var nowDate = new Date().getTime() / 1000| 0,
 					emoji = this.emojiService.parseEmojiFromHtml(el.innerHTML);
 
-				Module.Http.post(Module.Configs.trackStatUrl, [{
+				Module.Api.sendStatistic([{
 					action: 'use',
 					category: 'emoji',
 					label: emoji,

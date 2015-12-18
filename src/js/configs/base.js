@@ -27,13 +27,8 @@
 		// todo: rename apikey --> apiKey
 		apikey: '', // 72921666b5ff8651f374747bfefaf7b2
 
-		// todo only one API url
 		cdnUrl: 'http://cdn.stickerpipe.com',
-		// todo: remove api url options
-		clientPacksUrl: 'http://api.stickerpipe.com/api/v1/client-packs',
-		userPacksUrl: 'http://api.stickerpipe.com/api/v1/user/packs',
-		userPackUrl: 'http://api.stickerpipe.com/api/v1/user/pack',
-		trackStatUrl: 'http://api.stickerpipe.com/api/v1/track-statistic',
+		apiUrl: 'http://api.stickerpipe.com',
 		storeUrl: 'http://api.stickerpipe.com/api/v1/web',
 
 		storagePrefix: 'stickerPipe',

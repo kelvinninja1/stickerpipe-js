@@ -1915,6 +1915,10 @@ if ("document" in self) {
 		return Module.Configs.cdnUrl + '/' + Module.Configs.baseFolder + '/';
 	}
 
+	function getApiUrl(uri) {
+		return Module.Configs.apiUrl + '/api/v1/' + uri;
+	}
+
 	Module.Api = {
 
 		getStickerUrl: function(packName, stickerName) {
@@ -1925,6 +1929,41 @@ if ("document" in self) {
 		getPackTabIconUrl: function(packName) {
 			return getCdnUrl() + packName + '/' +
 				'tab_icon_' + Module.Configs.tabResolutionType + '.png';
+		},
+
+		getPacks: function(successCallback) {
+			var options = {
+				url: getApiUrl('client-packs'),
+				header: []
+			};
+
+			if (Module.Configs.userId !== null) {
+				options.url = getApiUrl('user/packs');
+				options.header['UserId'] = Module.StickerHelper.md5(Module.Configs.userId + Module.Configs.apikey);
+			}
+
+			Module.Http.get(options.url, {
+				success: successCallback
+			}, options.header);
+		},
+
+		sendStatistic: function(statistic) {
+			Module.Http.post(getApiUrl('track-statistic'), statistic);
+		},
+
+		changeUserPackStatus: function(packName, status, callback) {
+			var url = getApiUrl('user/pack/' + packName),
+				headers = {
+					UserId: Module.StickerHelper.md5(Module.Configs.userId + Module.Configs.apikey)
+				};
+
+			// todo: rewrite callback
+
+			Module.Http.post(url, {
+				status: status
+			}, {
+				success: callback
+			}, headers);
 		},
 
 		store: {
@@ -2081,23 +2120,6 @@ if ("document" in self) {
 			return Module.Storage.setPacks(packs);
 		},
 
-		getPacksFromServer: function(callback) {
-
-			var options = {
-				url: Module.Configs.clientPacksUrl,
-				header: []
-			};
-
-			if (Module.Configs.userId !== null) {
-				options.url = Module.Configs.userPacksUrl;
-				options.header['UserId'] = StickerHelper.md5(Module.Configs.userId + Module.Configs.apikey);
-			}
-
-			Module.Http.get(options.url, {
-				success: callback
-			}, options.header);
-		},
-
 		parseStickerFromText: function(text) {
 			var outData = {
 					isSticker: false,
@@ -2141,7 +2163,7 @@ if ("document" in self) {
 				label = (isSticker) ? 'sticker' : 'text';
 
 
-			Module.Http.post(Module.Configs.trackStatUrl, [{
+			Module.Api.sendStatistic([{
 				action: action,
 				category: category,
 				label: label,
@@ -2168,7 +2190,7 @@ if ("document" in self) {
 
 			storageStickerData = this.getPacksFromStorage();
 
-			this.getPacksFromServer(
+			Module.Api.getPacks(
 				(function(response) {
 					if(response.status != 'success') {
 						return;
@@ -2197,22 +2219,6 @@ if ("document" in self) {
 			}
 		},
 
-		changeUserPackStatus: function(packName, status, callback) {
-			var options = {
-				url: Module.Configs.userPackUrl + '/' + packName,
-				header: {
-					UserId: StickerHelper.md5(Module.Configs.userId + Module.Configs.apikey)
-				}
-			};
-
-			// todo: rewrite callback
-			Module.Http.post(options.url, {
-				status: status
-			}, {
-				success: callback
-			}, options.header);
-		},
-
 		purchaseSuccess: function(packName) {
 			try {
 				var handler = function() {
@@ -2226,7 +2232,7 @@ if ("document" in self) {
 				};
 
 				if (Module.Configs.userId !== null) {
-					this.changeUserPackStatus(packName, true, handler);
+					Module.Api.changeUserPackStatus(packName, true, handler);
 				} else {
 					handler();
 				}
@@ -2611,13 +2617,8 @@ if ("document" in self) {
 		// todo: rename apikey --> apiKey
 		apikey: '', // 72921666b5ff8651f374747bfefaf7b2
 
-		// todo only one API url
 		cdnUrl: 'http://cdn.stickerpipe.com',
-		// todo: remove api url options
-		clientPacksUrl: 'http://api.stickerpipe.com/api/v1/client-packs',
-		userPacksUrl: 'http://api.stickerpipe.com/api/v1/user/packs',
-		userPackUrl: 'http://api.stickerpipe.com/api/v1/user/pack',
-		trackStatUrl: 'http://api.stickerpipe.com/api/v1/track-statistic',
+		apiUrl: 'http://api.stickerpipe.com',
 		storeUrl: 'http://api.stickerpipe.com/api/v1/web',
 
 		storagePrefix: 'stickerPipe',
@@ -4637,7 +4638,7 @@ if ("document" in self) {
 				var stickerAttribute = el.getAttribute('data-sticker-string'),
 					nowDate = new Date().getTime() / 1000|0;
 
-				Module.Http.post(Module.Configs.trackStatUrl, [{
+				Module.Api.sendStatistic([{
 					action: 'use',
 					category: 'sticker',
 					label: '[[' + stickerAttribute + ']]',
@@ -4668,7 +4669,7 @@ if ("document" in self) {
 				var nowDate = new Date().getTime() / 1000| 0,
 					emoji = this.emojiService.parseEmojiFromHtml(el.innerHTML);
 
-				Module.Http.post(Module.Configs.trackStatUrl, [{
+				Module.Api.sendStatistic([{
 					action: 'use',
 					category: 'emoji',
 					label: emoji,
