@@ -13,6 +13,7 @@
 		stickerItemClass: 'sp-sticker-item',
 		emojiItemClass: 'sp-emoji',
 
+		// todo: remove
 		emojiTabContent: '<span class="sp-icon-face"></span>',
 		historyTabContent: '<span class="sp-icon-clock"></span>',
 		storeTabContent: '<span class="sp-icon-plus"></span>',
