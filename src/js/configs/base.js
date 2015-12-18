@@ -13,14 +13,6 @@
 		stickerItemClass: 'sp-sticker-item',
 		emojiItemClass: 'sp-emoji',
 
-		// todo: remove
-		emojiTabContent: '<span class="sp-icon-face"></span>',
-		historyTabContent: '<span class="sp-icon-clock"></span>',
-		storeTabContent: '<span class="sp-icon-plus"></span>',
-		settingsTabContent: '<span class="sp-icon-settings"></span>',
-		prevPacksTabContent: '<span class="sp-icon-arrow-back"></span>',
-		nextPacksTabContent: '<span class="sp-icon-arrow-forward"></span>',
-
 		baseFolder: 'stk',
 
 		htmlForEmptyRecent: '<div class="emptyRecent">Ваши Стикеры</div>',

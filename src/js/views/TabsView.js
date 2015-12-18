@@ -30,42 +30,42 @@
 				emoji: {
 					id: 'spTabEmoji',
 					class: 'sp-tab-emoji',
-					content: Module.Configs.emojiTabContent,
+					icon: 'sp-icon-face',
 					el: null,
 					isTab: true
 				},
 				history: {
 					id: 'spTabHistory',
 					class: 'sp-tab-history',
-					content: Module.Configs.historyTabContent,
+					icon: 'sp-icon-clock',
 					el: null,
 					isTab: true
 				},
 				settings: {
 					id: 'spTabSettings',
 					class: 'sp-tab-settings',
-					content: Module.Configs.settingsTabContent,
+					icon: 'sp-icon-settings',
 					el: null,
 					isTab: false
 				},
 				store: {
 					id: 'spTabStore',
 					class: 'sp-tab-store',
-					content: Module.Configs.storeTabContent,
+					icon: 'sp-icon-plus',
 					el: null,
 					isTab: false
 				},
 				prevPacks: {
 					id: 'spTabPrevPacks',
 					class: 'sp-tab-prev-packs',
-					content: Module.Configs.prevPacksTabContent,
+					icon: 'sp-icon-arrow-back',
 					el: null,
 					isTab: false
 				},
 				nextPacks: {
 					id: 'spTabNextPacks',
 					class: 'sp-tab-next-packs',
-					content: Module.Configs.nextPacksTabContent,
+					icon: 'sp-icon-arrow-forward',
 					el: null,
 					isTab: false
 				}
@@ -109,7 +109,9 @@
 			var classes = [controlButton.class];
 			classes.push((controlButton.isTab) ? this.classes.controlTab : this.classes.controlButton);
 
-			controlButton.el = this.renderTab(controlButton.id, classes, controlButton.content);
+			var content = '<span class="' + controlButton.icon + '"></span>';
+
+			controlButton.el = this.renderTab(controlButton.id, classes, content);
 			return controlButton.el;
 		},
 		renderPackTab: function(pack) {
