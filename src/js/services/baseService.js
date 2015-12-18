@@ -222,16 +222,16 @@
 			);
 		},
 
-		checkUserInfo: function() {
-			var conf = Module.Configs,
-				userInfo = Module.Storage.getUserInfo() || {};
+		trackUserData: function() {
+			if (!Module.Configs.userId || !Module.Configs.userData) {
+				return;
+			}
 
-			if (conf.userId) {
-				if (userInfo.age != conf.userAge ||
-					userInfo.gender != conf.userGender) {
+			var storedUserData = Module.Storage.getUserData() || {};
 
-					Module.Storage.setUserInfo(conf.userId, conf.userAge, conf.userGender);
-				}
+			if (!Module.StickerHelper.deepCompare(Module.Configs.userData, storedUserData)) {
+				Module.Api.updateUserData(Module.Configs.userData);
+				Module.Storage.setUserData(Module.Configs.userData);
 			}
 		},
 

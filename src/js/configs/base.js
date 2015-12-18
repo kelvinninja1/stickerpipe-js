@@ -29,8 +29,7 @@
 		enableStoreTab: false,
 
 		userId: null,
-		userGender: null,
-		userAge: null,
+		userData: {},
 
 		// todo: block or popover
 		display: 'block',

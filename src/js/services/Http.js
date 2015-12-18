@@ -3,6 +3,8 @@
 
 	Module.Http = {
 
+		// todo: refactor post(options) & get(options)
+
 		get: function(url, callbacks, headers) {
 			callbacks = callbacks || {};
 			headers = headers || {};
@@ -51,7 +53,11 @@
 			options.headers.Platform = 'JS';
 			options.headers.Localization = Module.Configs.lang;
 
-			if (options.type == 'POST') {
+			if (Module.Configs.userId !== null) {
+				options.headers.UserId = Module.StickerHelper.md5(Module.Configs.userId + Module.Configs.apiKey);
+			}
+
+			if (options.type == 'POST' || options.type == 'PUT') {
 				options.headers['Content-Type'] = options.headers['Content-Type'] || 'application/x-www-form-urlencoded';
 				options.headers['DeviceId'] = Module.Storage.getUniqUserId();
 			}

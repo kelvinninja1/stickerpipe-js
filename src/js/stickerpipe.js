@@ -22,7 +22,7 @@ window.StickersModule = {};
 			Module.StickerHelper.setConfig(config);
 			Module.Storage.setPrefix(Module.Configs.storagePrefix);
 
-			Module.BaseService.checkUserInfo();
+			Module.BaseService.trackUserData();
 
 			// todo: remove
 			//Plugin.JsApiInterface && Plugin.JsApiInterface._setConfigs(Module.Configs);

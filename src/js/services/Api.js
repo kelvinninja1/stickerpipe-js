@@ -34,30 +34,34 @@
 		},
 
 		getPacks: function(successCallback) {
-			var options = {
-				url: getApiUrl('client-packs'),
-				header: []
-			};
+			var url = getApiUrl('client-packs');
 
 			if (Module.Configs.userId !== null) {
-				options.url = getApiUrl('user/packs');
-				options.header['UserId'] = Module.StickerHelper.md5(Module.Configs.userId + Module.Configs.apiKey);
+				url = getApiUrl('user/packs');
 			}
 
-			Module.Http.get(options.url, {
+			Module.Http.get(url, {
 				success: successCallback
-			}, options.header);
+			});
 		},
 
 		sendStatistic: function(statistic) {
 			Module.Http.post(getApiUrl('track-statistic'), statistic);
 		},
 
+		updateUserData: function(userData) {
+			return Module.Http.ajax({
+				type: 'PUT',
+				url: getApiUrl('user'),
+				data: userData,
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			});
+		},
+
 		changeUserPackStatus: function(packName, status, callback) {
-			var url = getApiUrl('user/pack/' + packName),
-				headers = {
-					UserId: Module.StickerHelper.md5(Module.Configs.userId + Module.Configs.apiKey)
-				};
+			var url = getApiUrl('user/pack/' + packName);
 
 			// todo: rewrite callback
 
@@ -65,7 +69,7 @@
 				status: status
 			}, {
 				success: callback
-			}, headers);
+			});
 		},
 
 		store: {

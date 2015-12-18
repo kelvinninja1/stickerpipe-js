@@ -73,16 +73,12 @@
 			return uniqUserId;
 		},
 
-		getUserInfo: function() {
-			return this.lockr.get('userInfo');
+		getUserData: function() {
+			return this.lockr.get('userData');
 		},
 
-		setUserInfo: function(uid, age, gender) {
-			return this.lockr.set('userInfo', {
-				uid: uid,
-				age: age,
-				gender: gender
-			});
+		setUserData: function(userData) {
+			return this.lockr.set('userData', userData);
 		}
 	};
 
