@@ -2742,6 +2742,9 @@ if ("document" in self) {
 		userId: null,
 		userData: {},
 
+		priceB: null,
+		priceC: null,
+
 		// todo: block or popover
 		display: 'block',
 		width: '320px',
