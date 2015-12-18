@@ -111,7 +111,6 @@
 				}
 
 				// Quick checking of one object beeing a subset of another.
-				// todo: cache the structure of arguments[0] for performance
 				for (p in y) {
 					if (y.hasOwnProperty(p) !== x.hasOwnProperty(p)) {
 						return false;
@@ -162,7 +161,7 @@
 
 			for (i = 1, l = arguments.length; i < l; i++) {
 
-				leftChain = []; //Todo: this can be cached
+				leftChain = [];
 				rightChain = [];
 
 				if (!compare2Objects(arguments[0], arguments[i])) {
