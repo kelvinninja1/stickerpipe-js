@@ -1901,7 +1901,7 @@ if ("document" in self) {
 
 	function buildStoreUrl(uri) {
 		var params = {
-			apiKey: Module.Configs.apikey,
+			apiKey: Module.Configs.apiKey,
 			platform: 'JS',
 			userId: Module.Configs.userId,
 			density: Module.Configs.stickerResolutionType
@@ -1912,7 +1912,7 @@ if ("document" in self) {
 	}
 
 	function getCdnUrl() {
-		return Module.Configs.cdnUrl + '/' + Module.Configs.baseFolder + '/';
+		return Module.Configs.cdnUrl + '/stk/';
 	}
 
 	function getApiUrl(uri) {
@@ -1939,7 +1939,7 @@ if ("document" in self) {
 
 			if (Module.Configs.userId !== null) {
 				options.url = getApiUrl('user/packs');
-				options.header['UserId'] = Module.StickerHelper.md5(Module.Configs.userId + Module.Configs.apikey);
+				options.header['UserId'] = Module.StickerHelper.md5(Module.Configs.userId + Module.Configs.apiKey);
 			}
 
 			Module.Http.get(options.url, {
@@ -1954,7 +1954,7 @@ if ("document" in self) {
 		changeUserPackStatus: function(packName, status, callback) {
 			var url = getApiUrl('user/pack/' + packName),
 				headers = {
-					UserId: Module.StickerHelper.md5(Module.Configs.userId + Module.Configs.apikey)
+					UserId: Module.StickerHelper.md5(Module.Configs.userId + Module.Configs.apiKey)
 				};
 
 			// todo: rewrite callback
@@ -2407,7 +2407,7 @@ if ("document" in self) {
 			options.error = options.error || function() {};
 			options.complete = options.complete || function() {};
 
-			options.headers.Apikey = Module.Configs.apikey;
+			options.headers.Apikey = Module.Configs.apiKey;
 			options.headers.Platform = 'JS';
 			options.headers.Localization = Module.Configs.lang;
 
@@ -2603,12 +2603,9 @@ if ("document" in self) {
 		stickerItemClass: 'sp-sticker-item',
 		emojiItemClass: 'sp-emoji',
 
-		baseFolder: 'stk',
-
 		htmlForEmptyRecent: '<div class="emptyRecent">Ваши Стикеры</div>',
 
-		// todo: rename apikey --> apiKey
-		apikey: '', // 72921666b5ff8651f374747bfefaf7b2
+		apiKey: '', // 72921666b5ff8651f374747bfefaf7b2
 
 		cdnUrl: 'http://cdn.stickerpipe.com',
 		apiUrl: 'http://api.stickerpipe.com',

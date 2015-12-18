@@ -13,12 +13,9 @@
 		stickerItemClass: 'sp-sticker-item',
 		emojiItemClass: 'sp-emoji',
 
-		baseFolder: 'stk',
-
 		htmlForEmptyRecent: '<div class="emptyRecent">Ваши Стикеры</div>',
 
-		// todo: rename apikey --> apiKey
-		apikey: '', // 72921666b5ff8651f374747bfefaf7b2
+		apiKey: '', // 72921666b5ff8651f374747bfefaf7b2
 
 		cdnUrl: 'http://cdn.stickerpipe.com',
 		apiUrl: 'http://api.stickerpipe.com',

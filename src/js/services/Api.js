@@ -3,7 +3,7 @@
 
 	function buildStoreUrl(uri) {
 		var params = {
-			apiKey: Module.Configs.apikey,
+			apiKey: Module.Configs.apiKey,
 			platform: 'JS',
 			userId: Module.Configs.userId,
 			density: Module.Configs.stickerResolutionType
@@ -14,7 +14,7 @@
 	}
 
 	function getCdnUrl() {
-		return Module.Configs.cdnUrl + '/' + Module.Configs.baseFolder + '/';
+		return Module.Configs.cdnUrl + '/stk/';
 	}
 
 	function getApiUrl(uri) {
@@ -41,7 +41,7 @@
 
 			if (Module.Configs.userId !== null) {
 				options.url = getApiUrl('user/packs');
-				options.header['UserId'] = Module.StickerHelper.md5(Module.Configs.userId + Module.Configs.apikey);
+				options.header['UserId'] = Module.StickerHelper.md5(Module.Configs.userId + Module.Configs.apiKey);
 			}
 
 			Module.Http.get(options.url, {
@@ -56,7 +56,7 @@
 		changeUserPackStatus: function(packName, status, callback) {
 			var url = getApiUrl('user/pack/' + packName),
 				headers = {
-					UserId: Module.StickerHelper.md5(Module.Configs.userId + Module.Configs.apikey)
+					UserId: Module.StickerHelper.md5(Module.Configs.userId + Module.Configs.apiKey)
 				};
 
 			// todo: rewrite callback

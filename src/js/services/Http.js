@@ -47,7 +47,7 @@
 			options.error = options.error || function() {};
 			options.complete = options.complete || function() {};
 
-			options.headers.Apikey = Module.Configs.apikey;
+			options.headers.Apikey = Module.Configs.apiKey;
 			options.headers.Platform = 'JS';
 			options.headers.Localization = Module.Configs.lang;
 
