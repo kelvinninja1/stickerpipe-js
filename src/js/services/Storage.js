@@ -71,6 +71,18 @@
 			}
 
 			return uniqUserId;
+		},
+
+		getUserInfo: function() {
+			return this.lockr.get('userInfo');
+		},
+
+		setUserInfo: function(uid, age, gender) {
+			return this.lockr.set('userInfo', {
+				uid: uid,
+				age: age,
+				gender: gender
+			});
 		}
 	};
 

@@ -20,8 +20,6 @@
 		prevPacksTabContent: '<span class="sp-icon-arrow-back"></span>',
 		nextPacksTabContent: '<span class="sp-icon-arrow-forward"></span>',
 
-		// todo only one API url
-		domain: 'http://api.stickerpipe.com',
 		baseFolder: 'stk',
 
 		htmlForEmptyRecent: '<div class="emptyRecent">Ваши Стикеры</div>',
@@ -29,6 +27,8 @@
 		// todo: rename apikey --> apiKey
 		apikey: '', // 72921666b5ff8651f374747bfefaf7b2
 
+		// todo only one API url
+		cdnUrl: 'http://cdn.stickerpipe.com',
 		// todo: remove api url options
 		clientPacksUrl: 'http://api.stickerpipe.com/api/v1/client-packs',
 		userPacksUrl: 'http://api.stickerpipe.com/api/v1/user/packs',
@@ -44,6 +44,8 @@
 		enableStoreTab: false,
 
 		userId: null,
+		userGender: null,
+		userAge: null,
 
 		// todo: block or popover
 		display: 'block',

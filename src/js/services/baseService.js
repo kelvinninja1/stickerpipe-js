@@ -162,13 +162,7 @@
 
 			if (matchData) {
 				outData.isSticker = true;
-				outData.url = Module.Configs.domain +
-					'/' +
-					Module.Configs.baseFolder +
-					'/' + matchData[1] +
-					'/' + matchData[2] +
-					'_' + Module.Configs.stickerResolutionType +
-					'.png';
+				outData.url = Module.Api.getStickerUrl(matchData[1], matchData[2]);
 
 
 				outData.pack = matchData[1];
@@ -243,6 +237,19 @@
 					successCallback && successCallback(stickerPacks);
 				}).bind(this)
 			);
+		},
+
+		checkUserInfo: function() {
+			var conf = Module.Configs,
+				userInfo = Module.Storage.getUserInfo() || {};
+
+			if (conf.userId) {
+				if (userInfo.age != conf.userAge ||
+					userInfo.gender != conf.userGender) {
+
+					Module.Storage.setUserInfo(conf.userId, conf.userAge, conf.userGender);
+				}
+			}
 		},
 
 		changeUserPackStatus: function(packName, status, callback) {

@@ -1910,7 +1910,22 @@ if ("document" in self) {
 		return Module.Configs.storeUrl + ((Module.Configs.storeUrl.indexOf('?') == -1) ? '?' : '&')
 			+ Module.StickerHelper.urlParamsSerialize(params) + '#/' + uri;
 	}
+
+	function getCdnUrl() {
+		return Module.Configs.cdnUrl + '/' + Module.Configs.baseFolder + '/';
+	}
+
 	Module.Api = {
+
+		getStickerUrl: function(packName, stickerName) {
+			return getCdnUrl() + packName + '/' + stickerName +
+				'_' + Module.Configs.stickerResolutionType + '.png';
+		},
+
+		getPackTabIconUrl: function(packName) {
+			return getCdnUrl() + packName + '/' +
+				'tab_icon_' + Module.Configs.tabResolutionType + '.png';
+		},
 
 		store: {
 			getStoreUrl: function() {
@@ -2092,13 +2107,7 @@ if ("document" in self) {
 
 			if (matchData) {
 				outData.isSticker = true;
-				outData.url = Module.Configs.domain +
-					'/' +
-					Module.Configs.baseFolder +
-					'/' + matchData[1] +
-					'/' + matchData[2] +
-					'_' + Module.Configs.stickerResolutionType +
-					'.png';
+				outData.url = Module.Api.getStickerUrl(matchData[1], matchData[2]);
 
 
 				outData.pack = matchData[1];
@@ -2173,6 +2182,19 @@ if ("document" in self) {
 					successCallback && successCallback(stickerPacks);
 				}).bind(this)
 			);
+		},
+
+		checkUserInfo: function() {
+			var conf = Module.Configs,
+				userInfo = Module.Storage.getUserInfo() || {};
+
+			if (conf.userId) {
+				if (userInfo.age != conf.userAge ||
+					userInfo.gender != conf.userGender) {
+
+					Module.Storage.setUserInfo(conf.userId, conf.userAge, conf.userGender);
+				}
+			}
 		},
 
 		changeUserPackStatus: function(packName, status, callback) {
@@ -2544,6 +2566,18 @@ if ("document" in self) {
 			}
 
 			return uniqUserId;
+		},
+
+		getUserInfo: function() {
+			return this.lockr.get('userInfo');
+		},
+
+		setUserInfo: function(uid, age, gender) {
+			return this.lockr.set('userInfo', {
+				uid: uid,
+				age: age,
+				gender: gender
+			});
 		}
 	};
 
@@ -2570,8 +2604,6 @@ if ("document" in self) {
 		prevPacksTabContent: '<span class="sp-icon-arrow-back"></span>',
 		nextPacksTabContent: '<span class="sp-icon-arrow-forward"></span>',
 
-		// todo only one API url
-		domain: 'http://api.stickerpipe.com',
 		baseFolder: 'stk',
 
 		htmlForEmptyRecent: '<div class="emptyRecent">Ваши Стикеры</div>',
@@ -2579,6 +2611,8 @@ if ("document" in self) {
 		// todo: rename apikey --> apiKey
 		apikey: '', // 72921666b5ff8651f374747bfefaf7b2
 
+		// todo only one API url
+		cdnUrl: 'http://cdn.stickerpipe.com',
 		// todo: remove api url options
 		clientPacksUrl: 'http://api.stickerpipe.com/api/v1/client-packs',
 		userPacksUrl: 'http://api.stickerpipe.com/api/v1/user/packs',
@@ -2594,6 +2628,8 @@ if ("document" in self) {
 		enableStoreTab: false,
 
 		userId: null,
+		userGender: null,
+		userAge: null,
 
 		// todo: block or popover
 		display: 'block',
@@ -4321,10 +4357,7 @@ if ("document" in self) {
 				classes.push(this.classes.newPack);
 			}
 
-			var iconSrc = Module.Configs.domain + '/' +
-				Module.Configs.baseFolder + '/' +
-				pack.pack_name + '/tab_icon_' +
-				Module.Configs.tabResolutionType + '.png';
+			var iconSrc = Module.Api.getPackTabIconUrl(pack.pack_name);
 
 			var content = '<img src=' + iconSrc + '>';
 
@@ -4499,8 +4532,6 @@ if ("document" in self) {
 
 (function(Plugin, Module) {
 
-	var helper = Module.StickerHelper;
-
 	// todo: rename Stickers --> StickerPipe
 	Plugin.Stickers = Module.Class({
 
@@ -4513,6 +4544,8 @@ if ("document" in self) {
 
 			Module.StickerHelper.setConfig(config);
 			Module.Storage.setPrefix(Module.Configs.storagePrefix);
+
+			Module.BaseService.checkUserInfo();
 
 			// todo: remove
 			//Plugin.JsApiInterface && Plugin.JsApiInterface._setConfigs(Module.Configs);

@@ -119,10 +119,7 @@
 				classes.push(this.classes.newPack);
 			}
 
-			var iconSrc = Module.Configs.domain + '/' +
-				Module.Configs.baseFolder + '/' +
-				pack.pack_name + '/tab_icon_' +
-				Module.Configs.tabResolutionType + '.png';
+			var iconSrc = Module.Api.getPackTabIconUrl(pack.pack_name);
 
 			var content = '<img src=' + iconSrc + '>';
 

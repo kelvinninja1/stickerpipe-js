@@ -9,8 +9,6 @@ window.StickersModule = {};
 
 (function(Plugin, Module) {
 
-	var helper = Module.StickerHelper;
-
 	// todo: rename Stickers --> StickerPipe
 	Plugin.Stickers = Module.Class({
 
@@ -23,6 +21,8 @@ window.StickersModule = {};
 
 			Module.StickerHelper.setConfig(config);
 			Module.Storage.setPrefix(Module.Configs.storagePrefix);
+
+			Module.BaseService.checkUserInfo();
 
 			// todo: remove
 			//Plugin.JsApiInterface && Plugin.JsApiInterface._setConfigs(Module.Configs);
