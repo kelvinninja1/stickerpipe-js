@@ -58,6 +58,7 @@
 			(navigator.userAgent.match(/Trident\/\d+\.\d+/)));
 		},
 
+		// todo: maybe remove
 		deepCompare: function() {
 			var i, l, leftChain, rightChain;
 
