@@ -30,7 +30,7 @@
 			this.popoverEl.appendChild(this.el);
 			this.popoverEl.appendChild(this.triangleEl);
 
-			this.handleClickSticker((function() {
+			this.handleClickOnSticker((function() {
 				this.toggle();
 			}).bind(this));
 

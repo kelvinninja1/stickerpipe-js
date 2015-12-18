@@ -109,7 +109,7 @@ window.StickersModule = {};
 				pack && this.view.renderPack(pack);
 			}).bind(this));
 
-			this.view.handleClickSticker((function(el) {
+			this.view.handleClickOnSticker((function(el) {
 
 				var stickerAttribute = el.getAttribute('data-sticker-string'),
 					nowDate = new Date().getTime() / 1000|0;
@@ -141,7 +141,7 @@ window.StickersModule = {};
 				}
 			}).bind(this));
 
-			this.view.handleClickEmoji((function(el) {
+			this.view.handleClickOnEmoji((function(el) {
 				var nowDate = new Date().getTime() / 1000| 0,
 					emoji = this.emojiService.parseEmojiFromHtml(el.innerHTML);
 
@@ -170,7 +170,7 @@ window.StickersModule = {};
 
 		// todo: rename
 		onClickSticker: function(callback, context) {
-			this.view.handleClickSticker(function(el) {
+			this.view.handleClickOnSticker(function(el) {
 				callback.call(context, '[[' + el.getAttribute('data-sticker-string') + ']]');
 			});
 		},
@@ -185,7 +185,7 @@ window.StickersModule = {};
 		},
 
 		onClickEmoji: function(callback, context) {
-			this.view.handleClickEmoji((function(el) {
+			this.view.handleClickOnEmoji((function(el) {
 				var emoji = this.emojiService.parseEmojiFromHtml(el.innerHTML);
 
 				callback.call(context, emoji);

@@ -3751,14 +3751,12 @@ if ("document" in self) {
 		},
 
 
-		// todo: rename handleClickSticker --> handleClickOnSticker
-		handleClickSticker: function(callback) {
+		handleClickOnSticker: function(callback) {
 			// todo: create static Module.Configs.stickerItemClass
 			Module.StickerHelper.setEvent('click', this.contentEl, Module.Configs.stickerItemClass, callback);
 		},
 
-		// todo: rename handleClickEmoji --> handleClickOnEmoji
-		handleClickEmoji: function(callback) {
+		handleClickOnEmoji: function(callback) {
 			// todo: create static Module.Configs.emojiItemClass
 			Module.StickerHelper.setEvent('click', this.contentEl, Module.Configs.emojiItemClass, callback);
 		},
@@ -4146,7 +4144,7 @@ if ("document" in self) {
 			this.popoverEl.appendChild(this.el);
 			this.popoverEl.appendChild(this.triangleEl);
 
-			this.handleClickSticker((function() {
+			this.handleClickOnSticker((function() {
 				this.toggle();
 			}).bind(this));
 
@@ -4748,7 +4746,7 @@ if ("document" in self) {
 				pack && this.view.renderPack(pack);
 			}).bind(this));
 
-			this.view.handleClickSticker((function(el) {
+			this.view.handleClickOnSticker((function(el) {
 
 				var stickerAttribute = el.getAttribute('data-sticker-string'),
 					nowDate = new Date().getTime() / 1000|0;
@@ -4780,7 +4778,7 @@ if ("document" in self) {
 				}
 			}).bind(this));
 
-			this.view.handleClickEmoji((function(el) {
+			this.view.handleClickOnEmoji((function(el) {
 				var nowDate = new Date().getTime() / 1000| 0,
 					emoji = this.emojiService.parseEmojiFromHtml(el.innerHTML);
 
@@ -4809,7 +4807,7 @@ if ("document" in self) {
 
 		// todo: rename
 		onClickSticker: function(callback, context) {
-			this.view.handleClickSticker(function(el) {
+			this.view.handleClickOnSticker(function(el) {
 				callback.call(context, '[[' + el.getAttribute('data-sticker-string') + ']]');
 			});
 		},
@@ -4824,7 +4822,7 @@ if ("document" in self) {
 		},
 
 		onClickEmoji: function(callback, context) {
-			this.view.handleClickEmoji((function(el) {
+			this.view.handleClickOnEmoji((function(el) {
 				var emoji = this.emojiService.parseEmojiFromHtml(el.innerHTML);
 
 				callback.call(context, emoji);

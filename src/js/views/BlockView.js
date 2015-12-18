@@ -136,14 +136,12 @@
 		},
 
 
-		// todo: rename handleClickSticker --> handleClickOnSticker
-		handleClickSticker: function(callback) {
+		handleClickOnSticker: function(callback) {
 			// todo: create static Module.Configs.stickerItemClass
 			Module.StickerHelper.setEvent('click', this.contentEl, Module.Configs.stickerItemClass, callback);
 		},
 
-		// todo: rename handleClickEmoji --> handleClickOnEmoji
-		handleClickEmoji: function(callback) {
+		handleClickOnEmoji: function(callback) {
 			// todo: create static Module.Configs.emojiItemClass
 			Module.StickerHelper.setEvent('click', this.contentEl, Module.Configs.emojiItemClass, callback);
 		},
