@@ -89,7 +89,7 @@ var App = _makeClass(function(options) {
 			storeUrl: 'http://work.stk.908.vc/api/v1/web?uri=' + encodeURIComponent('http://demo.stickerpipe.com/work/demo/libs/store/js/stickerPipeStore.js'),
 			//storeUrl: 'http://localhost/stickerpipe/store/build',
 
-			userId: '123412341234122412',
+			userId: '123412351234122412',
 			userPremium: 0,
 			userData: {
 				age: 18,
