@@ -3,31 +3,9 @@
 
 (function(Module) {
 
-    var StickerHelper = Module.StickerHelper,
-		JsApiInterface = Module.StoreApiInterface;
+    var StickerHelper = Module.StickerHelper;
 
 	Module.BaseService = {
-
-		// todo: remove function
-		addToLatestUse: function(code) {
-			Module.Storage.addUsedSticker(code);
-		},
-
-		// todo: remove function
-		getNewStickersFlag: function() {
-			return Module.Storage.hasNewStickers();
-		},
-
-		// todo: remove function
-		resetNewStickersFlag: function() {
-			Module.DOMEventService.changeContentHighlight(false);
-			return Module.Storage.setHasNewStickers(false);
-		},
-
-		// todo: remove function
-		getLatestUse: function() {
-			return Module.Storage.getUsedStickers();
-		},
 
 		getPacksFromStorage: function() {
 			var expireDate = (+new Date()),
@@ -54,7 +32,7 @@
 		markNewPacks: function(oldPacks, newPacks) {
 			var globalNew = false;
 
-			if(oldPacks.length != 0){
+			if (oldPacks.length != 0){
 
 				StickerHelper.forEach(newPacks, function(newPack, key) {
 					var isNewPack = true;
@@ -77,10 +55,9 @@
 				// todo: check & fix
 				//if (globalNew) {
 
-				if (globalNew == false && this.getLatestUse().length == 0) {
+				if (globalNew == false && Module.Storage.getUsedStickers().length == 0) {
 					globalNew = true;
 				}
-				Module.Storage.setHasNewStickers(globalNew);
 				Module.DOMEventService.changeContentHighlight(globalNew);
 				//}
 
@@ -89,7 +66,7 @@
 				// todo: do in other function
 				// update used stickers
 
-				var used = this.getLatestUse();
+				var used = Module.Storage.getUsedStickers();
 
 				for (var i = 0; i < used.length; i++) {
 					var sticker = this.parseStickerFromText('[[' + used[i].code + ']]');
@@ -131,11 +108,6 @@
 			return newPacks;
 		},
 
-		// todo: remove function
-		setPacksToStorage: function(packs) {
-			return Module.Storage.setPacks(packs);
-		},
-
 		parseStickerFromText: function(text) {
 			var outData = {
 					isSticker: false,
@@ -153,23 +125,6 @@
 			}
 
 			return outData;
-		},
-
-		isNewPack: function(packs, packName)  {
-			var isNew = false;
-
-			StickerHelper.forEach(packs, function(pack) {
-
-				if(pack.pack_name &&
-					pack.pack_name.toLowerCase() == packName.toLowerCase()) {
-
-					isNew = !!pack.newPack;
-				}
-
-			});
-
-			return isNew;
-
 		},
 
 		onUserMessageSent: function(isSticker) {
@@ -215,7 +170,7 @@
 					var stickerPacks = response.data;
 
 					stickerPacks = this.markNewPacks(storageStickerData.packs, stickerPacks);
-					this.setPacksToStorage(stickerPacks);
+					Module.Storage.setPacks(stickerPacks);
 
 					successCallback && successCallback(stickerPacks);
 				}).bind(this)
@@ -236,6 +191,7 @@
 		},
 
 		purchaseSuccess: function(packName) {
+			// todo !!!
 			try {
 				var handler = function() {
 					if (!JsApiInterface) {

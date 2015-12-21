@@ -2,9 +2,17 @@
 // todo: move StickersModule --> Stickers
 window.StickersModule = {};
 
+
+window.StickersModule.Utils = {};
 //=include utils/**/*.js
+
+window.StickersModule.Service = {};
 //=include services/**/*.js
+
+window.StickersModule.Configs = {};
 //=include configs/**/*.js
+
+window.StickersModule.View = {};
 //=include views/**/*.js
 
 (function(Plugin, Module) {
@@ -13,6 +21,7 @@ window.StickersModule = {};
 	Plugin.Stickers = Module.Class({
 
 		emojiService: null,
+		storeService: null,
 		stickersModel: {},
 		view: null,
 		storeView: null,
@@ -24,17 +33,20 @@ window.StickersModule = {};
 
 			Module.BaseService.trackUserData();
 
-			// todo: remove
-			//Plugin.JsApiInterface && Plugin.JsApiInterface._setConfigs(Module.Configs);
+			this.storeService = new Module.Service.Store(this);
 
 			this.emojiService = new Module.EmojiService(Module.Twemoji);
 		},
+
+		////////////////////
+		//   Functions
+		////////////////////
 
 		render: function(onload, elId) {
 			Module.Configs.elId = elId || Module.Configs.elId;
 
 			this.view = new Module.PopoverView(this.emojiService);
-			this.storeView = new Module.StoreView();
+			this.storeView = new Module.StoreView(this.storeService);
 
 			this.delegateEvents();
 
@@ -47,7 +59,7 @@ window.StickersModule = {};
 				this.view.render(this.stickersModel);
 
 				// todo --> active 'used' tab
-				this.view.renderUsedStickers(Module.BaseService.getLatestUse());
+				this.view.renderUsedStickers();
 
 				callback && callback();
 			}).bind(this);
@@ -71,7 +83,7 @@ window.StickersModule = {};
 			}).bind(this));
 
 			this.view.tabsView.handleClickOnLastUsedPacksTab((function() {
-				this.view.renderUsedStickers(Module.BaseService.getLatestUse());
+				this.view.renderUsedStickers();
 			}).bind(this));
 
 			this.view.tabsView.handleClickOnStoreTab((function() {
@@ -92,7 +104,7 @@ window.StickersModule = {};
 						// set newPack - false
 						changed = true;
 						this.stickersModel[i].newPack = false;
-						Module.BaseService.setPacksToStorage(this.stickersModel);
+						Module.Storage.setPacks(this.stickersModel);
 
 						pack = this.stickersModel[i];
 					}
@@ -102,8 +114,8 @@ window.StickersModule = {};
 					}
 				}
 
-				if (changed == true && Module.BaseService.getLatestUse().length != 0 && hasNewContent == false) {
-					this.resetNewStickersFlag();
+				if (changed == true && Module.Storage.getUsedStickers().length != 0 && hasNewContent == false) {
+					Module.DOMEventService.changeContentHighlight(false);
 				}
 
 				pack && this.view.renderPack(pack);
@@ -123,7 +135,7 @@ window.StickersModule = {};
 
 				ga('stickerTracker.send', 'event', 'sticker', stickerAttribute.split('_')[0], stickerAttribute.split('_')[1], 1);
 
-				Module.BaseService.addToLatestUse(stickerAttribute);
+				Module.Storage.addUsedSticker(stickerAttribute);
 
 				// todo: rewrite
 				// new content mark
@@ -136,8 +148,8 @@ window.StickersModule = {};
 					}
 				}
 
-				if (Module.BaseService.getLatestUse().length != 0 && hasNewContent == false) {
-					this.resetNewStickersFlag();
+				if (Module.Storage.getUsedStickers().length != 0 && hasNewContent == false) {
+					Module.DOMEventService.changeContentHighlight(false);
 				}
 			}).bind(this));
 
@@ -168,38 +180,6 @@ window.StickersModule = {};
 			}).bind(this));
 		},
 
-		// todo: rename
-		onClickSticker: function(callback, context) {
-			this.view.handleClickOnSticker(function(el) {
-				callback.call(context, '[[' + el.getAttribute('data-sticker-string') + ']]');
-			});
-		},
-
-		// todo: rename or remove
-		onClickTab: function(callback, context) {
-
-			this.view.tabsView.handleClickOnPackTab(function(el) {
-				callback.call(context, el);
-			});
-
-		},
-
-		onClickEmoji: function(callback, context) {
-			this.view.handleClickOnEmoji((function(el) {
-				var emoji = this.emojiService.parseEmojiFromHtml(el.innerHTML);
-
-				callback.call(context, emoji);
-			}).bind(this));
-		},
-
-		getNewStickersFlag: function() {
-			return Module.BaseService.getNewStickersFlag(Module.BaseService.getPacksFromStorage().packs || []);
-		},
-
-		resetNewStickersFlag: function() {
-			return Module.BaseService.resetNewStickersFlag();
-		},
-
 		parseStickerFromText: function(text) {
 			return Module.BaseService.parseStickerFromText(text);
 		},
@@ -212,50 +192,43 @@ window.StickersModule = {};
 			return this.emojiService.parseEmojiFromHtml(html);
 		},
 
-		// todo rewrite
-		renderCurrentTab: function(tabName) {
-			//var obj = Module.BaseService.getPacksFromStorage();
-
-			//this.start(); // todo
-
-			//helper.forEach(obj.packs, (function(pack, key) {
-			//
-			//	if(pack.pack_name.toLowerCase() == tabName.toLowerCase()) {
-			//		this.tabActive = +key;
-			//	}
-			//
-			//}).bind(this));
-
-			//this.stickersModel[this.tabActive].newPack = false;
-			//Module.BaseService.setPacksToStorage(this.stickersModel);
-
-			//this._renderAll();
-
-			this.view.tabsView.activeTab(tabName);
-		},
-
-		isNewPack: function(packName) {
-			return Module.BaseService.isNewPack(this.stickersModel, packName);
-		},
-
 		onUserMessageSent: function(isSticker) {
 			return Module.BaseService.onUserMessageSent(isSticker);
-		},
-
-		renderPack: function(pack) {
-			this.storeView.render(pack);
 		},
 
 		purchaseSuccess: function(packName) {
 			Module.BaseService.purchaseSuccess(packName);
 		},
 
-		open: function() {
+		open: function(tabName) {
 			this.view.open();
+
+			tabName = tabName || null;
+			if (tabName) {
+				this.view.tabsView.activeTab(tabName);
+			}
 		},
 
 		close: function() {
 			this.view.close();
+		},
+
+		////////////////////
+		//  Callbacks
+		////////////////////
+
+		onClickSticker: function(callback, context) {
+			this.view.handleClickOnSticker(function(el) {
+				callback.call(context, '[[' + el.getAttribute('data-sticker-string') + ']]');
+			});
+		},
+
+		onClickEmoji: function(callback, context) {
+			this.view.handleClickOnEmoji((function(el) {
+				var emoji = this.emojiService.parseEmojiFromHtml(el.innerHTML);
+
+				callback.call(context, emoji);
+			}).bind(this));
 		}
 	});
 

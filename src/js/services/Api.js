@@ -6,7 +6,10 @@
 			apiKey: Module.Configs.apiKey,
 			platform: 'JS',
 			userId: Module.Configs.userId,
-			density: Module.Configs.stickerResolutionType
+			density: Module.Configs.stickerResolutionType,
+			priceB: Module.Configs.priceB,
+			priceC: Module.Configs.priceC,
+			userPremium: Module.Configs.userPremium
 		};
 
 		return Module.Configs.storeUrl + ((Module.Configs.storeUrl.indexOf('?') == -1) ? '?' : '&')

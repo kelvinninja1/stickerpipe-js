@@ -29,6 +29,7 @@
 		enableStoreTab: false,
 
 		userId: null,
+		userPremium: false,
 		userData: {},
 
 		priceB: null,

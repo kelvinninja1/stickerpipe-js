@@ -40,14 +40,6 @@
 			this.setUsedStickers(usedStickers);
 		},
 
-		hasNewStickers: function() {
-			return this.lockr.get('sticker_have_new');
-		},
-
-		setHasNewStickers: function(value) {
-			return this.lockr.set('sticker_have_new', value);
-		},
-
 		getPacks: function() {
 			return this.lockr.get('sticker_packs');
 		},

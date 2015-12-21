@@ -57,17 +57,19 @@
 			this.tabsView.onWindowResize();
 			this.onWindowResize();
 		},
-		renderUsedStickers: function(latesUseSticker) {
+		renderUsedStickers: function() {
+
+			var usedStickers = Module.Storage.getUsedStickers();
 
 			this.clearBlock(this.contentEl);
 
-			if (latesUseSticker.length == 0) {
+			if (usedStickers.length == 0) {
 				this.contentEl.innerHTML += Module.Configs.htmlForEmptyRecent;
 				return false;
 			}
 
 			var stickers = [];
-			StickerHelper.forEach(latesUseSticker, function(sticker) {
+			StickerHelper.forEach(usedStickers, function(sticker) {
 				stickers.push(sticker.code);
 			});
 
@@ -140,7 +142,6 @@
 			// todo: create static Module.Configs.stickerItemClass
 			Module.StickerHelper.setEvent('click', this.contentEl, Module.Configs.stickerItemClass, callback);
 		},
-
 		handleClickOnEmoji: function(callback) {
 			// todo: create static Module.Configs.emojiItemClass
 			Module.StickerHelper.setEvent('click', this.contentEl, Module.Configs.emojiItemClass, callback);

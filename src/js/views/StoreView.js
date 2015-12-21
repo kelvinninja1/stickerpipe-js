@@ -17,25 +17,28 @@
 
 	Module.StoreView = Module.Class({
 
-		el: null,
-
 		modal: null,
-		iframe: null,
 
-		_constructor: function() {
-			this.el = document.getElementById(Module.Configs.storeContainerId);
+		_constructor: function(storeService) {
 
-			this.iframe = document.createElement('iframe');
+			var self = this;
 
-			this.iframe.style.width = '100%';
-			this.iframe.style.height = '100%';
-			this.iframe.style.border = '0';
+			this.storeService = storeService;
 
-			this.modal = Module.View.Modal.init(this.iframe, {
+			var iframe = document.createElement('iframe');
+
+			iframe.style.width = '100%';
+			iframe.style.height = '100%';
+			iframe.style.border = '0';
+
+			this.modal = Module.View.Modal.init(iframe, {
 				onOpen: function() {
 					Module.DOMEventService.resize();
+					self.storeService._setWindow(iframe.contentWindow);
 				}
 			});
+
+			this.iframe = iframe;
 
 			window.addEventListener('resize', resizeModalWindow.bind(this));
 		},
@@ -48,6 +51,10 @@
 		renderPack: function(packName) {
 			this.iframe.src = Module.Api.store.getPackUrl(packName);
 			this.modal.open();
+		},
+
+		close: function() {
+			this.modal.close();
 		}
 	});
 
