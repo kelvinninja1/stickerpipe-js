@@ -196,7 +196,7 @@ window.StickersModule.View = {};
 		},
 
 		purchaseSuccess: function(packName) {
-			Module.BaseService.purchaseSuccess(packName);
+			Module.Service.Store.purchaseSuccess(packName);
 		},
 
 		open: function(tabName) {
@@ -228,6 +228,10 @@ window.StickersModule.View = {};
 
 				callback.call(context, emoji);
 			}).bind(this));
+		},
+
+		onPurchase: function(callback) {
+			Module.Service.Store.setOnPurchaseCallback(callback);
 		}
 	});
 

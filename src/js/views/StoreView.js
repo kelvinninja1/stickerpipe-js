@@ -27,7 +27,7 @@
 					return;
 				}
 
-				Module.Service.Store[data.action](data);
+				Module.Service.Store.api[data.action](data);
 
 			}).bind(this));
 

@@ -188,30 +188,6 @@
 				Module.Api.updateUserData(Module.Configs.userData);
 				Module.Storage.setUserData(Module.Configs.userData);
 			}
-		},
-
-		purchaseSuccess: function(packName) {
-			// todo !!!
-			try {
-				var handler = function() {
-					if (!JsApiInterface) {
-						throw new Error('JSApiInterface not found!');
-					}
-
-					JsApiInterface.downloadPack(packName, function() {
-						Module.Configs.callbacks.onPackStoreSuccess(packName);
-					});
-				};
-
-				if (Module.Configs.userId !== null) {
-					Module.Api.changeUserPackStatus(packName, true, handler);
-				} else {
-					handler();
-				}
-			} catch(e) {
-				console && console.error(e.message);
-				Module.Configs.callbacks.onPackStoreFail(packName);
-			}
 		}
 	};
 

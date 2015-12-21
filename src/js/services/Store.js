@@ -5,38 +5,63 @@
 
 		stickerpipe: null,
 
+		onPurchaseCallback: null,
+
 		init: function(stickerpipe) {
 			this.stickerpipe = stickerpipe;
-			return this;
 		},
 
-		showPackCollections: function(data) {
+		setOnPurchaseCallback: function(onPurchaseCallback) {
+			this.onPurchaseCallback = onPurchaseCallback;
+		},
+
+		showPackCollections: function(packName) {
 			this.stickerpipe.storeView.close();
-			this.stickerpipe.open(data.attrs.packName);
+			this.stickerpipe.open(packName);
 		},
 
-		downloadPack: function(data) {
+		downloadPack: function(packName) {
 			var self = this;
-			Module.Api.changeUserPackStatus(data.attrs.packName, true, {
+			Module.Api.changeUserPackStatus(packName, true, {
 				success: function () {
 					self.stickerpipe.fetchPacks(function() {
-						self.showPackCollections(data);
+						self.showPackCollections(packName);
 					});
 				}
 			});
 		},
 
-		purchasePackInStore: function(data) {
-			this.config.callbacks.onPurchase(packTitle, packProductId, packPrice, packName);
+		purchaseSuccess: function(packName) {
+			this.downloadPack(packName);
 		},
 
-		isPackActive: function(data) {
-			return this.isPackExistsInStorage(data);
-		},
+		api: {
+			showPackCollections: function(data) {
+				Module.Service.Store.showPackCollections(data.attrs.packName);
+			},
 
-		isPackExistsInStorage: function(data) {
-			var exist = Module.BaseService.isExistPackInStorage(data.attrs.packName);
-			this.stickerpipe.storeView._sendReturn(exist, data);
+			downloadPack: function(data) {
+				Module.Service.Store.downloadPack(data.attrs.packName);
+			},
+
+			purchasePack: function(data) {
+				var callback = Module.Service.Store.onPurchaseCallback;
+
+				callback && callback(
+					data.attrs.packName,
+					data.attrs.packTitle,
+					data.attrs.pricePoint
+				);
+			},
+
+			isPackActive: function(data) {
+				return this.isPackExistsInStorage(data);
+			},
+
+			isPackExistsInStorage: function(data) {
+				var exist = Module.BaseService.isExistPackInStorage(data.attrs.packName);
+				Module.Service.Store.stickerpipe.storeView._sendReturn(exist, data);
+			}
 		}
 	};
 
