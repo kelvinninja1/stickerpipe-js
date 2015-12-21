@@ -131,7 +131,7 @@ appStickerPipeStore.config(function(envServiceProvider) {
 	envServiceProvider.config({
 		domains: {
 			local: ['localhost', '192.168.56.1'],
-			development: ['work.stk.908.vc'],
+			development: ['work.stk.908.vc', 'demo.stickerpipe.com'],
 			production: ['stickerpipe.com']
 		},
 		vars: {
@@ -648,18 +648,6 @@ appStickerPipeStore.directive('errorPage', function(Config,  $window, $timeout, 
 	};
 });
 
-appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI) {
-
-	angular.extend($scope, {
-		platformAPI: PlatformAPI,
-		packs: packs.packs,
-
-		getPackMainIcon: function(pack) {
-			return pack.main_icon[Config.resolutionType];
-		}
-	});
-});
-
 appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, pack) {
 
 	angular.extend($scope, {
@@ -696,6 +684,18 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 		$scope.$apply();
 	});
 
+});
+
+appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI) {
+
+	angular.extend($scope, {
+		platformAPI: PlatformAPI,
+		packs: packs.packs,
+
+		getPackMainIcon: function(pack) {
+			return pack.main_icon[Config.resolutionType];
+		}
+	});
 });
 
 appStickerPipeStore.value('En', {
