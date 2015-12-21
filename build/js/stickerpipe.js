@@ -2081,16 +2081,12 @@ window.StickersModule.Service = {};
 			});
 		},
 
-		changeUserPackStatus: function(packName, status, callback) {
+		changeUserPackStatus: function(packName, status, callbacks) {
 			var url = getApiUrl('user/pack/' + packName);
-
-			// todo: rewrite callback
 
 			Module.Http.post(url, {
 				status: status
-			}, {
-				success: callback
-			});
+			}, callbacks);
 		},
 
 		store: {
@@ -2622,10 +2618,14 @@ window.StickersModule.Service = {};
 		},
 
 		downloadPack: function(data) {
-			this.service.updatePacks((function() {
-				this.config.functions.showPackCollection(packName);
-				callback && callback();
-			}).bind(this));
+			var self = this;
+			Module.Api.changeUserPackStatus(data.attrs.packName, true, {
+				success: function () {
+					self.stickerpipe.fetchPacks(function() {
+						self.showPackCollections(data);
+					});
+				}
+			});
 		},
 
 		purchasePackInStore: function(data) {
@@ -4131,6 +4131,10 @@ window.StickersModule.View = {};
 		},
 
 		open: function() {
+			if (this.active) {
+				return;
+			}
+
 			this.active = true;
 			this.toggleEl.parentElement.appendChild(this.popoverEl);
 			this.positioned();

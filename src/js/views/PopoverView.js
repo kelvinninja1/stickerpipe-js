@@ -76,6 +76,10 @@
 		},
 
 		open: function() {
+			if (this.active) {
+				return;
+			}
+
 			this.active = true;
 			this.toggleEl.parentElement.appendChild(this.popoverEl);
 			this.positioned();

@@ -16,10 +16,14 @@
 		},
 
 		downloadPack: function(data) {
-			this.service.updatePacks((function() {
-				this.config.functions.showPackCollection(packName);
-				callback && callback();
-			}).bind(this));
+			var self = this;
+			Module.Api.changeUserPackStatus(data.attrs.packName, true, {
+				success: function () {
+					self.stickerpipe.fetchPacks(function() {
+						self.showPackCollections(data);
+					});
+				}
+			});
 		},
 
 		purchasePackInStore: function(data) {

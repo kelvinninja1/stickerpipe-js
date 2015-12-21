@@ -63,16 +63,12 @@
 			});
 		},
 
-		changeUserPackStatus: function(packName, status, callback) {
+		changeUserPackStatus: function(packName, status, callbacks) {
 			var url = getApiUrl('user/pack/' + packName);
-
-			// todo: rewrite callback
 
 			Module.Http.post(url, {
 				status: status
-			}, {
-				success: callback
-			});
+			}, callbacks);
 		},
 
 		store: {
