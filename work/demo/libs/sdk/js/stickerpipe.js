@@ -4304,7 +4304,7 @@ window.StickersModule.View = {};
 				action: data.action,
 				value: value,
 				hashKey: data.hashKey
-			}), document.location.origin);
+			}), Module.Configs.apiUrl);
 		},
 
 		renderStore: function() {
