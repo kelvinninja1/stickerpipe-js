@@ -25,11 +25,11 @@ var App = _makeClass(function(options) {
 	$navbar: $('.navbar'),
 	$messages: $('#messages'),
 	$messageBox: $('#messageBox'),
-	$stickerPipeBlock: $('#stickerPipe'),
-	$stickerPipeStickers: $('#stickers'),
-	$stickerPipeStore: $('#store'),
 	$stickersToggle: $('#stickersToggle'),
 	$textarea: $('.textarea'),
+
+	priceB: 0.99,
+	priceC: 1.99,
 
 	_constructor: function() {
 		// setting lo-dash template
@@ -43,6 +43,7 @@ var App = _makeClass(function(options) {
 			this.sendMessage();
 			this.sendMessage(true);
 			this.sendMessage();
+			this.sendMessage(true, '[[cat4_iloveyou]]');
 		}).bind(this));
 		this.initMessageBox();
 		this.initStickers();
@@ -71,58 +72,33 @@ var App = _makeClass(function(options) {
 
 			debug: true,
 
-			//elId: this.$stickerPipeStickers.attr('id'),
 			elId: 'stickersToggle',
-
-			storeContainerId: this.$stickerPipeStore.attr('id'),
 
 			htmlForEmptyRecent: '<div class="emptyRecent">empty recent text</div>',
 
-			apikey: '72921666b5ff8651f374747bfefaf7b2',
-			//apikey: '52ed1358d7d09df5279147a5555061a9',
+			apiKey: '72921666b5ff8651f374747bfefaf7b2',
+			//apiKey: '52ed1358d7d09df5279147a5555061a9',
 
 			storagePrefix: 'stickerPipe',
 			enableEmojiTab: true,
 			enableHistoryTab: true,
 			enableStoreTab: true,
 
-			domain : 'http://work.stk.908.vc',
-			clientPacksUrl: 'http://work.stk.908.vc/api/v1/client-packs',
-			userPacksUrl: 'http://work.stk.908.vc/api/v1/user/packs',
-			userPackUrl: 'http://work.stk.908.vc/api/v1/user/pack',
-			trackStatUrl: 'http://work.stk.908.vc/api/v1/track-statistic',
-			storeUrl: 'http://work.stk.908.vc/api/v1/web',
+			cdnUrl: 'http://work.stk.908.vc',
+			apiUrl: 'http://work.stk.908.vc',
+			storeUrl: 'http://work.stk.908.vc/api/v1/web?uri=' + encodeURIComponent('http://demo.stickerpipe.com/work/demo/libs/store/js/stickerPipeStore.js'),
 			//storeUrl: 'http://localhost/stickerpipe/store/build',
 
-			userId: '12345678901234567890123456789012',
-
-			callbacks: {
-				onPurchase: (function(packTitle, productId, price, packName) {
-					if (confirm('#' + productId + ' Вы действительно хотите купить пак "' + packTitle + '", за '+ price + ' UAH?')) {
-						this.stickerpipe.purchaseSuccess(packName);
-					}
-				}).bind(this),
-
-				onPackStoreSuccess: function(packName) {
-					console.log('Спасибо за покупку!');
-				},
-
-				onPackStoreFail: function(packName) {
-					alert('Произошла ошибка при покупке пака. Повторите еще раз!')
-				}
+			userId: '123412341234122412',
+			userPremium: 0,
+			userData: {
+				age: 18,
+				gender: 'female'
 			},
 
-			functions: {
-				showPackCollection: (function(packName) {
-					// todo
-				}).bind(this)
-			}
-
+			priceB: 'USD $ ' + this.priceB,
+			priceC: 'USD $ ' + this.priceC
 		});
-
-		if (this.stickerpipe.getNewStickersFlag()) {
-			this.$stickersToggle.addClass('has-new-content');
-		}
 
 		this.stickerpipe.render((function() {
 			// todo: make as event
@@ -178,6 +154,16 @@ var App = _makeClass(function(options) {
 
 		this.$window.on('sp:popover:hidden', (function() {
 			this.$stickersToggle.removeClass('active');
+		}).bind(this));
+
+		this.stickerpipe.onPurchase((function(packName, packTitle, pricePoint) {
+			//console.log(packName, packTitle, pricePoint);
+
+			var result = confirm('Вы действительно хотите купить пак "' + packTitle + '" за ' + this['price' + pricePoint] + '$ ?');
+
+			if (result) {
+				this.stickerpipe.purchaseSuccess(packName);
+			}
 		}).bind(this));
 	},
 	initMessageBox: function() {
@@ -360,8 +346,7 @@ var App = _makeClass(function(options) {
 			this.$navbar.offset().top -
 			this.$navbar.outerHeight(true) -
 			this.$messageBox.parent().outerHeight(true) -
-			parseInt(this.$messages.css('margin-bottom'), 10) -
-			(this.$stickerPipeBlock.is(':visible') ? this.$stickerPipeBlock.outerHeight(true) : 0)
+			parseInt(this.$messages.css('margin-bottom'), 10)
 		);
 	}
 });

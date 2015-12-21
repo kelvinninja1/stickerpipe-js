@@ -14,12 +14,12 @@
 
 <body>
 
-<div data-base-page class="{{ appController.getResolutionType() }}"></div>
+<div data-base-page></div>
 
 <!-- AngularJS -->
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.2/angular.min.js"></script>
 
-<script src="js/stickerPipeStore.min.js"></script>
+<script src="js/stickerPipeStore.js"></script>
 
 <script>
 	(function() {
@@ -29,7 +29,10 @@
 			userId: '<?=($_GET['userId'] ?: '12345678901234567890123456789012');?>',
 			resolutionType: '<?=($_GET['density?'] ?: 'xxhdpi');?>',
 			lang: '<?=($_GET['lang'] ?: 'ru');?>',
-			clientDomain: '<?=($_SERVER['HTTP_HOST'] ?: 'localhost');?>'
+			clientDomain: '<?=($_SERVER['HTTP_HOST'] ?: 'localhost');?>',
+			priceB: '<?=($_GET['priceB'] ?: '');?>',
+			priceC: '<?=($_GET['priceC'] ?: '');?>',
+			userPremium: ('<?=($_GET['userPremium'] ?: 'false');?>' == 'true')
 		});
 	})()
 </script>
