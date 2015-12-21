@@ -1,46 +1,13 @@
 
 (function(Module) {
 
-	Module.Service.Store = Module.Class({
+	Module.Service.Store = {
 
 		stickerpipe: null,
 
-		window: null,
-		hasEventListener: false,
-
-		_constructor: function(stickerpipe) {
+		init: function(stickerpipe) {
 			this.stickerpipe = stickerpipe;
-		},
-
-		_return: function(value, data) {
-			this.window.postMessage(JSON.stringify({
-				action: data.action,
-				value: value,
-				hashKey: data.hashKey
-			}), document.location.origin);
-		},
-
-		_setWindow: function(_window) {
-			this.window = _window;
-
-			if (!this.hasEventListener) {
-				window.addEventListener('message', (function(e) {
-					var data = JSON.parse(e.data);
-
-					if (!data.action) {
-						return;
-					}
-
-					try {
-						this[data.action].call(this, data);
-					} catch(ex) {
-						console && console.error(ex.message, ex);
-					}
-
-				}).bind(this));
-
-				this.hasEventListener = true;
-			}
+			return this;
 		},
 
 		showPackCollections: function(data) {
@@ -60,13 +27,13 @@
 		},
 
 		isPackActive: function(data) {
-			return this.isPackExistsInStorage(packName);
+			return this.isPackExistsInStorage(data);
 		},
 
 		isPackExistsInStorage: function(data) {
 			var exist = Module.BaseService.isExistPackInStorage(data.attrs.packName);
-			this._return(exist, data);
+			this.stickerpipe.storeView._sendReturn(exist, data);
 		}
-	});
+	};
 
 })(StickersModule);

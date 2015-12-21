@@ -1,6 +1,9 @@
 
 (function(Module) {
 
+
+	var hasMessageListener = false;
+
 	function resizeModalWindow() {
 		if (parseInt(Module.El.css(this.modal.modalEl, 'height'), 10) < window.innerHeight) {
 			var newHeight = window.innerHeight
@@ -15,32 +18,51 @@
 		}
 	}
 
+	function setWindowMessageListener() {
+		if (!hasMessageListener) {
+			window.addEventListener('message', (function(e) {
+				var data = JSON.parse(e.data);
+
+				if (!data.action) {
+					return;
+				}
+
+				Module.Service.Store[data.action](data);
+
+			}).bind(this));
+
+			hasMessageListener = true;
+		}
+	}
+
 	Module.StoreView = Module.Class({
 
 		modal: null,
 
-		_constructor: function(storeService) {
+		_constructor: function() {
 
-			var self = this;
+			this.iframe = document.createElement('iframe');
 
-			this.storeService = storeService;
+			this.iframe.style.width = '100%';
+			this.iframe.style.height = '100%';
+			this.iframe.style.border = '0';
 
-			var iframe = document.createElement('iframe');
-
-			iframe.style.width = '100%';
-			iframe.style.height = '100%';
-			iframe.style.border = '0';
-
-			this.modal = Module.View.Modal.init(iframe, {
-				onOpen: function() {
+			this.modal = Module.View.Modal.init(this.iframe, {
+				onOpen: (function() {
 					Module.DOMEventService.resize();
-					self.storeService._setWindow(iframe.contentWindow);
-				}
+					setWindowMessageListener.bind(this)();
+				}).bind(this)
 			});
 
-			this.iframe = iframe;
-
 			window.addEventListener('resize', resizeModalWindow.bind(this));
+		},
+
+		_sendReturn: function (value, data) {
+			this.iframe.contentWindow.postMessage(JSON.stringify({
+				action: data.action,
+				value: value,
+				hashKey: data.hashKey
+			}), document.location.origin);
 		},
 
 		renderStore: function() {

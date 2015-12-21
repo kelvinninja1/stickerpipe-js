@@ -21,7 +21,6 @@ window.StickersModule.View = {};
 	Plugin.Stickers = Module.Class({
 
 		emojiService: null,
-		storeService: null,
 		stickersModel: {},
 		view: null,
 		storeView: null,
@@ -33,7 +32,7 @@ window.StickersModule.View = {};
 
 			Module.BaseService.trackUserData();
 
-			this.storeService = new Module.Service.Store(this);
+			Module.Service.Store.init(this);
 
 			this.emojiService = new Module.EmojiService(Module.Twemoji);
 		},
@@ -46,7 +45,7 @@ window.StickersModule.View = {};
 			Module.Configs.elId = elId || Module.Configs.elId;
 
 			this.view = new Module.PopoverView(this.emojiService);
-			this.storeView = new Module.StoreView(this.storeService);
+			this.storeView = new Module.StoreView();
 
 			this.delegateEvents();
 

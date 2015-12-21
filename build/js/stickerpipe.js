@@ -2607,46 +2607,13 @@ window.StickersModule.Service = {};
 
 (function(Module) {
 
-	Module.Service.Store = Module.Class({
+	Module.Service.Store = {
 
 		stickerpipe: null,
 
-		window: null,
-		hasEventListener: false,
-
-		_constructor: function(stickerpipe) {
+		init: function(stickerpipe) {
 			this.stickerpipe = stickerpipe;
-		},
-
-		_return: function(value, data) {
-			this.window.postMessage(JSON.stringify({
-				action: data.action,
-				value: value,
-				hashKey: data.hashKey
-			}), document.location.origin);
-		},
-
-		_setWindow: function(_window) {
-			this.window = _window;
-
-			if (!this.hasEventListener) {
-				window.addEventListener('message', (function(e) {
-					var data = JSON.parse(e.data);
-
-					if (!data.action) {
-						return;
-					}
-
-					try {
-						this[data.action].call(this, data);
-					} catch(ex) {
-						console && console.error(ex.message, ex);
-					}
-
-				}).bind(this));
-
-				this.hasEventListener = true;
-			}
+			return this;
 		},
 
 		showPackCollections: function(data) {
@@ -2666,14 +2633,14 @@ window.StickersModule.Service = {};
 		},
 
 		isPackActive: function(data) {
-			return this.isPackExistsInStorage(packName);
+			return this.isPackExistsInStorage(data);
 		},
 
 		isPackExistsInStorage: function(data) {
 			var exist = Module.BaseService.isExistPackInStorage(data.attrs.packName);
-			this._return(exist, data);
+			this.stickerpipe.storeView._sendReturn(exist, data);
 		}
-	});
+	};
 
 })(StickersModule);
 
@@ -4271,6 +4238,9 @@ window.StickersModule.View = {};
 
 (function(Module) {
 
+
+	var hasMessageListener = false;
+
 	function resizeModalWindow() {
 		if (parseInt(Module.El.css(this.modal.modalEl, 'height'), 10) < window.innerHeight) {
 			var newHeight = window.innerHeight
@@ -4285,32 +4255,51 @@ window.StickersModule.View = {};
 		}
 	}
 
+	function setWindowMessageListener() {
+		if (!hasMessageListener) {
+			window.addEventListener('message', (function(e) {
+				var data = JSON.parse(e.data);
+
+				if (!data.action) {
+					return;
+				}
+
+				Module.Service.Store[data.action](data);
+
+			}).bind(this));
+
+			hasMessageListener = true;
+		}
+	}
+
 	Module.StoreView = Module.Class({
 
 		modal: null,
 
-		_constructor: function(storeService) {
+		_constructor: function() {
 
-			var self = this;
+			this.iframe = document.createElement('iframe');
 
-			this.storeService = storeService;
+			this.iframe.style.width = '100%';
+			this.iframe.style.height = '100%';
+			this.iframe.style.border = '0';
 
-			var iframe = document.createElement('iframe');
-
-			iframe.style.width = '100%';
-			iframe.style.height = '100%';
-			iframe.style.border = '0';
-
-			this.modal = Module.View.Modal.init(iframe, {
-				onOpen: function() {
+			this.modal = Module.View.Modal.init(this.iframe, {
+				onOpen: (function() {
 					Module.DOMEventService.resize();
-					self.storeService._setWindow(iframe.contentWindow);
-				}
+					setWindowMessageListener.bind(this)();
+				}).bind(this)
 			});
 
-			this.iframe = iframe;
-
 			window.addEventListener('resize', resizeModalWindow.bind(this));
+		},
+
+		_sendReturn: function (value, data) {
+			this.iframe.contentWindow.postMessage(JSON.stringify({
+				action: data.action,
+				value: value,
+				hashKey: data.hashKey
+			}), document.location.origin);
 		},
 
 		renderStore: function() {
@@ -4631,7 +4620,6 @@ window.StickersModule.View = {};
 	Plugin.Stickers = Module.Class({
 
 		emojiService: null,
-		storeService: null,
 		stickersModel: {},
 		view: null,
 		storeView: null,
@@ -4643,7 +4631,7 @@ window.StickersModule.View = {};
 
 			Module.BaseService.trackUserData();
 
-			this.storeService = new Module.Service.Store(this);
+			Module.Service.Store.init(this);
 
 			this.emojiService = new Module.EmojiService(Module.Twemoji);
 		},
@@ -4656,7 +4644,7 @@ window.StickersModule.View = {};
 			Module.Configs.elId = elId || Module.Configs.elId;
 
 			this.view = new Module.PopoverView(this.emojiService);
-			this.storeView = new Module.StoreView(this.storeService);
+			this.storeView = new Module.StoreView();
 
 			this.delegateEvents();
 
