@@ -90,7 +90,7 @@ var App = _makeClass(function(options) {
 
 			//storeUrl: 'http://localhost/stickerpipe/store/build',
 
-			userId: '123412351234122412',
+			userId: '128412351234122412',
 			userPremium: 0,
 			userData: {
 				age: 18,
