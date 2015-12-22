@@ -39,14 +39,7 @@ var App = _makeClass(function(options) {
 			escape: /\{\{-([\s\S]+?)-\}\}/g // {{- html -}}
 		};
 
-		this.fetchRandomUsers().done((function() {
-			this.sendMessage();
-			this.sendMessage(true);
-			this.sendMessage();
-			this.sendMessage(true, '[[cat4_iloveyou]]');
-		}).bind(this));
-		this.initMessageBox();
-		this.initStickers();
+		this.init();
 
 		this.$window.resize((function() {
 			this.resizeWindow();
@@ -67,6 +60,16 @@ var App = _makeClass(function(options) {
 		}).bind(this));
 	},
 
+	init: function() {
+		this.fetchRandomUsers().done((function() {
+			this.sendMessage();
+			this.sendMessage(true);
+			this.sendMessage();
+			this.sendMessage(true, '[[cat4_iloveyou]]');
+		}).bind(this));
+		this.initMessageBox();
+		this.initStickers();
+	},
 	initStickers: function() {
 		this.stickerpipe = new Stickers({
 
@@ -90,7 +93,7 @@ var App = _makeClass(function(options) {
 			storeUrl: 'http://localhost/stickerpipe/store/build',
 
 			userId: this.getUserId(),
-			userPremium: 0,
+			userPremium: this.isUserPremium(),
 			userData: {
 				age: 18,
 				gender: 'female'
@@ -300,6 +303,7 @@ var App = _makeClass(function(options) {
 
 		return texts[this.getRandom(0, texts.length - 1)];
 	},
+
 	getUserId: function() {
 		var userId = localStorage.getItem('userId'),
 			resetUserId = this.getUrlParameter('resetUserId');
@@ -311,6 +315,14 @@ var App = _makeClass(function(options) {
 		}
 
 		return userId;
+	},
+	isUserPremium: function() {
+		var userPremium = this.getUrlParameter('userPremium');
+		if (!userPremium) {
+			userPremium = '0';
+		}
+		userPremium = (parseInt(userPremium, 10) == 1);
+		return userPremium;
 	},
 
 	getDateString: function() {
