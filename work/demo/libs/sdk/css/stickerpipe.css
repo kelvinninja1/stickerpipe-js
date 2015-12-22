@@ -105,6 +105,11 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
     max-height: 100% !important;
     margin: 0;
     width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
   }
 }
 
