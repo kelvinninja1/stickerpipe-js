@@ -63,17 +63,23 @@ footer {
 .packs > .row > div {
   margin-bottom: 30px; }
 
+.pack-preview {
+  display: table;
+  padding: 10px 20px; }
+  .pack-preview:hover {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px; }
+
 .pack-preview a {
   display: block;
   text-decoration: none; }
-  .pack-preview a:hover .pack-preview-name {
-    text-decoration: underline; }
 
 .pack-preview-name {
   margin: 5px 0; }
 
-.pack-preview-date {
-  color: rgba(0, 0, 0, 0.3); }
+.pack-preview-name,
+.pack-preview-cost {
+  color: black; }
 
 .pack-preview-sticker,
 .sticker img {
