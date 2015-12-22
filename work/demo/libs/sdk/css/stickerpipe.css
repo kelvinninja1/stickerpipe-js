@@ -95,6 +95,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   height: 606px;
   max-width: 650px;
   overflow: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 @media (max-width: 544px) {
