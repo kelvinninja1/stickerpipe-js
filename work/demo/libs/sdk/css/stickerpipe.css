@@ -119,6 +119,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 .sp-modal-body {
   height: 100%;
   width: 100%;
+  -webkit-overflow-scrolling: touch;
 }
 
 .sp-icon-close {
