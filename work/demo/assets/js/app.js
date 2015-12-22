@@ -86,11 +86,10 @@ var App = _makeClass(function(options) {
 
 			cdnUrl: 'http://work.stk.908.vc',
 			apiUrl: 'http://work.stk.908.vc',
-			storeUrl: 'http://work.stk.908.vc/api/v1/web?uri=' + encodeURIComponent('http://demo.stickerpipe.com/work/demo/libs/store/js/stickerPipeStore.js'),
+			//storeUrl: 'http://work.stk.908.vc/api/v1/web?uri=' + encodeURIComponent('http://demo.stickerpipe.com/work/demo/libs/store/js/stickerPipeStore.js'),
+			storeUrl: 'http://localhost/stickerpipe/store/build',
 
-			//storeUrl: 'http://localhost/stickerpipe/store/build',
-
-			userId: '128412351234122412',
+			userId: this.getUserId(),
 			userPremium: 0,
 			userData: {
 				age: 18,
@@ -117,9 +116,7 @@ var App = _makeClass(function(options) {
 			var _pack = this.getUrlParameter('pack');
 			if (!!_pack) {
 				this.stickerpipe.fetchPacks((function() {
-						this.stickerpipe.resetNewStickersFlag();
-						this.stickerpipe.open();
-						this.stickerpipe.renderCurrentTab(_pack);
+						this.stickerpipe.open(_pack);
 					}).bind(this)
 				);
 			}
@@ -128,17 +125,6 @@ var App = _makeClass(function(options) {
 
 
 		this.resizeWindow();
-		// todo: events
-		//this.stickerpipe.onClickSticker((function(text) {
-		//	this.sendMessage(true, text);
-		//}).bind(this));
-		//
-		//// todo: events
-		//this.stickerpipe.onClickEmoji((function(emoji) {
-		//	console.log('click on emoji', emoji);
-		//	this.$textarea.focus();
-		//	this.pasteHtmlAtCaret(this.stickerpipe.parseEmojiFromText(emoji));
-		//}).bind(this));
 
 		this.$window.on('sp:content:highlight:show', (function() {
 			this.$stickersToggle.addClass('has-new-content');
@@ -158,7 +144,6 @@ var App = _makeClass(function(options) {
 		}).bind(this));
 
 		this.stickerpipe.onPurchase((function(packName, packTitle, pricePoint) {
-			//console.log(packName, packTitle, pricePoint);
 
 			var result = confirm('Вы действительно хотите купить пак "' + packTitle + '" за ' + this['price' + pricePoint] + '$ ?');
 
@@ -314,6 +299,18 @@ var App = _makeClass(function(options) {
 		];
 
 		return texts[this.getRandom(0, texts.length - 1)];
+	},
+	getUserId: function() {
+		var userId = localStorage.getItem('userId'),
+			newUserId = this.getUrlParameter('newUserId');
+
+
+		if (!!newUserId || !userId || userId.length != 32) {
+			userId = StickersModule.StickerHelper.md5(+ new Date());
+			localStorage.setItem('userId', userId);
+		}
+
+		return userId;
 	},
 
 	getDateString: function() {

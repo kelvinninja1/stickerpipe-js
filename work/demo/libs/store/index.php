@@ -28,7 +28,7 @@
 			platform: '<?=($_GET['platform'] ?: 'Android');?>',
 			userId: '<?=($_GET['userId'] ?: '12345678901234567890123456789012');?>',
 			resolutionType: '<?=($_GET['density?'] ?: 'xxhdpi');?>',
-			lang: '<?=($_GET['lang'] ?: 'ru');?>',
+			lang: '<?=($_GET['localization'] ?: 'ru');?>',
 			clientDomain: '<?=($_SERVER['HTTP_HOST'] ?: 'localhost');?>',
 			priceB: '<?=($_GET['priceB'] ?: '');?>',
 			priceC: '<?=($_GET['priceC'] ?: '');?>',

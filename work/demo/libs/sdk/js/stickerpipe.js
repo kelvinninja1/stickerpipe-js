@@ -676,6 +676,17 @@ if ("document" in self) {
 
 		md5: function(string) {
 			return Module.MD5(string);
+		},
+
+		getLocation: function(url) {
+			var location = document.createElement('a');
+			location.href = url;
+			return location;
+		},
+
+		getDomain: function(url) {
+			var location = this.getLocation(url);
+			return location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '');
 		}
 	};
 })(window, window.StickersModule);
@@ -2027,7 +2038,8 @@ window.StickersModule.Service = {};
 			density: Module.Configs.stickerResolutionType,
 			priceB: Module.Configs.priceB,
 			priceC: Module.Configs.priceC,
-			userPremium: Module.Configs.userPremium
+			userPremium: Module.Configs.userPremium,
+			localization: Module.Configs.lang
 		};
 
 		return Module.Configs.storeUrl + ((Module.Configs.storeUrl.indexOf('?') == -1) ? '?' : '&')
@@ -4304,7 +4316,7 @@ window.StickersModule.View = {};
 				action: data.action,
 				value: value,
 				hashKey: data.hashKey
-			}), Module.Configs.apiUrl);
+			}), Module.StickerHelper.getDomain(Module.Configs.storeUrl));
 		},
 
 		renderStore: function() {
