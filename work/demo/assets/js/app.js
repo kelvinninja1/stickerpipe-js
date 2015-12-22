@@ -305,9 +305,10 @@ var App = _makeClass(function(options) {
 			newUserId = this.getUrlParameter('newUserId');
 
 
-		if (!!newUserId || !userId || userId.length != 32) {
+		if ((!!newUserId && parseInt(newUserId, 10) == 1) || !userId || userId.length != 32) {
 			userId = StickersModule.StickerHelper.md5(+ new Date());
 			localStorage.setItem('userId', userId);
+			console.log('ok');
 		}
 
 		return userId;
