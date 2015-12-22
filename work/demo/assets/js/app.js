@@ -302,10 +302,10 @@ var App = _makeClass(function(options) {
 	},
 	getUserId: function() {
 		var userId = localStorage.getItem('userId'),
-			newUserId = this.getUrlParameter('newUserId');
+			resetUserId = this.getUrlParameter('resetUserId');
 
 
-		if ((!!newUserId && parseInt(newUserId, 10) == 1) || !userId || userId.length != 32) {
+		if ((!!resetUserId && parseInt(resetUserId, 10) == 1) || !userId || userId.length != 32) {
 			userId = StickersModule.StickerHelper.md5(+ new Date());
 			localStorage.setItem('userId', userId);
 			console.log('ok');
