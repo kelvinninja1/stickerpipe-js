@@ -55,8 +55,12 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 h1, h2, h3, h4, h5, h6 {
   margin-top: 0; }
 
+body {
+  -webkit-overflow-scrolling: touch !important; }
+
 .store {
-  padding: 0 0 30px 0; }
+  padding: 0 0 30px 0;
+  -webkit-overflow-scrolling: touch !important; }
 
 .screen-header {
   background: rgba(255, 255, 255, 0.9);
