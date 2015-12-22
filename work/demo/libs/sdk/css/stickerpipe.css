@@ -103,6 +103,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
     box-sizing: border-box;
     min-height: 100% !important;
     max-height: 100% !important;
+    height: 100% !important;
     margin: 0;
     width: 100%;
     position: fixed;
