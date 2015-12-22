@@ -312,12 +312,14 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 }
 
 .sticker-pipe .sp-scroll-content .viewport {
+  -webkit-overflow-scrolling: touch;
   height: 298px;
   overflow: hidden;
   position: relative;
 }
 
 .sticker-pipe .sp-scroll-content .viewport .overview {
+  -webkit-overflow-scrolling: touch;
   left: 0;
   list-style: none;
   margin: 0;
