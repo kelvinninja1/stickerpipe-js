@@ -4260,7 +4260,7 @@ window.StickersModule.View = {};
 
 	function resizeModalWindow() {
 		if (window.innerWidth < 544) {
-			this.modal.modalEl.style.height = window.innerHeight + 'px';
+			this.modal.modalEl.style.height = '1000px';//window.innerHeight + 'px';
 		} else {
 			this.modal.modalEl.style.height = '';
 			if (parseInt(Module.El.css(this.modal.modalEl, 'height'), 10) < window.innerHeight) {
