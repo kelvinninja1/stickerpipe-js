@@ -74,7 +74,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   /* if modal content doesn't fit inside the overlay, display scrollbars */
   overflow: auto;
   /* allow one-finger iPad scrolling */
-  -webkit-overflow-scrolling: touch;
+  -webkit-overflow-scrolling: touch !important;
   /* IE6–IE8 */
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = #7F000000, endColorstr = #7F000000);
   zoom: 1;
@@ -125,7 +125,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   height: 100%;
   width: 100%;
   overflow: hidden;
-  -webkit-overflow-scrolling: touch;
+  -webkit-overflow-scrolling: touch !important;
 }
 
 .sp-icon-close {
@@ -313,14 +313,14 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 }
 
 .sticker-pipe .sp-scroll-content .viewport {
-  -webkit-overflow-scrolling: touch;
+  -webkit-overflow-scrolling: touch !important;
   height: 298px;
   overflow: hidden;
   position: relative;
 }
 
 .sticker-pipe .sp-scroll-content .viewport .overview {
-  -webkit-overflow-scrolling: touch;
+  -webkit-overflow-scrolling: touch !important;
   left: 0;
   list-style: none;
   margin: 0;
