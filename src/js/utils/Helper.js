@@ -175,6 +175,17 @@
 
 		md5: function(string) {
 			return Module.MD5(string);
+		},
+
+		getLocation: function(url) {
+			var location = document.createElement('a');
+			location.href = url;
+			return location;
+		},
+
+		getDomain: function(url) {
+			var location = this.getLocation(url);
+			return location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '');
 		}
 	};
 })(window, window.StickersModule);

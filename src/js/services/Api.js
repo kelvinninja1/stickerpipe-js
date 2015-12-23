@@ -9,7 +9,8 @@
 			density: Module.Configs.stickerResolutionType,
 			priceB: Module.Configs.priceB,
 			priceC: Module.Configs.priceC,
-			userPremium: Module.Configs.userPremium
+			userPremium: Module.Configs.userPremium,
+			localization: Module.Configs.lang
 		};
 
 		return Module.Configs.storeUrl + ((Module.Configs.storeUrl.indexOf('?') == -1) ? '?' : '&')

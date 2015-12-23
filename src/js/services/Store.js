@@ -61,6 +61,10 @@
 			isPackExistsInStorage: function(data) {
 				var exist = Module.BaseService.isExistPackInStorage(data.attrs.packName);
 				Module.Service.Store.stickerpipe.storeView._sendReturn(exist, data);
+			},
+
+			resizeStore: function(data) {
+				Module.Service.Store.stickerpipe.storeView._resize(data.attrs.height);
 			}
 		}
 	};
