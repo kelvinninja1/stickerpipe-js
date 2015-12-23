@@ -4335,7 +4335,9 @@ window.StickersModule.View = {};
 				this.modal.modalEl.style.height = ((window.innerHeight > height) ? window.innerHeight : height) + 'px';
 
 				if (this.overlay) {
-					this.overlay.style.webkitOverflowScrolling = 'touch';
+					setTimeout(function() {
+						this.overlay.style.webkitOverflowScrolling = 'touch';
+					}, 100);
 				}
 			} else {
 				this.modal.modalEl.style.height = '';
