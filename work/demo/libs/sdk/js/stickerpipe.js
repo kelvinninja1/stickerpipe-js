@@ -4339,7 +4339,7 @@ window.StickersModule.View = {};
 				if (this.overlay) {
 					setTimeout(function() {
 						self.overlay.style.webkitOverflowScrolling = 'touch';
-					}, 500);
+					}, 1000);
 				}
 			} else {
 				this.modal.modalEl.style.height = '';
