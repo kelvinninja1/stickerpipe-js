@@ -2651,6 +2651,10 @@ window.StickersModule.Service = {};
 			isPackExistsInStorage: function(data) {
 				var exist = Module.BaseService.isExistPackInStorage(data.attrs.packName);
 				Module.Service.Store.stickerpipe.storeView._sendReturn(exist, data);
+			},
+
+			resizeStore: function(data) {
+				Module.Service.Store.stickerpipe.storeView._resize(data.attrs.height);
 			}
 		}
 	};
@@ -4258,25 +4262,6 @@ window.StickersModule.View = {};
 
 	var hasMessageListener = false;
 
-	function resizeModalWindow() {
-		if (window.innerWidth < 544) {
-			this.modal.modalEl.style.height = '1000px';//window.innerHeight + 'px';
-		} else {
-			this.modal.modalEl.style.height = '';
-			if (parseInt(Module.El.css(this.modal.modalEl, 'height'), 10) < window.innerHeight) {
-				var newHeight = window.innerHeight
-					- parseInt(Module.El.css(this.modal.modalEl, 'marginTop'), 10)
-					- parseInt(Module.El.css(this.modal.modalEl, 'marginBottom'), 10);
-
-				if (newHeight == window.innerHeight) {
-					return;
-				}
-
-				this.modal.modalEl.style.height = newHeight + 'px';
-			}
-		}
-	}
-
 	function setWindowMessageListener() {
 		if (!hasMessageListener) {
 			window.addEventListener('message', (function(e) {
@@ -4297,6 +4282,7 @@ window.StickersModule.View = {};
 	Module.StoreView = Module.Class({
 
 		modal: null,
+		iframe: null,
 
 		_constructor: function() {
 
@@ -4313,15 +4299,9 @@ window.StickersModule.View = {};
 				}).bind(this)
 			});
 
-			window.addEventListener('resize', resizeModalWindow.bind(this));
-		},
-
-		_sendReturn: function (value, data) {
-			this.iframe.contentWindow.postMessage(JSON.stringify({
-				action: data.action,
-				value: value,
-				hashKey: data.hashKey
-			}), Module.StickerHelper.getDomain(Module.Configs.storeUrl));
+			window.addEventListener('resize', (function() {
+				this._resize();
+			}).bind(this));
 		},
 
 		renderStore: function() {
@@ -4336,6 +4316,35 @@ window.StickersModule.View = {};
 
 		close: function() {
 			this.modal.close();
+		},
+
+		_sendReturn: function (value, data) {
+			this.iframe.contentWindow.postMessage(JSON.stringify({
+				action: data.action,
+				value: value,
+				hashKey: data.hashKey
+			}), Module.StickerHelper.getDomain(Module.Configs.storeUrl));
+		},
+
+		_resize: function(height) {
+			height = height || 0;
+
+			if (window.innerWidth < 544) {
+				this.modal.modalEl.style.height = ((window.innerHeight > height) ? window.innerHeight : height) + 'px';
+			} else {
+				this.modal.modalEl.style.height = '';
+				if (parseInt(Module.El.css(this.modal.modalEl, 'height'), 10) < window.innerHeight) {
+					var newHeight = window.innerHeight
+						- parseInt(Module.El.css(this.modal.modalEl, 'marginTop'), 10)
+						- parseInt(Module.El.css(this.modal.modalEl, 'marginBottom'), 10);
+
+					if (newHeight == window.innerHeight) {
+						return;
+					}
+
+					this.modal.modalEl.style.height = newHeight + 'px';
+				}
+			}
 		}
 	});
 
