@@ -4283,6 +4283,7 @@ window.StickersModule.View = {};
 
 		modal: null,
 		iframe: null,
+		overlay: null,
 
 		_constructor: function() {
 
@@ -4293,7 +4294,8 @@ window.StickersModule.View = {};
 			this.iframe.style.border = '0';
 
 			this.modal = Module.View.Modal.init(this.iframe, {
-				onOpen: (function() {
+				onOpen: (function(contentEl, modalEl, overlay) {
+					this.overlay = overlay;
 					Module.DOMEventService.resize();
 					setWindowMessageListener.bind(this)();
 				}).bind(this)
@@ -4331,6 +4333,10 @@ window.StickersModule.View = {};
 
 			if (window.innerWidth < 544) {
 				this.modal.modalEl.style.height = ((window.innerHeight > height) ? window.innerHeight : height) + 'px';
+
+				if (this.overlay) {
+					this.overlay.style.webkitOverflowScrolling = 'touch';
+				}
 			} else {
 				this.modal.modalEl.style.height = '';
 				if (parseInt(Module.El.css(this.modal.modalEl, 'height'), 10) < window.innerHeight) {
