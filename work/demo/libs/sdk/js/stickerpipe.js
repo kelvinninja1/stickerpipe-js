@@ -4331,12 +4331,14 @@ window.StickersModule.View = {};
 		_resize: function(height) {
 			height = height || 0;
 
+			var self = this;
+
 			if (window.innerWidth < 544) {
 				this.modal.modalEl.style.height = ((window.innerHeight > height) ? window.innerHeight : height) + 'px';
 
 				if (this.overlay) {
 					setTimeout(function() {
-						this.overlay.style.webkitOverflowScrolling = 'touch';
+						self.overlay.style.webkitOverflowScrolling = 'touch';
 					}, 100);
 				}
 			} else {
