@@ -2093,8 +2093,22 @@ window.StickersModule.Service = {};
 			});
 		},
 
-		changeUserPackStatus: function(packName, status, callbacks) {
-			var url = getApiUrl('user/pack/' + packName);
+		changeUserPackStatus: function(packName, status, pricePoint, callbacks) {
+			var url = getApiUrl('user/pack/' + packName),
+				purchaseType = 'free';
+
+			if (pricePoint == 'B') {
+				purchaseType = 'oneoff';
+				if (Module.Configs.userPremium) {
+					purchaseType = 'subscription';
+				}
+			} else if (pricePoint == 'C') {
+				purchaseType = 'oneoff';
+			}
+
+			url += '?' + Module.StickerHelper.urlParamsSerialize({
+					purchase_type: purchaseType
+				});
 
 			Module.Http.post(url, {
 				status: status
@@ -2617,8 +2631,8 @@ window.StickersModule.Service = {};
 			this.stickerpipe.open(packName);
 		},
 
-		downloadPack: function(packName) {
-			Module.Api.changeUserPackStatus(packName, 1, {
+		downloadPack: function(packName, pricePoint) {
+			Module.Api.changeUserPackStatus(packName, true, pricePoint, {
 				success: (function () {
 					this.stickerpipe.fetchPacks((function() {
 						sendAPIMessage('onPackDownloaded', {
@@ -2629,8 +2643,8 @@ window.StickersModule.Service = {};
 			});
 		},
 
-		purchaseSuccess: function(packName) {
-			this.downloadPack(packName);
+		purchaseSuccess: function(packName, pricePoint) {
+			this.downloadPack(packName, pricePoint);
 		},
 
 		api: {
@@ -2644,7 +2658,7 @@ window.StickersModule.Service = {};
 					pricePoint = data.attrs.pricePoint;
 
 				if (pricePoint == 'A') {
-					Module.Service.Store.downloadPack(packName);
+					Module.Service.Store.downloadPack(packName, pricePoint);
 				} else {
 					var onPurchaseCallback = Module.Service.Store.onPurchaseCallback;
 
@@ -4826,8 +4840,8 @@ window.StickersModule.View = {};
 			return Module.BaseService.onUserMessageSent(isSticker);
 		},
 
-		purchaseSuccess: function(packName) {
-			Module.Service.Store.purchaseSuccess(packName);
+		purchaseSuccess: function(packName, pricePoint) {
+			Module.Service.Store.purchaseSuccess(packName, pricePoint);
 		},
 
 		open: function(tabName) {

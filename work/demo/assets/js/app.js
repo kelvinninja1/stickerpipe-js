@@ -151,7 +151,7 @@ var App = _makeClass(function(options) {
 			var result = confirm('Вы действительно хотите купить пак "' + packTitle + '" за ' + this['price' + pricePoint] + '$ ?');
 
 			if (result) {
-				this.stickerpipe.purchaseSuccess(packName);
+				this.stickerpipe.purchaseSuccess(packName, pricePoint);
 			}
 		}).bind(this));
 	},

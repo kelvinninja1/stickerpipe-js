@@ -12,7 +12,7 @@ appStickerPipeStore.controller('AppController', function(Config, envService, Pla
 		document.getElementById('css').setAttribute('href', envService.read('cssUrl') + Config.platform.toLocaleLowerCase() + '.css?v='+(+(new Date())));
 	}
 
-	PlatformAPI.init && PlatformAPI.init();
+	PlatformAPI.init();
 });
 angular.module('environment',[]).provider('envService',function(){this.environment='development';this.data={};this.config=function(config){this.data=config;};this.set=function(environment){this.environment=environment;};this.get=function(){return this.environment;};this.read=function(variable){if(variable!=='all'){return this.data.vars[this.get()][variable];}
 	return this.data.vars[this.get()];};this.is=function(environment){return(environment===this.environment);};this.check=function(){var	location=window.location.href,self=this;angular.forEach(this.data.domains,function(v,k){angular.forEach(v,function(v){if(location.match('//'+v)){self.environment=k;}});});};this.$get=function(){return this;};});
@@ -435,40 +435,54 @@ appStickerPipeStore.factory('PackService', function() {
 
 });
 
-appStickerPipeStore.factory('PlatformAPI', [
-	'Config',
-	'$injector',
-	'HttpApi',
-	'$q',
-	function(Config, $injector, HttpApi, $q) {
+appStickerPipeStore.factory('PlatformAPI', function(Config, $injector) {
 
-		var PlatformInstance = {},
-			PlatformAPI = {
-				isAndroid: function() {
-					return Config.platform.toLowerCase() == 'android';
-				},
+	var PlatformInstance = {},
+		PlatformAPI = {
+			isAndroid: function() {
+				return Config.platform.toLowerCase() == 'android';
+			},
 
-				isJS: function() {
-					return Config.platform.toLowerCase() == 'js';
-				},
+			isJS: function() {
+				return Config.platform.toLowerCase() == 'js';
+			},
 
-				isIOS: function() {
-					return Config.platform.toLowerCase() == 'ios';
+			isIOS: function() {
+				return Config.platform.toLowerCase() == 'ios';
+			}
+		};
+
+	switch(true) {
+		case PlatformAPI.isAndroid():
+			PlatformInstance = $injector.get('AndroidPlatform');
+			break;
+		case PlatformAPI.isJS():
+			PlatformInstance = $injector.get('JSPlatform');
+			break;
+	}
+
+	return angular.extend(PlatformAPI, PlatformInstance, {
+		init: function() {
+			PlatformInstance.init && PlatformInstance.init();
+
+			window.JsInterface = {
+				onPackDownloaded: function() {
+					PlatformInstance.onPackDownloaded.apply(PlatformInstance, arguments);
 				}
 			};
-
-		switch(true) {
-			case PlatformAPI.isAndroid():
-				PlatformInstance = $injector.get('AndroidPlatform');
-				break;
-			case PlatformAPI.isJS():
-				PlatformInstance = $injector.get('JSPlatform');
-				break;
 		}
+	});
 
-		return angular.extend(PlatformAPI, PlatformInstance);
+});
 
-	}]);
+appStickerPipeStore.directive('basePage', function() {
+
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/view.tpl',
+		link: function($scope, $el, attrs) {}
+	};
+});
 
 appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack) {
 
@@ -495,15 +509,6 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 			PlatformAPI.purchasePack(pack.title, pack.pack_name, pack.pricepoint);
 		}
 	});
-});
-
-appStickerPipeStore.directive('basePage', function() {
-
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/view.tpl',
-		link: function($scope, $el, attrs) {}
-	};
 });
 
 appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI) {
@@ -539,12 +544,6 @@ appStickerPipeStore.factory('AndroidPlatform', function() {
 	var platformJSProvider = window.AndroidJsInterface || {};
 
 	return angular.extend({}, {
-
-		init: function() {
-			platformJSProvider.onPackDownloaded = (function() {
-				this.onPackDownloaded();
-			}).bind(this);
-		},
 
 		////////////////////////////////////////////////////////////
 		// Functions
@@ -590,7 +589,10 @@ appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout
 					return;
 				}
 
-				this[data.action] && this[data.action](data.attrs);
+				var JsInterface = window.JsInterface;
+				if (JsInterface) {
+					JsInterface[data.action] && JsInterface[data.action](data.attrs);
+				}
 
 			}).bind(this));
 
