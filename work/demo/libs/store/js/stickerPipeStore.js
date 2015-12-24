@@ -435,7 +435,7 @@ appStickerPipeStore.factory('PackService', function() {
 
 });
 
-appStickerPipeStore.factory('PlatformAPI', function(Config, $injector) {
+appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $window) {
 
 	var PlatformInstance = {},
 		PlatformAPI = {
@@ -467,6 +467,7 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector) {
 
 			window.JsInterface = {
 				onPackDownloaded: function() {
+					$window.location.reload();
 					PlatformInstance.onPackDownloaded.apply(PlatformInstance, arguments);
 				}
 			};
