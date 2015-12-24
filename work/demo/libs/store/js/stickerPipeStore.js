@@ -142,7 +142,7 @@ module.run(['$templateCache', function($templateCache) {
     '	</div>\n' +
     '\n' +
     '\n' +
-    '	<p class="pack-description">{{ pack.description || \'\' }}</p>\n' +
+    '	<p class="pack-description" data-ng-show="pack.description">{{ pack.description || \'\' }}</p>\n' +
     '</div>\n' +
     '\n' +
     '<div class="clearfix"></div>\n' +
@@ -470,19 +470,7 @@ appStickerPipeStore.factory('PlatformAPI', [
 
 	}]);
 
-appStickerPipeStore.directive('basePage', function() {
-
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/view.tpl',
-		link: function($scope, $el, attrs) {}
-	};
-});
-
 appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack) {
-
-	console.log(PackService.isHidden(pack), pack.pricepoint, Config.isPremium);
-	console.log(PackService.isHidden(pack) || pack.pricepoint == 'A' || (pack.pricepoint == 'B' && Config.isPremium));
 
 	angular.extend($scope, {
 		config: Config,
@@ -507,6 +495,15 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 			PlatformAPI.purchasePack(pack.title, pack.pack_name, pack.pricepoint);
 		}
 	});
+});
+
+appStickerPipeStore.directive('basePage', function() {
+
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/view.tpl',
+		link: function($scope, $el, attrs) {}
+	};
 });
 
 appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI) {
@@ -543,60 +540,59 @@ appStickerPipeStore.factory('AndroidPlatform', function() {
 
 	return angular.extend({}, {
 
+		init: function() {
+			platformJSProvider.onPackDownloaded = (function() {
+				this.onPackDownloaded();
+			}).bind(this);
+		},
+
+		////////////////////////////////////////////////////////////
+		// Functions
+		////////////////////////////////////////////////////////////
+
 		showCollections: function() {
 			return platformJSProvider.showCollections();
 		},
 
 		purchasePack: function(packTitle, packName, packPrice) {
 			return platformJSProvider.purchasePack(packTitle, packName, packPrice);
+		},
+
+		////////////////////////////////////////////////////////////
+		// Callbacks
+		////////////////////////////////////////////////////////////
+
+		onPackDownloaded: function() {
+			this.showCollections()
 		}
 	});
 });
 
-appStickerPipeStore.factory('JSPlatform', function(Config, $rootScope, $window, $timeout) {
+appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout, Config) {
 
-	var isRunMessageListener = false,
-		callbackCache = {};
-
-	function runMessageListener() {
-		var eventListener = function(e) {
-			var data = JSON.parse(e.data);
-
-			if (!data.action) {
-				return;
-			}
-
-			var callbackHashKey = data.action + data.hashKey;
-			if (callbackCache[callbackHashKey]) {
-				callbackCache[callbackHashKey](data.value);
-				delete callbackCache[callbackHashKey];
-			}
-		};
-
-		$window.addEventListener('message', eventListener);
-
-		isRunMessageListener = true;
-	}
-
-	function api(action, attrs, callback) {
-		var hashKey = (+ new Date()) + Math.random() * 10000;
-		if (callback) {
-			callbackCache[action + hashKey] = callback;
-		}
-
+	function sendAPIMessage(action, attrs) {
 		window.parent.postMessage(JSON.stringify({
 			action: action,
-			attrs: attrs,
-			hashKey: hashKey
+			attrs: attrs
 		}), 'http://' + Config.clientDomain);
 	}
 
 	return angular.extend({}, {
 
 		init: function() {
-			if (!isRunMessageListener) {
-				runMessageListener();
-			}
+			$window.addEventListener('message', (function(e) {
+
+				var data = JSON.parse(e.data);
+
+				data.attrs = data.attrs || {};
+
+				if (!data.action) {
+					return;
+				}
+
+				this[data.action] && this[data.action](data.attrs);
+
+			}).bind(this));
 
 			// on render store - call API method resizeStore for resize iframe on client
 			$rootScope.$on('$routeChangeSuccess', (function() {
@@ -608,29 +604,42 @@ appStickerPipeStore.factory('JSPlatform', function(Config, $rootScope, $window, 
 			}).bind(this));
 		},
 
-		resizeStore: function() {
-			var storeEl = document.getElementsByClassName('store')[0];
-
-			$timeout(function() {
-				api('resizeStore', {
-					height: storeEl.offsetHeight
-				});
-			}, 100);
-		},
+		////////////////////////////////////////////////////////////
+		// Functions
+		////////////////////////////////////////////////////////////
 
 		showCollections: function(packName) {
-			api('showCollections', {
+			sendAPIMessage('showCollections', {
 				packName: packName
 			});
 		},
 
 		purchasePack: function(packTitle, packName, packPrice) {
-			api('purchasePack', {
+			sendAPIMessage('purchasePack', {
 				packTitle: packTitle,
 				packName: packName,
 				pricePoint: packPrice
 			});
+		},
+
+		resizeStore: function() {
+			var storeEl = document.getElementsByClassName('store')[0];
+
+			$timeout(function() {
+				sendAPIMessage('resizeStore', {
+					height: storeEl.offsetHeight
+				});
+			}, 100);
+		},
+
+		////////////////////////////////////////////////////////////
+		// Callbacks
+		////////////////////////////////////////////////////////////
+
+		onPackDownloaded: function(attrs) {
+			this.showCollections(attrs.packName)
 		}
+
 	});
 });
 

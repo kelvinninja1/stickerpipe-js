@@ -2591,6 +2591,15 @@ window.StickersModule.Service = {};
 
 (function(Module) {
 
+	function sendAPIMessage(action, attrs) {
+		var iframe = Module.Service.Store.stickerpipe.storeView.iframe;
+
+		iframe && iframe.contentWindow.postMessage(JSON.stringify({
+			action: action,
+			attrs: attrs
+		}), Module.StickerHelper.getDomain(Module.Configs.storeUrl));
+	}
+
 	Module.Service.Store = {
 
 		stickerpipe: null,
@@ -2607,15 +2616,14 @@ window.StickersModule.Service = {};
 		},
 
 		downloadPack: function(packName) {
-			var self = this;
-
-			Module.Api.changeUserPackStatus(packName, true, {
-				success: function () {
-					self.stickerpipe.fetchPacks(function() {
-						// todo remove - add: onPackDownloaded
-						self.showCollections(packName);
-					});
-				}
+			Module.Api.changeUserPackStatus(packName, 1, {
+				success: (function () {
+					this.stickerpipe.fetchPacks((function() {
+						sendAPIMessage('onPackDownloaded', {
+							packName: packName
+						});
+					}).bind(this));
+				}).bind(this)
 			});
 		},
 
@@ -2643,7 +2651,7 @@ window.StickersModule.Service = {};
 			},
 
 			resizeStore: function(data) {
-				Module.Service.Store.stickerpipe.storeView._resize(data.attrs.height);
+				Module.Service.Store.stickerpipe.storeView.resize(data.attrs.height);
 			}
 		}
 	};
@@ -4291,7 +4299,7 @@ window.StickersModule.View = {};
 			});
 
 			window.addEventListener('resize', (function() {
-				this._resize();
+				this.resize();
 			}).bind(this));
 		},
 
@@ -4309,15 +4317,7 @@ window.StickersModule.View = {};
 			this.modal.close();
 		},
 
-		_sendReturn: function (value, data) {
-			this.iframe.contentWindow.postMessage(JSON.stringify({
-				action: data.action,
-				value: value,
-				hashKey: data.hashKey
-			}), Module.StickerHelper.getDomain(Module.Configs.storeUrl));
-		},
-
-		_resize: function(height) {
+		resize: function(height) {
 			height = height || 0;
 
 			var self = this;
