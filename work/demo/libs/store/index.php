@@ -6,8 +6,8 @@
 	<title>Storage</title>
 
 	<!-- Bootstrap -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+<!--	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">-->
+<!--	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">-->
 
 	<link id="css" type="text/css" rel="stylesheet" />
 </head>
@@ -32,7 +32,7 @@
 			clientDomain: '<?=($_SERVER['HTTP_HOST'] ?: 'localhost');?>',
 			priceB: '<?=($_GET['priceB'] ?: '');?>',
 			priceC: '<?=($_GET['priceC'] ?: '');?>',
-			userPremium: ('<?=($_GET['userPremium'] ?: 'false');?>' == 'true')
+			isPremium: ('<?=($_GET['isPremium'] ?: 'false');?>' == 'true')
 		});
 	})()
 </script>

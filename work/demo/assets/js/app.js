@@ -89,8 +89,8 @@ var App = _makeClass(function(options) {
 
 			cdnUrl: 'http://work.stk.908.vc',
 			apiUrl: 'http://work.stk.908.vc',
-			storeUrl: 'http://work.stk.908.vc/api/v1/web?uri=' + encodeURIComponent('http://demo.stickerpipe.com/work/demo/libs/store/js/stickerPipeStore.js'),
-			//storeUrl: 'http://localhost/stickerpipe/store/build',
+			//storeUrl: 'http://work.stk.908.vc/api/v1/web?uri=' + encodeURIComponent('http://demo.stickerpipe.com/work/demo/libs/store/js/stickerPipeStore.js'),
+			storeUrl: 'http://localhost/stickerpipe/store/build',
 
 			userId: this.getUserId(),
 			userPremium: this.isUserPremium(),
@@ -99,8 +99,8 @@ var App = _makeClass(function(options) {
 				gender: 'female'
 			},
 
-			priceB: 'USD $ ' + this.priceB,
-			priceC: 'USD $ ' + this.priceC
+			priceB: this.priceB + ' $',
+			priceC: this.priceC + ' $'
 		});
 
 		this.stickerpipe.render((function() {

@@ -2038,7 +2038,7 @@ window.StickersModule.Service = {};
 			density: Module.Configs.stickerResolutionType,
 			priceB: Module.Configs.priceB,
 			priceC: Module.Configs.priceC,
-			userPremium: Module.Configs.userPremium,
+			isPremium: Module.Configs.userPremium,
 			localization: Module.Configs.lang
 		};
 
@@ -2601,21 +2601,19 @@ window.StickersModule.Service = {};
 			this.stickerpipe = stickerpipe;
 		},
 
-		setOnPurchaseCallback: function(onPurchaseCallback) {
-			this.onPurchaseCallback = onPurchaseCallback;
-		},
-
-		showPackCollections: function(packName) {
+		showCollections: function(packName) {
 			this.stickerpipe.storeView.close();
 			this.stickerpipe.open(packName);
 		},
 
 		downloadPack: function(packName) {
 			var self = this;
+
 			Module.Api.changeUserPackStatus(packName, true, {
 				success: function () {
 					self.stickerpipe.fetchPacks(function() {
-						self.showPackCollections(packName);
+						// todo remove - add: onPackDownloaded
+						self.showCollections(packName);
 					});
 				}
 			});
@@ -2626,31 +2624,22 @@ window.StickersModule.Service = {};
 		},
 
 		api: {
-			showPackCollections: function(data) {
-				Module.Service.Store.showPackCollections(data.attrs.packName);
-			},
-
-			downloadPack: function(data) {
-				Module.Service.Store.downloadPack(data.attrs.packName);
+			showCollections: function(data) {
+				Module.Service.Store.showCollections(data.attrs.packName);
 			},
 
 			purchasePack: function(data) {
-				var callback = Module.Service.Store.onPurchaseCallback;
+				var packName = data.attrs.packName,
+					packTitle = data.attrs.packTitle,
+					pricePoint = data.attrs.pricePoint;
 
-				callback && callback(
-					data.attrs.packName,
-					data.attrs.packTitle,
-					data.attrs.pricePoint
-				);
-			},
+				if (pricePoint == 'A') {
+					Module.Service.Store.downloadPack(packName);
+				} else {
+					var onPurchaseCallback = Module.Service.Store.onPurchaseCallback;
 
-			isPackActive: function(data) {
-				return this.isPackExistsInStorage(data);
-			},
-
-			isPackExistsInStorage: function(data) {
-				var exist = Module.BaseService.isExistPackInStorage(data.attrs.packName);
-				Module.Service.Store.stickerpipe.storeView._sendReturn(exist, data);
+					onPurchaseCallback && onPurchaseCallback(packName, packTitle, pricePoint);
+				}
 			},
 
 			resizeStore: function(data) {
@@ -4871,7 +4860,7 @@ window.StickersModule.View = {};
 		},
 
 		onPurchase: function(callback) {
-			Module.Service.Store.setOnPurchaseCallback(callback);
+			Module.Service.Store.onPurchaseCallback = callback;
 		}
 	});
 

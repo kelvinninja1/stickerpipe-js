@@ -52,15 +52,178 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 @include retina-sprites($retina-groups);
 */
-h1, h2, h3, h4, h5, h6 {
-  margin-top: 0; }
+/* http://meyerweb.com/eric/tools/css/reset/
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline; }
 
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block; }
+
+body {
+  line-height: 1; }
+
+ol, ul {
+  list-style: none; }
+
+blockquote, q {
+  quotes: none; }
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none; }
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0; }
+
+body {
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #333; }
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 500; }
+
+h1 {
+  font-size: 36px; }
+
+h2 {
+  font-size: 30px; }
+
+h3 {
+  font-size: 24px; }
+
+h4 {
+  font-size: 18px; }
+
+h5 {
+  font-size: 14px; }
+
+h6 {
+  font-size: 12px; }
+
+.icon-back {
+  background-image: url(../img/icons_sprite.png);
+  background-position: 0px 0px;
+  width: 24px;
+  height: 24px; }
+
+.icon-back {
+  background-image: url(../img/icons_sprite.png);
+  background-position: 0px 0px;
+  width: 24px;
+  height: 24px; }
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .icon-back {
+      background-image: url(../img/icons_sprite@2x.png);
+      background-size: 24px 24px; } }
+
+.preloader {
+  background: white;
+  display: table;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 9; }
+
+.preloader-content {
+  display: table-cell;
+  vertical-align: middle; }
+
+.preloader-chasing-dots {
+  margin: 40px auto;
+  width: 40px;
+  height: 40px;
+  position: relative;
+  text-align: center;
+  -webkit-animation: preloader-chasingDotsRotate 2s infinite linear;
+          animation: preloader-chasingDotsRotate 2s infinite linear; }
+  .preloader-chasing-dots .preloader-child {
+    width: 60%;
+    height: 60%;
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    background-color: #9e9e9e;
+    border-radius: 100%;
+    -webkit-animation: preloader-chasingDotsBounce 2s infinite ease-in-out;
+            animation: preloader-chasingDotsBounce 2s infinite ease-in-out; }
+  .preloader-chasing-dots .preloader-dot2 {
+    top: auto;
+    bottom: 0;
+    -webkit-animation-delay: -1s;
+            animation-delay: -1s; }
+
+@-webkit-keyframes preloader-chasingDotsRotate {
+  100% {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg); } }
+
+@keyframes preloader-chasingDotsRotate {
+  100% {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg); } }
+
+@-webkit-keyframes preloader-chasingDotsBounce {
+  0%, 100% {
+    -webkit-transform: scale(0);
+            transform: scale(0); }
+  50% {
+    -webkit-transform: scale(1);
+            transform: scale(1); } }
+
+@keyframes preloader-chasingDotsBounce {
+  0%, 100% {
+    -webkit-transform: scale(0);
+            transform: scale(0); }
+  50% {
+    -webkit-transform: scale(1);
+            transform: scale(1); } }
+
+/*
+ *  Usage:
+ *
+      <div class="preloader-chasing-dots">
+        <div class="preloader-child sk-dot1"></div>
+        <div class="preloader-child sk-dot2"></div>
+      </div>
+ *
+ */
 .store {
-  padding: 0 0 30px 0; }
+  margin: auto;
+  padding: 0 0 30px 0;
+  width: 66%; }
+  @media (max-width: 922px) {
+    .store {
+      width: 100%; } }
 
 .screen-header {
   background: rgba(255, 255, 255, 0.9);
-  height: 55px;
   left: 0;
   padding: 15px;
   position: fixed;
@@ -75,28 +238,76 @@ h1, h2, h3, h4, h5, h6 {
   .screen-header + div {
     padding-top: 55px; }
 
+.icon {
+  display: table; }
+
+.btn {
+  border: 0;
+  border-radius: 3px;
+  font-size: 14px;
+  margin-right: 10px;
+  outline: none;
+  height: 40px;
+  padding: 0 20px; }
+  .btn:focus {
+    outline: none; }
+
+.btn-purple {
+  background: #673ab7;
+  border: 1px solid #673ab7;
+  color: white; }
+  .btn-purple:hover {
+    background: #8e24aa;
+    border-color: #8e24aa;
+    color: white; }
+
+.error {
+  display: table;
+  height: 100%;
+  position: absolute;
+  text-align: center;
+  width: 100%; }
+  .error .error-content {
+    display: table-cell;
+    vertical-align: middle; }
+  .error img {
+    margin-bottom: 10px;
+    max-height: 240px;
+    max-width: 240px;
+    height: 100%;
+    width: 100%; }
+  .error h5 {
+    text-transform: uppercase; }
+
+.pack-header {
+  background: rgba(0, 0, 0, 0.1);
+  margin-bottom: 10px;
+  padding: 20px; }
+
 .pack-main-sticker {
-  float: left;
-  margin-right: 10px; }
-  @media (max-width: 544px) {
-    .pack-main-sticker {
-      display: table-cell;
-      float: none; } }
+  margin-right: 10px;
+  display: table-cell; }
   .pack-main-sticker img {
     height: 160px;
     width: 160px; }
 
-.pack-header {
+.pack-info {
+  display: table-cell;
+  padding-top: 0;
+  padding-left: 10px;
+  vertical-align: middle; }
+
+.pack-description {
+  margin-bottom: 0; }
+
+.pack-name {
   margin-bottom: 10px; }
 
-.pack-header-title {
-  padding-top: 20px; }
-  @media (max-width: 544px) {
-    .pack-header-title {
-      display: table-cell;
-      padding-top: 0;
-      padding-left: 10px;
-      vertical-align: middle; } }
+.pack-owner {
+  font-weight: normal; }
+  .pack-owner:before {
+    content: "©";
+    margin-right: 5px; }
 
 .pack-stickers {
   display: table;
@@ -122,20 +333,6 @@ h1, h2, h3, h4, h5, h6 {
     .pack-stickers .sticker img {
       height: 80px;
       width: 80px; }
-
-.pack-owner {
-  font-weight: normal;
-  margin-bottom: 5px; }
-  .pack-owner:before {
-    content: "©";
-    margin-right: 5px; }
-
-.pack-price {
-  color: #6607b5;
-  font-size: 14px;
-  font-weight: bold;
-  margin-right: 10px;
-  text-transform: uppercase; }
 
 .pack-preview {
   display: table;
@@ -177,62 +374,5 @@ h1, h2, h3, h4, h5, h6 {
     .packs .col {
       width: 20%; } }
 
-.page-spinner {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  background: white;
-  z-index: 9;
-  top: 0; }
-
-.error-page {
-  display: table;
-  height: 100%;
-  width: 100%; }
-  .error-page > div {
-    display: table-cell;
-    text-align: center;
-    vertical-align: middle; }
-    .error-page > div img {
-      margin: auto;
-      margin-bottom: 10px; }
-    .error-page > div p {
-      text-transform: uppercase;
-      font-weight: bold; }
-
-.icon {
-  display: table; }
-
-.pack-actions > div {
-  display: inline-block; }
-
-.icon-back {
-  background-image: url(../img/icons_sprite.png);
-  background-position: 0px 0px;
-  width: 24px;
-  height: 24px; }
-
-.icon-back {
-  background-image: url(../img/icons_sprite.png);
-  background-position: 0px 0px;
-  width: 24px;
-  height: 24px; }
-  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-    .icon-back {
-      background-image: url(../img/icons_sprite@2x.png);
-      background-size: 24px 24px; } }
-
-.btn-purple {
-  background: #6607b5;
-  border: 0;
-  border-radius: 3px;
-  color: white;
-  margin-right: 10px;
-  outline: none;
-  height: 40px;
-  padding: 0 20px;
-  box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box; }
-  .btn-purple:hover {
-    background: #4527a0; }
+.btn-action {
+  min-width: 100px; }
