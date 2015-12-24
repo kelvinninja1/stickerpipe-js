@@ -467,8 +467,11 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $route) {
 
 			window.JsInterface = {
 				onPackDownloaded: function() {
-					$route.reload();
 					PlatformInstance.onPackDownloaded.apply(PlatformInstance, arguments);
+				},
+
+				reload: function() {
+					$route.reload();
 				}
 			};
 		}
@@ -483,6 +486,18 @@ appStickerPipeStore.directive('basePage', function() {
 		templateUrl: '/modules/base-page/view.tpl',
 		link: function($scope, $el, attrs) {}
 	};
+});
+
+appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI) {
+
+	angular.extend($scope, {
+		platformAPI: PlatformAPI,
+		packs: packs.packs,
+
+		getPackMainIcon: function(pack) {
+			return pack.main_icon[Config.resolutionType];
+		}
+	});
 });
 
 appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack) {
@@ -508,18 +523,6 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 
 		purchasePack: function() {
 			PlatformAPI.purchasePack(pack.title, pack.pack_name, pack.pricepoint);
-		}
-	});
-});
-
-appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI) {
-
-	angular.extend($scope, {
-		platformAPI: PlatformAPI,
-		packs: packs.packs,
-
-		getPackMainIcon: function(pack) {
-			return pack.main_icon[Config.resolutionType];
 		}
 	});
 });
@@ -646,6 +649,20 @@ appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout
 	});
 });
 
+appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
+	
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/error/view.tpl',
+		link: function($scope, $el, attrs) {
+
+			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
+			$scope.i18n = i18n;
+		}
+
+	};
+});
+
 appStickerPipeStore.directive('preloader', function($rootScope) {
 
 	function showPreloader() {
@@ -671,20 +688,6 @@ appStickerPipeStore.directive('preloader', function($rootScope) {
 				hidePreloader();
 			});
 
-		}
-
-	};
-});
-
-appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
-	
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/error/view.tpl',
-		link: function($scope, $el, attrs) {
-
-			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
-			$scope.i18n = i18n;
 		}
 
 	};
