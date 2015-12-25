@@ -252,15 +252,18 @@ h6 {
   .btn:focus {
     outline: none !important; }
 
-.btn-purple {
+.btn-purple,
+.btn-purple:focus {
   background: #9c27b0;
   color: white; }
-  .btn-purple:hover {
-    background: #4a148c;
-    color: white; }
-  .btn-purple:focus {
-    background: #9c27b0;
-    color: white; }
+
+.btn-purple:hover {
+  background: #4a148c;
+  color: white; }
+
+.btn-purple:active {
+  background: #9c27b0;
+  color: white; }
 
 .error {
   display: table;
@@ -392,15 +395,18 @@ h6 {
   .btn:focus {
     box-shadow: none; }
 
-.btn-purple {
+.btn-purple,
+.btn-purple:focus {
   background: transparent;
   border-color: #9c27b0;
   color: #9c27b0; }
-  .btn-purple:hover {
-    background: transparent;
-    border-color: #4a148c;
-    color: #4a148c; }
-  .btn-purple:focus {
-    background: #9c27b0;
-    border-color: #9c27b0;
-    color: white; }
+
+.btn-purple:hover {
+  background: transparent;
+  border-color: #4a148c;
+  color: #4a148c; }
+
+.btn-purple:active {
+  background: #9c27b0;
+  border-color: #9c27b0;
+  color: white; }

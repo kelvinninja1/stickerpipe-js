@@ -390,7 +390,7 @@ appStickerPipeStore.factory('HttpApi', function(Http, EnvConfig, Config) {
 			var url = getUrl('pack/' + packName);
 
 			if (Config.isPremium) {
-				url += 'is_subscriber=1';
+				url += '?is_subscriber=1';
 			}
             return Http.get(url).then(function(response) {
 				return response.data || response;
@@ -534,22 +534,6 @@ appStickerPipeStore.controller('StoreController', function($scope, packs, Config
 	});
 });
 
-appStickerPipeStore.value('En', {
-	download: 'Download',
-	openStickers: 'Open stickers',
-	buyPack: 'Buy pack',
-	unavailableContent: 'This content is currently unavailable',
-	get: 'Get'
-});
-
-appStickerPipeStore.value('Ru', {
-	download: 'Скачать',
-	openStickers: 'Открыть стикеры',
-	buyPack: 'Купить',
-	unavailableContent: 'В данный момент этот контент недоступен',
-	get: 'Скачать'
-});
-
 appStickerPipeStore.factory('AndroidPlatform', function() {
 
 	var platformJSProvider = window.AndroidJsInterface || {};
@@ -668,6 +652,22 @@ appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout
 		}
 
 	});
+});
+
+appStickerPipeStore.value('En', {
+	download: 'Download',
+	openStickers: 'Open stickers',
+	buyPack: 'Buy pack',
+	unavailableContent: 'This content is currently unavailable',
+	get: 'Get'
+});
+
+appStickerPipeStore.value('Ru', {
+	download: 'Скачать',
+	openStickers: 'Открыть стикеры',
+	buyPack: 'Купить',
+	unavailableContent: 'В данный момент этот контент недоступен',
+	get: 'Скачать'
 });
 
 appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
