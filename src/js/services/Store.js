@@ -1,6 +1,15 @@
 
 (function(Module) {
 
+	function sendAPIMessage(action, attrs) {
+		var iframe = Module.Service.Store.stickerpipe.storeView.iframe;
+
+		iframe && iframe.contentWindow.postMessage(JSON.stringify({
+			action: action,
+			attrs: attrs
+		}), Module.StickerHelper.getDomain(Module.Configs.storeUrl));
+	}
+
 	Module.Service.Store = {
 
 		stickerpipe: null,
@@ -11,60 +20,48 @@
 			this.stickerpipe = stickerpipe;
 		},
 
-		setOnPurchaseCallback: function(onPurchaseCallback) {
-			this.onPurchaseCallback = onPurchaseCallback;
-		},
-
-		showPackCollections: function(packName) {
+		showCollections: function(packName) {
 			this.stickerpipe.storeView.close();
 			this.stickerpipe.open(packName);
 		},
 
-		downloadPack: function(packName) {
-			var self = this;
-			Module.Api.changeUserPackStatus(packName, true, {
-				success: function () {
-					self.stickerpipe.fetchPacks(function() {
-						self.showPackCollections(packName);
-					});
-				}
+		downloadPack: function(packName, pricePoint) {
+			Module.Api.changeUserPackStatus(packName, true, pricePoint, {
+				success: (function () {
+					this.stickerpipe.fetchPacks((function() {
+						sendAPIMessage('onPackDownloaded', {
+							packName: packName
+						});
+					}).bind(this));
+				}).bind(this)
 			});
 		},
 
-		purchaseSuccess: function(packName) {
-			this.downloadPack(packName);
+		purchaseSuccess: function(packName, pricePoint) {
+			this.downloadPack(packName, pricePoint);
 		},
 
 		api: {
-			showPackCollections: function(data) {
-				Module.Service.Store.showPackCollections(data.attrs.packName);
-			},
-
-			downloadPack: function(data) {
-				Module.Service.Store.downloadPack(data.attrs.packName);
+			showCollections: function(data) {
+				Module.Service.Store.showCollections(data.attrs.packName);
 			},
 
 			purchasePack: function(data) {
-				var callback = Module.Service.Store.onPurchaseCallback;
+				var packName = data.attrs.packName,
+					packTitle = data.attrs.packTitle,
+					pricePoint = data.attrs.pricePoint;
 
-				callback && callback(
-					data.attrs.packName,
-					data.attrs.packTitle,
-					data.attrs.pricePoint
-				);
-			},
+				if (pricePoint == 'A') {
+					Module.Service.Store.downloadPack(packName, pricePoint);
+				} else {
+					var onPurchaseCallback = Module.Service.Store.onPurchaseCallback;
 
-			isPackActive: function(data) {
-				return this.isPackExistsInStorage(data);
-			},
-
-			isPackExistsInStorage: function(data) {
-				var exist = Module.BaseService.isExistPackInStorage(data.attrs.packName);
-				Module.Service.Store.stickerpipe.storeView._sendReturn(exist, data);
+					onPurchaseCallback && onPurchaseCallback(packName, packTitle, pricePoint);
+				}
 			},
 
 			resizeStore: function(data) {
-				Module.Service.Store.stickerpipe.storeView._resize(data.attrs.height);
+				Module.Service.Store.stickerpipe.storeView.resize(data.attrs.height);
 			}
 		}
 	};

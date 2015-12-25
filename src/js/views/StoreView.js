@@ -44,7 +44,7 @@
 			});
 
 			window.addEventListener('resize', (function() {
-				this._resize();
+				this.resize();
 			}).bind(this));
 		},
 
@@ -62,15 +62,7 @@
 			this.modal.close();
 		},
 
-		_sendReturn: function (value, data) {
-			this.iframe.contentWindow.postMessage(JSON.stringify({
-				action: data.action,
-				value: value,
-				hashKey: data.hashKey
-			}), Module.StickerHelper.getDomain(Module.Configs.storeUrl));
-		},
-
-		_resize: function(height) {
+		resize: function(height) {
 			height = height || 0;
 
 			var self = this;

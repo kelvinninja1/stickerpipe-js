@@ -195,8 +195,8 @@ window.StickersModule.View = {};
 			return Module.BaseService.onUserMessageSent(isSticker);
 		},
 
-		purchaseSuccess: function(packName) {
-			Module.Service.Store.purchaseSuccess(packName);
+		purchaseSuccess: function(packName, pricePoint) {
+			Module.Service.Store.purchaseSuccess(packName, pricePoint);
 		},
 
 		open: function(tabName) {
@@ -231,7 +231,7 @@ window.StickersModule.View = {};
 		},
 
 		onPurchase: function(callback) {
-			Module.Service.Store.setOnPurchaseCallback(callback);
+			Module.Service.Store.onPurchaseCallback = callback;
 		}
 	});
 

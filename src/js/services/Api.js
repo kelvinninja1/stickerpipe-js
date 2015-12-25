@@ -64,12 +64,28 @@
 			});
 		},
 
-		changeUserPackStatus: function(packName, status, callbacks) {
-			var url = getApiUrl('user/pack/' + packName);
+		changeUserPackStatus: function(packName, status, pricePoint, callbacks) {
+			var url = getApiUrl('user/pack/' + packName),
+				purchaseType = 'free';
+
+			if (pricePoint == 'B') {
+				purchaseType = 'oneoff';
+				if (Module.Configs.userPremium) {
+					purchaseType = 'subscription';
+				}
+			} else if (pricePoint == 'C') {
+				purchaseType = 'oneoff';
+			}
+
+			url += '?' + Module.StickerHelper.urlParamsSerialize({
+					purchase_type: purchaseType
+				});
 
 			Module.Http.post(url, {
 				status: status
-			}, callbacks);
+			}, callbacks, {
+				'Content-Type': 'application/json'
+			});
 		},
 
 		store: {

@@ -2093,12 +2093,28 @@ window.StickersModule.Service = {};
 			});
 		},
 
-		changeUserPackStatus: function(packName, status, callbacks) {
-			var url = getApiUrl('user/pack/' + packName);
+		changeUserPackStatus: function(packName, status, pricePoint, callbacks) {
+			var url = getApiUrl('user/pack/' + packName),
+				purchaseType = 'free';
+
+			if (pricePoint == 'B') {
+				purchaseType = 'oneoff';
+				if (Module.Configs.userPremium) {
+					purchaseType = 'subscription';
+				}
+			} else if (pricePoint == 'C') {
+				purchaseType = 'oneoff';
+			}
+
+			url += '?' + Module.StickerHelper.urlParamsSerialize({
+					purchase_type: purchaseType
+				});
 
 			Module.Http.post(url, {
 				status: status
-			}, callbacks);
+			}, callbacks, {
+				'Content-Type': 'application/json'
+			});
 		},
 
 		store: {
@@ -2477,7 +2493,7 @@ window.StickersModule.Service = {};
 			options.headers.Localization = Module.Configs.lang;
 
 			if (Module.Configs.userId !== null) {
-				options.headers.UserId = Module.StickerHelper.md5(Module.Configs.userId + Module.Configs.apiKey);
+				options.headers.UserId = Module.Configs.userId;
 			}
 
 			if (options.type == 'POST' || options.type == 'PUT') {
@@ -2591,6 +2607,15 @@ window.StickersModule.Service = {};
 
 (function(Module) {
 
+	function sendAPIMessage(action, attrs) {
+		var iframe = Module.Service.Store.stickerpipe.storeView.iframe;
+
+		iframe && iframe.contentWindow.postMessage(JSON.stringify({
+			action: action,
+			attrs: attrs
+		}), Module.StickerHelper.getDomain(Module.Configs.storeUrl));
+	}
+
 	Module.Service.Store = {
 
 		stickerpipe: null,
@@ -2601,60 +2626,48 @@ window.StickersModule.Service = {};
 			this.stickerpipe = stickerpipe;
 		},
 
-		setOnPurchaseCallback: function(onPurchaseCallback) {
-			this.onPurchaseCallback = onPurchaseCallback;
-		},
-
-		showPackCollections: function(packName) {
+		showCollections: function(packName) {
 			this.stickerpipe.storeView.close();
 			this.stickerpipe.open(packName);
 		},
 
-		downloadPack: function(packName) {
-			var self = this;
-			Module.Api.changeUserPackStatus(packName, true, {
-				success: function () {
-					self.stickerpipe.fetchPacks(function() {
-						self.showPackCollections(packName);
-					});
-				}
+		downloadPack: function(packName, pricePoint) {
+			Module.Api.changeUserPackStatus(packName, true, pricePoint, {
+				success: (function () {
+					this.stickerpipe.fetchPacks((function() {
+						sendAPIMessage('onPackDownloaded', {
+							packName: packName
+						});
+					}).bind(this));
+				}).bind(this)
 			});
 		},
 
-		purchaseSuccess: function(packName) {
-			this.downloadPack(packName);
+		purchaseSuccess: function(packName, pricePoint) {
+			this.downloadPack(packName, pricePoint);
 		},
 
 		api: {
-			showPackCollections: function(data) {
-				Module.Service.Store.showPackCollections(data.attrs.packName);
-			},
-
-			downloadPack: function(data) {
-				Module.Service.Store.downloadPack(data.attrs.packName);
+			showCollections: function(data) {
+				Module.Service.Store.showCollections(data.attrs.packName);
 			},
 
 			purchasePack: function(data) {
-				var callback = Module.Service.Store.onPurchaseCallback;
+				var packName = data.attrs.packName,
+					packTitle = data.attrs.packTitle,
+					pricePoint = data.attrs.pricePoint;
 
-				callback && callback(
-					data.attrs.packName,
-					data.attrs.packTitle,
-					data.attrs.pricePoint
-				);
-			},
+				if (pricePoint == 'A') {
+					Module.Service.Store.downloadPack(packName, pricePoint);
+				} else {
+					var onPurchaseCallback = Module.Service.Store.onPurchaseCallback;
 
-			isPackActive: function(data) {
-				return this.isPackExistsInStorage(data);
-			},
-
-			isPackExistsInStorage: function(data) {
-				var exist = Module.BaseService.isExistPackInStorage(data.attrs.packName);
-				Module.Service.Store.stickerpipe.storeView._sendReturn(exist, data);
+					onPurchaseCallback && onPurchaseCallback(packName, packTitle, pricePoint);
+				}
 			},
 
 			resizeStore: function(data) {
-				Module.Service.Store.stickerpipe.storeView._resize(data.attrs.height);
+				Module.Service.Store.stickerpipe.storeView.resize(data.attrs.height);
 			}
 		}
 	};
@@ -4302,7 +4315,7 @@ window.StickersModule.View = {};
 			});
 
 			window.addEventListener('resize', (function() {
-				this._resize();
+				this.resize();
 			}).bind(this));
 		},
 
@@ -4320,15 +4333,7 @@ window.StickersModule.View = {};
 			this.modal.close();
 		},
 
-		_sendReturn: function (value, data) {
-			this.iframe.contentWindow.postMessage(JSON.stringify({
-				action: data.action,
-				value: value,
-				hashKey: data.hashKey
-			}), Module.StickerHelper.getDomain(Module.Configs.storeUrl));
-		},
-
-		_resize: function(height) {
+		resize: function(height) {
 			height = height || 0;
 
 			var self = this;
@@ -4835,8 +4840,8 @@ window.StickersModule.View = {};
 			return Module.BaseService.onUserMessageSent(isSticker);
 		},
 
-		purchaseSuccess: function(packName) {
-			Module.Service.Store.purchaseSuccess(packName);
+		purchaseSuccess: function(packName, pricePoint) {
+			Module.Service.Store.purchaseSuccess(packName, pricePoint);
 		},
 
 		open: function(tabName) {
@@ -4871,7 +4876,7 @@ window.StickersModule.View = {};
 		},
 
 		onPurchase: function(callback) {
-			Module.Service.Store.setOnPurchaseCallback(callback);
+			Module.Service.Store.onPurchaseCallback = callback;
 		}
 	});
 
