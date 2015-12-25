@@ -225,7 +225,7 @@ h6 {
 .screen-header {
   background: rgba(255, 255, 255, 0.9);
   left: 0;
-  padding: 15px;
+  padding: 12px;
   position: fixed;
   top: 0;
   width: 100%; }
@@ -236,7 +236,7 @@ h6 {
     .screen-header .icon:hover {
       opacity: 0.7; }
   .screen-header + div {
-    margin-top: 55px; }
+    margin-top: 49px; }
 
 .icon {
   display: table; }
