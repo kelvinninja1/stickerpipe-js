@@ -236,7 +236,7 @@ h6 {
     .screen-header .icon:hover {
       opacity: 0.7; }
   .screen-header + div {
-    padding-top: 55px; }
+    margin-top: 55px; }
 
 .icon {
   display: table; }
@@ -281,30 +281,30 @@ h6 {
 
 .pack-header {
   background: rgba(0, 0, 0, 0.1);
-  margin-bottom: 10px;
-  padding: 0 20px; }
+  margin-bottom: 8px;
+  padding: 16px; }
 
 .pack-main-sticker {
-  margin-right: 10px;
+  margin-right: 8px;
   display: table-cell; }
   .pack-main-sticker img {
-    height: 160px;
-    width: 160px; }
+    height: 120px;
+    width: 120px; }
 
 .pack-info {
   display: table-cell;
   padding-top: 0;
-  padding-left: 30px;
+  padding-left: 24px;
   vertical-align: middle; }
   @media (max-width: 544px) {
     .pack-info {
-      padding-left: 10px; } }
+      padding-left: 8px; } }
 
 .pack-description {
-  padding-bottom: 10px; }
+  padding-bottom: 8px; }
 
 .pack-name {
-  margin-bottom: 10px; }
+  margin-bottom: 8px; }
 
 .pack-owner {
   font-weight: normal; }
@@ -339,7 +339,7 @@ h6 {
 
 .pack-preview {
   display: table;
-  margin: 10px auto;
+  margin: 8px auto;
   padding: 5px 10px; }
   .pack-preview:hover {
     background: rgba(0, 0, 0, 0.1);
