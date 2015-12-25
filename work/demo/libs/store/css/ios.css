@@ -256,7 +256,8 @@ h6 {
   background: #673ab7;
   border: 1px solid #673ab7;
   color: white; }
-  .btn-purple:hover {
+  .btn-purple:hover,
+  .btn-purple:focus {
     background: #8e24aa;
     border-color: #8e24aa;
     color: white; }
@@ -385,6 +386,9 @@ h6 {
   font-weight: bolder;
   padding: 0 8px;
   height: 26px !important; }
+  .btn:hover,
+  .btn:focus {
+    box-shadow: none; }
 
 .btn-purple {
   background: transparent;
@@ -392,3 +396,6 @@ h6 {
   .btn-purple:hover {
     background: transparent;
     color: #8e24aa; }
+  .btn-purple:focus {
+    background: #8e24aa;
+    color: white; }

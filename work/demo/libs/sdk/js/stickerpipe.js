@@ -2071,10 +2071,9 @@ window.StickersModule.Service = {};
 
 			if (Module.Configs.userId !== null) {
 				url = getApiUrl('packs');
-				url = getApiUrl('user/packs');
 
 				if (Module.Configs.userPremium) {
-					//url += '?is_subscriber=1';
+					url += '?is_subscriber=1';
 				}
 			}
 
