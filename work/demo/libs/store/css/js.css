@@ -247,7 +247,6 @@ h6 {
   font-size: 14px;
   margin-right: 10px;
   outline: none;
-  height: 40px;
   padding: 0 20px; }
   .btn:focus {
     outline: none !important; }
@@ -383,6 +382,9 @@ h6 {
   @media screen and (min-width: 768px) {
     .packs .col {
       width: 20%; } }
+
+.btn {
+  min-height: 40px; }
 
 .btn-action {
   min-width: 100px; }

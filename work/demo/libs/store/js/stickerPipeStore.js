@@ -31,7 +31,7 @@ appStickerPipeStore.controller('AppController', function(Config, envService) {
 
 	if (envService.is('local') || envService.is('development')) {
 		document.getElementById('css').setAttribute('href', envService.read('cssUrl') + Config.platform.toLocaleLowerCase() + '.css?v='+(+(new Date())));
-		document.getElementById('css').setAttribute('href', envService.read('cssUrl') + 'ios' + '.css?v='+(+(new Date())));
+		//document.getElementById('css').setAttribute('href', envService.read('cssUrl') + 'ios' + '.css?v='+(+(new Date())));
 	}
 });
 angular.module('environment',[]).provider('envService',function(){this.environment='development';this.data={};this.config=function(config){this.data=config;};this.set=function(environment){this.environment=environment;};this.get=function(){return this.environment;};this.read=function(variable){if(variable!=='all'){return this.data.vars[this.get()][variable];}
@@ -488,6 +488,15 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $route) {
 
 });
 
+appStickerPipeStore.directive('basePage', function() {
+
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/view.tpl',
+		link: function($scope, $el, attrs) {}
+	};
+});
+
 appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack) {
 
 	angular.extend($scope, {
@@ -515,15 +524,6 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 	});
 });
 
-appStickerPipeStore.directive('basePage', function() {
-
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/view.tpl',
-		link: function($scope, $el, attrs) {}
-	};
-});
-
 appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI) {
 
 	angular.extend($scope, {
@@ -534,6 +534,22 @@ appStickerPipeStore.controller('StoreController', function($scope, packs, Config
 			return pack.main_icon[Config.resolutionType];
 		}
 	});
+});
+
+appStickerPipeStore.value('En', {
+	download: 'Download',
+	open: 'Open',
+	buyPack: 'Buy pack',
+	unavailableContent: 'This content is currently unavailable',
+	get: 'Get'
+});
+
+appStickerPipeStore.value('Ru', {
+	download: 'Скачать',
+	open: 'Открыть',
+	buyPack: 'Купить',
+	unavailableContent: 'В данный момент этот контент недоступен',
+	get: 'Скачать'
 });
 
 appStickerPipeStore.factory('AndroidPlatform', function() {
@@ -654,22 +670,6 @@ appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout
 		}
 
 	});
-});
-
-appStickerPipeStore.value('En', {
-	download: 'Download',
-	open: 'Open',
-	buyPack: 'Buy pack',
-	unavailableContent: 'This content is currently unavailable',
-	get: 'Get'
-});
-
-appStickerPipeStore.value('Ru', {
-	download: 'Скачать',
-	open: 'Открыть',
-	buyPack: 'Купить',
-	unavailableContent: 'В данный момент этот контент недоступен',
-	get: 'Скачать'
 });
 
 appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {

@@ -247,7 +247,6 @@ h6 {
   font-size: 14px;
   margin-right: 10px;
   outline: none;
-  height: 40px;
   padding: 0 20px; }
   .btn:focus {
     outline: none !important; }
@@ -389,8 +388,7 @@ h6 {
   border-radius: 3px;
   font-size: 13px;
   font-weight: bolder;
-  padding: 0 8px;
-  height: 26px !important; }
+  padding: 4px 8px; }
   .btn:hover,
   .btn:focus {
     box-shadow: none; }
