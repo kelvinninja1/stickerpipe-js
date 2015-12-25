@@ -123,8 +123,8 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   cursor: pointer;
   opacity: 0.5;
   position: absolute;
-  top: 15px;
-  right: 15px;
+  top: 12px;
+  right: 12px;
 }
 
 .sp-icon-close:hover {
