@@ -337,6 +337,9 @@ h6 {
       height: 80px;
       width: 80px; }
 
+.btn-action {
+  margin-bottom: 8px; }
+
 .pack-preview {
   display: table;
   margin: 8px auto;
@@ -379,7 +382,7 @@ h6 {
 
 .btn {
   font-size: 13px;
-  font-weight: 500;
+  font-weight: bolder;
   padding: 0 8px;
   height: 26px !important; }
 
