@@ -300,11 +300,12 @@ h6 {
 .pack-description {
   padding-bottom: 8px; }
 
-.pack-name {
+.pack-title {
+  font-size: 24px;
   margin-bottom: 8px; }
 
 .pack-owner {
-  font-weight: normal; }
+  font-size: 14px; }
   .pack-owner:before {
     content: "©";
     margin-right: 5px; }
