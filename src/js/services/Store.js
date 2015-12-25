@@ -51,7 +51,7 @@
 					packTitle = data.attrs.packTitle,
 					pricePoint = data.attrs.pricePoint;
 
-				if (pricePoint == 'A') {
+				if (pricePoint == 'A' || (pricePoint == 'B' && Module.Configs.userPremium)) {
 					Module.Service.Store.downloadPack(packName, pricePoint);
 				} else {
 					var onPurchaseCallback = Module.Service.Store.onPurchaseCallback;

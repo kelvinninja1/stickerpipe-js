@@ -2038,7 +2038,7 @@ window.StickersModule.Service = {};
 			density: Module.Configs.stickerResolutionType,
 			priceB: Module.Configs.priceB,
 			priceC: Module.Configs.priceC,
-			isPremium: Module.Configs.userPremium,
+			isPremium: (Module.Configs.userPremium ? 1 : 0),
 			localization: Module.Configs.lang
 		};
 
@@ -2070,7 +2070,11 @@ window.StickersModule.Service = {};
 			var url = getApiUrl('client-packs');
 
 			if (Module.Configs.userId !== null) {
-				url = getApiUrl('user/packs');
+				url = getApiUrl('packs');
+
+				if (Module.Configs.userPremium) {
+					url += '?is_subscriber=1';
+				}
 			}
 
 			Module.Http.get(url, {
@@ -2657,7 +2661,7 @@ window.StickersModule.Service = {};
 					packTitle = data.attrs.packTitle,
 					pricePoint = data.attrs.pricePoint;
 
-				if (pricePoint == 'A') {
+				if (pricePoint == 'A' || (pricePoint == 'B' && Module.Configs.userPremium)) {
 					Module.Service.Store.downloadPack(packName, pricePoint);
 				} else {
 					var onPurchaseCallback = Module.Service.Store.onPurchaseCallback;
