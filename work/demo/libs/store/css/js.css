@@ -250,7 +250,7 @@ h6 {
   height: 40px;
   padding: 0 20px; }
   .btn:focus {
-    outline: none; }
+    outline: none !important; }
 
 .btn-purple {
   background: #9c27b0;
