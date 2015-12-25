@@ -2071,9 +2071,10 @@ window.StickersModule.Service = {};
 
 			if (Module.Configs.userId !== null) {
 				url = getApiUrl('packs');
+				url = getApiUrl('user/packs');
 
 				if (Module.Configs.userPremium) {
-					url += '?is_subscriber=1';
+					//url += '?is_subscriber=1';
 				}
 			}
 
@@ -2639,6 +2640,7 @@ window.StickersModule.Service = {};
 			Module.Api.changeUserPackStatus(packName, true, pricePoint, {
 				success: (function () {
 					this.stickerpipe.fetchPacks((function() {
+						sendAPIMessage('reload');
 						sendAPIMessage('onPackDownloaded', {
 							packName: packName
 						});
