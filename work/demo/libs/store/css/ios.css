@@ -379,8 +379,9 @@ h6 {
 
 .btn {
   font-size: 13px;
+  font-weight: 500;
   padding: 0 8px;
-  height: 30px; }
+  height: 26px !important; }
 
 .btn-purple {
   background: transparent;
