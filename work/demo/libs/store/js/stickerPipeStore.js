@@ -377,7 +377,7 @@ appStickerPipeStore.factory('Http', ['$http', '$q', 'Config', function($http, $q
     return Http;
 
 }]);
-appStickerPipeStore.factory('HttpApi', function(Http, EnvConfig) {
+appStickerPipeStore.factory('HttpApi', function(Http, EnvConfig, Config) {
 
     var apiVersion = 1,
         getUrl = function(uri) {
@@ -387,7 +387,12 @@ appStickerPipeStore.factory('HttpApi', function(Http, EnvConfig) {
 
     return angular.extend({}, {
         getPack: function(packName) {
-            return Http.get(getUrl('pack/' + packName)).then(function(response) {
+			var url = getUrl('pack/' + packName);
+
+			if (Config.isPremium) {
+				url += 'is_subscriber=1';
+			}
+            return Http.get(url).then(function(response) {
 				return response.data || response;
             });
         },
@@ -665,6 +670,20 @@ appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout
 	});
 });
 
+appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
+	
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/error/view.tpl',
+		link: function($scope, $el, attrs) {
+
+			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
+			$scope.i18n = i18n;
+		}
+
+	};
+});
+
 appStickerPipeStore.directive('preloader', function($rootScope) {
 
 	return {
@@ -690,20 +709,6 @@ appStickerPipeStore.directive('preloader', function($rootScope) {
 				}
 			});
 
-		}
-
-	};
-});
-
-appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
-	
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/error/view.tpl',
-		link: function($scope, $el, attrs) {
-
-			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
-			$scope.i18n = i18n;
 		}
 
 	};
