@@ -256,10 +256,10 @@ h6 {
   background: #9c27b0;
   color: white; }
   .btn-purple:hover {
-    background: #9c27b0;
+    background: #4a148c;
     color: white; }
   .btn-purple:focus {
-    background: #4a148c;
+    background: #9c27b0;
     color: white; }
 
 .error {
