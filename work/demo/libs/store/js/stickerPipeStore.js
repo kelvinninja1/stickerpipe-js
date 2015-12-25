@@ -31,13 +31,30 @@ var appStickerPipeStore = angular.module('appStickerPipeStore', [
 	'environment'
 ]);
 
-appStickerPipeStore.controller('AppController', function(Config, envService, PlatformAPI) {
+appStickerPipeStore.run(function($rootScope, PlatformAPI) {
+
+	PlatformAPI.init();
+
+	$rootScope.$on('$routeChangeStart', function() {
+		PlatformAPI.togglePreloader(true);
+	});
+
+	$rootScope.$on('$routeChangeSuccess', function() {
+		PlatformAPI.togglePreloader(false);
+		$rootScope.error = false;
+	});
+
+	$rootScope.$on('$routeChangeError', function(e, c, p, error) {
+		PlatformAPI.togglePreloader(false);
+		$rootScope.error = true;
+	});
+});
+
+appStickerPipeStore.controller('AppController', function(Config, envService) {
 
 	if (envService.is('local') || envService.is('development')) {
 		document.getElementById('css').setAttribute('href', envService.read('cssUrl') + Config.platform.toLocaleLowerCase() + '.css?v='+(+(new Date())));
 	}
-
-	PlatformAPI.init();
 });
 appStickerPipeStore.config(function(envServiceProvider) {
 
@@ -245,22 +262,6 @@ appStickerPipeStore.config(function($routeProvider) {
 		.otherwise({
 			redirectTo: '/store'
 		});
-});
-
-appStickerPipeStore.run(function($rootScope) {
-	$rootScope.$on('$routeChangeStart', function() {
-		$rootScope.$emit('preloaderShow');
-	});
-
-	$rootScope.$on('$routeChangeSuccess', function() {
-		$rootScope.$emit('preloaderHide');
-		$rootScope.error = false;
-	});
-
-	$rootScope.$on('$routeChangeError', function(e, c, p, error) {
-		$rootScope.$emit('preloaderHide');
-		$rootScope.error = true;
-	});
 });
 appStickerPipeStore.factory('EnvConfig', ['envService', function(envService) {
 	return envService.read('all');
@@ -479,6 +480,15 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $route) {
 
 });
 
+appStickerPipeStore.directive('basePage', function() {
+
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/view.tpl',
+		link: function($scope, $el, attrs) {}
+	};
+});
+
 appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack) {
 
 	angular.extend($scope, {
@@ -504,15 +514,6 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 			PlatformAPI.purchasePack(pack.title, pack.pack_name, pack.pricepoint);
 		}
 	});
-});
-
-appStickerPipeStore.directive('basePage', function() {
-
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/view.tpl',
-		link: function($scope, $el, attrs) {}
-	};
 });
 
 appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI) {
@@ -559,6 +560,10 @@ appStickerPipeStore.factory('AndroidPlatform', function() {
 
 		purchasePack: function(packTitle, packName, packPrice) {
 			return platformJSProvider.purchasePack(packTitle, packName, packPrice);
+		},
+
+		togglePreloader: function(show) {
+			return platformJSProvider.setInProgress(show);
 		},
 
 		////////////////////////////////////////////////////////////
@@ -628,6 +633,14 @@ appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout
 			});
 		},
 
+		togglePreloader: function(show) {
+			if (show) {
+				$rootScope.$emit('preloaderShow');
+			} else {
+				$rootScope.$emit('preloaderHide');
+			}
+		},
+
 		resizeStore: function() {
 			var storeEl = document.getElementsByClassName('store')[0];
 
@@ -647,20 +660,6 @@ appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout
 		}
 
 	});
-});
-
-appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
-	
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/error/view.tpl',
-		link: function($scope, $el, attrs) {
-
-			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
-			$scope.i18n = i18n;
-		}
-
-	};
 });
 
 appStickerPipeStore.directive('preloader', function($rootScope) {
@@ -688,6 +687,20 @@ appStickerPipeStore.directive('preloader', function($rootScope) {
 				hidePreloader();
 			});
 
+		}
+
+	};
+});
+
+appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
+	
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/error/view.tpl',
+		link: function($scope, $el, attrs) {
+
+			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
+			$scope.i18n = i18n;
 		}
 
 	};
