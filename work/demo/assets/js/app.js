@@ -18,6 +18,7 @@ var App = _makeClass(function(options) {
 
 	// todo: rename to stickerpipe
 	stickerpipe: null,
+	configs: null,
 	randomUsers: [],
 	currentUser: {},
 
@@ -31,7 +32,9 @@ var App = _makeClass(function(options) {
 	priceB: 0.99,
 	priceC: 1.99,
 
-	_constructor: function() {
+	_constructor: function(configs) {
+		this.configs = configs;
+
 		// setting lo-dash template
 		_.templateSettings = {
 			evaluate: /\{\[([\s\S]+?)\]\}/g,   // {[ alert() ]}
@@ -89,8 +92,7 @@ var App = _makeClass(function(options) {
 
 			cdnUrl: 'http://work.stk.908.vc',
 			apiUrl: 'http://work.stk.908.vc',
-			storeUrl: 'http://work.stk.908.vc/api/v1/web?uri=' + encodeURIComponent('http://demo.stickerpipe.com/work/demo/libs/store/js/stickerPipeStore.js'),
-			//storeUrl: 'http://localhost/stickerpipe/store/build',
+			storeUrl: this.configs.storeUrl,
 
 			userId: this.getUserId(),
 			userPremium: this.isUserPremium(),
