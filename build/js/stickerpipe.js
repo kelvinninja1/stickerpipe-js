@@ -2639,6 +2639,7 @@ window.StickersModule.Service = {};
 			Module.Api.changeUserPackStatus(packName, true, pricePoint, {
 				success: (function () {
 					this.stickerpipe.fetchPacks((function() {
+						sendAPIMessage('reload');
 						sendAPIMessage('onPackDownloaded', {
 							packName: packName
 						});
