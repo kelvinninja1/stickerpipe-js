@@ -294,11 +294,8 @@ h6 {
 .pack-info {
   display: table-cell;
   padding-top: 0;
-  padding-left: 24px;
+  padding-left: 8px;
   vertical-align: middle; }
-  @media (max-width: 544px) {
-    .pack-info {
-      padding-left: 8px; } }
 
 .pack-description {
   padding-bottom: 8px; }
