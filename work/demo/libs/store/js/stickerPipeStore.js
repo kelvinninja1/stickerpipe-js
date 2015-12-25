@@ -27,6 +27,8 @@ appStickerPipeStore.run(function($rootScope, PlatformAPI) {
 
 appStickerPipeStore.controller('AppController', function(Config, envService) {
 
+	document.body.addEventListener('touchstart',function(){},false);
+
 	if (envService.is('local') || envService.is('development')) {
 		document.getElementById('css').setAttribute('href', envService.read('cssUrl') + Config.platform.toLocaleLowerCase() + '.css?v='+(+(new Date())));
 		document.getElementById('css').setAttribute('href', envService.read('cssUrl') + 'ios' + '.css?v='+(+(new Date())));
@@ -142,7 +144,7 @@ module.run(['$templateCache', function($templateCache) {
     '		<div class="pack-title">{{ pack.title }}</div>\n' +
     '\n' +
     '		<div data-ng-show="packService.isActive(pack)">\n' +
-    '			<button class="btn btn-purple btn-action" data-ng-click="showCollections()">{{ i18n.openStickers.toUpperCase() }}</button>\n' +
+    '			<button class="btn btn-purple btn-action" data-ng-click="showCollections()">{{ i18n.open.toUpperCase() }}</button>\n' +
     '		</div>\n' +
     '		<div data-ng-show="!packService.isActive(pack)">\n' +
     '\n' +
@@ -486,15 +488,6 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $route) {
 
 });
 
-appStickerPipeStore.directive('basePage', function() {
-
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/view.tpl',
-		link: function($scope, $el, attrs) {}
-	};
-});
-
 appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack) {
 
 	angular.extend($scope, {
@@ -520,6 +513,15 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 			PlatformAPI.purchasePack(pack.title, pack.pack_name, pack.pricepoint);
 		}
 	});
+});
+
+appStickerPipeStore.directive('basePage', function() {
+
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/view.tpl',
+		link: function($scope, $el, attrs) {}
+	};
 });
 
 appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI) {
@@ -656,7 +658,7 @@ appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout
 
 appStickerPipeStore.value('En', {
 	download: 'Download',
-	openStickers: 'Open stickers',
+	open: 'Open',
 	buyPack: 'Buy pack',
 	unavailableContent: 'This content is currently unavailable',
 	get: 'Get'
@@ -664,7 +666,7 @@ appStickerPipeStore.value('En', {
 
 appStickerPipeStore.value('Ru', {
 	download: 'Скачать',
-	openStickers: 'Открыть стикеры',
+	open: 'Открыть',
 	buyPack: 'Купить',
 	unavailableContent: 'В данный момент этот контент недоступен',
 	get: 'Скачать'
