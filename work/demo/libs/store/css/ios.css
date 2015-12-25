@@ -243,7 +243,7 @@ h6 {
 
 .btn {
   border: 0;
-  border-radius: 3px;
+  border-radius: 2px;
   font-size: 14px;
   margin-right: 10px;
   outline: none;
@@ -253,13 +253,13 @@ h6 {
     outline: none; }
 
 .btn-purple {
-  background: #673ab7;
-  border: 1px solid #673ab7;
+  background: #9c27b0;
   color: white; }
-  .btn-purple:hover,
+  .btn-purple:hover {
+    background: #9c27b0;
+    color: white; }
   .btn-purple:focus {
-    background: #8e24aa;
-    border-color: #8e24aa;
+    background: #4a148c;
     color: white; }
 
 .error {
@@ -281,7 +281,7 @@ h6 {
     text-transform: uppercase; }
 
 .pack-header {
-  background: rgba(0, 0, 0, 0.1);
+  background: #eee;
   margin-bottom: 8px;
   padding: 16px; }
 
@@ -382,6 +382,8 @@ h6 {
       width: 20%; } }
 
 .btn {
+  border: 1px solid;
+  border-radius: 3px;
   font-size: 13px;
   font-weight: bolder;
   padding: 0 8px;
@@ -392,10 +394,13 @@ h6 {
 
 .btn-purple {
   background: transparent;
-  color: #673ab7; }
+  border-color: #9c27b0;
+  color: #9c27b0; }
   .btn-purple:hover {
-    background: transparent;
-    color: #8e24aa; }
-  .btn-purple:focus {
-    background: #8e24aa;
+    background: #9c27b0;
+    border-color: #9c27b0;
     color: white; }
+  .btn-purple:focus {
+    background: transparent;
+    border-color: #4a148c;
+    color: #4a148c; }
