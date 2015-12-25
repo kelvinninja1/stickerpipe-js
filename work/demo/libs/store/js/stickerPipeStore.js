@@ -488,19 +488,9 @@ appStickerPipeStore.directive('basePage', function() {
 	};
 });
 
-appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI) {
-
-	angular.extend($scope, {
-		platformAPI: PlatformAPI,
-		packs: packs.packs,
-
-		getPackMainIcon: function(pack) {
-			return pack.main_icon[Config.resolutionType];
-		}
-	});
-});
-
 appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack) {
+
+	console.log(PackService.isHidden(pack), (pack.pricepoint == 'A'), (pack.pricepoint == 'B' && Config.isPremium));
 
 	angular.extend($scope, {
 		config: Config,
@@ -523,6 +513,18 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 
 		purchasePack: function() {
 			PlatformAPI.purchasePack(pack.title, pack.pack_name, pack.pricepoint);
+		}
+	});
+});
+
+appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI) {
+
+	angular.extend($scope, {
+		platformAPI: PlatformAPI,
+		packs: packs.packs,
+
+		getPackMainIcon: function(pack) {
+			return pack.main_icon[Config.resolutionType];
 		}
 	});
 });
