@@ -1,11 +1,3 @@
-
-var appStickerPipeStore = angular.module('appStickerPipeStore', [
-	'ngRoute',
-	'angular-google-analytics',
-	'partials',
-	'angularSpinner',
-	'environment'
-]);
 angular.module('environment',[]).provider('envService',function(){this.environment='development';this.data={};this.config=function(config){this.data=config;};this.set=function(environment){this.environment=environment;};this.get=function(){return this.environment;};this.read=function(variable){if(variable!=='all'){return this.data.vars[this.get()][variable];}
 	return this.data.vars[this.get()];};this.is=function(environment){return(environment===this.environment);};this.check=function(){var	location=window.location.href,self=this;angular.forEach(this.data.domains,function(v,k){angular.forEach(v,function(v){if(location.match('//'+v)){self.environment=k;}});});};this.$get=function(){return this;};});
 /**
@@ -31,99 +23,47 @@ angular.module('environment',[]).provider('envService',function(){this.environme
     e,u,b)})}function k(){var a,b;c.forEach(g,function(d,g){var q;if(q=!b){var h=f.path();q=d.keys;var l={};if(d.regexp)if(h=d.regexp.exec(h)){for(var k=1,m=h.length;k<m;++k){var n=q[k-1],p=h[k];n&&p&&(l[n.name]=p)}q=l}else q=null;else q=null;q=a=q}q&&(b=r(d,{params:c.extend({},f.search(),a),pathParams:a}),b.$$route=d)});return b||g[null]&&r(g[null],{params:{},pathParams:{}})}function t(a,b){var d=[];c.forEach((a||"").split(":"),function(a,c){if(0===c)d.push(a);else{var f=a.match(/(\w+)(?:[?*])?(.*)/),
     g=f[1];d.push(b[g]);d.push(f[2]||"");delete b[g]}});return d.join("")}var w=!1,n,v,s={routes:g,reload:function(){w=!0;a.$evalAsync(function(){l();m()})},updateParams:function(a){if(this.current&&this.current.$$route)a=c.extend({},this.current.params,a),f.path(t(this.current.$$route.originalPath,a)),f.search(a);else throw B("norout");}};a.$on("$locationChangeStart",l);a.$on("$locationChangeSuccess",m);return s}]});var B=c.$$minErr("ngRoute");p.provider("$routeParams",function(){this.$get=function(){return{}}});
     p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScroll","$animate"];A.$inject=["$compile","$controller","$route"]})(window,window.angular);
-/**
- * angular-spinner version 0.5.0
- * License: MIT.
- * Copyright (C) 2013, 2014, Uri Shaked and contributors.
- */
 
-(function (root) {
-	'use strict';
+var appStickerPipeStore = angular.module('appStickerPipeStore', [
+	'ngRoute',
+	'angular-google-analytics',
+	'partials',
+	'environment'
+]);
 
-	function factory(angular, Spinner) {
+appStickerPipeStore.run(function($rootScope, PlatformAPI, $window, $timeout) {
 
-		angular
-			.module('angularSpinner', [])
+	PlatformAPI.init();
 
-			.factory('usSpinnerService', ['$rootScope', function ($rootScope) {
-				var config = {};
+	$rootScope.$on('$viewContentLoaded', function () {
+		$timeout(function() {
+			$window.scrollTo(0, 0);
+		}, 100);
+	});
 
-				config.spin = function (key) {
-					$rootScope.$broadcast('us-spinner:spin', key);
-				};
+	$rootScope.$on('$routeChangeStart', function() {
+		PlatformAPI.showInProgress(true);
+	});
 
-				config.stop = function (key) {
-					$rootScope.$broadcast('us-spinner:stop', key);
-				};
+	$rootScope.$on('$routeChangeSuccess', function() {
+		PlatformAPI.showInProgress(false);
+		$rootScope.error = false;
+	});
 
-				return config;
-			}])
+	$rootScope.$on('$routeChangeError', function(e, c, p, error) {
+		PlatformAPI.showInProgress(false);
+		$rootScope.error = true;
+	});
+});
 
-			.directive('usSpinner', ['$window', function ($window) {
-				return {
-					scope: true,
-					link: function (scope, element, attr) {
-						var SpinnerConstructor = Spinner || $window.Spinner;
+appStickerPipeStore.controller('AppController', function(Config, envService) {
 
-						scope.spinner = null;
+	document.body.addEventListener('touchstart',function(){},false);
 
-						scope.key = angular.isDefined(attr.spinnerKey) ? attr.spinnerKey : false;
-
-						scope.startActive = angular.isDefined(attr.spinnerStartActive) ?
-							attr.spinnerStartActive : scope.key ?
-							false : true;
-
-						scope.spin = function () {
-							if (scope.spinner) {
-								scope.spinner.spin(element[0]);
-							}
-						};
-
-						scope.stop = function () {
-							if (scope.spinner) {
-								scope.spinner.stop();
-							}
-						};
-
-						scope.$watch(attr.usSpinner, function (options) {
-							scope.stop();
-							scope.spinner = new SpinnerConstructor(options);
-							if (!scope.key || scope.startActive) {
-								scope.spinner.spin(element[0]);
-							}
-						}, true);
-
-						scope.$on('us-spinner:spin', function (event, key) {
-							if (key === scope.key) {
-								scope.spin();
-							}
-						});
-
-						scope.$on('us-spinner:stop', function (event, key) {
-							if (key === scope.key) {
-								scope.stop();
-							}
-						});
-
-						scope.$on('$destroy', function () {
-							scope.stop();
-							scope.spinner = null;
-						});
-					}
-				};
-			}]);
+	if (envService.is('local') || envService.is('development')) {
+		document.getElementById('css').setAttribute('href', envService.read('cssUrl') + Config.platform.toLocaleLowerCase() + '.css?v='+(+(new Date())));
 	}
-
-	if (typeof define === 'function' && define.amd) {
-		/* AMD module */
-		define(['angular', 'spin'], factory);
-	} else {
-		/* Browser global */
-		factory(root.angular);
-	}
-}(window));
-// http://spin.js.org/#v2.3.2
-!function(a,b){"object"==typeof module&&module.exports?module.exports=b():"function"==typeof define&&define.amd?define(b):a.Spinner=b()}(this,function(){"use strict";function a(a,b){var c,d=document.createElement(a||"div");for(c in b)d[c]=b[c];return d}function b(a){for(var b=1,c=arguments.length;c>b;b++)a.appendChild(arguments[b]);return a}function c(a,b,c,d){var e=["opacity",b,~~(100*a),c,d].join("-"),f=.01+c/d*100,g=Math.max(1-(1-a)/b*(100-f),a),h=j.substring(0,j.indexOf("Animation")).toLowerCase(),i=h&&"-"+h+"-"||"";return m[e]||(k.insertRule("@"+i+"keyframes "+e+"{0%{opacity:"+g+"}"+f+"%{opacity:"+a+"}"+(f+.01)+"%{opacity:1}"+(f+b)%100+"%{opacity:"+a+"}100%{opacity:"+g+"}}",k.cssRules.length),m[e]=1),e}function d(a,b){var c,d,e=a.style;if(b=b.charAt(0).toUpperCase()+b.slice(1),void 0!==e[b])return b;for(d=0;d<l.length;d++)if(c=l[d]+b,void 0!==e[c])return c}function e(a,b){for(var c in b)a.style[d(a,c)||c]=b[c];return a}function f(a){for(var b=1;b<arguments.length;b++){var c=arguments[b];for(var d in c)void 0===a[d]&&(a[d]=c[d])}return a}function g(a,b){return"string"==typeof a?a:a[b%a.length]}function h(a){this.opts=f(a||{},h.defaults,n)}function i(){function c(b,c){return a("<"+b+' xmlns="urn:schemas-microsoft.com:vml" class="spin-vml">',c)}k.addRule(".spin-vml","behavior:url(#default#VML)"),h.prototype.lines=function(a,d){function f(){return e(c("group",{coordsize:k+" "+k,coordorigin:-j+" "+-j}),{width:k,height:k})}function h(a,h,i){b(m,b(e(f(),{rotation:360/d.lines*a+"deg",left:~~h}),b(e(c("roundrect",{arcsize:d.corners}),{width:j,height:d.scale*d.width,left:d.scale*d.radius,top:-d.scale*d.width>>1,filter:i}),c("fill",{color:g(d.color,a),opacity:d.opacity}),c("stroke",{opacity:0}))))}var i,j=d.scale*(d.length+d.width),k=2*d.scale*j,l=-(d.width+d.length)*d.scale*2+"px",m=e(f(),{position:"absolute",top:l,left:l});if(d.shadow)for(i=1;i<=d.lines;i++)h(i,-2,"progid:DXImageTransform.Microsoft.Blur(pixelradius=2,makeshadow=1,shadowopacity=.3)");for(i=1;i<=d.lines;i++)h(i);return b(a,m)},h.prototype.opacity=function(a,b,c,d){var e=a.firstChild;d=d.shadow&&d.lines||0,e&&b+d<e.childNodes.length&&(e=e.childNodes[b+d],e=e&&e.firstChild,e=e&&e.firstChild,e&&(e.opacity=c))}}var j,k,l=["webkit","Moz","ms","O"],m={},n={lines:12,length:7,width:5,radius:10,scale:1,corners:1,color:"#000",opacity:.25,rotate:0,direction:1,speed:1,trail:100,fps:20,zIndex:2e9,className:"spinner",top:"50%",left:"50%",shadow:!1,hwaccel:!1,position:"absolute"};if(h.defaults={},f(h.prototype,{spin:function(b){this.stop();var c=this,d=c.opts,f=c.el=a(null,{className:d.className});if(e(f,{position:d.position,width:0,zIndex:d.zIndex,left:d.left,top:d.top}),b&&b.insertBefore(f,b.firstChild||null),f.setAttribute("role","progressbar"),c.lines(f,c.opts),!j){var g,h=0,i=(d.lines-1)*(1-d.direction)/2,k=d.fps,l=k/d.speed,m=(1-d.opacity)/(l*d.trail/100),n=l/d.lines;!function o(){h++;for(var a=0;a<d.lines;a++)g=Math.max(1-(h+(d.lines-a)*n)%l*m,d.opacity),c.opacity(f,a*d.direction+i,g,d);c.timeout=c.el&&setTimeout(o,~~(1e3/k))}()}return c},stop:function(){var a=this.el;return a&&(clearTimeout(this.timeout),a.parentNode&&a.parentNode.removeChild(a),this.el=void 0),this},lines:function(d,f){function h(b,c){return e(a(),{position:"absolute",width:f.scale*(f.length+f.width)+"px",height:f.scale*f.width+"px",background:b,boxShadow:c,transformOrigin:"left",transform:"rotate("+~~(360/f.lines*k+f.rotate)+"deg) translate("+f.scale*f.radius+"px,0)",borderRadius:(f.corners*f.scale*f.width>>1)+"px"})}for(var i,k=0,l=(f.lines-1)*(1-f.direction)/2;k<f.lines;k++)i=e(a(),{position:"absolute",top:1+~(f.scale*f.width/2)+"px",transform:f.hwaccel?"translate3d(0,0,0)":"",opacity:f.opacity,animation:j&&c(f.opacity,f.trail,l+k*f.direction,f.lines)+" "+1/f.speed+"s linear infinite"}),f.shadow&&b(i,e(h("#000","0 0 4px #000"),{top:"2px"})),b(d,b(i,h(g(f.color,k),"0 0 1px rgba(0,0,0,.1)")));return d},opacity:function(a,b,c){b<a.childNodes.length&&(a.childNodes[b].style.opacity=c)}}),"undefined"!=typeof document){k=function(){var c=a("style",{type:"text/css"});return b(document.getElementsByTagName("head")[0],c),c.sheet||c.styleSheet}();var o=e(a("group"),{behavior:"url(#default#VML)"});!d(o,"transform")&&o.adj?i():j=d(o,"animation")}return h});
+});
 appStickerPipeStore.config(function(envServiceProvider) {
 
 	// default development(work)
@@ -131,10 +71,11 @@ appStickerPipeStore.config(function(envServiceProvider) {
 	envServiceProvider.config({
 		domains: {
 			local: ['localhost', '192.168.56.1'],
-			development: ['work.stk.908.vc'],
+			development: ['work.stk.908.vc', 'demo.stickerpipe.com'],
 			production: ['stickerpipe.com']
 		},
 		vars: {
+			// todo
 			local: {
 				cssUrl: 'css/',
 				notAvailableImgUrl: 'http://work.stk.908.vc/static/img/notavailable.png',
@@ -143,6 +84,7 @@ appStickerPipeStore.config(function(envServiceProvider) {
 				apiUrl: 'http://work.stk.908.vc/api/'
 			},
 			development: {
+				cssUrl: 'http://demo.stickerpipe.com/work/demo/libs/store/css/',
 				notAvailableImgUrl: 'http://work.stk.908.vc/static/img/notavailable.png',
 				coinImgUrl: 'http://work.stk.908.vc/libs/store/current/coins/',
 				stickersStorageUrl: 'http://work.stk.908.vc/stk/',
@@ -151,7 +93,7 @@ appStickerPipeStore.config(function(envServiceProvider) {
 			production: {
 				notAvailableImgUrl: 'http://stickerpipe.com/static/img/notavailable.png',
 				coinImgUrl: 'http://stickerpipe.com/libs/store/current/coins/',
-				stickersStorageUrl: 'http://api.stickerpipe.com/stk/',
+				stickersStorageUrl: 'http://cdn.stickerpipe.com/stk/',
 				apiUrl: 'http://api.stickerpipe.com/api/'
 			}
 		}
@@ -175,74 +117,12 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/basePage/BasePageView.tpl',
-    '<div data-page-spinner></div>\n' +
-    '\n' +
+  $templateCache.put('/modules/base-page/view.tpl',
+    '<!--<div class="version">0.0.7</div>-->\n' +
     '<div class="store">\n' +
-    '	<div data-ng-view=""></div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/pack/PackView.tpl',
-    '<div class="pack-screen {{ hasTappedSticker() ? \'hasTappedSticker\' : \'\' }}"\n' +
-    '	 ng-click="resetTappedSticker()">\n' +
-    '\n' +
-    '	<div class="pack-header">\n' +
-    '		<div data-pack-header pack="pack" sticker-url="getStickerUrl"></div>\n' +
-    '	</div>\n' +
-    '\n' +
-    '	<div class="pack-content">\n' +
-    '		<div class="container">\n' +
-    '			<div class="row">\n' +
-    '				<div class="col-xs-12">\n' +
-    '					<p class="description">{{ pack.get(\'description\') || \'\' }}</p>\n' +
-    '				</div>\n' +
-    '			</div>\n' +
-    '\n' +
-    '			<div class="row">\n' +
-    '				<div class="stickers">\n' +
-    '					<div class="sticker-container" ng-repeat="sticker in pack.get(\'stickers\')">\n' +
-    '						<div class="sticker {{ isTappedSticker(sticker) ? \'tapped\' : \'\' }}"\n' +
-    '						     ng-click="tapSticker(sticker); $event.stopPropagation();">\n' +
-    '\n' +
-    '							<img ng-src="{{ getStickerUrl(sticker.name) }}"\n' +
-    '							     alt="{{ sticker.name }}"\n' +
-    '							     class="img-responsive"/>\n' +
-    '						</div>\n' +
-    '					</div>\n' +
-    '				</div>\n' +
-    '			</div>\n' +
-    '		</div>\n' +
-    '	</div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/error/ErrorView.tpl',
-    '<div class="error-page">\n' +
-    '	<div class="container">\n' +
-    '		<div class="row">\n' +
-    '			<div class="col-xs-6 col-xs-offset-3">\n' +
-    '				<img src="{{ imgUrl }}" alt="" class="img-responsive"><br>\n' +
-    '				<p>{{ i18n.unavailableContent }}</p>\n' +
-    '			</div>\n' +
-    '		</div>\n' +
-    '	</div>\n' +
+    '	<div data-ng-show="!error" data-ng-view=""></div>\n' +
+    '	<div data-ng-show="error" data-error></div>\n' +
+    '	<div data-ng-show="preloader" data-preloader></div>\n' +
     '</div>');
 }]);
 })();
@@ -255,21 +135,16 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/store/StoreView.tpl',
-    '<div>StoreView</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/pack/actionButton/ActionButtonView.tpl',
-    '<div data-ng-show="show">\n' +
-    '	<a href="javascript: void(0);" ng-click="buttonOnClick(pack); $event.stopPropagation();">{{ buttonText }}</a>\n' +
-    '	<img ng-src="{{ getCoinUrl() }}" alt="" ng-if="showCoin">\n' +
+    '<div ng-class="{\'screen-header\': platformAPI.isJS()}" data-ng-show="platformAPI.isJS()"></div>\n' +
+    '<div class="packs">\n' +
+    '	<div class="col" data-ng-repeat="pack in packs">\n' +
+    '		<div class="pack-preview center-block">\n' +
+    '			<a href="#/packs/{{ pack.pack_name }}">\n' +
+    '				<img ng-src="{{ getPackMainIcon(pack) }}" alt="" class="pack-preview-sticker">\n' +
+    '				<h5 class="pack-preview-name">{{ pack.title }}</h5>\n' +
+    '			</a>\n' +
+    '		</div>\n' +
+    '	</div>\n' +
     '</div>');
 }]);
 })();
@@ -281,33 +156,95 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/pack/header/HeaderView.tpl',
-    '<div data-pack-banner\n' +
-    '     ng-if="!!getPackBanner()"\n' +
-    '     class="pack-banner"\n' +
-    '     style="background: url(\'{{ getPackBanner() }}\');">\n' +
+  $templateCache.put('/modules/pack/PackView.tpl',
+    '<div ng-class="{\'screen-header\': platformAPI.isJS()}" data-ng-show="platformAPI.isJS()">\n' +
+    '	<a href="#/store">\n' +
+    '		<span class="icon icon-back"></span>\n' +
+    '	</a>\n' +
     '</div>\n' +
+    '<div class="pack-header">\n' +
+    '	<div class="pack-main-sticker">\n' +
+    '		<img data-ng-src="{{ getMainStickerUrl() }}" alt="Main sticker">\n' +
+    '	</div>\n' +
     '\n' +
-    '<div class="pack-details-info">\n' +
-    '	<div class="container">\n' +
-    '		<div class="row">\n' +
-    '			<div class="col-xs-12">\n' +
-    '				<div class="pack-details-info-content">\n' +
-    '					<div class="pack-main-sticker">\n' +
-    '						<img src="{{ getMainStickerUrl() }}"\n' +
-    '						     alt="{{ pack.get(\'title\') }}"\n' +
-    '						     class="img-responsive">\n' +
-    '					</div>\n' +
+    '	<div class="pack-info">\n' +
+    '		<div class="pack-owner">{{ pack.artist }}</div>\n' +
+    '		<div class="pack-title">{{ pack.title }}</div>\n' +
     '\n' +
-    '					<div class="pack-info-box">\n' +
-    '						<h3>{{ pack.get(\'artist\') }}</h3>\n' +
-    '						<h1>{{ pack.get(\'title\') }}</h1>\n' +
-    '\n' +
-    '						<div pack-action-button pack="pack"></div>\n' +
-    '					</div>\n' +
-    '				</div>\n' +
+    '		<div data-ng-show="showActionProgress">\n' +
+    '			<div class="preloader2">\n' +
+    '				<div class="bounce1"></div>\n' +
+    '				<div class="bounce2"></div>\n' +
+    '				<div class="bounce3"></div>\n' +
     '			</div>\n' +
     '		</div>\n' +
+    '		<div data-ng-show="packService.isActive(pack) && !showActionProgress">\n' +
+    '			<button class="btn btn-purple btn-action" data-ng-click="showCollections()">{{ i18n.open.toUpperCase() }}</button>\n' +
+    '		</div>\n' +
+    '		<div data-ng-show="!packService.isActive(pack) && !showActionProgress">\n' +
+    '\n' +
+    '			<button class="btn btn-purple btn-action" data-ng-click="purchasePack()">\n' +
+    '				<span data-ng-show="packService.isHidden(pack) || (pack.pricepoint == \'A\') || (pack.pricepoint == \'B\' && config.isSubscriber)">\n' +
+    '					{{ i18n.download.toUpperCase() }}\n' +
+    '				</span>\n' +
+    '\n' +
+    '				<span data-ng-show="!packService.isHidden(pack) && (pack.pricepoint == \'C\' || (pack.pricepoint == \'B\' && !config.isSubscriber))">\n' +
+    '					<span data-ng-show="pack.pricepoint == \'B\' && !config.isSubscriber">{{ config.priceB }}</span>\n' +
+    '					<span data-ng-show="pack.pricepoint == \'C\'">{{ config.priceC }}</span>\n' +
+    '				</span>\n' +
+    '			</button>\n' +
+    '		</div>\n' +
+    '	</div>\n' +
+    '\n' +
+    '\n' +
+    '	<p class="pack-description" data-ng-show="pack.description">{{ pack.description || \'\' }}</p>\n' +
+    '</div>\n' +
+    '\n' +
+    '<div class="clearfix"></div>\n' +
+    '\n' +
+    '<div class="pack-stickers">\n' +
+    '	<div class="col" data-ng-repeat="sticker in pack.stickers">\n' +
+    '		<div class="sticker center-block">\n' +
+    '			<img data-ng-src="{{ getStickerUrl(sticker.name) }}" alt="{{ sticker.name }}" />\n' +
+    '		</div>\n' +
+    '	</div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/base-page/preloader/view.tpl',
+    '<div class="preloader">\n' +
+    '	<div class="preloader-content">\n' +
+    '		<div class="preloader-chasing-dots">\n' +
+    '			<div class="preloader-child preloader-dot1"></div>\n' +
+    '			<div class="preloader-child preloader-dot2"></div>\n' +
+    '		</div>\n' +
+    '	</div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/base-page/error/view.tpl',
+    '<div class="error">\n' +
+    '	<div class="error-content">\n' +
+    '		<div class="error-image">\n' +
+    '			<img src="{{ imgUrl }}" alt="">\n' +
+    '		</div>\n' +
+    '		<h5>{{ i18n.unavailableContent }}</h5>\n' +
     '	</div>\n' +
     '</div>');
 }]);
@@ -317,16 +254,21 @@ module.run(['$templateCache', function($templateCache) {
 appStickerPipeStore.config(function($routeProvider) {
 
 	$routeProvider
-		.when('/', {
+		.when('/store', {
 			controller: 'StoreController as storeController',
-			templateUrl: '/modules/store/StoreView.tpl'
+			templateUrl: '/modules/store/StoreView.tpl',
+			resolve: {
+				packs: function($route, HttpApi) {
+					return HttpApi.getPacks();
+				}
+			}
 		})
 		.when('/packs/:packName', {
 			controller: 'PackController as packController',
-			template: '<div pack-page pack="packController.pack"></div>',
+			templateUrl: '/modules/pack/PackView.tpl',
 			resolve: {
-				pack: function($route, PacksCollection) {
-					return PacksCollection.findOne($route.current.params.packName);
+				pack: function($route, HttpApi) {
+					return HttpApi.getPack($route.current.params.packName);
 				}
 			}
 		})
@@ -334,15 +276,8 @@ appStickerPipeStore.config(function($routeProvider) {
 			template: '<div error-page></div>'
 		})
 		.otherwise({
-			redirectTo: '/'
+			redirectTo: '/store'
 		});
-});
-
-appStickerPipeStore.run(function($rootScope, $location) {
-	$rootScope.$on('$routeChangeError', function(e, c, p, error) {
-		$location.path('/error');
-		$location.replace();
-	});
 });
 appStickerPipeStore.factory('EnvConfig', ['envService', function(envService) {
 	return envService.read('all');
@@ -457,7 +392,7 @@ appStickerPipeStore.factory('Http', ['$http', '$q', 'Config', function($http, $q
     return Http;
 
 }]);
-appStickerPipeStore.factory('HttpApi', function(Http, EnvConfig) {
+appStickerPipeStore.factory('HttpApi', function(Http, EnvConfig, Config) {
 
     var apiVersion = 1,
         getUrl = function(uri) {
@@ -467,9 +402,20 @@ appStickerPipeStore.factory('HttpApi', function(Http, EnvConfig) {
 
     return angular.extend({}, {
         getPack: function(packName) {
-            return Http.get(getUrl('pack/' + packName)).then(function(responce) {
-                return responce.data || responce;
+			var url = getUrl('pack/' + packName);
+
+			if (Config.isSubscriber) {
+				url += '?is_subscriber=1';
+			}
+            return Http.get(url).then(function(response) {
+				return response.data || response;
             });
+        },
+
+        getPacks: function() {
+			return Http.get(getUrl('shop')).then(function(response) {
+				return response.data || response;
+			});
         },
 
         changeUserPackStatus: function(packName, status) {
@@ -497,602 +443,304 @@ appStickerPipeStore.factory('i18n', ['Config', '$injector',
 
 
 
-appStickerPipeStore.factory('PlatformAPI', [
-	'Config',
-	'$injector',
-	'HttpApi',
-	'$q',
-	function(Config, $injector, HttpApi, $q) {
-
-		var PlatformInstance = {},
-			PlatformAPI = {
-				isAndroid: function() {
-					return Config.platform.toLowerCase() == 'android';
-				},
-
-				isJS: function() {
-					return Config.platform.toLowerCase() == 'js';
-				},
-
-				isIOS: function() {
-					return Config.platform.toLowerCase() == 'ios';
-				}
-			};
-
-		switch(true) {
-			case PlatformAPI.isAndroid():
-				PlatformInstance = $injector.get('AndroidPlatform');
-				break;
-			case PlatformAPI.isJS():
-				PlatformInstance = $injector.get('JSPlatform');
-				break;
-		}
-
-		return angular.extend(PlatformAPI, {
-
-			showPackCollections: function(pack) {
-				return PlatformInstance.showPackCollections(pack.get('pack_name'));
-			},
-
-			downloadPack: function(pack) {
-
-				if (Config.userId != null && Config.userId != 'null') {
-					return HttpApi.changeUserPackStatus(pack.get('pack_name'), 1).then(function() {
-						PlatformInstance.downloadPack(pack.get('pack_name'));
-					});
-				}
-
-				var deferred = $q.defer();
-				PlatformInstance.downloadPack(pack.get('pack_name'));
-				deferred.resolve();
-				return deferred.promise;
-
-			},
-
-			purchasePackInStore: function(pack) {
-				return PlatformInstance.purchasePackInStore(pack.get('title'), pack.get('product_id'), pack.get('price'), pack.get('pack_name'));
-			},
-
-			purchasePackInPlatformStore: function(pack) {
-				return PlatformInstance.purchasePackInPlatformStore(pack.get('product_id'));
-			},
-
-			isPackActive: function(pack) {
-				return PlatformInstance.isPackActive(pack.get('pack_name'));
-			},
-
-			getProductPrice: function(pack) {
-				return PlatformInstance.getProductPrice(pack.get('product_id'));
-			},
-
-			isPackExistsAtUserLibrary: function(pack) {
-				return PlatformInstance.isPackExistsAtUserLibrary(pack.get('pack_name'));
-			}
-
-		});
-
-	}]);
-
-appStickerPipeStore.controller('AppController', function(Config, envService) {
-
-	if (envService.is('local')) {
-		document.getElementById('css').setAttribute('href', envService.read('cssUrl') + Config.platform.toLocaleLowerCase() + '.css?v='+(+(new Date())));
-	}
-
-	this.getResolutionType = function() {
-		return Config.resolutionType;
-	};
-});
-
-appStickerPipeStore.value('En', {
-	download: 'Download',
-	openStickers: 'Open stickers',
-	buyPack: 'Buy pack',
-	unavailableContent: 'This content is currently unavailable'
-});
-
-appStickerPipeStore.value('Ru', {
-	download: 'Скачать',
-	openStickers: 'Открыть стикеры',
-	buyPack: 'Купить',
-	unavailableContent: 'В данный момент этот контент недоступен'
-});
-
-appStickerPipeStore.factory('AndroidPlatform', [
-	'BasePlatform',
-	function(BasePlatform) {
-
-		var platformJSProvider = window.AndroidJsInterface || {};
-
-		return angular.extend(BasePlatform, {
-
-			showPackCollections: function() {
-				return platformJSProvider.showCollections();
-			},
-
-			downloadPack: function(packName) {
-				return platformJSProvider.onPackDownloaded(packName);
-			},
-
-			purchasePackInStore: function(packTitle, packProductId, packPrice) {
-				return platformJSProvider.onPurchase(packTitle, packProductId, packPrice);
-			},
-
-			purchasePackInPlatformStore: function(packProductId) {
-				return platformJSProvider.onPurchase(packProductId);
-			},
-
-			isPackActive: function(packName) {
-				return platformJSProvider.isPackActive(packName);
-			},
-
-			getProductPrice: function(packProductId) {
-				return platformJSProvider.getProductPrice(packProductId);
-			},
-
-			isPackExistsAtUserLibrary: function(packName) {
-				return platformJSProvider.isPackExistsAtUserLibrary(packName);
-			}
-		});
-	}]);
-
-appStickerPipeStore.factory('BasePlatform', [function() {
+appStickerPipeStore.factory('PackService', function() {
 
 	return angular.extend({}, {
-
-		showPackCollections: function(packName) {
-			return false;
+		isActive: function(pack) {
+			return pack.user_status == 'active';
 		},
 
-		downloadPack: function(packName) {
-			return false;
-		},
-
-		purchasePackInStore: function(packTitle, packProductId, packPrice) {
-			return false;
-		},
-
-		purchasePackInPlatformStore: function(packProductId) {
-			return false;
-		},
-
-		isPackActive: function(packName) {
-			return false;
-		},
-
-		getProductPrice: function(productId) {
-			return false;
-		},
-
-		isPackExistsAtUserLibrary: function(packName) {
-			return false;
+		isHidden: function(pack) {
+			return pack.user_status == 'hidden';
 		}
 	});
 
-}]);
+});
 
-appStickerPipeStore.factory('JSPlatform', [
-	'BasePlatform',
-	function(BasePlatform) {
+appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $route, $rootScope) {
 
-		var platformJSProvider = window.JsApiInterface || window.parent.JsApiInterface ||  {};
-
-		return angular.extend(BasePlatform, {
-
-			showPackCollections: function(packName) {
-				return platformJSProvider.showPackCollections(packName);
+	var PlatformInstance = {},
+		PlatformAPI = {
+			isAndroid: function() {
+				return Config.platform.toLowerCase() == 'android';
 			},
 
-			downloadPack: function(packName) {
-				return platformJSProvider.downloadPack(packName);
+			isJS: function() {
+				return Config.platform.toLowerCase() == 'js';
 			},
 
-			purchasePackInStore: function(packTitle, packProductId, packPrice, packName) {
-				return platformJSProvider.purchasePackInStore(packTitle, packProductId, packPrice, packName);
-			},
-
-			isPackActive: function(packName) {
-				return platformJSProvider.isPackActive(packName);
-			},
-
-			isPackExistsAtUserLibrary: function(packName) {
-				return platformJSProvider.isPackExistsAtUserLibrary(packName);
+			isIOS: function() {
+				return Config.platform.toLowerCase() == 'ios';
 			}
-		});
-	}]);
+		};
+
+	switch(true) {
+		case PlatformAPI.isAndroid():
+			PlatformInstance = $injector.get('AndroidPlatform');
+			break;
+		case PlatformAPI.isJS():
+			PlatformInstance = $injector.get('JSPlatform');
+			break;
+	}
+
+	return angular.extend(PlatformAPI, PlatformInstance, {
+		init: function() {
+			PlatformInstance.init && PlatformInstance.init();
+
+			window.JsInterface = {
+				onPackDownloaded: function() {
+					this.hideActionProgress();
+					PlatformInstance.onPackDownloaded.apply(PlatformInstance, arguments);
+				},
+
+				reload: function() {
+					$route.reload();
+				},
+
+				showActionProgress: function() {
+					$rootScope.$emit('showActionProgress');
+				},
+
+				hideActionProgress: function() {
+					$rootScope.$emit('hideActionProgress');
+				}
+			};
+		}
+	});
+
+});
 
 appStickerPipeStore.directive('basePage', function() {
 
 	return {
 		restrict: 'AE',
-		templateUrl: '/modules/basePage/BasePageView.tpl',
-		link: function($scope, $el, attrs) {
-		}
-
+		templateUrl: '/modules/base-page/view.tpl',
+		link: function($scope, $el, attrs) {}
 	};
 });
 
-appStickerPipeStore.directive('pageSpinner', function($rootScope, usSpinnerService) {
+appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack) {
 
-	return {
-		restrict: 'AE',
-		template: '<div class="page-spinner" ng-if="showSpinner"><span us-spinner="{radius: 15, width: 4, length: 15, color: \'white\'}" spinner-key="spinner-1"></span></div>',
-		link: function($scope, $el, attrs) {
-			var bodyEl = document.getElementsByTagName('body')[0];
+	angular.extend($scope, {
+		config: Config,
+		platformAPI: PlatformAPI,
+		pack: pack,
+		i18n: i18n,
+		packService: PackService,
+		showActionProgress: false,
 
-			$rootScope.$on('$routeChangeStart', function() {
-				showSpinner();
-			});
-
-			$rootScope.$on('$routeChangeSuccess', function() {
-				hideSpinner();
-			});
-
-			$rootScope.$on('$routeChangeError', function(e, c, p, error) {
-				hideSpinner();
-			});
-
-			function showSpinner() {
-				$scope.showSpinner = true;
-				bodyEl.style.overflow = 'hidden';
-
-				setTimeout(function() {
-					usSpinnerService.spin('spinner-1');
-				}, 50);
-			}
-
-			function hideSpinner() {
-				$scope.showSpinner = false;
-				bodyEl.style.overflow = 'auto';
-
-				usSpinnerService.stop('spinner-1');
-			}
-
-			$scope.$on('showSpinner', function () {
-				showSpinner();
-			});
-
-			$scope.$on('hideSpinner', function () {
-				hideSpinner();
-			});
-
-		}
-
-	};
-});
-
-appStickerPipeStore.directive('errorPage', function(Config,  $window, $timeout, i18n, EnvConfig) {
-	
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/error/ErrorView.tpl',
-		link: function($scope, $el, attrs) {
-
-			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
-
-			var $errorPage = angular.element($el[0].getElementsByClassName('error-page')[0]);
-
-			var $mainDivBlock = angular.element(
-				$errorPage[0].getElementsByTagName('div')[0]
-			);
-
-			$mainDivBlock.find('img').bind('load', function() {
-				$scope.onWindowResize();
-			});
-
-			$scope.i18n = i18n;
-
-			$scope.onWindowResize = function() {
-
-				$errorPage.css({
-					paddingTop: (($window.innerHeight - $mainDivBlock.prop('offsetHeight')) / 2) + 'px'
-				});
-
-			};
-
-			angular.element($window).on('resize', function() {
-				$scope.onWindowResize();
-			});
-
-			// on render
-			$timeout(function () {
-				angular.element($window).triggerHandler('resize');
-			});
-		}
-
-	};
-});
-
-appStickerPipeStore.controller('PackController', function(pack) {
-	this.pack = pack;
-});
-
-appStickerPipeStore.directive('packPage', function(Config,  $window, $timeout, EnvConfig) {
-
-	return {
-		restrict: 'AE',
-		scope: {
-			pack: '=pack'
-		},
-		templateUrl: '/modules/pack/PackView.tpl',
-		link: function($scope, $el, attrs) {
-
-			$scope.tappedSticker = null;
-
-			$scope.getStickerUrl = function(name) {
-				return EnvConfig.stickersStorageUrl + $scope.pack.get('pack_name') + '/' + name + '_' + Config.resolutionType + '.png';
-			};
-
-			$scope.isTappedSticker = function(sticker) {
-				return $scope.tappedSticker == sticker;
-			};
-
-			$scope.tapSticker = function(sticker) {
-				$scope.tappedSticker = (sticker != $scope.tappedSticker) ? sticker : null;
-			};
-
-			$scope.resetTappedSticker = function() {
-				$scope.tapSticker(null);
-			};
-
-			$scope.hasTappedSticker = function() {
-				return !$scope.isTappedSticker(null);
-			};
-
-			angular.element($window).bind('scroll', function() {
-				$scope.resetTappedSticker();
-				$scope.$apply();
-			});
-
-			// ************************************************************
-
-			var $windowEl = angular.element($window);
-
-			$scope.stickerColSpan = 2;
-
-			$scope.onWindowResize = function() {
-				var windowWidth = $windowEl[0].innerWidth,
-					countStickersInRow = 6;
-
-				if (windowWidth < 330) {
-					countStickersInRow = 2;
-				} else if (windowWidth < 720) {
-					countStickersInRow = 3;
-				} else if (windowWidth < 980) {
-					countStickersInRow = 4;
-				}
-
-				$scope.stickerColSpan = 12 / countStickersInRow;
-
-				$scope.$apply();
-			};
-
-			$windowEl.on('resize', function() {
-				$scope.onWindowResize();
-			});
-
-			$timeout(function () {
-				$windowEl.triggerHandler('resize');
-			});
-		}
-
-	};
-});
-
-appStickerPipeStore.factory('PackModel', function(PlatformAPI) {
-
-	var PackModel = function(data) {
-		if (data) {
-			this.setData(data);
-		}
-	};
-
-	angular.extend(PackModel.prototype, {
-		platformPrice: null,
-
-		setData: function(data) {
-			this.data = this.data || {};
-			angular.extend(this.data, data);
+		getStickerUrl: function(name) {
+			return EnvConfig.stickersStorageUrl + this.pack.pack_name + '/' + name + '_' + Config.resolutionType + '.png';
 		},
 
-		get: function(field) {
-			this.data = this.data || {};
-			return this.data[field];
+		getMainStickerUrl: function() {
+			return $scope.getStickerUrl('main_icon');
 		},
 
-		getPlatformPrice: function(fetch) {
-			fetch = fetch || false;
+		showCollections: function() {
+			PlatformAPI.showCollections(pack.pack_name);
+		},
 
-			if (fetch || this.platformPrice === null) {
-				this.platformPrice = PlatformAPI.getProductPrice(this);
-			}
-
-			return this.platformPrice;
+		purchasePack: function() {
+			$scope.showActionProgress = true;
+			PlatformAPI.purchasePack(pack.title, pack.pack_name, pack.pricepoint);
 		}
 	});
 
-	return PackModel;
-});
-
-
-
-appStickerPipeStore.factory('PacksCollection', function(HttpApi, PackModel) {
-	return {
-		findOne: function (name) {
-			return HttpApi.getPack(name).then(function(data) {
-				return new PackModel(data);
-			});
+	$rootScope.$on('hideActionProgress', function() {
+		$scope.showActionProgress = false;
+		if(!$scope.$$phase) {
+			$scope.$apply();
 		}
-
-	};
+	});
 });
 
-appStickerPipeStore.controller('StoreController', function() {
+appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI) {
 
+	angular.extend($scope, {
+		platformAPI: PlatformAPI,
+		packs: packs.packs,
+
+		getPackMainIcon: function(pack) {
+			return pack.main_icon[Config.resolutionType];
+		}
+	});
 });
 
-appStickerPipeStore.directive('packActionButton', function(PlatformAPI, Config, i18n, EnvConfig) {
+appStickerPipeStore.value('En', {
+	download: 'Download',
+	open: 'Open',
+	buyPack: 'Buy pack',
+	unavailableContent: 'This content is currently unavailable',
+	get: 'Get'
+});
 
-	return {
-		restrict: 'AE',
-		scope: {
-			pack: '=pack'
+appStickerPipeStore.value('Ru', {
+	download: 'Скачать',
+	open: 'Открыть',
+	buyPack: 'Купить',
+	unavailableContent: 'В данный момент этот контент недоступен',
+	get: 'Скачать'
+});
+
+appStickerPipeStore.factory('AndroidPlatform', function() {
+
+	var platformJSProvider = window.AndroidJsInterface || {};
+
+	return angular.extend({}, {
+
+		////////////////////////////////////////////////////////////
+		// Functions
+		////////////////////////////////////////////////////////////
+
+		showCollections: function() {
+			return platformJSProvider.showCollections();
 		},
-		templateUrl: '/modules/pack/actionButton/ActionButtonView.tpl',
-		link: function($scope, $el, attrs) {
 
-			$scope.getCoinUrl = function() {
-				return EnvConfig.coinImgUrl + 'coin_' + Config.resolutionType + '.png';
-			};
+		purchasePack: function(packTitle, packName, packPrice) {
+			return platformJSProvider.purchasePack(packTitle, packName, packPrice);
+		},
 
+		showInProgress: function(show) {
+			return platformJSProvider.setInProgress(show);
+		},
 
-			function renderActionButton($scope) {
-				var pack = $scope.pack;
+		////////////////////////////////////////////////////////////
+		// Callbacks
+		////////////////////////////////////////////////////////////
 
-				$scope.buttonText = i18n.download;
-				$scope.buttonOnClick = function(pack) {};
-				$scope.showCoin = false;
-				$scope.show = true;
+		onPackDownloaded: function() {
+			this.showCollections()
+		}
+	});
+});
 
-				if (PlatformAPI.isPackActive(pack)) {
-					$scope.buttonText = i18n.openStickers;
-					$scope.buttonOnClick = PlatformAPI.showPackCollections;
-				} else {
-					if (PlatformAPI.isPackExistsAtUserLibrary(pack) || (pack.get('product_id') === undefined && !pack.get('price'))) {
-						$scope.buttonText = i18n.download;
-						$scope.buttonOnClick = function(pack) {
-							$scope.$emit('showSpinner');
-							PlatformAPI.downloadPack(pack).then(function() {
-								$scope.$emit('hideSpinner');
-							});
-						};
-					} else {
-						if (pack.get('product_id') !== undefined && !pack.get('price')) {
+appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout, Config) {
 
-							var price = pack.getPlatformPrice();
-							$scope.show = !!price;
+	function sendAPIMessage(action, attrs) {
+		window.parent.postMessage(JSON.stringify({
+			action: action,
+			attrs: attrs
+		}), 'http://' + Config.clientDomain);
+	}
 
-							$scope.buttonText = i18n.buyPack + ' ' + price;
-							$scope.buttonOnClick = PlatformAPI.purchasePackInPlatformStore;
-							$scope.showCoin = true;
+	return angular.extend({}, {
 
-						} else { // if (pack.get('product_id') && pack.get('price'))
+		init: function() {
+			$window.addEventListener('message', (function(e) {
 
-							$scope.buttonText = i18n.buyPack + ' ' + pack.get('price');
-							$scope.buttonOnClick = PlatformAPI.purchasePackInStore;
-							$scope.showCoin = true;
-						}
-					}
+				var data = JSON.parse(e.data);
+
+				data.attrs = data.attrs || {};
+
+				if (!data.action) {
+					return;
 				}
+
+				var JsInterface = window.JsInterface;
+				if (JsInterface) {
+					JsInterface[data.action] && JsInterface[data.action](data.attrs);
+				}
+
+			}).bind(this));
+
+			// on render store - call API method resizeStore for resize iframe on client
+			$rootScope.$on('$routeChangeSuccess', (function() {
+				this.resizeStore();
+			}).bind(this));
+
+			$rootScope.$on('$routeChangeError', (function() {
+				this.resizeStore();
+			}).bind(this));
+		},
+
+		////////////////////////////////////////////////////////////
+		// Functions
+		////////////////////////////////////////////////////////////
+
+		showCollections: function(packName) {
+			sendAPIMessage('showCollections', {
+				packName: packName
+			});
+		},
+
+		purchasePack: function(packTitle, packName, packPrice) {
+			sendAPIMessage('purchasePack', {
+				packTitle: packTitle,
+				packName: packName,
+				pricePoint: packPrice
+			});
+		},
+
+		showInProgress: function(show) {
+			if (show) {
+				$rootScope.$emit('preloaderShow');
+			} else {
+				$rootScope.$emit('preloaderHide');
 			}
+		},
 
-			renderActionButton($scope);
+		resizeStore: function() {
+			var storeEl = document.getElementsByClassName('store')[0];
+
+			$timeout(function() {
+				sendAPIMessage('resizeStore', {
+					height: storeEl.offsetHeight
+				});
+			}, 100);
+		},
+
+		////////////////////////////////////////////////////////////
+		// Callbacks
+		////////////////////////////////////////////////////////////
+
+		onPackDownloaded: function(attrs) {
+			this.showCollections(attrs.packName)
+		}
+
+	});
+});
+
+appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
+	
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/error/view.tpl',
+		link: function($scope, $el, attrs) {
+
+			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
+			$scope.i18n = i18n;
 		}
 
 	};
 });
 
-appStickerPipeStore.directive('packHeader', function(Config,  $window, $timeout, PlatformAPI) {
-
-	var bannerSizes = {};
-
-	bannerSizes.mdpi = {
-		width: 360,
-		height: 168
-	};
-
-	bannerSizes.hdpi = {
-		width: bannerSizes.mdpi.width * 1.5,
-		height: bannerSizes.mdpi.height * 1.5
-	};
-
-	bannerSizes.xhdpi = {
-		width: bannerSizes.mdpi.width * 2,
-		height: bannerSizes.mdpi.height * 2
-	};
-
-	bannerSizes.xxhdpi = {
-		width: bannerSizes.mdpi.width * 3,
-		height: bannerSizes.mdpi.height * 3
-	};
+appStickerPipeStore.directive('preloader', function($rootScope) {
 
 	return {
 		restrict: 'AE',
-		scope: {
-			pack: '=pack',
-			stickerUrl: '=stickerUrl'
-		},
-		templateUrl: '/modules/pack/header/HeaderView.tpl',
+		templateUrl: '/modules/base-page/preloader/view.tpl',
 		link: function($scope, $el, attrs) {
 
-			var pack = $scope.pack;
-			var bannerSize = bannerSizes[Config.resolutionType];
+			$rootScope.$on('preloaderShow', function() {
+				$scope.preloader = true;
+				document.body.style.overflow = 'hidden';
 
-			$scope.getPackBanner = function() {
-				var banners = pack.get('banners');
-				return banners && banners[Config.resolutionType];
-			};
-
-			$scope.getMainStickerUrl = function() {
-				return $scope.stickerUrl('main_icon');
-			};
-
-			$scope.onWindowResize = function() {
-				var $packBanner = angular.element($el[0].getElementsByClassName('pack-banner')[0]),
-					$packDetailsInfo = angular.element($el[0].getElementsByClassName('pack-details-info')[0]),
-					$packMainStickerImg = angular.element($packDetailsInfo[0].getElementsByClassName('pack-main-sticker')[0]).find('img'),
-					bannerImgHeight = ($window.innerWidth / bannerSize.width) * bannerSize.height;
-
-				if ($packBanner[0]) {
-
-					// *** *** *** CUSTOMIZE IF EXIST BANNER *** *** ***
-
-					if (PlatformAPI.isAndroid() || PlatformAPI.isIOS()) {
-
-						var $packInfoBox = angular.element($packDetailsInfo[0].getElementsByClassName('pack-info-box')[0]),
-							packInfoHeight = $packDetailsInfo.prop('offsetHeight');
-
-						$packDetailsInfo.css({
-							marginTop: -(packInfoHeight / 2) + 'px'
-						});
-
-						$packBanner.css({
-							width: $window.innerWidth + 'px',
-							height: bannerImgHeight + 'px'
-						});
-
-						$packInfoBox.css({
-							marginTop: ((packInfoHeight - $packInfoBox.prop('offsetHeight')) / 2) + 'px'
-						});
-					}
+				if(!$scope.$$phase) {
+					$scope.$apply();
 				}
-
-
-				// *** *** *** CUSTOMIZE COMMON *** *** ***
-
-				if (PlatformAPI.isAndroid() || PlatformAPI.isIOS()) {
-					if ($packMainStickerImg.prop('naturalHeight') > bannerImgHeight) {
-						$packMainStickerImg.css({
-							height: ((bannerImgHeight / 4) * 3) + 'px'
-						});
-					}
-				}
-
-				$packMainStickerImg.bind('load', function() {
-					$scope.onWindowResize();
-				});
-
-				$scope.$apply();
-			};
-
-			angular.element($window).on('resize', function() {
-				$scope.onWindowResize();
 			});
 
-			// on render
-			$timeout(function () {
-				angular.element($window).triggerHandler('resize');
+			$rootScope.$on('preloaderHide', function() {
+				$scope.preloader = false;
+				document.body.style.overflow = 'auto';
+
+				if(!$scope.$$phase) {
+					$scope.$apply();
+				}
 			});
+
 		}
+
 	};
 });
