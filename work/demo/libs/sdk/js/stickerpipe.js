@@ -3741,7 +3741,15 @@ window.StickersModule.View = {};
 			Module.StickerHelper.setEvent('click', this.contentEl, Module.Configs.emojiItemClass, callback);
 		},
 
-		open: function() {},
+		open: function(tabName) {
+			tabName = tabName || null;
+
+			if (tabName) {
+				this.tabsView.activeTab(tabName);
+			} else {
+				this.tabsView.activeLastUsedStickersTab();
+			}
+		},
 		close: function() {},
 
 
@@ -4178,6 +4186,7 @@ window.StickersModule.View = {};
 			this.toggleEl.parentElement.appendChild(this.popoverEl);
 			this.positioned();
 			Module.DOMEventService.popoverShown();
+			parent.prototype.open.apply(this, arguments);
 		},
 
 		close: function() {
@@ -4860,12 +4869,7 @@ window.StickersModule.View = {};
 		},
 
 		open: function(tabName) {
-			this.view.open();
-
-			tabName = tabName || null;
-			if (tabName) {
-				this.view.tabsView.activeTab(tabName);
-			}
+			this.view.open(tabName);
 		},
 
 		close: function() {
