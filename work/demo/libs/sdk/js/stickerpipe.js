@@ -4623,6 +4623,9 @@ window.StickersModule.View = {};
 		activeTab: function(tabName) {
 			this.packTabs[tabName].click();
 		},
+		activeLastUsedStickersTab: function() {
+			this.controls.history.el.click();
+		},
 
 
 		handleClickOnEmojiTab: function(callback) {
@@ -4711,8 +4714,7 @@ window.StickersModule.View = {};
 			var onPacksLoadCallback = (function() {
 				this.view.render(this.stickersModel);
 
-				// todo --> active 'used' tab
-				this.view.renderUsedStickers();
+				this.view.tabsView.activeLastUsedStickersTab();
 
 				callback && callback();
 			}).bind(this);
