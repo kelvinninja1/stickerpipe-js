@@ -214,6 +214,38 @@ h6 {
       </div>
  *
  */
+.preloader2 {
+  width: 70px;
+  text-align: center; }
+  .preloader2 > div {
+    width: 10px;
+    height: 10px;
+    background-color: #333;
+    border-radius: 100%;
+    display: inline-block;
+    -webkit-animation: preloader2-sk-bouncedelay 1.4s infinite ease-in-out both;
+    animation: preloader2-sk-bouncedelay 1.4s infinite ease-in-out both; }
+  .preloader2 .bounce1 {
+    -webkit-animation-delay: -0.32s;
+    animation-delay: -0.32s; }
+  .preloader2 .bounce2 {
+    -webkit-animation-delay: -0.16s;
+    animation-delay: -0.16s; }
+
+@-webkit-keyframes preloader2-sk-bouncedelay {
+  0%, 80%, 100% {
+    -webkit-transform: scale(0); }
+  40% {
+    -webkit-transform: scale(1); } }
+
+@keyframes preloader2-sk-bouncedelay {
+  0%, 80%, 100% {
+    -webkit-transform: scale(0);
+    transform: scale(0); }
+  40% {
+    -webkit-transform: scale(1);
+    transform: scale(1); } }
+
 .store {
   margin: auto;
   padding: 0 0 30px 0;

@@ -32,7 +32,7 @@
 			clientDomain: '<?=($_SERVER['HTTP_HOST'] ?: 'localhost');?>',
 			priceB: '<?=($_GET['priceB'] ?: '');?>',
 			priceC: '<?=($_GET['priceC'] ?: '');?>',
-			isPremium: ('<?=($_GET['isPremium'] ?: '0');?>' == '1')
+			isSubscriber: ('<?=($_GET['is_subscriber'] ?: '0');?>' == '1')
 		});
 	})()
 </script>
