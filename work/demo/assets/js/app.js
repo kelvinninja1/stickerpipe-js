@@ -86,8 +86,6 @@ var App = _makeClass(function(options) {
 
 			elId: 'stickersToggle',
 
-			htmlForEmptyRecent: '<div class="emptyRecent">empty recent text</div>',
-
 			apiKey: '72921666b5ff8651f374747bfefaf7b2',
 			//apiKey: '52ed1358d7d09df5279147a5555061a9',
 
