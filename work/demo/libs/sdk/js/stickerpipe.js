@@ -3742,6 +3742,7 @@ window.StickersModule.View = {};
 		},
 
 		open: function(tabName) {
+			console.log(tabName);
 			tabName = tabName || null;
 
 			if (tabName) {
@@ -4178,14 +4179,15 @@ window.StickersModule.View = {};
 		},
 
 		open: function() {
-			if (this.active) {
-				return;
+			if (!this.active) {
+
+				this.active = true;
+
+				this.toggleEl.parentElement.appendChild(this.popoverEl);
+				this.positioned();
+				Module.DOMEventService.popoverShown();
 			}
 
-			this.active = true;
-			this.toggleEl.parentElement.appendChild(this.popoverEl);
-			this.positioned();
-			Module.DOMEventService.popoverShown();
 			parent.prototype.open.apply(this, arguments);
 		},
 
