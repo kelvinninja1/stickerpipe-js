@@ -13,7 +13,7 @@ appStickerPipeStore.run(function($rootScope, PlatformAPI, $window, $timeout) {
 	$rootScope.$on('$viewContentLoaded', function () {
 		$timeout(function() {
 			$window.scrollTo(0, 0);
-		});
+		}, 100);
 	});
 
 	$rootScope.$on('$routeChangeStart', function() {
@@ -118,7 +118,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/view.tpl',
-    '<div class="version">0.0.2</div>\n' +
+    '<div class="version">0.0.3</div>\n' +
     '<div class="store">\n' +
     '	<div data-ng-show="!error" data-ng-view=""></div>\n' +
     '	<div data-ng-show="error" data-error></div>\n' +
