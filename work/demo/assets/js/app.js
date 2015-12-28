@@ -28,12 +28,18 @@ var App = _makeClass(function(options) {
 	$messageBox: $('#messageBox'),
 	$stickersToggle: $('#stickersToggle'),
 	$textarea: $('.textarea'),
+	$wipeData: $('#wipeData'),
 
 	priceB: 0.99,
 	priceC: 1.99,
 
 	_constructor: function(configs) {
 		this.configs = configs;
+
+		this.$wipeData.on('click', (function() {
+			this.getUserId(true);
+			location.reload();
+		}).bind(this));
 
 		// setting lo-dash template
 		_.templateSettings = {
@@ -308,9 +314,9 @@ var App = _makeClass(function(options) {
 		return texts[this.getRandom(0, texts.length - 1)];
 	},
 
-	getUserId: function() {
+	getUserId: function(force) {
 		var userId = localStorage.getItem('userId'),
-			resetUserId = this.getUrlParameter('resetUserId');
+			resetUserId = (force) ? '1' : this.getUrlParameter('resetUserId');
 
 
 		if ((!!resetUserId && parseInt(resetUserId, 10) == 1) || !userId || userId.length != 32) {
