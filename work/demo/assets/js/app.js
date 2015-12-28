@@ -71,9 +71,9 @@ var App = _makeClass(function(options) {
 
 	init: function() {
 		this.fetchRandomUsers().done((function() {
-			this.sendMessage();
-			this.sendMessage(true);
-			this.sendMessage();
+			this.sendMessage(false, '', true);
+			this.sendMessage(true, '', true);
+			this.sendMessage(false, '', true);
 			this.sendMessage(true, '[[cat4_iloveyou]]');
 		}).bind(this));
 		this.initMessageBox();
@@ -240,9 +240,19 @@ var App = _makeClass(function(options) {
 		}
 	},
 
-	sendMessage: function(isCurrentUser, text) {
+	sendMessage: function(isCurrentUser, text, random) {
 
-		text = (text && text.trim()) || this.getRandomMessageText();
+		text = text && text.trim();
+		random = random || false;
+
+		if (random) {
+			text = this.getRandomMessageText();
+		}
+
+		if (!text) {
+			return;
+		}
+
 		text = text.replace(new RegExp('\r?\n','g'), '<br />');
 
 		var user = this.currentUser;
