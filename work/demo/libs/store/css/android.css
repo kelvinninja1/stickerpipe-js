@@ -427,5 +427,4 @@ h6 {
       width: 20%; } }
 
 .btn {
-  padding-top: 9px !important;
-  padding-bottom: 10px !important; }
+  min-height: 36px; }
