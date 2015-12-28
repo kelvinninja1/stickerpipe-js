@@ -37,7 +37,7 @@ var App = _makeClass(function(options) {
 		this.configs = configs;
 
 		this.$wipeData.on('click', (function() {
-			this.getUserId(true);
+			localStorage.clear();
 			location.reload();
 		}).bind(this));
 
@@ -314,9 +314,9 @@ var App = _makeClass(function(options) {
 		return texts[this.getRandom(0, texts.length - 1)];
 	},
 
-	getUserId: function(force) {
+	getUserId: function() {
 		var userId = localStorage.getItem('userId'),
-			resetUserId = (force) ? '1' : this.getUrlParameter('resetUserId');
+			resetUserId = this.getUrlParameter('resetUserId');
 
 
 		if ((!!resetUserId && parseInt(resetUserId, 10) == 1) || !userId || userId.length != 32) {
