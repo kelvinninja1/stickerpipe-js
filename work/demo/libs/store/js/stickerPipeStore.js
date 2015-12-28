@@ -482,7 +482,7 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $route, $
 
 			window.JsInterface = {
 				onPackDownloaded: function() {
-					this.hidePageSpinner();
+					this.setInProgress(false);
 					PlatformInstance.onPackDownloaded.apply(PlatformInstance, arguments);
 				},
 
@@ -490,8 +490,12 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $route, $
 					$route.reload();
 				},
 
-				hidePageSpinner: function() {
-					$rootScope.$emit('hidePageSpinner');
+				setInProgress: function(value) {
+					if (value) {
+						$rootScope.$emit('showPreloader');
+					} else {
+						$rootScope.$emit('hidePreloader');
+					}
 				}
 			};
 		}
@@ -527,7 +531,7 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 		}
 	});
 
-	$rootScope.$on('hidePageSpinner', function() {
+	$rootScope.$on('hidePreloader', function() {
 		$scope.showPreloader = false;
 	});
 });
@@ -689,20 +693,6 @@ appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout
 	});
 });
 
-appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
-	
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/error/view.tpl',
-		link: function($scope, $el, attrs) {
-
-			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
-			$scope.i18n = i18n;
-		}
-
-	};
-});
-
 appStickerPipeStore.directive('preloader', function($rootScope) {
 
 	return {
@@ -728,6 +718,20 @@ appStickerPipeStore.directive('preloader', function($rootScope) {
 				}
 			});
 
+		}
+
+	};
+});
+
+appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
+	
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/error/view.tpl',
+		link: function($scope, $el, attrs) {
+
+			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
+			$scope.i18n = i18n;
 		}
 
 	};
