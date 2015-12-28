@@ -339,9 +339,9 @@ h6 {
 
 .pack-info {
   display: table-cell;
-  padding-top: 0;
+  padding-top: 15px;
   padding-left: 8px;
-  vertical-align: middle; }
+  vertical-align: top; }
 
 .pack-description {
   padding-bottom: 8px; }
