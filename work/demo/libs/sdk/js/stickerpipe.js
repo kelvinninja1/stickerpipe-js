@@ -2652,6 +2652,10 @@ window.StickersModule.Service = {};
 			this.downloadPack(packName, pricePoint);
 		},
 
+		purchaseFail: function() {
+			sendAPIMessage('hideActionProgress');
+		},
+
 		api: {
 			showCollections: function(data) {
 				Module.Service.Store.showCollections(data.attrs.packName);
@@ -4847,6 +4851,10 @@ window.StickersModule.View = {};
 
 		purchaseSuccess: function(packName, pricePoint) {
 			Module.Service.Store.purchaseSuccess(packName, pricePoint);
+		},
+
+		purchaseFail: function() {
+			Module.Service.Store.purchaseFail();
 		},
 
 		open: function(tabName) {

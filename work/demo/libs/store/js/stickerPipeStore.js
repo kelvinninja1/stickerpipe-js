@@ -490,12 +490,12 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $route, $
 					$route.reload();
 				},
 
-				setActionProgress: function(progress) {
-					if (progress) {
-						$rootScope.$emit('showActionProgress');
-					} else {
-						$rootScope.$emit('hideActionProgress');
-					}
+				showActionProgress: function() {
+					$rootScope.$emit('showActionProgress');
+				},
+
+				hideActionProgress: function() {
+					$rootScope.$emit('hideActionProgress');
 				}
 			};
 		}
@@ -542,6 +542,9 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 
 	$rootScope.$on('hideActionProgress', function() {
 		$scope.showActionProgress = false;
+		if(!$scope.$$phase) {
+			$scope.$apply();
+		}
 	});
 });
 

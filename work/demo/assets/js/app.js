@@ -154,6 +154,8 @@ var App = _makeClass(function(options) {
 
 			if (result) {
 				this.stickerpipe.purchaseSuccess(packName, pricePoint);
+			} else {
+				this.stickerpipe.purchaseFail();
 			}
 		}).bind(this));
 	},
