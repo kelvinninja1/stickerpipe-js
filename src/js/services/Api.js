@@ -9,7 +9,7 @@
 			density: Module.Configs.stickerResolutionType,
 			priceB: Module.Configs.priceB,
 			priceC: Module.Configs.priceC,
-			isPremium: (Module.Configs.userPremium ? 1 : 0),
+			is_subscriber: (Module.Configs.userPremium ? 1 : 0),
 			localization: Module.Configs.lang
 		};
 
