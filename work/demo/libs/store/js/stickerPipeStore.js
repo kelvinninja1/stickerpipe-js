@@ -549,14 +549,15 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 	});
 });
 
-appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI) {
+appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI, EnvConfig) {
 
 	angular.extend($scope, {
 		platformAPI: PlatformAPI,
 		packs: packs.packs,
 
 		getPackMainIcon: function(pack) {
-			return pack.main_icon[Config.resolutionType];
+			//return pack.main_icon[Config.resolutionType];
+			return EnvConfig.stickersStorageUrl + pack.pack_name + '/' + 'main_icon' + '_' + Config.resolutionType + '.png'
 		}
 	});
 });
