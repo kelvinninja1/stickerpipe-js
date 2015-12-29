@@ -10,12 +10,6 @@ appStickerPipeStore.run(function($rootScope, PlatformAPI, $window, $timeout) {
 
 	PlatformAPI.init();
 
-	//$rootScope.$on('$viewContentLoaded', function () {
-	//	$timeout(function() {
-	//		$window.scrollTo(0, 0);
-	//	}, 100);
-	//});
-
 	$rootScope.$on('$routeChangeStart', function() {
 		PlatformAPI.showInProgress(true);
 	});
@@ -120,31 +114,9 @@ module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/view.tpl',
     '<!--<div class="version">0.0.7</div>-->\n' +
     '<div class="store">\n' +
-    '	<div data-ng-show="!error" data-ng-view=""></div>\n' +
+    '	<div data-ng-show="!error" data-ng-view="" autoscroll="true"></div>\n' +
     '	<div data-ng-show="error" data-error></div>\n' +
     '	<div data-ng-show="preloader" data-preloader></div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/store/StoreView.tpl',
-    '<div ng-class="{\'screen-header\': platformAPI.isJS()}" data-ng-show="platformAPI.isJS()"></div>\n' +
-    '<div class="packs">\n' +
-    '	<div class="col" data-ng-repeat="pack in packs">\n' +
-    '		<div class="pack-preview center-block">\n' +
-    '			<a href="#/packs/{{ pack.pack_name }}">\n' +
-    '				<img ng-src="{{ getPackMainIcon(pack) }}" alt="" class="pack-preview-sticker">\n' +
-    '				<h5 class="pack-preview-name">{{ pack.title }}</h5>\n' +
-    '			</a>\n' +
-    '		</div>\n' +
-    '	</div>\n' +
     '</div>');
 }]);
 })();
@@ -219,12 +191,15 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/base-page/preloader/view.tpl',
-    '<div class="preloader">\n' +
-    '	<div class="preloader-content">\n' +
-    '		<div class="preloader-chasing-dots">\n' +
-    '			<div class="preloader-child preloader-dot1"></div>\n' +
-    '			<div class="preloader-child preloader-dot2"></div>\n' +
+  $templateCache.put('/modules/store/StoreView.tpl',
+    '<div ng-class="{\'screen-header\': platformAPI.isJS()}" data-ng-show="platformAPI.isJS()"></div>\n' +
+    '<div class="packs">\n' +
+    '	<div class="col" data-ng-repeat="pack in packs">\n' +
+    '		<div class="pack-preview center-block">\n' +
+    '			<a href="#/packs/{{ pack.pack_name }}">\n' +
+    '				<img ng-src="{{ getPackMainIcon(pack) }}" alt="" class="pack-preview-sticker">\n' +
+    '				<h5 class="pack-preview-name">{{ pack.title }}</h5>\n' +
+    '			</a>\n' +
     '		</div>\n' +
     '	</div>\n' +
     '</div>');
@@ -245,6 +220,25 @@ module.run(['$templateCache', function($templateCache) {
     '			<img src="{{ imgUrl }}" alt="">\n' +
     '		</div>\n' +
     '		<h5>{{ i18n.unavailableContent }}</h5>\n' +
+    '	</div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/base-page/preloader/view.tpl',
+    '<div class="preloader">\n' +
+    '	<div class="preloader-content">\n' +
+    '		<div class="preloader-chasing-dots">\n' +
+    '			<div class="preloader-child preloader-dot1"></div>\n' +
+    '			<div class="preloader-child preloader-dot2"></div>\n' +
+    '		</div>\n' +
     '	</div>\n' +
     '</div>');
 }]);
@@ -521,10 +515,6 @@ appStickerPipeStore.directive('basePage', function() {
 
 appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack) {
 
-	$scope.$on('$viewContentLoaded', function () {
-		$window.scrollTo(0, 0);
-	});
-
 	angular.extend($scope, {
 		config: Config,
 		platformAPI: PlatformAPI,
@@ -560,10 +550,6 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 });
 
 appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI) {
-
-	$scope.$on('$viewContentLoaded', function () {
-		$window.scrollTo(0, 0);
-	});
 
 	angular.extend($scope, {
 		platformAPI: PlatformAPI,
