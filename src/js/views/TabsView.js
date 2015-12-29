@@ -246,7 +246,7 @@
 
 
 		activeTab: function(tabName) {
-			var i = 0;
+			var i = 1;
 			for (var packName in this.packTabs) {
 				if (packName == tabName) {
 					break;
@@ -254,25 +254,29 @@
 				i++;
 			}
 
+			if (Module.Configs.enableEmojiTab) {
+				i++;
+			}
+			if (Module.Configs.enableHistoryTab) {
+				i++;
+			}
+
 			this.packTabs[tabName].click();
 
-			// todo
-			//var tabWidth = this.scrollableContentEl.getElementsByClassName(this.classes.packTab)[0].offsetWidth;
-			//var containerWidth = this.scrollableContainerEl.offsetWidth;
-			//var countFullShownTabs = parseInt((containerWidth / tabWidth), 10);
-			//
-			//var offset = tabWidth * countFullShownTabs * (i + 1);
-			//offset = (offset > 0) ? 0 : offset;
-			//this.scrollableContentEl.style.left = offset + 'px';
-			//
-			//console.log(i);
-			//
-			//this.onWindowResize();
+			var tabWidth = this.scrollableContentEl.getElementsByClassName(this.classes.packTab)[0].offsetWidth;
+			var containerWidth = this.scrollableContainerEl.offsetWidth;
+			var countFullShownTabs = parseInt((containerWidth / tabWidth), 10);
+
+
+			var offset = -(parseInt((i / countFullShownTabs), 10) * containerWidth);
+			offset = (offset > 0) ? 0 : offset;
+			this.scrollableContentEl.style.left = offset + 'px';
+
+			this.onWindowResize();
 		},
 		activeLastUsedStickersTab: function() {
 			this.controls.history.el.click();
 		},
-
 
 		handleClickOnEmojiTab: function(callback) {
 			Module.StickerHelper.setEvent('click', this.el, this.controls.emoji.class, callback);
