@@ -192,12 +192,12 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/store/StoreView.tpl',
-    '<div ng-class="{\'screen-header\': platformAPI.isJS()}" data-ng-show="platformAPI.isJS()"></div>\n' +
+    '<div data-ng-class="{\'screen-header\': platformAPI.isJS()}" data-ng-show="platformAPI.isJS()"></div>\n' +
     '<div class="packs">\n' +
     '	<div class="col" data-ng-repeat="pack in packs">\n' +
     '		<div class="pack-preview center-block">\n' +
     '			<a href="#/packs/{{ pack.pack_name }}">\n' +
-    '				<img ng-src="{{ getPackMainIcon(pack) }}" alt="" class="pack-preview-sticker">\n' +
+    '				<img data-ng-src="{{ getPackMainIcon(pack) }}" alt="" class="pack-preview-sticker">\n' +
     '				<h5 class="pack-preview-name">{{ pack.title }}</h5>\n' +
     '			</a>\n' +
     '		</div>\n' +
