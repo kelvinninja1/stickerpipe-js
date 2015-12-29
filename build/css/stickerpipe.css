@@ -119,15 +119,16 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   width: 100%;
 }
 
-.sp-icon-close {
+.sp-modal-close {
   cursor: pointer;
   opacity: 0.5;
+  padding: 12px;
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 0;
+  right: 0;
 }
 
-.sp-icon-close:hover {
+.sp-modal-close:hover {
   opacity: 0.7;
 }
 

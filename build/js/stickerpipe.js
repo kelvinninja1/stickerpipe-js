@@ -3776,7 +3776,8 @@ window.StickersModule.View = {};
 			overlay: 'sp-modal-overlay',
 			modal: 'sp-modal',
 			modalBody: 'sp-modal-body',
-			iconClose: 'sp-icon-close'
+			iconClose: 'sp-icon-close',
+			close: 'sp-modal-close'
 		},
 
 		defaultOptions = {
@@ -3878,14 +3879,18 @@ window.StickersModule.View = {};
 
 		modalEl.appendChild(modalBody);
 
-		var close = document.createElement('div');
-		close.className = classes.iconClose;
-		close.addEventListener('click', (function() {
+		var closeIcon = document.createElement('div');
+		closeIcon.className = classes.iconClose;
+
+		var closeButton = document.createElement('div');
+		closeButton.className = classes.close;
+		closeButton.addEventListener('click', (function() {
 			this.close();
 		}).bind(context));
 
 
-		modalEl.appendChild(close);
+		closeButton.appendChild(closeIcon);
+		modalEl.appendChild(closeButton);
 
 		return modalEl;
 	}
@@ -4641,6 +4646,7 @@ window.StickersModule.View = {};
 
 			this.packTabs[tabName].click();
 
+			// todo
 			//var tabWidth = this.scrollableContentEl.getElementsByClassName(this.classes.packTab)[0].offsetWidth;
 			//var containerWidth = this.scrollableContainerEl.offsetWidth;
 			//var countFullShownTabs = parseInt((containerWidth / tabWidth), 10);

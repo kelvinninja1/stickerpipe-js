@@ -17,7 +17,8 @@
 			overlay: 'sp-modal-overlay',
 			modal: 'sp-modal',
 			modalBody: 'sp-modal-body',
-			iconClose: 'sp-icon-close'
+			iconClose: 'sp-icon-close',
+			close: 'sp-modal-close'
 		},
 
 		defaultOptions = {
@@ -119,14 +120,18 @@
 
 		modalEl.appendChild(modalBody);
 
-		var close = document.createElement('div');
-		close.className = classes.iconClose;
-		close.addEventListener('click', (function() {
+		var closeIcon = document.createElement('div');
+		closeIcon.className = classes.iconClose;
+
+		var closeButton = document.createElement('div');
+		closeButton.className = classes.close;
+		closeButton.addEventListener('click', (function() {
 			this.close();
 		}).bind(context));
 
 
-		modalEl.appendChild(close);
+		closeButton.appendChild(closeIcon);
+		modalEl.appendChild(closeButton);
 
 		return modalEl;
 	}

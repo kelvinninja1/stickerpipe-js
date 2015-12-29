@@ -72,15 +72,16 @@
 	width: 100%;
 }
 
-.sp-icon-close {
+.sp-modal-close {
 
 	$modalCloseButtonOpacity: 0.5;
 
 	cursor: pointer;
 	opacity: $modalCloseButtonOpacity;
+	padding: 12px;
 	position: absolute;
-	top: 12px;
-	right: 12px;
+	top: 0;
+	right: 0;
 
 	&:hover {
 		opacity: $modalCloseButtonOpacity + 0.2;
