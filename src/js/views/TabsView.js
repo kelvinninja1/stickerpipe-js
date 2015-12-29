@@ -256,6 +256,7 @@
 
 			this.packTabs[tabName].click();
 
+			// todo
 			//var tabWidth = this.scrollableContentEl.getElementsByClassName(this.classes.packTab)[0].offsetWidth;
 			//var containerWidth = this.scrollableContainerEl.offsetWidth;
 			//var countFullShownTabs = parseInt((containerWidth / tabWidth), 10);
