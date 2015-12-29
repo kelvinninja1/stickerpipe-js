@@ -147,7 +147,15 @@
 			Module.StickerHelper.setEvent('click', this.contentEl, Module.Configs.emojiItemClass, callback);
 		},
 
-		open: function() {},
+		open: function(tabName) {
+			tabName = tabName || null;
+
+			if (tabName) {
+				this.tabsView.activeTab(tabName);
+			} else {
+				this.tabsView.activeLastUsedStickersTab();
+			}
+		},
 		close: function() {},
 
 

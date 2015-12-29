@@ -2652,6 +2652,10 @@ window.StickersModule.Service = {};
 			this.downloadPack(packName, pricePoint);
 		},
 
+		purchaseFail: function() {
+			sendAPIMessage('hideActionProgress');
+		},
+
 		api: {
 			showCollections: function(data) {
 				Module.Service.Store.showCollections(data.attrs.packName);
@@ -2696,7 +2700,7 @@ window.StickersModule.Configs = {};
 		stickerItemClass: 'sp-sticker-item',
 		emojiItemClass: 'sp-emoji',
 
-		htmlForEmptyRecent: '<div class="emptyRecent">Ваши Стикеры</div>',
+		htmlForEmptyRecent: '<div class="emptyRecent">No recent stickers</div>',
 
 		apiKey: '', // 72921666b5ff8651f374747bfefaf7b2
 
@@ -3737,7 +3741,15 @@ window.StickersModule.View = {};
 			Module.StickerHelper.setEvent('click', this.contentEl, Module.Configs.emojiItemClass, callback);
 		},
 
-		open: function() {},
+		open: function(tabName) {
+			tabName = tabName || null;
+
+			if (tabName) {
+				this.tabsView.activeTab(tabName);
+			} else {
+				this.tabsView.activeLastUsedStickersTab();
+			}
+		},
 		close: function() {},
 
 
@@ -4166,14 +4178,16 @@ window.StickersModule.View = {};
 		},
 
 		open: function() {
-			if (this.active) {
-				return;
+			if (!this.active) {
+
+				this.active = true;
+
+				this.toggleEl.parentElement.appendChild(this.popoverEl);
+				this.positioned();
+				Module.DOMEventService.popoverShown();
 			}
 
-			this.active = true;
-			this.toggleEl.parentElement.appendChild(this.popoverEl);
-			this.positioned();
-			Module.DOMEventService.popoverShown();
+			parent.prototype.open.apply(this, arguments);
 		},
 
 		close: function() {
@@ -4617,7 +4631,30 @@ window.StickersModule.View = {};
 
 
 		activeTab: function(tabName) {
+			var i = 0;
+			for (var packName in this.packTabs) {
+				if (packName == tabName) {
+					break;
+				}
+				i++;
+			}
+
 			this.packTabs[tabName].click();
+
+			//var tabWidth = this.scrollableContentEl.getElementsByClassName(this.classes.packTab)[0].offsetWidth;
+			//var containerWidth = this.scrollableContainerEl.offsetWidth;
+			//var countFullShownTabs = parseInt((containerWidth / tabWidth), 10);
+			//
+			//var offset = tabWidth * countFullShownTabs * (i + 1);
+			//offset = (offset > 0) ? 0 : offset;
+			//this.scrollableContentEl.style.left = offset + 'px';
+			//
+			//console.log(i);
+			//
+			//this.onWindowResize();
+		},
+		activeLastUsedStickersTab: function() {
+			this.controls.history.el.click();
 		},
 
 
@@ -4707,8 +4744,7 @@ window.StickersModule.View = {};
 			var onPacksLoadCallback = (function() {
 				this.view.render(this.stickersModel);
 
-				// todo --> active 'used' tab
-				this.view.renderUsedStickers();
+				this.view.tabsView.activeLastUsedStickersTab();
 
 				callback && callback();
 			}).bind(this);
@@ -4849,13 +4885,12 @@ window.StickersModule.View = {};
 			Module.Service.Store.purchaseSuccess(packName, pricePoint);
 		},
 
-		open: function(tabName) {
-			this.view.open();
+		purchaseFail: function() {
+			Module.Service.Store.purchaseFail();
+		},
 
-			tabName = tabName || null;
-			if (tabName) {
-				this.view.tabsView.activeTab(tabName);
-			}
+		open: function(tabName) {
+			this.view.open(tabName);
 		},
 
 		close: function() {

@@ -57,8 +57,7 @@ window.StickersModule.View = {};
 			var onPacksLoadCallback = (function() {
 				this.view.render(this.stickersModel);
 
-				// todo --> active 'used' tab
-				this.view.renderUsedStickers();
+				this.view.tabsView.activeLastUsedStickersTab();
 
 				callback && callback();
 			}).bind(this);
@@ -199,13 +198,12 @@ window.StickersModule.View = {};
 			Module.Service.Store.purchaseSuccess(packName, pricePoint);
 		},
 
-		open: function(tabName) {
-			this.view.open();
+		purchaseFail: function() {
+			Module.Service.Store.purchaseFail();
+		},
 
-			tabName = tabName || null;
-			if (tabName) {
-				this.view.tabsView.activeTab(tabName);
-			}
+		open: function(tabName) {
+			this.view.open(tabName);
 		},
 
 		close: function() {

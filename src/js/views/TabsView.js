@@ -246,7 +246,30 @@
 
 
 		activeTab: function(tabName) {
+			var i = 0;
+			for (var packName in this.packTabs) {
+				if (packName == tabName) {
+					break;
+				}
+				i++;
+			}
+
 			this.packTabs[tabName].click();
+
+			//var tabWidth = this.scrollableContentEl.getElementsByClassName(this.classes.packTab)[0].offsetWidth;
+			//var containerWidth = this.scrollableContainerEl.offsetWidth;
+			//var countFullShownTabs = parseInt((containerWidth / tabWidth), 10);
+			//
+			//var offset = tabWidth * countFullShownTabs * (i + 1);
+			//offset = (offset > 0) ? 0 : offset;
+			//this.scrollableContentEl.style.left = offset + 'px';
+			//
+			//console.log(i);
+			//
+			//this.onWindowResize();
+		},
+		activeLastUsedStickersTab: function() {
+			this.controls.history.el.click();
 		},
 
 

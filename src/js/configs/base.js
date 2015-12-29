@@ -13,7 +13,7 @@
 		stickerItemClass: 'sp-sticker-item',
 		emojiItemClass: 'sp-emoji',
 
-		htmlForEmptyRecent: '<div class="emptyRecent">Ваши Стикеры</div>',
+		htmlForEmptyRecent: '<div class="emptyRecent">No recent stickers</div>',
 
 		apiKey: '', // 72921666b5ff8651f374747bfefaf7b2
 

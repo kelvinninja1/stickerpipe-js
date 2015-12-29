@@ -42,6 +42,10 @@
 			this.downloadPack(packName, pricePoint);
 		},
 
+		purchaseFail: function() {
+			sendAPIMessage('hideActionProgress');
+		},
+
 		api: {
 			showCollections: function(data) {
 				Module.Service.Store.showCollections(data.attrs.packName);
