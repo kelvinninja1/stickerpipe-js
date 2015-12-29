@@ -521,6 +521,10 @@ appStickerPipeStore.directive('basePage', function() {
 
 appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack) {
 
+	$scope.$on('$viewContentLoaded', function () {
+		$window.scrollTo(0, 0);
+	});
+
 	angular.extend($scope, {
 		config: Config,
 		platformAPI: PlatformAPI,
@@ -556,6 +560,10 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 });
 
 appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI) {
+
+	$scope.$on('$viewContentLoaded', function () {
+		$window.scrollTo(0, 0);
+	});
 
 	angular.extend($scope, {
 		platformAPI: PlatformAPI,
