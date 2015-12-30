@@ -29,7 +29,9 @@ appStickerPipeStore.controller('AppController', function(Config, envService) {
 
 	document.body.addEventListener('touchstart',function(){},false);
 
+	console.log(1);
 	if (envService.is('local') || envService.is('development')) {
+		console.log(2);
 		document.getElementById('css').setAttribute('href', envService.read('cssUrl') + Config.platform.toLocaleLowerCase() + '.css?v='+(+(new Date())));
 	}
 });
@@ -561,22 +563,6 @@ appStickerPipeStore.controller('StoreController', function($scope, packs, Config
 	});
 });
 
-appStickerPipeStore.value('En', {
-	download: 'Download',
-	open: 'Open',
-	buyPack: 'Buy pack',
-	unavailableContent: 'This content is currently unavailable',
-	get: 'Get'
-});
-
-appStickerPipeStore.value('Ru', {
-	download: 'Скачать',
-	open: 'Открыть',
-	buyPack: 'Купить',
-	unavailableContent: 'В данный момент этот контент недоступен',
-	get: 'Скачать'
-});
-
 appStickerPipeStore.factory('AndroidPlatform', function() {
 
 	var platformJSProvider = window.AndroidJsInterface || {};
@@ -693,6 +679,22 @@ appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout
 		}
 
 	});
+});
+
+appStickerPipeStore.value('En', {
+	download: 'Download',
+	open: 'Open',
+	buyPack: 'Buy pack',
+	unavailableContent: 'This content is currently unavailable',
+	get: 'Get'
+});
+
+appStickerPipeStore.value('Ru', {
+	download: 'Скачать',
+	open: 'Открыть',
+	buyPack: 'Купить',
+	unavailableContent: 'В данный момент этот контент недоступен',
+	get: 'Скачать'
 });
 
 appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
