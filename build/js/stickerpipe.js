@@ -2693,8 +2693,9 @@ window.StickersModule.Configs = {};
 		elId: 'stickerPipe',
 		storeContainerId: 'stickerPipeStore',
 
-		stickerResolutionType : (window.devicePixelRatio == 2) ? 'xhdpi' : 'mdpi',
-		tabResolutionType: (window.devicePixelRatio == 2) ? 'xxhdpi' : 'hdpi',
+		// todo: more than 2 resolution
+		stickerResolutionType : (window.devicePixelRatio == 1) ? 'mdpi' : 'xhdpi',
+		tabResolutionType: (window.devicePixelRatio == 1) ? 'hdpi' : 'xxhdpi',
 
 		tabItemClass: 'sp-tab-item',
 		stickerItemClass: 'sp-sticker-item',
