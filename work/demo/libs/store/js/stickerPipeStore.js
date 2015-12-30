@@ -198,8 +198,27 @@ module.run(['$templateCache', function($templateCache) {
     '		<div class="pack-preview center-block">\n' +
     '			<a href="#/packs/{{ pack.pack_name }}">\n' +
     '				<img data-ng-src="{{ getPackMainIcon(pack) }}" alt="" class="pack-preview-sticker">\n' +
-    '				<h5 class="pack-preview-name">_ {{ getPackMainIcon(pack) }}</h5>\n' +
+    '				<h5 class="pack-preview-name">123 {{ getPackMainIcon(pack) }}</h5>\n' +
     '			</a>\n' +
+    '		</div>\n' +
+    '	</div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/base-page/preloader/view.tpl',
+    '<div class="preloader">\n' +
+    '	<div class="preloader-content">\n' +
+    '		<div class="preloader-chasing-dots">\n' +
+    '			<div class="preloader-child preloader-dot1"></div>\n' +
+    '			<div class="preloader-child preloader-dot2"></div>\n' +
     '		</div>\n' +
     '	</div>\n' +
     '</div>');
@@ -220,25 +239,6 @@ module.run(['$templateCache', function($templateCache) {
     '			<img src="{{ imgUrl }}" alt="">\n' +
     '		</div>\n' +
     '		<h5>{{ i18n.unavailableContent }}</h5>\n' +
-    '	</div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/base-page/preloader/view.tpl',
-    '<div class="preloader">\n' +
-    '	<div class="preloader-content">\n' +
-    '		<div class="preloader-chasing-dots">\n' +
-    '			<div class="preloader-child preloader-dot1"></div>\n' +
-    '			<div class="preloader-child preloader-dot2"></div>\n' +
-    '		</div>\n' +
     '	</div>\n' +
     '</div>');
 }]);
@@ -504,6 +504,15 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $route, $
 
 });
 
+appStickerPipeStore.directive('basePage', function() {
+
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/view.tpl',
+		link: function($scope, $el, attrs) {}
+	};
+});
+
 appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack) {
 
 	angular.extend($scope, {
@@ -538,15 +547,6 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 			$scope.$apply();
 		}
 	});
-});
-
-appStickerPipeStore.directive('basePage', function() {
-
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/view.tpl',
-		link: function($scope, $el, attrs) {}
-	};
 });
 
 appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI, EnvConfig) {
@@ -695,20 +695,6 @@ appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout
 	});
 });
 
-appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
-	
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/error/view.tpl',
-		link: function($scope, $el, attrs) {
-
-			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
-			$scope.i18n = i18n;
-		}
-
-	};
-});
-
 appStickerPipeStore.directive('preloader', function($rootScope) {
 
 	return {
@@ -734,6 +720,20 @@ appStickerPipeStore.directive('preloader', function($rootScope) {
 				}
 			});
 
+		}
+
+	};
+});
+
+appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
+	
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/error/view.tpl',
+		link: function($scope, $el, attrs) {
+
+			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
+			$scope.i18n = i18n;
 		}
 
 	};

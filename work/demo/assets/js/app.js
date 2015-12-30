@@ -271,7 +271,7 @@ var App = _makeClass(function(options) {
 			text: text,
 			date: this.getDateString(0),
 			sticker: parseSticker
-		})).animate({ scrollTop: this.$messages[0].scrollHeight }, 1000);
+		})).animate({ scrollTop: this.$messages[0].scrollHeight }, 0);
 	},
 
 	getUrlParameter: function(name) {
