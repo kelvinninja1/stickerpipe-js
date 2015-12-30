@@ -111,6 +111,23 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/base-page/view.tpl',
+    '<!--<div class="version">0.0.7</div>-->\n' +
+    '<div class="store">\n' +
+    '	<div data-ng-show="!error" data-ng-view="" autoscroll="true"></div>\n' +
+    '	<div data-ng-show="error" data-error></div>\n' +
+    '	<div data-ng-show="preloader" data-preloader></div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/pack/PackView.tpl',
     '<div ng-class="{\'screen-header\': platformAPI.isJS()}" data-ng-show="platformAPI.isJS()">\n' +
     '	<a href="#/store">\n' +
@@ -174,23 +191,6 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/base-page/view.tpl',
-    '<!--<div class="version">0.0.7</div>-->\n' +
-    '<div class="store">\n' +
-    '	<div data-ng-show="!error" data-ng-view="" autoscroll="true"></div>\n' +
-    '	<div data-ng-show="error" data-error></div>\n' +
-    '	<div data-ng-show="preloader" data-preloader></div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/store/StoreView.tpl',
     '<div data-ng-class="{\'screen-header\': platformAPI.isJS()}" data-ng-show="platformAPI.isJS()"></div>\n' +
     '<div class="packs">\n' +
@@ -198,7 +198,7 @@ module.run(['$templateCache', function($templateCache) {
     '		<div class="pack-preview center-block">\n' +
     '			<a href="#/packs/{{ pack.pack_name }}">\n' +
     '				<img data-ng-src="{{ getPackMainIcon(pack) }}" alt="" class="pack-preview-sticker">\n' +
-    '				<h5 class="pack-preview-name">{{ getPackMainIcon(pack) }}</h5>\n' +
+    '				<h5 class="pack-preview-name">_ {{ getPackMainIcon(pack) }}</h5>\n' +
     '			</a>\n' +
     '		</div>\n' +
     '	</div>\n' +
@@ -556,8 +556,7 @@ appStickerPipeStore.controller('StoreController', function($scope, packs, Config
 		packs: packs.packs,
 
 		getPackMainIcon: function(pack) {
-			//return pack.main_icon[Config.resolutionType];
-			return EnvConfig.stickersStorageUrl + pack.pack_name + '/' + 'main_icon' + '_' + Config.resolutionType + '.png'
+			return pack.main_icon[Config.resolutionType];
 		}
 	});
 });
