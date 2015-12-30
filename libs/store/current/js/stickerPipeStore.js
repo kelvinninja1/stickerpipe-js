@@ -1,3 +1,38 @@
+
+var appStickerPipeStore = angular.module('appStickerPipeStore', [
+	'ngRoute',
+	'angular-google-analytics',
+	'partials',
+	'environment'
+]);
+
+appStickerPipeStore.run(function($rootScope, PlatformAPI, $window, $timeout) {
+
+	PlatformAPI.init();
+
+	$rootScope.$on('$routeChangeStart', function() {
+		PlatformAPI.showInProgress(true);
+	});
+
+	$rootScope.$on('$routeChangeSuccess', function() {
+		PlatformAPI.showInProgress(false);
+		$rootScope.error = false;
+	});
+
+	$rootScope.$on('$routeChangeError', function(e, c, p, error) {
+		PlatformAPI.showInProgress(false);
+		$rootScope.error = true;
+	});
+});
+
+appStickerPipeStore.controller('AppController', function(Config, envService) {
+
+	document.body.addEventListener('touchstart',function(){},false);
+
+	if (envService.is('local') || envService.is('development')) {
+		document.getElementById('css').setAttribute('href', envService.read('cssUrl') + Config.platform.toLocaleLowerCase() + '.css?v='+(+(new Date())));
+	}
+});
 angular.module('environment',[]).provider('envService',function(){this.environment='development';this.data={};this.config=function(config){this.data=config;};this.set=function(environment){this.environment=environment;};this.get=function(){return this.environment;};this.read=function(variable){if(variable!=='all'){return this.data.vars[this.get()][variable];}
 	return this.data.vars[this.get()];};this.is=function(environment){return(environment===this.environment);};this.check=function(){var	location=window.location.href,self=this;angular.forEach(this.data.domains,function(v,k){angular.forEach(v,function(v){if(location.match('//'+v)){self.environment=k;}});});};this.$get=function(){return this;};});
 /**
@@ -23,47 +58,6 @@ angular.module('environment',[]).provider('envService',function(){this.environme
     e,u,b)})}function k(){var a,b;c.forEach(g,function(d,g){var q;if(q=!b){var h=f.path();q=d.keys;var l={};if(d.regexp)if(h=d.regexp.exec(h)){for(var k=1,m=h.length;k<m;++k){var n=q[k-1],p=h[k];n&&p&&(l[n.name]=p)}q=l}else q=null;else q=null;q=a=q}q&&(b=r(d,{params:c.extend({},f.search(),a),pathParams:a}),b.$$route=d)});return b||g[null]&&r(g[null],{params:{},pathParams:{}})}function t(a,b){var d=[];c.forEach((a||"").split(":"),function(a,c){if(0===c)d.push(a);else{var f=a.match(/(\w+)(?:[?*])?(.*)/),
     g=f[1];d.push(b[g]);d.push(f[2]||"");delete b[g]}});return d.join("")}var w=!1,n,v,s={routes:g,reload:function(){w=!0;a.$evalAsync(function(){l();m()})},updateParams:function(a){if(this.current&&this.current.$$route)a=c.extend({},this.current.params,a),f.path(t(this.current.$$route.originalPath,a)),f.search(a);else throw B("norout");}};a.$on("$locationChangeStart",l);a.$on("$locationChangeSuccess",m);return s}]});var B=c.$$minErr("ngRoute");p.provider("$routeParams",function(){this.$get=function(){return{}}});
     p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScroll","$animate"];A.$inject=["$compile","$controller","$route"]})(window,window.angular);
-
-var appStickerPipeStore = angular.module('appStickerPipeStore', [
-	'ngRoute',
-	'angular-google-analytics',
-	'partials',
-	'environment'
-]);
-
-appStickerPipeStore.run(function($rootScope, PlatformAPI, $window, $timeout) {
-
-	PlatformAPI.init();
-
-	$rootScope.$on('$viewContentLoaded', function () {
-		$timeout(function() {
-			$window.scrollTo(0, 0);
-		}, 100);
-	});
-
-	$rootScope.$on('$routeChangeStart', function() {
-		PlatformAPI.showInProgress(true);
-	});
-
-	$rootScope.$on('$routeChangeSuccess', function() {
-		PlatformAPI.showInProgress(false);
-		$rootScope.error = false;
-	});
-
-	$rootScope.$on('$routeChangeError', function(e, c, p, error) {
-		PlatformAPI.showInProgress(false);
-		$rootScope.error = true;
-	});
-});
-
-appStickerPipeStore.controller('AppController', function(Config, envService) {
-
-	document.body.addEventListener('touchstart',function(){},false);
-
-	if (envService.is('local') || envService.is('development')) {
-		document.getElementById('css').setAttribute('href', envService.read('cssUrl') + Config.platform.toLocaleLowerCase() + '.css?v='+(+(new Date())));
-	}
-});
 appStickerPipeStore.config(function(envServiceProvider) {
 
 	// default development(work)
@@ -120,7 +114,7 @@ module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/view.tpl',
     '<!--<div class="version">0.0.7</div>-->\n' +
     '<div class="store">\n' +
-    '	<div data-ng-show="!error" data-ng-view=""></div>\n' +
+    '	<div data-ng-show="!error" data-ng-view="" autoscroll="true"></div>\n' +
     '	<div data-ng-show="error" data-error></div>\n' +
     '	<div data-ng-show="preloader" data-preloader></div>\n' +
     '</div>');
@@ -135,12 +129,12 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/store/StoreView.tpl',
-    '<div ng-class="{\'screen-header\': platformAPI.isJS()}" data-ng-show="platformAPI.isJS()"></div>\n' +
+    '<div data-ng-class="{\'screen-header\': platformAPI.isJS()}" data-ng-show="platformAPI.isJS()"></div>\n' +
     '<div class="packs">\n' +
     '	<div class="col" data-ng-repeat="pack in packs">\n' +
     '		<div class="pack-preview center-block">\n' +
     '			<a href="#/packs/{{ pack.pack_name }}">\n' +
-    '				<img ng-src="{{ getPackMainIcon(pack) }}" alt="" class="pack-preview-sticker">\n' +
+    '				<img data-ng-src="{{ getPackMainIcon(pack) }}" alt="" class="pack-preview-sticker">\n' +
     '				<h5 class="pack-preview-name">{{ pack.title }}</h5>\n' +
     '			</a>\n' +
     '		</div>\n' +
@@ -555,14 +549,15 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 	});
 });
 
-appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI) {
+appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI, EnvConfig) {
 
 	angular.extend($scope, {
 		platformAPI: PlatformAPI,
 		packs: packs.packs,
 
 		getPackMainIcon: function(pack) {
-			return pack.main_icon[Config.resolutionType];
+			//return pack.main_icon[Config.resolutionType];
+			return EnvConfig.stickersStorageUrl + pack.pack_name + '/' + 'main_icon' + '_' + Config.resolutionType + '.png'
 		}
 	});
 });
