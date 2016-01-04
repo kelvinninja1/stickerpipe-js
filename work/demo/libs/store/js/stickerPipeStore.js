@@ -104,7 +104,7 @@ appStickerPipeStore.config(function(envServiceProvider) {
 		domains: {
 			local: ['localhost', '192.168.56.1'],
 			development: ['work.stk.908.vc'],
-			production: ['stickerpipe.com']
+			production: ['stickerpipe.com', 'api.stickerpipe.com']
 		},
 
 		vars: {
@@ -790,20 +790,6 @@ appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout
 	});
 });
 
-appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
-	
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/error/view.tpl',
-		link: function($scope, $el, attrs) {
-
-			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
-			$scope.i18n = i18n;
-		}
-
-	};
-});
-
 appStickerPipeStore.directive('preloader', function($rootScope) {
 
 	return {
@@ -829,6 +815,20 @@ appStickerPipeStore.directive('preloader', function($rootScope) {
 				}
 			});
 
+		}
+
+	};
+});
+
+appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
+	
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/error/view.tpl',
+		link: function($scope, $el, attrs) {
+
+			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
+			$scope.i18n = i18n;
 		}
 
 	};
