@@ -3748,6 +3748,10 @@ window.StickersModule.View = {};
 			if (tabName) {
 				this.tabsView.activeTab(tabName);
 			}
+
+			if (!this.tabsView.hasActiveTab) {
+				this.tabsView.activeLastUsedStickersTab();
+			}
 		},
 		close: function() {},
 
@@ -4400,6 +4404,8 @@ window.StickersModule.View = {};
 		controls: null,
 		packTabs: {},
 
+		hasActiveTab: false,
+
 		classes: {
 			scrollableContainer: 'sp-tabs-scrollable-container',
 			scrollableContent: 'sp-tabs-scrollable-content',
@@ -4651,6 +4657,7 @@ window.StickersModule.View = {};
 			}
 
 			this.packTabs[tabName].click();
+			this.hasActiveTab = true;
 
 			var tabWidth = this.scrollableContentEl.getElementsByClassName(this.classes.packTab)[0].offsetWidth;
 			var containerWidth = this.scrollableContainerEl.offsetWidth;
@@ -4665,6 +4672,7 @@ window.StickersModule.View = {};
 		},
 		activeLastUsedStickersTab: function() {
 			this.controls.history.el.click();
+			this.hasActiveTab = true;
 		},
 
 		handleClickOnEmojiTab: function(callback) {
@@ -4752,8 +4760,6 @@ window.StickersModule.View = {};
 
 			var onPacksLoadCallback = (function() {
 				this.view.render(this.stickersModel);
-
-				this.view.tabsView.activeLastUsedStickersTab();
 
 				callback && callback();
 			}).bind(this);

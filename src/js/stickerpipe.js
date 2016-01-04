@@ -57,8 +57,6 @@ window.StickersModule.View = {};
 			var onPacksLoadCallback = (function() {
 				this.view.render(this.stickersModel);
 
-				this.view.tabsView.activeLastUsedStickersTab();
-
 				callback && callback();
 			}).bind(this);
 

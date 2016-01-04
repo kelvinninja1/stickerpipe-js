@@ -153,6 +153,10 @@
 			if (tabName) {
 				this.tabsView.activeTab(tabName);
 			}
+
+			if (!this.tabsView.hasActiveTab) {
+				this.tabsView.activeLastUsedStickersTab();
+			}
 		},
 		close: function() {},
 

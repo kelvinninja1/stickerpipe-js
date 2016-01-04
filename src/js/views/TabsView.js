@@ -11,6 +11,8 @@
 		controls: null,
 		packTabs: {},
 
+		hasActiveTab: false,
+
 		classes: {
 			scrollableContainer: 'sp-tabs-scrollable-container',
 			scrollableContent: 'sp-tabs-scrollable-content',
@@ -262,6 +264,7 @@
 			}
 
 			this.packTabs[tabName].click();
+			this.hasActiveTab = true;
 
 			var tabWidth = this.scrollableContentEl.getElementsByClassName(this.classes.packTab)[0].offsetWidth;
 			var containerWidth = this.scrollableContainerEl.offsetWidth;
@@ -276,6 +279,7 @@
 		},
 		activeLastUsedStickersTab: function() {
 			this.controls.history.el.click();
+			this.hasActiveTab = true;
 		},
 
 		handleClickOnEmojiTab: function(callback) {
