@@ -10,6 +10,7 @@
 
 		controls: null,
 		packTabs: {},
+		packTabsIndexes: {},
 
 		hasActiveTab: false,
 
@@ -189,7 +190,9 @@
 			this.renderHistoryTab();
 
 			for (var i = 0; i < stickerPacks.length; i++) {
-				this.scrollableContentEl.appendChild(this.renderPackTab(stickerPacks[i], i));
+				var pack = stickerPacks[i];
+				this.scrollableContentEl.appendChild(this.renderPackTab(pack));
+				this.packTabsIndexes[pack.pack_name] = i;
 			}
 
 			this.renderSettingsTab();
@@ -248,13 +251,7 @@
 
 
 		activeTab: function(tabName) {
-			var i = 1;
-			for (var packName in this.packTabs) {
-				if (packName == tabName) {
-					break;
-				}
-				i++;
-			}
+			var i = this.packTabsIndexes[tabName];
 
 			if (Module.Configs.enableEmojiTab) {
 				i++;
@@ -270,9 +267,8 @@
 			var containerWidth = this.scrollableContainerEl.offsetWidth;
 			var countFullShownTabs = parseInt((containerWidth / tabWidth), 10);
 
-
 			var offset = -(parseInt((i / countFullShownTabs), 10) * containerWidth);
-			offset = (offset > 0) ? 0 : offset;
+			offset = (offset > 0) ? 0 : offset - 1;
 			this.scrollableContentEl.style.left = offset + 'px';
 
 			this.onWindowResize();
