@@ -11,18 +11,30 @@
 	<!-- FontAwesome -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 
-	<link rel="stylesheet" type="text/css" href="libs/sdk/0.0.3/css/stickerpipe.css" />
+	<link rel="stylesheet" type="text/css" href="libs/sdk/0.0.4/css/stickerpipe.css" />
 	<link rel="stylesheet" type="text/css" href="assets/css/style.css" />
 	<title>Stickers</title>
 </head>
 <body>
+
 <div class="container">
 	<div class="row">
 		<div class="col-sm-12">
 			<nav class="navbar navbar-default">
 				<div class="container-fluid">
 					<div class="navbar-header">
-						<a class="navbar-brand" href="/">StickerPipe</a>
+						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+							<span class="sr-only">Toggle navigation</span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+						<a class="navbar-brand" href="#">StickerPipe</a>
+					</div>
+					<div id="navbar" class="navbar-collapse collapse">
+						<ul class="nav navbar-nav navbar-right">
+							<li><a href="javascript: void(0);" id="wipeData" style="padding-right: 0;">Wipe user data</a></li>
+						</ul>
 					</div>
 				</div>
 			</nav>
@@ -48,16 +60,16 @@
 			<div id="messageBox">
 				<div class="input-group">
                     <span class="input-group-btn">
-                        <button class="btn btn-default" id="stickersToggle">
-	                        <span class="icon"></span>
+                        <button class="btn btn-default" id="stickersToggle" style="margin-left: 0px;">
+                            <span class="icon"></span>
                         </button>
                     </span>
 
 					<!--<textarea class="form-control" id="search-church" placeholder="Сообщение" rows='1'></textarea>-->
-					<div class="form-control textarea" placeholder="Сообщение" contenteditable="true"></div>
+					<div class="form-control textarea" placeholder="Message..." contenteditable="true"></div>
 
 					<span class="input-group-btn">
-                        <button class="btn btn-default" type="submit">Отправить</button>
+                        <button class="btn btn-default" type="submit">Send</button>
                     </span>
 				</div>
 			</div>
@@ -106,11 +118,11 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/3.0.13/autosize.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
-<script src="libs/sdk/0.0.3/js/stickerpipe.js"></script>
+<script src="libs/sdk/0.0.4/js/stickerpipe.js"></script>
 <script src="assets/js/app.js"></script>
 <script>
 	(function() {
-		var app = new App();
+		window.app = new App({});
 	})();
 </script>
 </body>

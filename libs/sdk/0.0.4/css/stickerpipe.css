@@ -1,0 +1,592 @@
+@charset "UTF-8";
+
+/*
+SCSS variables are information about icon's compiled state, stored under its original file name
+
+.icon-home {
+  width: $icon-home-width;
+}
+
+The large array-like variables contain all information about a single icon
+$icon-home: x y offset_x offset_y width height total_width total_height image_path;
+
+At the bottom of this section, we provide information about the spritesheet itself
+$spritesheet: width height image $spritesheet-sprites;
+*/
+
+/*
+These "retina group" variables are mappings for the naming and pairing of normal and retina sprites.
+
+The list formatted variables are intended for mixins like `retina-sprite` and `retina-sprites`.
+*/
+
+/*
+The provided mixins are intended to be used with the array-like variables
+
+.icon-home {
+  @include sprite-width($icon-home);
+}
+
+.icon-email {
+  @include sprite($icon-email);
+}
+*/
+
+/*
+The `retina-sprite` mixin sets up rules and a media query for a sprite/retina sprite.
+  It should be used with a "retina group" variable.
+
+The media query is from CSS Tricks: https://css-tricks.com/snippets/css/retina-display-media-query/
+
+$icon-home-group: ('icon-home', $icon-home, $icon-home-2x, );
+
+.icon-home {
+  @include retina-sprite($icon-home-group);
+}
+*/
+
+/*
+The `sprites` mixin generates identical output to the CSS template
+  but can be overridden inside of SCSS
+
+@include sprites($spritesheet-sprites);
+*/
+
+/*
+The `retina-sprites` mixin generates a CSS rule and media query for retina groups
+  This yields the same output as CSS retina template but can be overridden in SCSS
+
+@include retina-sprites($retina-groups);
+*/
+
+.sp-modal-lock {
+  overflow: hidden;
+}
+
+.sp-modal-overlay {
+  background: rgba(0, 0, 0, 0.5);
+  bottom: 0;
+  left: 0;
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 100;
+  /* if modal content doesn't fit inside the overlay, display scrollbars */
+  overflow: auto;
+  /* allow one-finger iPad scrolling */
+  /* IE6–IE8 */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = #7F000000, endColorstr = #7F000000);
+  zoom: 1;
+  /* fix for iPad glitches */
+}
+
+.sp-modal-overlay > * {
+  -webkit-transform: translateZ(0px);
+}
+
+/* modal box style, can be anything you want */
+
+.sp-modal {
+  background: white;
+  border-radius: 3px;
+  box-shadow: 1px 1px 2px 0 rgba(50, 50, 50, 0.5);
+  margin: 45px auto;
+  height: 606px;
+  max-width: 650px;
+  overflow: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 544px) {
+  .sp-modal {
+    border-radius: 0;
+    box-sizing: border-box;
+    margin: 0;
+    width: 100%;
+  }
+}
+
+.sp-modal-header {
+  background: rgba(255, 255, 255, 0.5);
+  display: table;
+  width: 100%;
+  padding: 10px;
+  position: absolute;
+}
+
+.sp-modal-body {
+  height: 100%;
+  width: 100%;
+}
+
+.sp-modal-close {
+  cursor: pointer;
+  opacity: 0.5;
+  padding: 12px;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.sp-modal-close:hover {
+  opacity: 0.7;
+}
+
+.sp-popover {
+  background: #fafafa;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  position: absolute;
+  height: 350px;
+  width: 320px;
+  box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.15);
+}
+
+.sp-popover .sp-arrow,
+.sp-popover .sp-arrow:after {
+  position: absolute;
+  display: block;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+}
+
+.sp-popover .sp-arrow {
+  bottom: -11px;
+  margin-left: 1px;
+  border-top-color: rgba(0, 0, 0, 0.25);
+  border-width: 11px;
+  border-bottom-width: 0;
+}
+
+@media (max-width: 544px) {
+  .sp-popover .sp-arrow {
+    display: none;
+  }
+}
+
+.sp-popover .sp-arrow:after {
+  bottom: 1px;
+  margin-left: -10px;
+  content: " ";
+  border-top-color: #fafafa;
+  border-width: 10px;
+  border-bottom-width: 0;
+}
+
+.sticker-pipe .sp-store {
+  background: white;
+}
+
+.sticker-pipe .sp-tabs {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  background-color: #fff;
+  border-bottom: 1px solid #c8c8c8;
+  border-radius: 3px 3px 0 0;
+  width: 100%;
+  white-space: nowrap;
+}
+
+.sticker-pipe .sp-tabs .sp-tabs-scrollable-container {
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  float: left;
+  overflow: hidden;
+  position: relative;
+}
+
+.sticker-pipe .sp-tabs .sp-tabs-scrollable-container .sp-tabs-scrollable-content {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  left: 0;
+  position: relative;
+  -webkit-transition: 300ms;
+  transition: 300ms;
+  white-space: nowrap;
+}
+
+.sticker-pipe .sp-tabs .sp-tab-item {
+  display: inline-table;
+  cursor: pointer;
+  padding: 6px;
+}
+
+.sticker-pipe .sp-tabs .sp-tab-item img {
+  border-radius: 50%;
+  height: 36px;
+  width: 36px;
+  opacity: .5;
+}
+
+.sticker-pipe .sp-tabs .sp-tab-item img:hover {
+  opacity: .7;
+}
+
+.sticker-pipe .sp-tabs .sp-tab-item.sp-tab-active {
+  background: rgba(0, 0, 0, 0.1);
+  color: orange;
+}
+
+.sticker-pipe .sp-tabs .sp-tab-item.sp-tab-active img {
+  opacity: 1;
+}
+
+.sticker-pipe .sp-tabs .sp-tab-item.sp-tab-active.sp-control-tab > span,
+.sticker-pipe .sp-tabs .sp-tab-item.sp-tab-active.sp-control-button > span {
+  opacity: 0.9;
+}
+
+.sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab,
+.sticker-pipe .sp-tabs .sp-tab-item.sp-control-button {
+  margin: 0;
+  padding: 12px;
+}
+
+.sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab:hover > span,
+.sticker-pipe .sp-tabs .sp-tab-item.sp-control-button:hover > span {
+  opacity: .7;
+}
+
+.sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab > span,
+.sticker-pipe .sp-tabs .sp-tab-item.sp-control-button > span {
+  display: table;
+  opacity: .5;
+}
+
+.sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-next-packs,
+.sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-store,
+.sticker-pipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-next-packs,
+.sticker-pipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-store {
+  border-left: 1px solid #c8c8c8;
+  border-radius: 0;
+}
+
+.sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-prev-packs,
+.sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-history,
+.sticker-pipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-prev-packs,
+.sticker-pipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-history {
+  border-right: 1px solid #c8c8c8;
+}
+
+.sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-prev-packs,
+.sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-next-packs,
+.sticker-pipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-prev-packs,
+.sticker-pipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-next-packs {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.sticker-pipe .sp-tabs .sp-tab-item.sp-pack-tab.sp-new-pack::after {
+  content: "";
+  width: 10px;
+  height: 10px;
+  display: block;
+  position: absolute;
+  background-color: #f60;
+  border-radius: 50%;
+  margin-left: 29px;
+  margin-top: -10px;
+}
+
+.sticker-pipe .sp-scroll-content {
+  position: relative;
+}
+
+.sticker-pipe .sp-scroll-content:hover .scrollbar {
+  opacity: 1;
+}
+
+.sticker-pipe .sp-scroll-content .viewport {
+  height: 298px;
+  overflow: hidden;
+  position: relative;
+}
+
+.sticker-pipe .sp-scroll-content .viewport .overview {
+  left: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  top: 0;
+}
+
+.sticker-pipe .sp-scroll-content .scrollbar {
+  background-position: 0 0;
+  opacity: 0;
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  -webkit-transition: 400ms;
+  transition: 400ms;
+  z-index: 1;
+}
+
+.sticker-pipe .sp-scroll-content .scrollbar .track {
+  height: 100%;
+  position: relative;
+  width: 7px;
+}
+
+.sticker-pipe .sp-scroll-content .scrollbar .track .thumb {
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 3px;
+  cursor: pointer;
+  height: 20px;
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
+.sticker-pipe .sp-scroll-content .scrollbar .track .thumb:hover {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.sticker-pipe .sp-scroll-content .disable {
+  display: none;
+}
+
+.sticker-pipe .sp-scroll-content .noSelect {
+  -ms-user-select: none;
+  user-select: none;
+  -o-user-select: none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+}
+
+.sticker-pipe .sp-content {
+  background: #fafafa;
+  border-radius: 0 0 3px 3px;
+  display: table;
+}
+
+.sticker-pipe .sp-content.sp-emojis {
+  padding: 8px 16px;
+}
+
+.sticker-pipe .sp-content.sp-emojis .sp-emoji {
+  display: inline-table;
+  float: left;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.sticker-pipe .sp-content.sp-emojis .sp-emoji:hover {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+}
+
+.sticker-pipe .sp-content.sp-emojis .sp-emoji img {
+  height: 24px;
+  width: 24px;
+}
+
+.sticker-pipe .sp-content.sp-stickers .sp-sticker-item,
+.sticker-pipe .sp-content.sp-stickers .sp-sticker-placeholder {
+  float: left;
+  display: inline-table;
+}
+
+.sticker-pipe .sp-content.sp-stickers .sp-sticker-placeholder {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  height: 40px;
+  width: 40px;
+  margin: 32px;
+}
+
+.sticker-pipe .sp-content.sp-stickers .sp-sticker-item {
+  cursor: pointer;
+  display: inline-table;
+  float: left;
+  margin: 9px;
+  padding: 3px;
+}
+
+.sticker-pipe .sp-content.sp-stickers .sp-sticker-item:not(.sp-sticker-placeholder):hover {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+}
+
+.sticker-pipe .sp-content.sp-stickers .sp-sticker-item img {
+  height: 80px;
+  width: 80px;
+}
+
+.sp-icon-arrow-back {
+  background-image: url("../img/icons_sprite.png");
+  background-position: 0px 0px;
+  width: 24px;
+  height: 24px;
+}
+
+.sp-icon-arrow-forward {
+  background-image: url("../img/icons_sprite.png");
+  background-position: -24px 0px;
+  width: 24px;
+  height: 24px;
+}
+
+.sp-icon-clock {
+  background-image: url("../img/icons_sprite.png");
+  background-position: 0px -24px;
+  width: 24px;
+  height: 24px;
+}
+
+.sp-icon-close {
+  background-image: url("../img/icons_sprite.png");
+  background-position: -24px -24px;
+  width: 24px;
+  height: 24px;
+}
+
+.sp-icon-face {
+  background-image: url("../img/icons_sprite.png");
+  background-position: -48px 0px;
+  width: 24px;
+  height: 24px;
+}
+
+.sp-icon-mall {
+  background-image: url("../img/icons_sprite.png");
+  background-position: -48px -24px;
+  width: 24px;
+  height: 24px;
+}
+
+.sp-icon-plus {
+  background-image: url("../img/icons_sprite.png");
+  background-position: 0px -48px;
+  width: 24px;
+  height: 24px;
+}
+
+.sp-icon-settings {
+  background-image: url("../img/icons_sprite.png");
+  background-position: -24px -48px;
+  width: 24px;
+  height: 24px;
+}
+
+.sp-icon-arrow-back {
+  background-image: url("../img/icons_sprite.png");
+  background-position: 0px 0px;
+  width: 24px;
+  height: 24px;
+}
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .sp-icon-arrow-back {
+    background-image: url("../img/icons_sprite@2x.png");
+    background-size: 72px 72px;
+  }
+}
+
+.sp-icon-arrow-forward {
+  background-image: url("../img/icons_sprite.png");
+  background-position: -24px 0px;
+  width: 24px;
+  height: 24px;
+}
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .sp-icon-arrow-forward {
+    background-image: url("../img/icons_sprite@2x.png");
+    background-size: 72px 72px;
+  }
+}
+
+.sp-icon-clock {
+  background-image: url("../img/icons_sprite.png");
+  background-position: 0px -24px;
+  width: 24px;
+  height: 24px;
+}
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .sp-icon-clock {
+    background-image: url("../img/icons_sprite@2x.png");
+    background-size: 72px 72px;
+  }
+}
+
+.sp-icon-close {
+  background-image: url("../img/icons_sprite.png");
+  background-position: -24px -24px;
+  width: 24px;
+  height: 24px;
+}
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .sp-icon-close {
+    background-image: url("../img/icons_sprite@2x.png");
+    background-size: 72px 72px;
+  }
+}
+
+.sp-icon-face {
+  background-image: url("../img/icons_sprite.png");
+  background-position: -48px 0px;
+  width: 24px;
+  height: 24px;
+}
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .sp-icon-face {
+    background-image: url("../img/icons_sprite@2x.png");
+    background-size: 72px 72px;
+  }
+}
+
+.sp-icon-mall {
+  background-image: url("../img/icons_sprite.png");
+  background-position: -48px -24px;
+  width: 24px;
+  height: 24px;
+}
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .sp-icon-mall {
+    background-image: url("../img/icons_sprite@2x.png");
+    background-size: 72px 72px;
+  }
+}
+
+.sp-icon-plus {
+  background-image: url("../img/icons_sprite.png");
+  background-position: 0px -48px;
+  width: 24px;
+  height: 24px;
+}
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .sp-icon-plus {
+    background-image: url("../img/icons_sprite@2x.png");
+    background-size: 72px 72px;
+  }
+}
+
+.sp-icon-settings {
+  background-image: url("../img/icons_sprite.png");
+  background-position: -24px -48px;
+  width: 24px;
+  height: 24px;
+}
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .sp-icon-settings {
+    background-image: url("../img/icons_sprite@2x.png");
+    background-size: 72px 72px;
+  }
+}

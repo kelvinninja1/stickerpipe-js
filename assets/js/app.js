@@ -13,43 +13,42 @@ var _makeClass = function(constructor, source) {
 };
 
 var App = _makeClass(function(options) {
-	this.init(options);
+	this._constructor(options);
 }, {
 
 	// todo: rename to stickerpipe
-	stickers: null,
+	stickerpipe: null,
+	configs: null,
 	randomUsers: [],
 	currentUser: {},
 
-	$window: null,
-	$navbar: null,
-	$messages: null,
-	$messageBox: null,
-	$stickerPipeBlock: null,
-	$stickerPipeStickers: null,
-	$stickerPipeStore: null,
-	$stickersToggle: null,
-	$textarea: null,
+	$window: $(window),
+	$navbar: $('.navbar'),
+	$messages: $('#messages'),
+	$messageBox: $('#messageBox'),
+	$stickersToggle: $('#stickersToggle'),
+	$textarea: $('.textarea'),
+	$wipeData: $('#wipeData'),
 
-	init: function() {
-		this.$window = $(window);
-		this.$navbar = $('.navbar');
-		this.$messages = $('#messages');
-		this.$messageBox = $('#messageBox');
-		this.$stickerPipeBlock = $('#stickerPipe');
-		this.$stickerPipeStickers = $('#stickers');
-		this.$stickerPipeStore = $('#store');
-		this.$stickersToggle = this.$messageBox.find('#stickersToggle');
-		this.$textarea = this.$messageBox.find('.textarea');
+	priceB: 0.99,
+	priceC: 1.99,
 
-		this.fetchRandomUsers().done((function() {
-			this.sendMessage();
-			this.sendMessage(true);
-			this.sendMessage();
+	_constructor: function(configs) {
+		this.configs = configs;
+
+		this.$wipeData.on('click', (function() {
+			localStorage.clear();
+			location.reload();
 		}).bind(this));
-		this.initLoDash();
-		this.initMessageBox();
-		this.initStickers();
+
+		// setting lo-dash template
+		_.templateSettings = {
+			evaluate: /\{\[([\s\S]+?)\]\}/g,   // {[ alert() ]}
+			interpolate: /\{\{([\s\S]+?)\}\}/g, // {{ name }}
+			escape: /\{\{-([\s\S]+?)-\}\}/g // {{- html -}}
+		};
+
+		this.init();
 
 		this.$window.resize((function() {
 			this.resizeWindow();
@@ -65,98 +64,71 @@ var App = _makeClass(function(options) {
 
 		this.$messages.on('click', 'img[data-sticker]', (function(e) {
 			var $target = $(e.target);
-			//this.openStickersStore($target.attr('data-sticker-pack'));
-		}).bind(this));
 
-		//this.$stickersToggle.popover({
-		//	content: '213 dfgfgdfg dfgdfgdfg dfgdfgdfgf dfgdfgdgf dfgdfgdfgd ',
-		//	placement: 'top',
-		//	html: true,
-		//	viewport: this.$messageBox
-		//});
+			this.stickerpipe.storeView.renderPack($target.attr('data-sticker-pack'));
+		}).bind(this));
 	},
-	initLoDash: function() {
-		// setting lo-dash template
-		_.templateSettings = {
-			evaluate: /\{\[([\s\S]+?)\]\}/g,   // {[ alert() ]}
-			interpolate: /\{\{([\s\S]+?)\}\}/g, // {{ name }}
-			escape: /\{\{-([\s\S]+?)-\}\}/g // {{- html -}}
-		};
+
+	init: function() {
+		this.fetchRandomUsers().done((function() {
+			this.sendMessage(false, '', true);
+			this.sendMessage(true, '', true);
+			this.sendMessage(false, '', true);
+			this.sendMessage(true, '[[cat4_iloveyou]]');
+		}).bind(this));
+		this.initMessageBox();
+		this.initStickers();
 	},
 	initStickers: function() {
-		this.stickers = new Stickers({
+		this.stickerpipe = new Stickers({
 
 			debug: true,
 
 			elId: 'stickersToggle',
 
-			storeContainerId: this.$stickerPipeStore.attr('id'),
-
-			htmlForEmptyRecent: '<div class="emptyRecent">empty recent text</div>',
-
-			apikey: '72921666b5ff8651f374747bfefaf7b2',
+			apiKey: '72921666b5ff8651f374747bfefaf7b2',
 
 			storagePrefix: 'stickerPipe',
 			enableEmojiTab: true,
 			enableHistoryTab: true,
+			enableStoreTab: true,
 
-			userId: '12345678901234567890123456789012',
-
-			callbacks: {
-				onPurchase: (function(packTitle, productId, price, packName) {
-					if (confirm('#' + productId + ' Вы действительно хотите купить пак "' + packTitle + '", за '+ price + ' UAH?')) {
-						this.stickers.purchaseSuccess(packName);
-					}
-				}).bind(this),
-
-				onPackStoreSuccess: function(packName) {
-					console.log('Спасибо за покупку!');
-				},
-
-				onPackStoreFail: function(packName) {
-					alert('Произошла ошибка при покупке пака. Повторите еще раз!')
-				}
+			userId: this.getUserId(),
+			userPremium: this.isUserPremium(),
+			userData: {
+				age: 18,
+				gender: 'female'
 			},
 
-			functions: {
-				showPackCollection: (function(packName) {
-					this.openStickers(packName);
-				}).bind(this)
-			}
-
+			priceB: this.priceB + ' $',
+			priceC: this.priceC + ' $'
 		});
 
-		if (this.stickers.getNewStickersFlag()) {
-			this.$stickersToggle.addClass('has-new-content');
-		}
-
-		this.stickers.render((function() {
+		this.stickerpipe.render((function() {
 			// todo: make as event
-			this.stickers.onClickSticker((function(text) {
+			this.stickerpipe.onClickSticker((function(text) {
 				this.sendMessage(true, text);
 			}).bind(this));
 
 			// todo: make as event
-			this.stickers.onClickEmoji((function(emoji) {
+			this.stickerpipe.onClickEmoji((function(emoji) {
 				console.log('click on emoji', emoji);
 				this.$textarea.focus();
-				this.pasteHtmlAtCaret(this.stickers.parseEmojiFromText(emoji));
+				this.pasteHtmlAtCaret(this.stickerpipe.parseEmojiFromText(emoji));
 			}).bind(this));
+
+			var _pack = this.getUrlParameter('pack');
+			if (!!_pack) {
+				this.stickerpipe.fetchPacks((function() {
+						this.stickerpipe.open(_pack);
+					}).bind(this)
+				);
+			}
+
 		}).bind(this));
 
 
 		this.resizeWindow();
-		// todo: events
-		//this.stickers.onClickSticker((function(text) {
-		//	this.sendMessage(true, text);
-		//}).bind(this));
-		//
-		//// todo: events
-		//this.stickers.onClickEmoji((function(emoji) {
-		//	console.log('click on emoji', emoji);
-		//	this.$textarea.focus();
-		//	this.pasteHtmlAtCaret(this.stickers.parseEmojiFromText(emoji));
-		//}).bind(this));
 
 		this.$window.on('sp:content:highlight:show', (function() {
 			this.$stickersToggle.addClass('has-new-content');
@@ -164,6 +136,26 @@ var App = _makeClass(function(options) {
 
 		this.$window.on('sp:content:highlight:hide', (function() {
 			this.$stickersToggle.removeClass('has-new-content');
+		}).bind(this));
+
+
+		this.$window.on('sp:popover:shown', (function() {
+			this.$stickersToggle.addClass('active');
+		}).bind(this));
+
+		this.$window.on('sp:popover:hidden', (function() {
+			this.$stickersToggle.removeClass('active');
+		}).bind(this));
+
+		this.stickerpipe.onPurchase((function(packName, packTitle, pricePoint) {
+
+			var result = confirm('Вы действительно хотите купить пак "' + packTitle + '" за ' + this['price' + pricePoint] + '$ ?');
+
+			if (result) {
+				this.stickerpipe.purchaseSuccess(packName, pricePoint);
+			} else {
+				this.stickerpipe.purchaseFail();
+			}
 		}).bind(this));
 	},
 	initMessageBox: function() {
@@ -193,14 +185,6 @@ var App = _makeClass(function(options) {
 		this.$messageBox.find('button[type=submit]').on('click', function() {
 			sendMessageHandler();
 		});
-
-		this.$stickersToggle.on('click', (function() {
-			if (this.$stickersToggle.hasClass('active')) {
-				this.closeStickerPipeBlock();
-			} else {
-				this.openStickers();
-			}
-		}).bind(this));
 
 		window.addEventListener('sp.popover.shown', (function() {
 			this.$stickersToggle.addClass('active');
@@ -249,9 +233,19 @@ var App = _makeClass(function(options) {
 		}
 	},
 
-	sendMessage: function(isCurrentUser, text) {
+	sendMessage: function(isCurrentUser, text, random) {
 
-		text = (text && text.trim()) || this.getRandomMessageText();
+		text = text && text.trim();
+		random = random || false;
+
+		if (random) {
+			text = this.getRandomMessageText();
+		}
+
+		if (!text) {
+			return;
+		}
+
 		text = text.replace(new RegExp('\r?\n','g'), '<br />');
 
 		var user = this.currentUser;
@@ -260,9 +254,9 @@ var App = _makeClass(function(options) {
 			user = this.getRandomUser();
 		}
 
-		var parseSticker = this.stickers.parseStickerFromText(text);
+		var parseSticker = this.stickerpipe.parseStickerFromText(text);
 
-		this.stickers.onUserMessageSent(parseSticker.isSticker);
+		this.stickerpipe.onUserMessageSent(parseSticker.isSticker);
 
 		var messageTemplate = _.template($('#messageTemplate').html());
 
@@ -272,67 +266,14 @@ var App = _makeClass(function(options) {
 			text: text,
 			date: this.getDateString(0),
 			sticker: parseSticker
-		})).animate({ scrollTop: this.$messages[0].scrollHeight }, 1000);
+		})).animate({ scrollTop: this.$messages[0].scrollHeight }, 0);
 	},
 
-	openStickerPipeBlock: function(completeCallback) {
-
-		if (this.$stickersToggle.hasClass('active')) {
-			completeCallback && completeCallback();
-			return;
-		}
-
-		var messagesHeight = this.$messages.height();
-		this.$messages.attr('data-saved-height', messagesHeight);
-
-		//this.$stickersToggle.addClass('active');
-
-		this.$stickerPipeBlock.slideDown({
-			progress: (function() {
-				this.$messages.height(messagesHeight - this.$stickerPipeBlock.height());
-			}).bind(this),
-			complete: function() {
-				completeCallback && completeCallback();
-			}
-		});
-	},
-	closeStickerPipeBlock: function() {
-		if (!this.$stickersToggle.hasClass('active')) {
-			return;
-		}
-
-		var messagesSavedHeight = this.$messages.attr('data-saved-height');
-
-		//this.$stickersToggle.removeClass('active');
-
-		this.$stickerPipeBlock.slideUp({
-			progress: (function() {
-				this.$messages.height(messagesSavedHeight - this.$stickerPipeBlock.height());
-			}).bind(this)
-		});
-	},
-
-	openStickers: function(packName) {
-
-		this.$stickerPipeStickers.show();
-		this.$stickerPipeStore.hide();
-
-		this.openStickerPipeBlock((function() {
-			if (packName) {
-				this.stickers.renderCurrentTab(packName);
-			}
-		}).bind(this));
-	},
-	openStickersStore: function(packName) {
-
-		this.$stickerPipeStickers.hide();
-		this.$stickerPipeStore.show();
-
-		this.openStickerPipeBlock();
-
-		this.resizeWindow();
-
-		this.stickers.renderPack(packName);
+	getUrlParameter: function(name) {
+		name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+		var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+			results = regex.exec(location.search);
+		return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 	},
 
 	fetchRandomUsers: function() {
@@ -376,6 +317,27 @@ var App = _makeClass(function(options) {
 		return texts[this.getRandom(0, texts.length - 1)];
 	},
 
+	getUserId: function() {
+		var userId = localStorage.getItem('userId'),
+			resetUserId = this.getUrlParameter('resetUserId');
+
+
+		if ((!!resetUserId && parseInt(resetUserId, 10) == 1) || !userId || userId.length != 32) {
+			userId = StickersModule.StickerHelper.md5(+ new Date());
+			localStorage.setItem('userId', userId);
+		}
+
+		return userId;
+	},
+	isUserPremium: function() {
+		var userPremium = this.getUrlParameter('userPremium');
+		if (!userPremium) {
+			userPremium = '0';
+		}
+		userPremium = (parseInt(userPremium, 10) == 1);
+		return userPremium;
+	},
+
 	getDateString: function() {
 		var today = new Date(),
 			dd = today.getDate(),
@@ -407,8 +369,7 @@ var App = _makeClass(function(options) {
 			this.$navbar.offset().top -
 			this.$navbar.outerHeight(true) -
 			this.$messageBox.parent().outerHeight(true) -
-			parseInt(this.$messages.css('margin-bottom'), 10) -
-			(this.$stickerPipeBlock.is(':visible') ? this.$stickerPipeBlock.outerHeight(true) : 0)
+			parseInt(this.$messages.css('margin-bottom'), 10)
 		);
 	}
 });
