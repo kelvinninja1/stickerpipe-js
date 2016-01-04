@@ -22,16 +22,16 @@ appStickerPipeStore.run(function($rootScope, PlatformAPI, $window, $anchorScroll
 
 	PlatformAPI.init();
 
-	$rootScope.$on('$routeChangeStart', function() {
+	$rootScope.$on('$stateChangeStart', function() {
 		PlatformAPI.showInProgress(true);
 	});
 
-	$rootScope.$on('$routeChangeSuccess', function() {
+	$rootScope.$on('$stateChangeSuccess', function() {
 		PlatformAPI.showInProgress(false);
 		$rootScope.error = false;
 	});
 
-	$rootScope.$on('$routeChangeError', function(e, c, p, error) {
+	$rootScope.$on('$stateChangeError', function(e, c, p, error) {
 		PlatformAPI.showInProgress(false);
 		$rootScope.error = true;
 	});
@@ -769,6 +769,20 @@ appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout
 	});
 });
 
+appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
+	
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/error/view.tpl',
+		link: function($scope, $el, attrs) {
+
+			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
+			$scope.i18n = i18n;
+		}
+
+	};
+});
+
 appStickerPipeStore.directive('preloader', function($rootScope) {
 
 	return {
@@ -794,20 +808,6 @@ appStickerPipeStore.directive('preloader', function($rootScope) {
 				}
 			});
 
-		}
-
-	};
-});
-
-appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
-	
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/error/view.tpl',
-		link: function($scope, $el, attrs) {
-
-			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
-			$scope.i18n = i18n;
 		}
 
 	};
