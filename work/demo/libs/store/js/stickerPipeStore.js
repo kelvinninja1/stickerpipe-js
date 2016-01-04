@@ -136,23 +136,6 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/base-page/view.tpl',
-    '<!--<div class="version">0.0.7</div>-->\n' +
-    '<div class="store">\n' +
-    '	<div data-ng-show="!error" data-ui-view=""></div>\n' +
-    '	<div data-ng-show="error" data-error></div>\n' +
-    '	<div data-ng-show="preloader" data-preloader></div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/pack/PackView.tpl',
     '<div ng-class="{\'screen-header\': platformAPI.isJS()}" data-ng-show="platformAPI.isJS()">\n' +
     '	<a href="#/store">\n' +
@@ -205,6 +188,23 @@ module.run(['$templateCache', function($templateCache) {
     '			<img data-ng-src="{{ getStickerUrl(sticker.name) }}" alt="{{ sticker.name }}" />\n' +
     '		</div>\n' +
     '	</div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/base-page/view.tpl',
+    '<!--<div class="version">0.0.7</div>-->\n' +
+    '<div class="store">\n' +
+    '	<div data-ng-show="!error" data-ui-view="" autoscroll="true"></div>\n' +
+    '	<div data-ng-show="error" data-error></div>\n' +
+    '	<div data-ng-show="preloader" data-preloader></div>\n' +
     '</div>');
 }]);
 })();
@@ -641,6 +641,22 @@ appStickerPipeStore.controller('StoreController', function($scope, packs, Config
 	});
 });
 
+appStickerPipeStore.value('En', {
+	download: 'Download',
+	open: 'Open',
+	buyPack: 'Buy pack',
+	unavailableContent: 'This content is currently unavailable',
+	get: 'Get'
+});
+
+appStickerPipeStore.value('Ru', {
+	download: 'Скачать',
+	open: 'Открыть',
+	buyPack: 'Купить',
+	unavailableContent: 'В данный момент этот контент недоступен',
+	get: 'Скачать'
+});
+
 appStickerPipeStore.factory('AndroidPlatform', function() {
 
 	var platformJSProvider = window.AndroidJsInterface || {};
@@ -757,22 +773,6 @@ appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout
 		}
 
 	});
-});
-
-appStickerPipeStore.value('En', {
-	download: 'Download',
-	open: 'Open',
-	buyPack: 'Buy pack',
-	unavailableContent: 'This content is currently unavailable',
-	get: 'Get'
-});
-
-appStickerPipeStore.value('Ru', {
-	download: 'Скачать',
-	open: 'Открыть',
-	buyPack: 'Купить',
-	unavailableContent: 'В данный момент этот контент недоступен',
-	get: 'Скачать'
 });
 
 appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
