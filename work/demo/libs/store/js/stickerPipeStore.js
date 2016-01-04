@@ -7,10 +7,7 @@ var appStickerPipeStore = angular.module('appStickerPipeStore', [
 	'ui.router'
 ]);
 
-appStickerPipeStore.run(function($rootScope, PlatformAPI, $window, $anchorScroll, $uiViewScrollProvider) {
-
-
-	$uiViewScrollProvider.useAnchorScroll();
+appStickerPipeStore.run(function($rootScope, PlatformAPI, $window, $anchorScroll) {
 
 	//var wrap = function(method) {
 	//	var orig = $window.window.history[method];
@@ -26,18 +23,15 @@ appStickerPipeStore.run(function($rootScope, PlatformAPI, $window, $anchorScroll
 	PlatformAPI.init();
 
 	$rootScope.$on('$stateChangeStart', function() {
-		console.log(1);
 		PlatformAPI.showInProgress(true);
 	});
 
 	$rootScope.$on('$stateChangeSuccess', function() {
-		console.log(2);
 		PlatformAPI.showInProgress(false);
 		$rootScope.error = false;
 	});
 
 	$rootScope.$on('$stateChangeError', function(e, c, p, error) {
-		console.log(3);
 		PlatformAPI.showInProgress(false);
 		$rootScope.error = true;
 	});
@@ -136,6 +130,23 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/base-page/view.tpl',
+    '<!--<div class="version">0.0.7</div>-->\n' +
+    '<div class="store">\n' +
+    '	<div data-ng-show="!error" data-ui-view="" autoscroll="true"></div>\n' +
+    '	<div data-ng-show="error" data-error></div>\n' +
+    '	<div data-ng-show="preloader" data-preloader></div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/pack/PackView.tpl',
     '<div ng-class="{\'screen-header\': platformAPI.isJS()}" data-ng-show="platformAPI.isJS()">\n' +
     '	<a href="#/store">\n' +
@@ -188,23 +199,6 @@ module.run(['$templateCache', function($templateCache) {
     '			<img data-ng-src="{{ getStickerUrl(sticker.name) }}" alt="{{ sticker.name }}" />\n' +
     '		</div>\n' +
     '	</div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/base-page/view.tpl',
-    '<!--<div class="version">0.0.7</div>-->\n' +
-    '<div class="store">\n' +
-    '	<div data-ng-show="!error" data-ui-view="" autoscroll="true"></div>\n' +
-    '	<div data-ng-show="error" data-error></div>\n' +
-    '	<div data-ng-show="preloader" data-preloader></div>\n' +
     '</div>');
 }]);
 })();
@@ -325,9 +319,10 @@ appStickerPipeStore.config(function() {
 	//	});
 });
 
-appStickerPipeStore.config(function($stateProvider, $urlRouterProvider) {
+appStickerPipeStore.config(function($stateProvider, $urlRouterProvider, $uiViewScrollProvider) {
 
 	$urlRouterProvider.otherwise('/store');
+	$uiViewScrollProvider.useAnchorScroll();
 
 
 	$stateProvider
@@ -584,13 +579,16 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $rootScop
 
 });
 
-appStickerPipeStore.directive('basePage', function() {
+appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI) {
 
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/view.tpl',
-		link: function($scope, $el, attrs) {}
-	};
+	angular.extend($scope, {
+		platformAPI: PlatformAPI,
+		packs: packs.packs,
+
+		getPackMainIcon: function(pack) {
+			return pack.main_icon[Config.resolutionType];
+		}
+	});
 });
 
 appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack) {
@@ -629,16 +627,13 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 	});
 });
 
-appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI) {
+appStickerPipeStore.directive('basePage', function() {
 
-	angular.extend($scope, {
-		platformAPI: PlatformAPI,
-		packs: packs.packs,
-
-		getPackMainIcon: function(pack) {
-			return pack.main_icon[Config.resolutionType];
-		}
-	});
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/view.tpl',
+		link: function($scope, $el, attrs) {}
+	};
 });
 
 appStickerPipeStore.value('En', {
