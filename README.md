@@ -30,13 +30,11 @@ Bower: bower install stickers --save
 
 
 
-
-
 ## Initialize
 
-demo apikey: 72921666b5ff8651f374747bfefaf7b2
+demo apiKey: 72921666b5ff8651f374747bfefaf7b2
 
-If you want use own apikey: http://stickerpipe.com/
+If you want use own apiKey: http://stickerpipe.com/
 
 html
 ```html
@@ -56,7 +54,7 @@ js
         htmlForEmptyRecent: '<div class="emptyRecent">empty recent text</div>',
         storagePrefix: 'stickerPipe_',
         
-        apikey: '72921666b5ff8651f374747bfefaf7b2',
+        apiKey: '72921666b5ff8651f374747bfefaf7b2',
 
         userId: MD5('<YOUR_USER_ID>')
 
@@ -66,6 +64,21 @@ js
     	// on render callback
     });
 ```
+
+## Options
+
+
+| Name                  | value                             |  description                                  |
+| --------------------- | --------------------------------- | --------------------------------------------- |
+| elId                  | id name string                    | name of container id where will render plugin |
+| htmlForEmptyRecent    | html code                         | insert in empty recent block                  |
+| apiKey                | api key your account              | your api key                                  |
+| storagePrefix         | string                            | prefix for LocalStorage                       |
+| enableEmojiTab        | boolean                           | if your wont use emoji tab                    |
+| enableHistoryTab      | boolean                           | if your wont use history tab                  |
+| userId                | md5 of user id - string           | client user id hash                           |
+| userData              | object type                       | data of user for statistic                    |
+| lang                  | "en", "ru" ...                    | language ISO 2                                |
 
 
 ## Methods
@@ -91,9 +104,9 @@ js
     sticker.parseEmojiFromHtml(html);
 ```
 
--  open current tab
+-  open (by default - history tab) or open pack tab
 ```js
-    sticker.renderCurrentTab(tabName);
+    sticker.open([packName]);
 ```
 
 - return - are the new content flag
@@ -107,6 +120,15 @@ js
 ```js
     sticker.onUserMessageSent(isSticker);
 ```
+
+## Events
+
+| Name                      |  description                                                        |
+| ------------------------- | ------------------------------------------------------------------- |
+| sp:popover:shown          | fire on popover was shown                                           |
+| sp:popover:hidden         | fire on popover was hidden                                          |
+| sp:content:highlight:show | fire on getting new content (unseen or when stickers history empty) |
+| sp:content:highlight:hide | fire on have not new contend and stickers history not empty         |
 
 ## Callbacks
 
@@ -122,26 +144,11 @@ js
     sticker.onClickEmoji(function(text) {...}, context);
 ```
 
-- when user click on tab
-    
-```js
-    sticker.onClickTab(function(el) {...}, context);
-```
-
 - when user click on custom tab
     
 ```js
     sticker.onClickCustomTab(function(el) {...}, context);
 ```
-
-## Events
-
-| Name                      |  description                                                        |
-| ------------------------- | ------------------------------------------------------------------- |
-| sp:popover:shown          | fire on popover was shown                                           |
-| sp:popover:hidden         | fire on popover was hidden                                          |
-| sp:content:highlight:show | fire on getting new content (unseen or when stickers history empty) |
-| sp:content:highlight:hide | fire on have not new contend and stickers history not empty         |
 
 ### Example
 
@@ -156,24 +163,6 @@ js
     	// do something ...
     });
 ```
-
-
-## Options
-
-
-| Name                  | value                             |  description                                  |
-| --------------------- | --------------------------------- | --------------------------------------------- |
-| elId                  | id name string                    | name of container id where will render plugin |
-| tabItemClass          | class name string                 | Will set in tab block                         |
-| stickerItemClass      | class name string                 | Will set in sticker block                     |
-| emojiItemClass        | class name string                 | Will set in emoji block                       |
-| htmlForEmptyRecent    | html code                         | insert in empty recent block                  |
-| apikey                | api key your account              | your api key                                  |
-| storagePrefix         | string                            | prefix for LocalStorage                       |
-| enableEmojiTab        | boolean                           | if your wont use emoji tab                    |
-| enableHistoryTab      | boolean                           | if your wont use history tab                  |
-| userId                | md5 of user id - string           | client user id hash                           |
-| lang                  | "en", "ru" ...                    | language ISO 2                                |
 
 
 ## Credits
