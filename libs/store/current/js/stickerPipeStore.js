@@ -6,7 +6,7 @@ var appStickerPipeStore = angular.module('appStickerPipeStore', [
 	'environment'
 ]);
 
-appStickerPipeStore.run(function($rootScope, PlatformAPI, $window, $timeout) {
+appStickerPipeStore.run(function($rootScope, PlatformAPI) {
 
 	PlatformAPI.init();
 
@@ -27,7 +27,7 @@ appStickerPipeStore.run(function($rootScope, PlatformAPI, $window, $timeout) {
 
 appStickerPipeStore.controller('AppController', function(Config, envService) {
 
-	document.body.addEventListener('touchstart',function(){},false);
+	document.body.addEventListener('touchstart',function() {},false);
 
 	if (envService.is('local') || envService.is('development')) {
 		document.getElementById('css').setAttribute('href', envService.read('cssUrl') + Config.platform.toLocaleLowerCase() + '.css?v='+(+(new Date())));
@@ -549,7 +549,7 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 	});
 });
 
-appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI, EnvConfig) {
+appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI) {
 
 	angular.extend($scope, {
 		platformAPI: PlatformAPI,
@@ -695,20 +695,6 @@ appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout
 	});
 });
 
-appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
-	
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/error/view.tpl',
-		link: function($scope, $el, attrs) {
-
-			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
-			$scope.i18n = i18n;
-		}
-
-	};
-});
-
 appStickerPipeStore.directive('preloader', function($rootScope) {
 
 	return {
@@ -734,6 +720,20 @@ appStickerPipeStore.directive('preloader', function($rootScope) {
 				}
 			});
 
+		}
+
+	};
+});
+
+appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
+	
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/error/view.tpl',
+		link: function($scope, $el, attrs) {
+
+			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
+			$scope.i18n = i18n;
 		}
 
 	};
