@@ -4644,14 +4644,6 @@ window.StickersModule.View = {};
 
 
 		activeTab: function(tabName) {
-			//var i = 1;
-			//for (var packName in this.packTabs) {
-			//	if (packName == tabName) {
-			//		break;
-			//	}
-			//	i++;
-			//}
-
 			var i = this.packTabsIndexes[tabName];
 
 			if (Module.Configs.enableEmojiTab) {
@@ -4668,11 +4660,8 @@ window.StickersModule.View = {};
 			var containerWidth = this.scrollableContainerEl.offsetWidth;
 			var countFullShownTabs = parseInt((containerWidth / tabWidth), 10);
 
-			console.log(this.packTabs, i, tabName);
-
 			var offset = -(parseInt((i / countFullShownTabs), 10) * containerWidth);
-			console.log(offset);
-			offset = (offset > 0) ? 0 : offset;
+			offset = (offset > 0) ? 0 : offset - 1;
 			this.scrollableContentEl.style.left = offset + 'px';
 
 			this.onWindowResize();
