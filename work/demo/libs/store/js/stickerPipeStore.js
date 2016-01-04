@@ -7,18 +7,21 @@ var appStickerPipeStore = angular.module('appStickerPipeStore', [
 	'ui.router'
 ]);
 
-appStickerPipeStore.run(function($rootScope, PlatformAPI, $window, $anchorScroll) {
+appStickerPipeStore.run(function($rootScope, PlatformAPI, $window, $anchorScroll, $uiViewScrollProvider) {
 
-	var wrap = function(method) {
-		var orig = $window.window.history[method];
-		$window.window.history[method] = function() {
-			var retval = orig.apply(this, Array.prototype.slice.call(arguments));
-			$anchorScroll();
-			return retval;
-		};
-	};
-	wrap('pushState');
-	wrap('replaceState');
+
+	$uiViewScrollProvider.useAnchorScroll();
+
+	//var wrap = function(method) {
+	//	var orig = $window.window.history[method];
+	//	$window.window.history[method] = function() {
+	//		var retval = orig.apply(this, Array.prototype.slice.call(arguments));
+	//		$anchorScroll();
+	//		return retval;
+	//	};
+	//};
+	//wrap('pushState');
+	//wrap('replaceState');
 
 	PlatformAPI.init();
 
@@ -638,22 +641,6 @@ appStickerPipeStore.controller('StoreController', function($scope, packs, Config
 	});
 });
 
-appStickerPipeStore.value('En', {
-	download: 'Download',
-	open: 'Open',
-	buyPack: 'Buy pack',
-	unavailableContent: 'This content is currently unavailable',
-	get: 'Get'
-});
-
-appStickerPipeStore.value('Ru', {
-	download: 'Скачать',
-	open: 'Открыть',
-	buyPack: 'Купить',
-	unavailableContent: 'В данный момент этот контент недоступен',
-	get: 'Скачать'
-});
-
 appStickerPipeStore.factory('AndroidPlatform', function() {
 
 	var platformJSProvider = window.AndroidJsInterface || {};
@@ -770,6 +757,22 @@ appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout
 		}
 
 	});
+});
+
+appStickerPipeStore.value('En', {
+	download: 'Download',
+	open: 'Open',
+	buyPack: 'Buy pack',
+	unavailableContent: 'This content is currently unavailable',
+	get: 'Get'
+});
+
+appStickerPipeStore.value('Ru', {
+	download: 'Скачать',
+	open: 'Открыть',
+	buyPack: 'Купить',
+	unavailableContent: 'В данный момент этот контент недоступен',
+	get: 'Скачать'
 });
 
 appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
