@@ -23,15 +23,18 @@ appStickerPipeStore.run(function($rootScope, PlatformAPI, $window, $anchorScroll
 	PlatformAPI.init();
 
 	$rootScope.$on('$stateChangeStart', function() {
+		console.log(1);
 		PlatformAPI.showInProgress(true);
 	});
 
 	$rootScope.$on('$stateChangeSuccess', function() {
+		console.log(2);
 		PlatformAPI.showInProgress(false);
 		$rootScope.error = false;
 	});
 
 	$rootScope.$on('$stateChangeError', function(e, c, p, error) {
+		console.log(3);
 		PlatformAPI.showInProgress(false);
 		$rootScope.error = true;
 	});
