@@ -1,6 +1,6 @@
 {
   "name": "stikers-js",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "homepage": "http://stickerpipe.com",
   "authors": [
     "Dmitry Shevchuk shevchuk@908.dp.ua"
@@ -16,6 +16,7 @@
   "ignore": [
     "**/.*",
     "node_modules",
+    "src",
     "bower_components",
     "test",
     "tests",
