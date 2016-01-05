@@ -687,6 +687,18 @@ if ("document" in self) {
 		getDomain: function(url) {
 			var location = this.getLocation(url);
 			return location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '');
+		},
+
+		getMobileOS: function() {
+			var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+			if(userAgent.match( /iPad/i ) || userAgent.match( /iPhone/i ) || userAgent.match( /iPod/i )) {
+				return 'ios';
+			} else if(userAgent.match( /Android/i )) {
+				return 'android';
+			} else {
+				return 'other';
+			}
 		}
 	};
 })(window, window.StickersModule);
@@ -4726,6 +4738,11 @@ window.StickersModule.View = {};
 		storeView: null,
 
 		_constructor: function(config) {
+
+			var mobileOS = Module.StickerHelper.getMobileOS();
+			if (mobileOS == 'ios' || mobileOS == 'android') {
+				config.enableEmojiTab = false;
+			}
 
 			Module.StickerHelper.setConfig(config);
 			Module.Storage.setPrefix(Module.Configs.storagePrefix);
