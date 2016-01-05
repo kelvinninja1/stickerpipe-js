@@ -253,6 +253,7 @@ h6 {
   z-index: 999; }
 
 .store {
+  display: table;
   margin: auto;
   padding: 0 0 30px 0;
   width: 66%; }
