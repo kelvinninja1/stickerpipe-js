@@ -27,6 +27,11 @@ window.StickersModule.View = {};
 
 		_constructor: function(config) {
 
+			var mobileOS = Module.StickerHelper.getMobileOS();
+			if (mobileOS == 'ios' || mobileOS == 'android') {
+				config.enableEmojiTab = false;
+			}
+
 			Module.StickerHelper.setConfig(config);
 			Module.Storage.setPrefix(Module.Configs.storagePrefix);
 

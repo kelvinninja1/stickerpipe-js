@@ -186,6 +186,18 @@
 		getDomain: function(url) {
 			var location = this.getLocation(url);
 			return location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '');
+		},
+
+		getMobileOS: function() {
+			var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+			if(userAgent.match( /iPad/i ) || userAgent.match( /iPhone/i ) || userAgent.match( /iPod/i )) {
+				return 'ios';
+			} else if(userAgent.match( /Android/i )) {
+				return 'android';
+			} else {
+				return 'other';
+			}
 		}
 	};
 })(window, window.StickersModule);
