@@ -25,14 +25,12 @@ https://github.com/908Inc/stickerpipe-js/tree/gh-pages (Example sources)
 
 ### Bower
 
-
 Bower: bower install stickers --save
-
 
 
 ## Initialize
 
-demo apiKey: 72921666b5ff8651f374747bfefaf7b2
+Demo apiKey: 72921666b5ff8651f374747bfefaf7b2
 
 If you want use own apiKey: http://stickerpipe.com/
 
@@ -130,6 +128,20 @@ js
 | sp:content:highlight:show | fire on getting new content (unseen or when stickers history empty) |
 | sp:content:highlight:hide | fire on have not new contend and stickers history not empty         |
 
+### Example
+
+```js
+    window.addEventListener('sp:popover:shown', function() {
+    	// do something ...
+    });
+    
+    // or with jQuery
+    
+    $(window).on('sp:popover:shown', function() {
+    	// do something ...
+    });
+```
+
 ## Callbacks
 
 - when user click on sticker
@@ -150,21 +162,6 @@ js
     sticker.onClickCustomTab(function(el) {...}, context);
 ```
 
-### Example
-
-```js
-    window.addEventListener('sp:popover:shown', function() {
-    	// do something ...
-    });
-    
-    // or with jQuery
-    
-    $(window).on('sp:popover:shown', function() {
-    	// do something ...
-    });
-```
-
-
 ## Credits
 
 908 Inc.
@@ -172,7 +169,6 @@ js
 ## Contact
 
 mail@908.vc
-
 
 
 ## License
