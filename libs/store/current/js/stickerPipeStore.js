@@ -108,11 +108,33 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/view.tpl',
-    '<div class="version">0.0.9</div>\n' +
+    '<div class="version">0.0.10</div>\n' +
     '<div class="store" my-auto-scroll>\n' +
     '	<div data-ng-show="!error" data-ui-view=""></div>\n' +
     '	<div data-ng-show="error" data-error></div>\n' +
     '	<div data-ng-show="preloader" data-preloader></div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/store/StoreView.tpl',
+    '<div data-ng-class="{\'screen-header\': platformAPI.isJS()}" data-ng-show="platformAPI.isJS()"></div>\n' +
+    '<div class="packs">\n' +
+    '	<div class="col" data-ng-repeat="pack in packs">\n' +
+    '		<div class="pack-preview center-block">\n' +
+    '			<a href="#/packs/{{ pack.pack_name }}">\n' +
+    '				<img data-ng-src="{{ getPackMainIcon(pack) }}" alt="" class="pack-preview-sticker">\n' +
+    '				<h5 class="pack-preview-name">{{ getPackTitle(pack) }}</h5>\n' +
+    '			</a>\n' +
+    '		</div>\n' +
+    '	</div>\n' +
     '</div>');
 }]);
 })();
@@ -174,28 +196,6 @@ module.run(['$templateCache', function($templateCache) {
     '	<div class="col" data-ng-repeat="sticker in pack.stickers">\n' +
     '		<div class="sticker center-block">\n' +
     '			<img data-ng-src="{{ getStickerUrl(sticker.name) }}" alt="{{ sticker.name }}" />\n' +
-    '		</div>\n' +
-    '	</div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/store/StoreView.tpl',
-    '<div data-ng-class="{\'screen-header\': platformAPI.isJS()}" data-ng-show="platformAPI.isJS()"></div>\n' +
-    '<div class="packs">\n' +
-    '	<div class="col" data-ng-repeat="pack in packs">\n' +
-    '		<div class="pack-preview center-block">\n' +
-    '			<a href="#/packs/{{ pack.pack_name }}">\n' +
-    '				<img data-ng-src="{{ getPackMainIcon(pack) }}" alt="" class="pack-preview-sticker">\n' +
-    '				<h5 class="pack-preview-name">{{ getPackTitle(pack) }}</h5>\n' +
-    '			</a>\n' +
     '		</div>\n' +
     '	</div>\n' +
     '</div>');
@@ -738,12 +738,14 @@ appStickerPipeStore.directive('myAutoScroll', function ($document, $timeout, $lo
 			$rootScope.$watch(function () {
 				return $location.path()
 			}, function (newLocation, oldLocation) {
-				if ($rootScope.actualLocation == newLocation) {
-					window.scrollTo(0, scope.scrollHistory[$location.path()] ? scope.scrollHistory[$location.path()] : 0);
-				} else {
-					window.scrollTo(0, 0);
-				}
-				scope.okSaveScroll = true;
+				$timeout(function () {
+					if ($rootScope.actualLocation == newLocation) {
+						window.scrollTo(0, scope.scrollHistory[$location.path()] ? scope.scrollHistory[$location.path()] : 0);
+					} else {
+						window.scrollTo(0, 0);
+					}
+					scope.okSaveScroll = true;
+				}, 400);
 			});
 
 		}
