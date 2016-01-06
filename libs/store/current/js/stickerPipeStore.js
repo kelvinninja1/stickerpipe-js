@@ -150,10 +150,32 @@ try {
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/view.tpl',
     '<!--<div class="version">0.0.7</div>-->\n' +
-    '<div class="store">\n' +
+    '<div class="store" my-auto-scroll>\n' +
     '	<div data-ng-show="!error" data-ui-view="" autoscroll="true"></div>\n' +
     '	<div data-ng-show="error" data-error></div>\n' +
     '	<div data-ng-show="preloader" data-preloader></div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/store/StoreView.tpl',
+    '<div data-ng-class="{\'screen-header\': platformAPI.isJS()}" data-ng-show="platformAPI.isJS()"></div>\n' +
+    '<div class="packs">\n' +
+    '	<div class="col" data-ng-repeat="pack in packs">\n' +
+    '		<div class="pack-preview center-block">\n' +
+    '			<a href="#/packs/{{ pack.pack_name }}">\n' +
+    '				<img data-ng-src="{{ getPackMainIcon(pack) }}" alt="" class="pack-preview-sticker">\n' +
+    '				<h5 class="pack-preview-name">{{ getPackTitle(pack) }}</h5>\n' +
+    '			</a>\n' +
+    '		</div>\n' +
+    '	</div>\n' +
     '</div>');
 }]);
 })();
@@ -228,16 +250,13 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/store/StoreView.tpl',
-    '<div data-ng-class="{\'screen-header\': platformAPI.isJS()}" data-ng-show="platformAPI.isJS()"></div>\n' +
-    '<div class="packs">\n' +
-    '	<div class="col" data-ng-repeat="pack in packs">\n' +
-    '		<div class="pack-preview center-block">\n' +
-    '			<a href="#/packs/{{ pack.pack_name }}">\n' +
-    '				<img data-ng-src="{{ getPackMainIcon(pack) }}" alt="" class="pack-preview-sticker">\n' +
-    '				<h5 class="pack-preview-name">{{ getPackTitle(pack) }}</h5>\n' +
-    '			</a>\n' +
+  $templateCache.put('/modules/base-page/error/view.tpl',
+    '<div class="error">\n' +
+    '	<div class="error-content">\n' +
+    '		<div class="error-image">\n' +
+    '			<img ng-src="{{ imgUrl }}" alt="">\n' +
     '		</div>\n' +
+    '		<h5>{{ i18n.unavailableContent }}</h5>\n' +
     '	</div>\n' +
     '</div>');
 }]);
@@ -257,25 +276,6 @@ module.run(['$templateCache', function($templateCache) {
     '			<div class="preloader-child preloader-dot1"></div>\n' +
     '			<div class="preloader-child preloader-dot2"></div>\n' +
     '		</div>\n' +
-    '	</div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/base-page/error/view.tpl',
-    '<div class="error">\n' +
-    '	<div class="error-content">\n' +
-    '		<div class="error-image">\n' +
-    '			<img ng-src="{{ imgUrl }}" alt="">\n' +
-    '		</div>\n' +
-    '		<h5>{{ i18n.unavailableContent }}</h5>\n' +
     '	</div>\n' +
     '</div>');
 }]);
@@ -597,40 +597,20 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $rootScop
 
 });
 
-appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack) {
+appStickerPipeStore.value('En', {
+	download: 'Download',
+	open: 'Open',
+	buyPack: 'Buy pack',
+	unavailableContent: 'This content is currently unavailable',
+	get: 'Get'
+});
 
-	angular.extend($scope, {
-		config: Config,
-		platformAPI: PlatformAPI,
-		pack: pack,
-		i18n: i18n,
-		packService: PackService,
-		showActionProgress: false,
-
-		getStickerUrl: function(name) {
-			return EnvConfig.stickersStorageUrl + this.pack.pack_name + '/' + name + '_' + Config.resolutionType + '.png';
-		},
-
-		getMainStickerUrl: function() {
-			return $scope.getStickerUrl('main_icon');
-		},
-
-		showCollections: function() {
-			PlatformAPI.showCollections(pack.pack_name);
-		},
-
-		purchasePack: function() {
-			$scope.showActionProgress = true;
-			PlatformAPI.purchasePack(pack.title, pack.pack_name, pack.pricepoint);
-		}
-	});
-
-	$rootScope.$on('hideActionProgress', function() {
-		$scope.showActionProgress = false;
-		if(!$scope.$$phase) {
-			$scope.$apply();
-		}
-	});
+appStickerPipeStore.value('Ru', {
+	download: 'Скачать',
+	open: 'Открыть',
+	buyPack: 'Купить',
+	unavailableContent: 'В данный момент этот контент недоступен',
+	get: 'Скачать'
 });
 
 appStickerPipeStore.directive('basePage', function() {
@@ -640,28 +620,6 @@ appStickerPipeStore.directive('basePage', function() {
 		templateUrl: '/modules/base-page/view.tpl',
 		link: function($scope, $el, attrs) {}
 	};
-});
-
-appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI) {
-
-	angular.extend($scope, {
-		platformAPI: PlatformAPI,
-		packs: packs.packs,
-
-		getPackMainIcon: function(pack) {
-			return pack.main_icon[Config.resolutionType];
-		},
-
-		getPackTitle: function(pack) {
-			var title = pack.title;
-			if (title.length > 15) {
-				title = title.substr(0, 15);
-				title += '...';
-			}
-
-			return title;
-		}
-	});
 });
 
 appStickerPipeStore.factory('AndroidPlatform', function() {
@@ -782,20 +740,96 @@ appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout
 	});
 });
 
-appStickerPipeStore.value('En', {
-	download: 'Download',
-	open: 'Open',
-	buyPack: 'Buy pack',
-	unavailableContent: 'This content is currently unavailable',
-	get: 'Get'
+appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack) {
+
+	angular.extend($scope, {
+		config: Config,
+		platformAPI: PlatformAPI,
+		pack: pack,
+		i18n: i18n,
+		packService: PackService,
+		showActionProgress: false,
+
+		getStickerUrl: function(name) {
+			return EnvConfig.stickersStorageUrl + this.pack.pack_name + '/' + name + '_' + Config.resolutionType + '.png';
+		},
+
+		getMainStickerUrl: function() {
+			return $scope.getStickerUrl('main_icon');
+		},
+
+		showCollections: function() {
+			PlatformAPI.showCollections(pack.pack_name);
+		},
+
+		purchasePack: function() {
+			$scope.showActionProgress = true;
+			PlatformAPI.purchasePack(pack.title, pack.pack_name, pack.pricepoint);
+		}
+	});
+
+	$rootScope.$on('hideActionProgress', function() {
+		$scope.showActionProgress = false;
+		if(!$scope.$$phase) {
+			$scope.$apply();
+		}
+	});
 });
 
-appStickerPipeStore.value('Ru', {
-	download: 'Скачать',
-	open: 'Открыть',
-	buyPack: 'Купить',
-	unavailableContent: 'В данный момент этот контент недоступен',
-	get: 'Скачать'
+appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI) {
+
+	angular.extend($scope, {
+		platformAPI: PlatformAPI,
+		packs: packs.packs,
+
+		getPackMainIcon: function(pack) {
+			return pack.main_icon[Config.resolutionType];
+		},
+
+		getPackTitle: function(pack) {
+			var title = pack.title;
+			if (title.length > 15) {
+				title = title.substr(0, 15);
+				title += '...';
+			}
+
+			return title;
+		}
+	});
+});
+
+appStickerPipeStore.directive('myAutoScroll', function ($document, $timeout, $location, $window) {
+	return {
+		restrict: 'A',
+		link: function (scope, element, attrs) {
+			scope.okSaveScroll = true;
+
+			scope.scrollPos = {};
+
+			$document.bind('scroll', function () {
+				if (scope.okSaveScroll) {
+					scope.scrollPos[$location.path()] = $window.scrollY;
+				}
+			});
+
+			scope.scrollClear = function (path) {
+				scope.scrollPos[path] = 0;
+			};
+
+			scope.$on('$locationChangeSuccess', function (route) {
+				$timeout(function () {
+					//$(window).scrollTop(scope.scrollPos[$location.path()] ? scope.scrollPos[$location.path()] : 0);
+					console.log(scope.scrollPos[$location.path()] ? scope.scrollPos[$location.path()] : 0);
+					window.scrollTo(scope.scrollPos[$location.path()] ? scope.scrollPos[$location.path()] : 0, scope.scrollPos[$location.path()] ? scope.scrollPos[$location.path()] : 0);
+					scope.okSaveScroll = true;
+				}, 400);
+			});
+
+			scope.$on('$locationChangeStart', function (event) {
+				scope.okSaveScroll = false;
+			});
+		}
+	};
 });
 
 appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
