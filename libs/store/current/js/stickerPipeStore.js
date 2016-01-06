@@ -108,7 +108,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/view.tpl',
-    '<div class="version">0.0.14</div>\n' +
+    '<div class="version">0.0.15</div>\n' +
     '<div class="store" my-auto-scroll>\n' +
     '	<div data-ng-show="!error" data-ui-view=""></div>\n' +
     '	<div data-ng-show="error" data-error></div>\n' +
@@ -751,7 +751,9 @@ appStickerPipeStore.directive('myAutoScroll', function ($document, $timeout, $lo
 			}
 
 			$rootScope.$on('$viewContentLoaded', function() {
-				scroll();
+				$timeout(function() {
+					scroll();
+				}, 50);
 			});
 
 			//$rootScope.$on('$stateChangeSuccess', function() {
