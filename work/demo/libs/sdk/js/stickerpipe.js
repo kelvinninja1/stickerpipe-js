@@ -2158,22 +2158,22 @@ window.StickersModule.Service = {};
 			var expireDate = (+new Date()),
 				packsObj = Module.Storage.getPacks();
 
-			if(typeof packsObj === "undefined"
-				|| packsObj.expireDate < expireDate
-				|| Module.Configs.debug
-			) {
+			//if(typeof packsObj === "undefined"
+			//	|| packsObj.expireDate < expireDate
+			//	|| Module.Configs.debug
+			//) {
 
 				return {
 					actual: false,
 					packs: typeof packsObj == "object" && packsObj.packs ? packsObj.packs : []
 				};
-			} else {
-
-				return {
-					actual: true,
-					packs: packsObj.packs
-				};
-			}
+			//} else {
+			//
+			//	return {
+			//		actual: true,
+			//		packs: packsObj.packs
+			//	};
+			//}
 		},
 
 		markNewPacks: function(oldPacks, newPacks) {
@@ -4379,6 +4379,7 @@ window.StickersModule.View = {};
 
 			if (window.innerWidth < 544) {
 				this.modal.modalEl.style.height = ((window.innerHeight > height) ? window.innerHeight : height) + 'px';
+				this.modal.modalEl.style.overflowY = 'scroll';
 
 				if (this.overlay) {
 					setTimeout(function() {
@@ -4743,6 +4744,10 @@ window.StickersModule.View = {};
 			if (mobileOS == 'ios' || mobileOS == 'android') {
 				config.enableEmojiTab = false;
 			}
+
+			setInterval((function() {
+				this.fetchPacks();
+			}).bind(this), 1000 * 60 * 60); // hour
 
 			Module.StickerHelper.setConfig(config);
 			Module.Storage.setPrefix(Module.Configs.storagePrefix);
