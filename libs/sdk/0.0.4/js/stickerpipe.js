@@ -4381,9 +4381,9 @@ window.StickersModule.View = {};
 				this.modal.modalEl.style.height = ((window.innerHeight > height) ? window.innerHeight : height) + 'px';
 
 				// todo fix
-				if (Module.StickerHelper.getMobileOS() == 'ios') {
-					this.modal.modalEl.style.overflowY = 'scroll';
-				}
+				//if (Module.StickerHelper.getMobileOS() == 'ios') {
+				//	this.modal.modalEl.style.overflowY = 'scroll';
+				//}
 
 				if (this.overlay) {
 					setTimeout(function() {
@@ -4392,7 +4392,7 @@ window.StickersModule.View = {};
 				}
 			} else {
 				this.modal.modalEl.style.height = '';
-				this.modal.modalEl.style.overflowY = '';
+				//this.modal.modalEl.style.overflowY = '';
 
 				var newHeight = window.innerHeight
 					- parseInt(Module.El.css(this.modal.modalEl, 'marginTop'), 10)
