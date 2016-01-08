@@ -108,33 +108,11 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/view.tpl',
-    '<!--<div class="version">0.0.18</div>-->\n' +
+    '<div class="version">0.0.19</div>\n' +
     '<div class="store" my-auto-scroll>\n' +
     '	<div data-ng-show="!error" data-ui-view=""></div>\n' +
     '	<div data-ng-show="error" data-error></div>\n' +
     '	<div data-ng-show="preloader" data-preloader></div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/store/StoreView.tpl',
-    '<div data-ng-class="{\'screen-header\': platformAPI.isJS()}" data-ng-show="platformAPI.isJS()"></div>\n' +
-    '<div class="packs">\n' +
-    '	<div class="col" data-ng-repeat="pack in packs">\n' +
-    '		<div class="pack-preview center-block">\n' +
-    '			<a href="#/packs/{{ pack.pack_name }}">\n' +
-    '				<img data-ng-src="{{ getPackMainIcon(pack) }}" alt="" class="pack-preview-sticker">\n' +
-    '				<h5 class="pack-preview-name">{{ getPackTitle(pack) }}</h5>\n' +
-    '			</a>\n' +
-    '		</div>\n' +
-    '	</div>\n' +
     '</div>');
 }]);
 })();
@@ -196,6 +174,28 @@ module.run(['$templateCache', function($templateCache) {
     '	<div class="col" data-ng-repeat="sticker in pack.stickers">\n' +
     '		<div class="sticker center-block">\n' +
     '			<img data-ng-src="{{ getStickerUrl(sticker.name) }}" alt="{{ sticker.name }}" />\n' +
+    '		</div>\n' +
+    '	</div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/store/StoreView.tpl',
+    '<div data-ng-class="{\'screen-header\': platformAPI.isJS()}" data-ng-show="platformAPI.isJS()"></div>\n' +
+    '<div class="packs">\n' +
+    '	<div class="col" data-ng-repeat="pack in packs">\n' +
+    '		<div class="pack-preview center-block">\n' +
+    '			<a href="#/packs/{{ pack.pack_name }}">\n' +
+    '				<img data-ng-src="{{ getPackMainIcon(pack) }}" alt="" class="pack-preview-sticker">\n' +
+    '				<h5 class="pack-preview-name">{{ getPackTitle(pack) }}</h5>\n' +
+    '			</a>\n' +
     '		</div>\n' +
     '	</div>\n' +
     '</div>');
@@ -499,6 +499,15 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $rootScop
 
 });
 
+appStickerPipeStore.directive('basePage', function() {
+
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/view.tpl',
+		link: function($scope, $el, attrs) {}
+	};
+});
+
 appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack) {
 
 	angular.extend($scope, {
@@ -533,15 +542,6 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 			$scope.$apply();
 		}
 	});
-});
-
-appStickerPipeStore.directive('basePage', function() {
-
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/view.tpl',
-		link: function($scope, $el, attrs) {}
-	};
 });
 
 appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI) {
@@ -779,39 +779,39 @@ appStickerPipeStore.directive('myAutoScroll', function ($document, $timeout, $lo
 			scope.history = [];
 			scope.historyIndex = 0;
 
-			$document.bind('scroll', function () {
-				if (scope.okSaveScroll && scope.historyIndex > -1) {
-					scope.history[scope.historyIndex] = $window.scrollY;
-				}
-			});
-
-			scope.$on('$locationChangeStart', function () {
-				scope.okSaveScroll = false;
-			});
-
-			// ************************
-
-			$rootScope.$on('$locationChangeSuccess', function() {
-				$rootScope.actualLocation = $location.path();
-			});
-
-			$rootScope.$watch(function () { return $location.path() }, function (newLocation, oldLocation) {
-				// back
-				if ($rootScope.actualLocation == newLocation) {
-					$timeout(function() {
-						scope.historyIndex--;
-						var yPosition = scope.history[scope.historyIndex] ? scope.history[scope.historyIndex] : 0;
-						window.scrollTo(0, yPosition);
-						scope.okSaveScroll = true;
-					}, 100);
-				}
-				// forward
-				else {
-					scope.historyIndex++;
-					window.scrollTo(0, 0);
-					scope.okSaveScroll = true;
-				}
-			});
+			//$document.bind('scroll', function () {
+			//	if (scope.okSaveScroll && scope.historyIndex > -1) {
+			//		scope.history[scope.historyIndex] = $window.scrollY;
+			//	}
+			//});
+			//
+			//scope.$on('$locationChangeStart', function () {
+			//	scope.okSaveScroll = false;
+			//});
+			//
+			//// ************************
+			//
+			//$rootScope.$on('$locationChangeSuccess', function() {
+			//	$rootScope.actualLocation = $location.path();
+			//});
+			//
+			//$rootScope.$watch(function () { return $location.path() }, function (newLocation, oldLocation) {
+			//	// back
+			//	if ($rootScope.actualLocation == newLocation) {
+			//		$timeout(function() {
+			//			scope.historyIndex--;
+			//			var yPosition = scope.history[scope.historyIndex] ? scope.history[scope.historyIndex] : 0;
+			//			window.scrollTo(0, yPosition);
+			//			scope.okSaveScroll = true;
+			//		}, 100);
+			//	}
+			//	// forward
+			//	else {
+			//		scope.historyIndex++;
+			//		window.scrollTo(0, 0);
+			//		scope.okSaveScroll = true;
+			//	}
+			//});
 		}
 	};
 });
