@@ -2040,7 +2040,7 @@ if ("document" in self) {
 
 window.StickersModule.Service = {};
 
-(function(Plugin, Module) {
+(function(Module) {
 
 	function buildStoreUrl(uri) {
 		var params = {
@@ -2144,7 +2144,7 @@ window.StickersModule.Service = {};
 		}
 
 	};
-})(window, window.StickersModule);
+})(window.StickersModule);
 
 // todo: rename file baseService --> BaseService
 
@@ -2156,8 +2156,7 @@ window.StickersModule.Service = {};
 
 		markNewPacks: function(newPacks) {
 			var globalNew = false,
-				packsObj = Module.Storage.getPacks(),// todo: remove
-				oldPacks = (typeof packsObj == 'object' && packsObj.packs) ? packsObj.packs : [];
+				oldPacks = Module.Storage.getPacks();
 
 			if (oldPacks.length != 0){
 
@@ -2373,7 +2372,7 @@ window.StickersModule.Service = {};
 
 })(window.StickersModule);
 
-(function(Plugin, Module) {
+(function(Module) {
 
 	Module.El = {
 
@@ -2392,7 +2391,7 @@ window.StickersModule.Service = {};
 			return width;
 		}
 	};
-})(window, window.StickersModule);
+})(window.StickersModule);
 
 (function(Module) {
 
@@ -2427,7 +2426,7 @@ window.StickersModule.Service = {};
 
 })(window.StickersModule);
 
-(function(Plugin, Module) {
+(function(Module) {
 
 	Module.Http = {
 
@@ -2513,7 +2512,7 @@ window.StickersModule.Service = {};
 			xmlhttp.send(JSON.stringify(options.data));
 		}
 	};
-})(window, window.StickersModule);
+})(window.StickersModule);
 
 // todo: StatisticService
 
@@ -2559,17 +2558,19 @@ window.StickersModule.Service = {};
 		},
 
 		getPacks: function() {
-			return this.lockr.get('sticker_packs');
+			var packs = this.lockr.get('sticker_packs');
+
+			if (typeof packs == 'object' && packs.packs) {
+				packs = packs.packs;
+			} else if (Object.prototype.toString.call(packs) !== '[object Array]') {
+				packs = [];
+			}
+
+			return packs;
 		},
 
 		setPacks: function(packs) {
-			var expireDate = new Date(),
-				saveObj = {
-					packs: packs,
-					expireDate: ( expireDate.setDate( expireDate.getDate() + 1) )
-				};
-
-			return this.lockr.set('sticker_packs', saveObj)
+			return this.lockr.set('sticker_packs', packs)
 		},
 
 		getUniqUserId: function() {
