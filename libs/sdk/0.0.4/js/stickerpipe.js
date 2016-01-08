@@ -2158,22 +2158,22 @@ window.StickersModule.Service = {};
 			var expireDate = (+new Date()),
 				packsObj = Module.Storage.getPacks();
 
-			//if(typeof packsObj === "undefined"
-			//	|| packsObj.expireDate < expireDate
-			//	|| Module.Configs.debug
-			//) {
+			if(typeof packsObj === "undefined"
+				|| packsObj.expireDate < expireDate
+				|| Module.Configs.debug
+			) {
 
 				return {
 					actual: false,
 					packs: typeof packsObj == "object" && packsObj.packs ? packsObj.packs : []
 				};
-			//} else {
-			//
-			//	return {
-			//		actual: true,
-			//		packs: packsObj.packs
-			//	};
-			//}
+			} else {
+
+				return {
+					actual: true,
+					packs: packsObj.packs
+				};
+			}
 		},
 
 		markNewPacks: function(oldPacks, newPacks) {
@@ -4380,11 +4380,6 @@ window.StickersModule.View = {};
 			if (window.innerWidth < 544) {
 				this.modal.modalEl.style.height = ((window.innerHeight > height) ? window.innerHeight : height) + 'px';
 
-				// todo fix
-				//if (Module.StickerHelper.getMobileOS() == 'ios') {
-				//	this.modal.modalEl.style.overflowY = 'scroll';
-				//}
-
 				if (this.overlay) {
 					setTimeout(function() {
 						self.overlay.style.webkitOverflowScrolling = 'touch';
@@ -4392,17 +4387,17 @@ window.StickersModule.View = {};
 				}
 			} else {
 				this.modal.modalEl.style.height = '';
-				//this.modal.modalEl.style.overflowY = '';
+				if (parseInt(Module.El.css(this.modal.modalEl, 'height'), 10) < window.innerHeight) {
+					var newHeight = window.innerHeight
+						- parseInt(Module.El.css(this.modal.modalEl, 'marginTop'), 10)
+						- parseInt(Module.El.css(this.modal.modalEl, 'marginBottom'), 10);
 
-				var newHeight = window.innerHeight
-					- parseInt(Module.El.css(this.modal.modalEl, 'marginTop'), 10)
-					- parseInt(Module.El.css(this.modal.modalEl, 'marginBottom'), 10);
+					if (newHeight == window.innerHeight) {
+						return;
+					}
 
-				if (newHeight == window.innerHeight) {
-					return;
+					this.modal.modalEl.style.height = newHeight + 'px';
 				}
-
-				this.modal.modalEl.style.height = newHeight + 'px';
 			}
 		}
 	});
@@ -4748,10 +4743,6 @@ window.StickersModule.View = {};
 			if (mobileOS == 'ios' || mobileOS == 'android') {
 				config.enableEmojiTab = false;
 			}
-
-			setInterval((function() {
-				this.fetchPacks();
-			}).bind(this), 1000 * 60 * 60); // hour
 
 			Module.StickerHelper.setConfig(config);
 			Module.Storage.setPrefix(Module.Configs.storagePrefix);

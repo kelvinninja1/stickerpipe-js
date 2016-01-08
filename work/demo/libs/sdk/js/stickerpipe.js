@@ -2154,30 +2154,10 @@ window.StickersModule.Service = {};
 
 	Module.BaseService = {
 
-		getPacksFromStorage: function() {
-			var expireDate = (+new Date()),
-				packsObj = Module.Storage.getPacks();
-
-			//if(typeof packsObj === "undefined"
-			//	|| packsObj.expireDate < expireDate
-			//	|| Module.Configs.debug
-			//) {
-
-				return {
-					actual: false,
-					packs: typeof packsObj == "object" && packsObj.packs ? packsObj.packs : []
-				};
-			//} else {
-			//
-			//	return {
-			//		actual: true,
-			//		packs: packsObj.packs
-			//	};
-			//}
-		},
-
-		markNewPacks: function(oldPacks, newPacks) {
-			var globalNew = false;
+		markNewPacks: function(newPacks) {
+			var globalNew = false,
+				packsObj = Module.Storage.getPacks(),// todo: remove
+				oldPacks = (typeof packsObj == 'object' && packsObj.packs) ? packsObj.packs : [];
 
 			if (oldPacks.length != 0){
 
@@ -2291,22 +2271,7 @@ window.StickersModule.Service = {};
 			ga('stickerTracker.send', 'event', category, action, label);
 		},
 
-		isExistPackInStorage: function(packName) {
-			var packs = this.getPacksFromStorage()['packs'];
-
-			for (var i = 0; i < packs.length; i++) {
-				if (packs[i].pack_name == packName) {
-					return true;
-				}
-			}
-
-			return false;
-		},
-
 		updatePacks: function(successCallback) {
-			var storageStickerData;
-
-			storageStickerData = this.getPacksFromStorage();
 
 			Module.Api.getPacks(
 				(function(response) {
@@ -2314,12 +2279,20 @@ window.StickersModule.Service = {};
 						return;
 					}
 
-					var stickerPacks = response.data;
+					var packs = response.data;
 
-					stickerPacks = this.markNewPacks(storageStickerData.packs, stickerPacks);
-					Module.Storage.setPacks(stickerPacks);
+					// show only active packs
+					for (var i = 0; i < packs.length; i++) {
+						if (packs[i].user_status != 'active') {
+							packs.splice(i, 1);
+						}
+					}
 
-					successCallback && successCallback(stickerPacks);
+					packs = this.markNewPacks(packs);
+
+					Module.Storage.setPacks(packs);
+
+					successCallback && successCallback(packs);
 				}).bind(this)
 			);
 		},
@@ -4749,10 +4722,6 @@ window.StickersModule.View = {};
 				config.enableEmojiTab = false;
 			}
 
-			setInterval((function() {
-				this.fetchPacks();
-			}).bind(this), 1000 * 60 * 60); // hour
-
 			Module.StickerHelper.setConfig(config);
 			Module.Storage.setPrefix(Module.Configs.storagePrefix);
 
@@ -4780,22 +4749,15 @@ window.StickersModule.View = {};
 
 			var callback = onload || null;
 
-			var onPacksLoadCallback = (function() {
+			this.fetchPacks((function() {
 				this.view.render(this.stickersModel);
 
 				callback && callback();
-			}).bind(this);
+			}).bind(this));
 
-			var storageStickerData = Module.BaseService.getPacksFromStorage();
-
-			if (storageStickerData.actual) {
-
-				this.stickersModel = storageStickerData.packs;
-
-				onPacksLoadCallback.apply();
-			} else {
-				this.fetchPacks(onPacksLoadCallback);
-			}
+			setInterval((function() {
+				this.fetchPacks();
+			}).bind(this), 1000 * 60 * 60); // hour
 		},
 
 		delegateEvents: function() {
