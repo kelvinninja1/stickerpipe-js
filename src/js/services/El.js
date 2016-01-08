@@ -1,5 +1,5 @@
 
-(function(Plugin, Module) {
+(function(Module) {
 
 	Module.El = {
 
@@ -18,4 +18,4 @@
 			return width;
 		}
 	};
-})(window, window.StickersModule);
+})(window.StickersModule);

@@ -59,22 +59,15 @@ window.StickersModule.View = {};
 
 			var callback = onload || null;
 
-			var onPacksLoadCallback = (function() {
+			this.fetchPacks((function() {
 				this.view.render(this.stickersModel);
 
 				callback && callback();
-			}).bind(this);
+			}).bind(this));
 
-			var storageStickerData = Module.BaseService.getPacksFromStorage();
-
-			if (storageStickerData.actual) {
-
-				this.stickersModel = storageStickerData.packs;
-
-				onPacksLoadCallback.apply();
-			} else {
-				this.fetchPacks(onPacksLoadCallback);
-			}
+			setInterval((function() {
+				this.fetchPacks();
+			}).bind(this), 1000 * 60 * 60); // hour
 		},
 
 		delegateEvents: function() {

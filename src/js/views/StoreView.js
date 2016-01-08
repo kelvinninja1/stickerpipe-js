@@ -77,17 +77,16 @@
 				}
 			} else {
 				this.modal.modalEl.style.height = '';
-				if (parseInt(Module.El.css(this.modal.modalEl, 'height'), 10) < window.innerHeight) {
-					var newHeight = window.innerHeight
-						- parseInt(Module.El.css(this.modal.modalEl, 'marginTop'), 10)
-						- parseInt(Module.El.css(this.modal.modalEl, 'marginBottom'), 10);
 
-					if (newHeight == window.innerHeight) {
-						return;
-					}
+				var newHeight = window.innerHeight
+					- parseInt(Module.El.css(this.modal.modalEl, 'marginTop'), 10)
+					- parseInt(Module.El.css(this.modal.modalEl, 'marginBottom'), 10);
 
-					this.modal.modalEl.style.height = newHeight + 'px';
+				if (newHeight == window.innerHeight) {
+					return;
 				}
+
+				this.modal.modalEl.style.height = newHeight + 'px';
 			}
 		}
 	});

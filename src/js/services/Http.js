@@ -1,5 +1,5 @@
 
-(function(Plugin, Module) {
+(function(Module) {
 
 	Module.Http = {
 
@@ -85,4 +85,4 @@
 			xmlhttp.send(JSON.stringify(options.data));
 		}
 	};
-})(window, window.StickersModule);
+})(window.StickersModule);

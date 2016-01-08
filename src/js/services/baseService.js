@@ -7,30 +7,9 @@
 
 	Module.BaseService = {
 
-		getPacksFromStorage: function() {
-			var expireDate = (+new Date()),
-				packsObj = Module.Storage.getPacks();
-
-			if(typeof packsObj === "undefined"
-				|| packsObj.expireDate < expireDate
-				|| Module.Configs.debug
-			) {
-
-				return {
-					actual: false,
-					packs: typeof packsObj == "object" && packsObj.packs ? packsObj.packs : []
-				};
-			} else {
-
-				return {
-					actual: true,
-					packs: packsObj.packs
-				};
-			}
-		},
-
-		markNewPacks: function(oldPacks, newPacks) {
-			var globalNew = false;
+		markNewPacks: function(newPacks) {
+			var globalNew = false,
+				oldPacks = Module.Storage.getPacks();
 
 			if (oldPacks.length != 0){
 
@@ -144,22 +123,7 @@
 			ga('stickerTracker.send', 'event', category, action, label);
 		},
 
-		isExistPackInStorage: function(packName) {
-			var packs = this.getPacksFromStorage()['packs'];
-
-			for (var i = 0; i < packs.length; i++) {
-				if (packs[i].pack_name == packName) {
-					return true;
-				}
-			}
-
-			return false;
-		},
-
 		updatePacks: function(successCallback) {
-			var storageStickerData;
-
-			storageStickerData = this.getPacksFromStorage();
 
 			Module.Api.getPacks(
 				(function(response) {
@@ -167,12 +131,20 @@
 						return;
 					}
 
-					var stickerPacks = response.data;
+					var packs = response.data;
 
-					stickerPacks = this.markNewPacks(storageStickerData.packs, stickerPacks);
-					Module.Storage.setPacks(stickerPacks);
+					// show only active packs
+					for (var i = 0; i < packs.length; i++) {
+						if (packs[i].user_status != 'active') {
+							packs.splice(i, 1);
+						}
+					}
 
-					successCallback && successCallback(stickerPacks);
+					packs = this.markNewPacks(packs);
+
+					Module.Storage.setPacks(packs);
+
+					successCallback && successCallback(packs);
 				}).bind(this)
 			);
 		},

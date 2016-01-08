@@ -1,5 +1,5 @@
 
-(function(Plugin, Module) {
+(function(Module) {
 
 	function buildStoreUrl(uri) {
 		var params = {
@@ -103,4 +103,4 @@
 		}
 
 	};
-})(window, window.StickersModule);
+})(window.StickersModule);

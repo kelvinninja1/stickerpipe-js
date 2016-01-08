@@ -41,17 +41,19 @@
 		},
 
 		getPacks: function() {
-			return this.lockr.get('sticker_packs');
+			var packs = this.lockr.get('sticker_packs');
+
+			if (typeof packs == 'object' && packs.packs) {
+				packs = packs.packs;
+			} else if (Object.prototype.toString.call(packs) !== '[object Array]') {
+				packs = [];
+			}
+
+			return packs;
 		},
 
 		setPacks: function(packs) {
-			var expireDate = new Date(),
-				saveObj = {
-					packs: packs,
-					expireDate: ( expireDate.setDate( expireDate.getDate() + 1) )
-				};
-
-			return this.lockr.set('sticker_packs', saveObj)
+			return this.lockr.set('sticker_packs', packs)
 		},
 
 		getUniqUserId: function() {
