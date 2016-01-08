@@ -107,6 +107,23 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/base-page/view.tpl',
+    '<div class="version">0.0.25</div>\n' +
+    '<div class="store" my-auto-scroll>\n' +
+    '	<div data-ng-show="!error" data-ui-view=""></div>\n' +
+    '	<div data-ng-show="error" data-error></div>\n' +
+    '	<div data-ng-show="preloader" data-preloader></div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/pack/PackView.tpl',
     '<div ng-class="{\'screen-header\': platformAPI.isJS()}" data-ng-show="platformAPI.isJS()">\n' +
     '	<a href="#/store">\n' +
@@ -173,33 +190,16 @@ module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/store/StoreView.tpl',
     '<div data-ng-class="{\'screen-header\': platformAPI.isJS()}" data-ng-show="platformAPI.isJS()"></div>\n' +
     '<div class="packs">\n' +
-    '	<div class="col" data-ng-repeat="pack in packs">\n' +
+    '	<div class="col">\n' +
     '		<div class="pack-preview center-block">\n' +
     '			<a href="#/packs/{{ pack.pack_name }}">\n' +
     '				<div class="pack-preview-sticker">\n' +
-    '					<img data-ng-src="{{ getPackMainIcon(pack) }}" alt="" />\n' +
+    '					<img data-ng-src="{{ getPackMainIcon(packs[0]) }}" alt="" />\n' +
     '				</div>\n' +
-    '				<h5 class="pack-preview-name">{{ getPackMainIcon(pack) }}</h5>\n' +
+    '				<h5 class="pack-preview-name">{{ getPackMainIcon(packs[0]) }}</h5>\n' +
     '			</a>\n' +
     '		</div>\n' +
     '	</div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/base-page/view.tpl',
-    '<div class="version">0.0.24</div>\n' +
-    '<div class="store" my-auto-scroll>\n' +
-    '	<div data-ng-show="!error" data-ui-view=""></div>\n' +
-    '	<div data-ng-show="error" data-error></div>\n' +
-    '	<div data-ng-show="preloader" data-preloader></div>\n' +
     '</div>');
 }]);
 })();
