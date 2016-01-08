@@ -108,7 +108,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/view.tpl',
-    '<div class="version">0.0.21</div>\n' +
+    '<div class="version">0.0.22</div>\n' +
     '<div class="store" my-auto-scroll>\n' +
     '	<div data-ng-show="!error" data-ui-view=""></div>\n' +
     '	<div data-ng-show="error" data-error></div>\n' +
@@ -192,12 +192,12 @@ module.run(['$templateCache', function($templateCache) {
     '<div class="packs">\n' +
     '	<div class="col" data-ng-repeat="pack in packs">\n' +
     '		<div class="pack-preview center-block">\n' +
-    '			<a href="#/packs/{{ pack.pack_name }}">\n' +
+    '			<!--<a href="#/packs/{{ pack.pack_name }}">-->\n' +
     '				<div class="pack-preview-sticker">\n' +
     '					<img data-ng-src="{{ getPackMainIcon(pack) }}" alt="" />\n' +
     '					<h5 class="pack-preview-name">{{ getPackTitle(pack) }}</h5>\n' +
     '				</div>\n' +
-    '			</a>\n' +
+    '			<!--</a>-->\n' +
     '		</div>\n' +
     '	</div>\n' +
     '</div>');
@@ -510,6 +510,28 @@ appStickerPipeStore.directive('basePage', function() {
 	};
 });
 
+appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI) {
+
+	angular.extend($scope, {
+		platformAPI: PlatformAPI,
+		packs: packs.packs,
+
+		getPackMainIcon: function(pack) {
+			return pack.main_icon[Config.resolutionType];
+		},
+
+		getPackTitle: function(pack) {
+			var title = pack.title;
+			if (title.length > 15) {
+				title = title.substr(0, 15);
+				title += '...';
+			}
+
+			return title;
+		}
+	});
+});
+
 appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack) {
 
 	angular.extend($scope, {
@@ -542,28 +564,6 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 		$scope.showActionProgress = false;
 		if(!$scope.$$phase) {
 			$scope.$apply();
-		}
-	});
-});
-
-appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI) {
-
-	angular.extend($scope, {
-		platformAPI: PlatformAPI,
-		packs: packs.packs,
-
-		getPackMainIcon: function(pack) {
-			return pack.main_icon[Config.resolutionType];
-		},
-
-		getPackTitle: function(pack) {
-			var title = pack.title;
-			if (title.length > 15) {
-				title = title.substr(0, 15);
-				title += '...';
-			}
-
-			return title;
 		}
 	});
 });
@@ -818,20 +818,6 @@ appStickerPipeStore.directive('myAutoScroll', function ($document, $timeout, $lo
 	};
 });
 
-appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
-	
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/error/view.tpl',
-		link: function($scope, $el, attrs) {
-
-			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
-			$scope.i18n = i18n;
-		}
-
-	};
-});
-
 appStickerPipeStore.directive('preloader', function($rootScope) {
 
 	return {
@@ -857,6 +843,20 @@ appStickerPipeStore.directive('preloader', function($rootScope) {
 				}
 			});
 
+		}
+
+	};
+});
+
+appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
+	
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/error/view.tpl',
+		link: function($scope, $el, attrs) {
+
+			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
+			$scope.i18n = i18n;
 		}
 
 	};
