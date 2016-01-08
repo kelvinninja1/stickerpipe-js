@@ -108,7 +108,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/view.tpl',
-    '<div class="version">0.0.20</div>\n' +
+    '<div class="version">0.0.21</div>\n' +
     '<div class="store" my-auto-scroll>\n' +
     '	<div data-ng-show="!error" data-ui-view=""></div>\n' +
     '	<div data-ng-show="error" data-error></div>\n' +
@@ -193,8 +193,10 @@ module.run(['$templateCache', function($templateCache) {
     '	<div class="col" data-ng-repeat="pack in packs">\n' +
     '		<div class="pack-preview center-block">\n' +
     '			<a href="#/packs/{{ pack.pack_name }}">\n' +
-    '				<img data-ng-src="{{ getPackMainIcon(pack) }}" alt="" class="pack-preview-sticker" />\n' +
-    '				<h5 class="pack-preview-name">{{ getPackTitle(pack) }}</h5>\n' +
+    '				<div class="pack-preview-sticker">\n' +
+    '					<img data-ng-src="{{ getPackMainIcon(pack) }}" alt="" />\n' +
+    '					<h5 class="pack-preview-name">{{ getPackTitle(pack) }}</h5>\n' +
+    '				</div>\n' +
     '			</a>\n' +
     '		</div>\n' +
     '	</div>\n' +
@@ -566,6 +568,22 @@ appStickerPipeStore.controller('StoreController', function($scope, packs, Config
 	});
 });
 
+appStickerPipeStore.value('En', {
+	download: 'Download',
+	open: 'Open',
+	buyPack: 'Buy pack',
+	unavailableContent: 'This content is currently unavailable',
+	get: 'Get'
+});
+
+appStickerPipeStore.value('Ru', {
+	download: 'Скачать',
+	open: 'Открыть',
+	buyPack: 'Купить',
+	unavailableContent: 'В данный момент этот контент недоступен',
+	get: 'Скачать'
+});
+
 appStickerPipeStore.factory('AndroidPlatform', function() {
 
 	var platformJSProvider = window.AndroidJsInterface || {};
@@ -682,22 +700,6 @@ appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout
 		}
 
 	});
-});
-
-appStickerPipeStore.value('En', {
-	download: 'Download',
-	open: 'Open',
-	buyPack: 'Buy pack',
-	unavailableContent: 'This content is currently unavailable',
-	get: 'Get'
-});
-
-appStickerPipeStore.value('Ru', {
-	download: 'Скачать',
-	open: 'Открыть',
-	buyPack: 'Купить',
-	unavailableContent: 'В данный момент этот контент недоступен',
-	get: 'Скачать'
 });
 //
 //appStickerPipeStore.directive('myAutoScroll', function ($document, $timeout, $location, $window, $rootScope) {
