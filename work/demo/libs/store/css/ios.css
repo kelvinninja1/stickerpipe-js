@@ -330,6 +330,8 @@ h6 {
   background: #eee;
   margin-bottom: 8px;
   padding: 16px; }
+  .pack-header .pack-main-sticker {
+    display: table-cell; }
 
 .pack-info {
   display: table-cell;
@@ -397,16 +399,9 @@ h6 {
   margin: 5px 0;
   text-align: center; }
 
-.pack-preview-sticker {
-  display: table; }
-
 .pack-main-sticker {
-  display: table-cell; }
-
-.pack-preview-sticker,
-.pack-main-sticker {
+  display: table;
   margin-right: 8px; }
-  .pack-preview-sticker img,
   .pack-main-sticker img {
     height: 120px;
     width: 120px; }
