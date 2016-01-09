@@ -331,13 +331,6 @@ h6 {
   margin-bottom: 8px;
   padding: 16px; }
 
-.pack-main-sticker {
-  margin-right: 8px;
-  display: table-cell; }
-  .pack-main-sticker img {
-    height: 120px;
-    width: 120px; }
-
 .pack-info {
   display: table-cell;
   padding-top: 15px;
@@ -404,12 +397,19 @@ h6 {
   margin: 5px 0;
   text-align: center; }
 
-.pack-preview-sticker img,
-.sticker img {
-  max-height: 120px;
-  max-width: 120px;
-  height: 100%;
-  width: 100%; }
+.pack-preview-sticker {
+  display: table; }
+
+.pack-main-sticker {
+  display: table-cell; }
+
+.pack-preview-sticker,
+.pack-main-sticker {
+  margin-right: 8px; }
+  .pack-preview-sticker img,
+  .pack-main-sticker img {
+    height: 120px;
+    width: 120px; }
 
 .packs .col {
   float: left;
