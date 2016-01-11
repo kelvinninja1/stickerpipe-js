@@ -108,7 +108,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/view.tpl',
-    '<div class="version">0.0.36</div>\n' +
+    '<div class="version">0.0.37</div>\n' +
     '<div class="store" my-auto-scroll>\n' +
     '	<div data-ng-show="!error && showContent" data-ui-view=""></div>\n' +
     '	<div data-ng-show="error" data-error></div>\n' +
@@ -501,6 +501,37 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $rootScop
 
 });
 
+appStickerPipeStore.directive('basePage', function() {
+
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/view.tpl',
+		link: function($scope, $el, attrs) {}
+	};
+});
+
+appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI) {
+
+	angular.extend($scope, {
+		platformAPI: PlatformAPI,
+		packs: packs.packs,
+
+		getPackMainIcon: function(pack) {
+			return pack.main_icon[Config.resolutionType];
+		},
+
+		getPackTitle: function(pack) {
+			var title = pack.title;
+			if (title.length > 15) {
+				title = title.substr(0, 15);
+				title += '...';
+			}
+
+			return title;
+		}
+	});
+});
+
 appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack) {
 
 	angular.extend($scope, {
@@ -533,37 +564,6 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 		$scope.showActionProgress = false;
 		if(!$scope.$$phase) {
 			$scope.$apply();
-		}
-	});
-});
-
-appStickerPipeStore.directive('basePage', function() {
-
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/view.tpl',
-		link: function($scope, $el, attrs) {}
-	};
-});
-
-appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI) {
-
-	angular.extend($scope, {
-		platformAPI: PlatformAPI,
-		packs: packs.packs,
-
-		getPackMainIcon: function(pack) {
-			return pack.main_icon[Config.resolutionType];
-		},
-
-		getPackTitle: function(pack) {
-			var title = pack.title;
-			if (title.length > 15) {
-				title = title.substr(0, 15);
-				title += '...';
-			}
-
-			return title;
 		}
 	});
 });
@@ -794,98 +794,38 @@ appStickerPipeStore.directive('myAutoScroll', function ($document, $timeout, $lo
 
 			// ************************
 
-			//$rootScope.$on('$locationChangeSuccess', function() {
-			//	$rootScope.actualLocation = $location.path();
-			//});
 
-			function complete() {
-				scope.okSaveScroll = true;
+			function onContentLoad() {
+				$rootScope.showContent = true;
 
-				var y = scope.history[scope.history.length - 1].y;
+				$timeout(function() {
+					scope.okSaveScroll = true;
 
-				console.log(y);
-				$window.scrollTo(0, y);
+					var y = scope.history[scope.history.length - 1].y;
+
+					$window.scrollTo(0, y);
+				}, 100);
 			}
 
 			$rootScope.$on('$stateChangeSuccess', function() {
-				$rootScope.showContent = true;
-				$timeout(function() {
-					complete();
-				}, 100);
+				onContentLoad();
 			});
 
 			$rootScope.$on('$stateChangeError', function() {
-				$rootScope.showContent = true;
-				$timeout(function() {
-					complete();
-				}, 100);
+				onContentLoad();
 			});
 
 			$rootScope.$watch(function () { return $location.path() }, function (newLocation, oldLocation) {
 
-				// v1
-				//// back
-				//if ($rootScope.actualLocation == newLocation) {
-				//	$timeout(function() {
-				//		console.log('back');
-				//		//scope.historyIndex--;
-				//		//var yPosition = scope.history[scope.historyIndex] ? scope.history[scope.historyIndex] : 0;
-				//		//window.scrollTo(0, yPosition);
-				//		//scope.okSaveScroll = true;
-				//	}, 100);
-				//}
-				//// forward
-				//else {
-				//	console.log('forward');
-				//	//scope.historyIndex++;
-				//	//window.scrollTo(0, 0);
-				//	//scope.okSaveScroll = true;
-				//}
-				//console.log('------------------');
-
-				// v2
-				//function f() {
-				//	scope.history[scope.history.length] = {
-				//		url: newLocation
-				//	};
-				//	console.log('forward');
-				//}
-				//
-				//function b() {
-				//	if (scope.history == 1) {
-				//		scope.history.slice(scope.history.length - 1, 1);
-				//	} else {
-				//		scope.history.slice(scope.history.length - 2, 2);
-				//	}
-				//	//scope.history.slice(scope.history.length - 1, 1);
-				//	console.log('back');
-				//}
-				//
-				//if (scope.history.length > 0) {
-				//	//console.log(newLocation, scope.history[scope.history.length - 2], newLocation + '/' == scope.history[scope.history.length - 2].url);
-				//	//console.log(newLocation, scope.history[scope.history.length - 1].url);
-				//	if ((scope.history.length == 1 && newLocation + '/' == scope.history[scope.history.length - 1].url) ||
-				//		(scope.history.length > 1 && newLocation + '/' == scope.history[scope.history.length - 2].url)) {
-				//		b();
-				//	} else {
-				//		f();
-				//	}
-				//} else {
-				//	f();
-				//}
-
-				// v3
 				function forward() {
 					scope.history[scope.history.length] = {
 						url: newLocation,
 						y: 0
 					};
-					//console.log('forward');
 				}
 
 				function back() {
 					scope.history.splice(scope.history.length - 1, 1);
-					//console.log('back');
 				}
 
 				if (scope.history.length > 1) {
@@ -898,29 +838,8 @@ appStickerPipeStore.directive('myAutoScroll', function ($document, $timeout, $lo
 				} else {
 					forward();
 				}
-
-				//console.table(scope.history);
-				//scope.okSaveScroll = true;
-
-				//$timeout(function() {
-				//	complete();
-				//}, 200);
 			});
 		}
-	};
-});
-
-appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
-	
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/error/view.tpl',
-		link: function($scope, $el, attrs) {
-
-			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
-			$scope.i18n = i18n;
-		}
-
 	};
 });
 
@@ -949,6 +868,20 @@ appStickerPipeStore.directive('preloader', function($rootScope) {
 				}
 			});
 
+		}
+
+	};
+});
+
+appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
+	
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/error/view.tpl',
+		link: function($scope, $el, attrs) {
+
+			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
+			$scope.i18n = i18n;
 		}
 
 	};
