@@ -92,6 +92,15 @@ body {
   margin: 0 .2em;
   width: 1em; }
 
+.message-box-container {
+  bottom: 0;
+  left: 0;
+  position: fixed;
+  width: 100%; }
+  @media (max-width: 768px) {
+    .message-box-container .container {
+      padding: 0; } }
+
 #messageBox {
   background: white; }
   #messageBox .textarea {
@@ -184,6 +193,8 @@ body {
   background-color: #6607b5;
   border-width: 0;
   border-radius: 0; }
+  .navbar-custom.navbar-fixed-top {
+    z-index: 99; }
   .navbar-custom .navbar-brand {
     color: white; }
   .navbar-custom .navbar-nav > li > a {
