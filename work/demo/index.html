@@ -30,25 +30,28 @@
 		</div>
 		<div id="navbar" class="navbar-collapse collapse">
 			<ul class="nav navbar-nav">
-				<li><a href="#about">About</a></li>
-				<li><a href="#contact">Contact</a></li>
-				<li class="dropdown">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
-					<ul class="dropdown-menu">
-						<li><a href="#">Action</a></li>
-						<li><a href="#">Another action</a></li>
-						<li><a href="#">Something else here</a></li>
-						<li role="separator" class="divider"></li>
-						<li class="dropdown-header">Nav header</li>
-						<li><a href="#">Separated link</a></li>
-						<li><a href="#">One more separated link</a></li>
-					</ul>
-				</li>
+				<!--<li><a href="#about">About</a></li>-->
+				<!--<li><a href="#contact">Contact</a></li>-->
+				<!--<li class="dropdown">-->
+					<!--<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>-->
+					<!--<ul class="dropdown-menu">-->
+						<!--<li><a href="#">Action</a></li>-->
+						<!--<li><a href="#">Another action</a></li>-->
+						<!--<li><a href="#">Something else here</a></li>-->
+						<!--<li role="separator" class="divider"></li>-->
+						<!--<li class="dropdown-header">Nav header</li>-->
+						<!--<li><a href="#">Separated link</a></li>-->
+						<!--<li><a href="#">One more separated link</a></li>-->
+					<!--</ul>-->
+				<!--</li>-->
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
-				<li><a href="../navbar/">Default</a></li>
-				<li><a href="../navbar-static-top/">Static top</a></li>
-				<li class="active"><a href="./">Fixed top <span class="sr-only">(current)</span></a></li>
+				<!--<li><a href="../navbar/">Default</a></li>-->
+				<!--<li><a href="../navbar-static-top/">Static top</a></li>-->
+				<!--<li class="active"><a href="./">Fixed top <span class="sr-only">(current)</span></a></li>-->
+				<li>
+					<a href="javascript: void(0);" id="wipeData">Wipe user data</a>
+				</li>
 			</ul>
 		</div><!--/.nav-collapse -->
 	</div>
@@ -62,69 +65,60 @@
 			</div>
 		</div>
 	</div>
+</div>
 
-	<div class="row">
-		<div class="col-sm-12">
-			<div class="message-box-container">
-				<div class="container">
-					<div id="messageBox">
-						<div class="input-group">
-		                    <span class="input-group-btn">
-		                        <button class="btn btn-default" id="stickersToggle">
-			                        <span class="icon icon-smile"></span>
-		                        </button>
-		                    </span>
+<div class="message-box-container">
+	<div class="container">
+		<div id="messageBox">
+			<div class="input-group">
+                <span class="input-group-btn">
+                    <button class="btn btn-default" id="stickersToggle">
+                        <span class="icon icon-smile"></span>
+                    </button>
+                </span>
 
-							<div class="form-control textarea" placeholder="Message..." contenteditable="true"></div>
+				<div class="form-control textarea" placeholder="Message..." contenteditable="true"></div>
 
-							<!--<span class="input-group-btn">-->
-		                        <!--<button class="btn btn-default" type="submit">Send</button>-->
-		                    <!--</span>-->
-							<span class="input-group-btn">
-		                        <button class="btn btn-default" type="submit">
-			                        <span class="icon icon-send"></span>
-		                        </button>
-		                    </span>
-						</div>
-					</div>
-				</div>
+				<span class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <span class="icon icon-send"></span>
+                    </button>
+                </span>
 			</div>
 		</div>
 	</div>
 </div>
 
 <script id="messageTemplate" type="text/template">
-	<div class="row">
-		<div class="col-sm-12">
-			<div class="row">
-				<div class="col-xs-2 {{ isCurrentUser && 'col-xs-push-10' }}">
-					<img src="{{ user.picture }}" class="img-thumbnail img-responsive img-circle {{ !isCurrentUser ? 'pull-right' : 'pull-left' }}" style="width:70px;">
-				</div>
-				<div class="col-xs-10 {{ isCurrentUser && 'col-xs-pull-2' }}">
-					{[ if (!sticker.isSticker) { ]}
-					<div class="panel panel-default">
-						<div class="panel-body">
-							<h5 style="margin-top: 0;">@{{ user.username }}</h5>
-							<p>{{ text }}</p>
-							<small class="text-muted">{{ date }}</small>
-						</div>
-					</div>
-					{[ } else { ]}
-					<div class="text-center {{ !isCurrentUser ? 'pull-left' : 'pull-right' }}"
-					     style="margin-bottom: 30px;">
-						<p><img src="{{ sticker.url }}"
-						        alt=""
-						        data-sticker="{{ sticker.pack }}_{{ sticker.name }}"
-						        data-sticker-code="{{ text }}"
-						        data-sticker-pack="{{ sticker.pack }}"
-						        data-sticker-name="{{ sticker.name }}"
-							></p>
-						<small class="text-muted">{{ date }}</small>
-					</div>
-					{[ } ]}
-				</div>
-			</div>
+	<div class="message {{ sticker.isSticker && 'is-sticker' }}">
+		{[ if (!isCurrentUser) { ]}
+		<div class="message-user-photo">
+			<img src="{{ user.picture }}" class="img-circle" style="width:70px;">
 		</div>
+		{[ } ]}
+		<div class="message-body">
+			{[ if (!sticker.isSticker) { ]}
+			<div class="{{ isCurrentUser ? 'message-bubble-from-me' : 'message-bubble-from-them' }}">
+				<p>{{ text }}</p>
+			</div>
+			<div class="clearfix"></div>
+			{[ } else { ]}
+			<div class="text-center {{ !isCurrentUser ? 'pull-left' : 'pull-right' }}"
+			     style="margin-bottom: 30px;">
+				<img src="{{ sticker.url }}"
+				        alt=""
+				        data-sticker="{{ sticker.pack }}_{{ sticker.name }}"
+				        data-sticker-code="{{ text }}"
+				        data-sticker-pack="{{ sticker.pack }}"
+				        data-sticker-name="{{ sticker.name }}" />
+			</div>
+			{[ } ]}
+		</div>
+		{[ if (isCurrentUser) { ]}
+		<div class="message-user-photo">
+			<img src="{{ user.picture }}" class="img-circle" style="width:70px;">
+		</div>
+		{[ } ]}
 	</div>
 </script>
 

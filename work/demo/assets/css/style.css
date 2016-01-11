@@ -52,7 +52,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 @include retina-sprites($retina-groups);
 */
 body {
-  background: rgba(0, 0, 0, 0.1);
+  background: #e6e6e6;
   padding-top: 50px;
   padding-bottom: 40px; }
 
@@ -252,6 +252,83 @@ body {
       background-color: white; }
   .navbar-custom .navbar-toggle .icon-bar {
     background-color: white; }
+
+.message {
+  display: table;
+  padding: 10px;
+  width: 100%; }
+  .message.is-sticker .message-user-photo {
+    vertical-align: top; }
+
+.message-user-photo {
+  display: table-cell;
+  vertical-align: bottom;
+  width: 70px; }
+
+.message-body {
+  display: table-cell; }
+  .message-body p {
+    margin: 0; }
+
+.message-bubble-from-me,
+.message-bubble-from-them {
+  margin-bottom: 20px; }
+
+.message-bubble-from-me {
+  margin-right: 26px;
+  position: relative;
+  padding: 10px 20px;
+  color: white;
+  background: #0B93F6;
+  border-radius: 25px;
+  float: right; }
+  .message-bubble-from-me:before {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    right: -7px;
+    height: 23px;
+    border-right: 20px solid #0B93F6;
+    border-bottom-left-radius: 16px 14px;
+    -webkit-transform: translate(0, -2px); }
+  .message-bubble-from-me:after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    right: -56px;
+    width: 26px;
+    height: 23px;
+    background: #e6e6e6;
+    border-bottom-left-radius: 10px;
+    -webkit-transform: translate(-30px, -2px); }
+
+.message-bubble-from-them {
+  margin-left: 26px;
+  position: relative;
+  padding: 10px 20px;
+  background: #ccc;
+  border-radius: 25px;
+  color: black;
+  float: left; }
+  .message-bubble-from-them:before {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: -7px;
+    height: 23px;
+    border-left: 20px solid #ccc;
+    border-bottom-right-radius: 16px 14px;
+    -webkit-transform: translate(0, -2px); }
+  .message-bubble-from-them:after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 4px;
+    width: 26px;
+    height: 23px;
+    background: #e6e6e6;
+    border-bottom-right-radius: 10px;
+    -webkit-transform: translate(-30px, -2px); }
 
 .icon-send {
   background-image: url(../img/icons_sprite.png);

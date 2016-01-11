@@ -5,7 +5,7 @@ $purple: rgba(102, 7, 181, 1);
 $purpleDark: #4527a0;
 
 body {
-	background: rgba(0, 0, 0, 0.1);
+	background: #e6e6e6;
 	padding-top: 50px;
 	padding-bottom: 40px;
 }
@@ -201,6 +201,106 @@ body {
 		.icon-bar {
 			background-color: white;
 		}
+	}
+}
+
+.message {
+	display: table;
+	padding: 10px;
+	width: 100%;
+
+	&.is-sticker {
+		.message-user-photo {
+			vertical-align: top;
+		}
+	}
+}
+
+.message-user-photo {
+	display: table-cell;
+	vertical-align: bottom;
+	width: 70px;
+}
+
+.message-body {
+	display: table-cell;
+
+	p {
+		margin: 0;
+	}
+}
+
+.message-bubble-from-me,
+.message-bubble-from-them {
+	margin-bottom: 20px;
+}
+
+.message-bubble-from-me {
+	margin-right: 26px;
+	position:relative;
+	padding:10px 20px;
+	color:white;
+	background:#0B93F6;
+	border-radius:25px;
+	float: right;
+
+	&:before {
+		content:"";
+		position:absolute;
+		//z-index:-1;
+		bottom:-2px;
+		right:-7px;
+		height:23px;
+		border-right:20px solid #0B93F6;
+		border-bottom-left-radius: 16px 14px;
+		-webkit-transform:translate(0, -2px);
+	}
+
+	&:after {
+		content:"";
+		position:absolute;
+		//z-index:1;
+		bottom:-2px;
+		right:-56px;
+		width:26px;
+		height:23px;
+		background: #e6e6e6;
+		border-bottom-left-radius: 10px;
+		-webkit-transform:translate(-30px, -2px);
+	}
+}
+.message-bubble-from-them {
+	margin-left: 26px;
+	position:relative;
+	padding:10px 20px;
+	background: #ccc;
+	border-radius:25px;
+	color: black;
+	float: left;
+
+	&:before {
+		content:"";
+		position:absolute;
+		//z-index:2;
+		bottom:-2px;
+		left:-7px;
+		height:23px;
+		border-left:20px solid #ccc;
+		border-bottom-right-radius: 16px 14px;
+		-webkit-transform:translate(0, -2px);
+	}
+
+	&:after {
+		content:"";
+		position:absolute;
+		//z-index:3;
+		bottom:-2px;
+		left:4px;
+		width:26px;
+		height:23px;
+		background:#e6e6e6;
+		border-bottom-right-radius: 10px;
+		-webkit-transform:translate(-30px, -2px);
 	}
 }
 
