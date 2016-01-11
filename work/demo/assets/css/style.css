@@ -166,7 +166,7 @@ body {
     border: 0;
     box-shadow: none;
     outline: none;
-    padding: 8px; }
+    padding: 11px; }
     #messageBox .textarea:hover, #messageBox .textarea:focus, #messageBox .textarea:active,
     #messageBox .input-group-btn button:hover,
     #messageBox .input-group-btn button:focus,
@@ -176,8 +176,8 @@ body {
       outline: none; }
   #messageBox .textarea {
     max-height: 300px;
-    min-height: 40px;
-    padding-top: 11px; }
+    min-height: 46px;
+    padding-top: 14px; }
   #messageBox .input-group-btn {
     vertical-align: top; }
     #messageBox .input-group-btn button:hover .icon {
