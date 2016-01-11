@@ -369,12 +369,12 @@ var App = _makeClass(function(options) {
 
 	resizeWindow: function() {
 
-		this.$messages.height(
-			this.$window.outerHeight(true) -
-			this.$navbar.offset().top -
-			this.$navbar.outerHeight(true) -
-			this.$messageBox.parent().outerHeight(true) -
-			parseInt(this.$messages.css('margin-bottom'), 10)
-		);
+		//this.$messages.height(
+		//	this.$window.outerHeight(true) -
+		//	this.$navbar.offset().top -
+		//	this.$navbar.outerHeight(true) -
+		//	this.$messageBox.parent().outerHeight(true) -
+		//	parseInt(this.$messages.css('margin-bottom'), 10)
+		//);
 	}
 });

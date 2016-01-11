@@ -1,6 +1,7 @@
 body {
-  background: #f0f0f0;
-  padding-top: 20px; }
+  background: rgba(0, 0, 0, 0.1);
+  padding-top: 50px;
+  padding-bottom: 40px; }
 
 @media (min-width: 992px) {
   .container {
@@ -92,8 +93,7 @@ body {
   width: 1em; }
 
 #messageBox {
-  background: white;
-  margin-bottom: 5px; }
+  background: white; }
   #messageBox .textarea {
     box-shadow: none;
     max-height: 300px;
@@ -149,10 +149,9 @@ body {
   overflow: hidden; }
 
 #messages {
-  height: 420px;
-  margin-bottom: 20px;
   overflow: hidden;
-  overflow-y: scroll; }
+  overflow-y: scroll;
+  margin-top: 20px; }
   #messages img[data-sticker] {
     height: 160px;
     width: 160px; }
@@ -179,3 +178,28 @@ body {
   border-radius: 50%;
   margin-left: 16px;
   margin-top: -24px !important; }
+
+.navbar-custom {
+  font-size: 14px;
+  background-color: #6607b5;
+  border-width: 0;
+  border-radius: 0; }
+  .navbar-custom .navbar-brand {
+    color: white; }
+  .navbar-custom .navbar-nav > li > a {
+    color: white;
+    background-color: #6607b5; }
+    .navbar-custom .navbar-nav > li > a:hover, .navbar-custom .navbar-nav > li > a:focus {
+      color: white;
+      background-color: #6607b5; }
+  .navbar-custom .navbar-nav .active > a, .navbar-custom .navbar-nav .active > a:hover, .navbar-custom .navbar-nav .active > a:focus {
+    color: white;
+    background-color: #6607b5; }
+  .navbar-custom .navbar-toggle {
+    border-color: white; }
+    .navbar-custom .navbar-toggle:hover, .navbar-custom .navbar-toggle:focus {
+      background-color: #4527a0; }
+      .navbar-custom .navbar-toggle:hover .icon-bar, .navbar-custom .navbar-toggle:focus .icon-bar {
+        background-color: white; }
+    .navbar-custom .navbar-toggle .icon-bar {
+      background-color: white; }

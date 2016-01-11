@@ -1,7 +1,11 @@
 
+$purple: rgba(102, 7, 181, 1);
+$purpleDark: #4527a0;
+
 body {
-	background: rgb(240, 240, 240);
-	padding-top: 20px;
+	background: rgba(0, 0, 0, 0.1);
+	padding-top: 50px;
+	padding-bottom: 40px;
 }
 
 @media (min-width: 992px) {
@@ -39,7 +43,7 @@ body {
 
 #messageBox {
 	background: white;
-	margin-bottom: 5px;
+	//margin-bottom: 5px;
 
 	.textarea {
 		box-shadow: none;
@@ -136,10 +140,11 @@ body {
 }
 
 #messages {
-	height: 420px;
-	margin-bottom: 20px;
+	//height: 420px;
+	//margin-bottom: 20px;
 	overflow: hidden;
 	overflow-y: scroll;
+	margin-top: 20px;
 
 	img[data-sticker] {
 		$stickerSize: 160px;
@@ -174,4 +179,54 @@ body {
 	border-radius: 50%;
 	margin-left: 16px;
 	margin-top: -24px !important;
+}
+
+.navbar-custom {
+	font-size: 14px;
+	background-color: $purple;
+	border-width: 0;
+	border-radius: 0;
+
+	.navbar-brand {
+		color: white;
+	}
+
+	.navbar-nav {
+		>li>a {
+			color: white;
+			background-color: $purple;
+
+			&:hover,
+			&:focus {
+				color: white;
+				background-color: $purple;
+			}
+		}
+
+		.active>a {
+			&,
+			&:hover,
+			&:focus {
+				color: white;
+				background-color: $purple;
+			}
+		}
+	}
+
+	.navbar-toggle {
+		border-color: white;
+
+		&:hover,
+		&:focus {
+			background-color: $purpleDark;
+
+			.icon-bar {
+				background-color: white;
+			}
+		}
+
+		.icon-bar {
+			background-color: white;
+		}
+	}
 }
