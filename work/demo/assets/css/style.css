@@ -263,7 +263,10 @@ body {
 .message-user-photo {
   display: table-cell;
   vertical-align: bottom;
-  width: 70px; }
+  width: 50px; }
+  .message-user-photo img {
+    height: 50px;
+    width: 50px; }
 
 .message-body {
   display: table-cell; }

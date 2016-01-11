@@ -217,9 +217,17 @@ body {
 }
 
 .message-user-photo {
+	$photoSize: 50px;
+
 	display: table-cell;
 	vertical-align: bottom;
-	width: 70px;
+
+	width: $photoSize;
+
+	img {
+		height: $photoSize;
+		width: $photoSize;
+	}
 }
 
 .message-body {

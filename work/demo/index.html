@@ -93,7 +93,7 @@
 	<div class="message {{ sticker.isSticker && 'is-sticker' }}">
 		{[ if (!isCurrentUser) { ]}
 		<div class="message-user-photo">
-			<img src="{{ user.picture }}" class="img-circle" style="width:70px;">
+			<img src="{{ user.picture }}" class="img-circle">
 		</div>
 		{[ } ]}
 		<div class="message-body">
@@ -116,7 +116,7 @@
 		</div>
 		{[ if (isCurrentUser) { ]}
 		<div class="message-user-photo">
-			<img src="{{ user.picture }}" class="img-circle" style="width:70px;">
+			<img src="{{ user.picture }}" class="img-circle">
 		</div>
 		{[ } ]}
 	</div>
