@@ -1,4 +1,6 @@
 
+@import 'icons';
+
 $purple: rgba(102, 7, 181, 1);
 $purpleDark: #4527a0;
 
@@ -35,6 +37,11 @@ body {
 	font-size: 14px;
 }
 
+.icon {
+	display: table;
+	opacity: .5;
+}
+
 .emoji {
 	height: 1em;
 	margin: 0 .2em;
@@ -56,36 +63,14 @@ body {
 
 #messageBox {
 	background: white;
-	//margin-bottom: 5px;
-
-	.textarea {
-		box-shadow: none;
-		max-height: 300px;
-		padding-top: 10px;
-
-		+ .input-group-btn {
-			padding-top: 4px;
-		}
-	}
-
-	.input-group-btn {
-		vertical-align: top;
-
-		button {
-			&:hover {
-				color: rgb(100, 100, 100);
-			}
-
-			&:active {
-				color: orange;
-			}
-		}
-	}
 
 	.textarea,
 	.input-group-btn button {
+		background: #fff;
 		border: 0;
+		box-shadow: none;
 		outline: none;
+		padding: 8px;
 
 		&:hover,
 		&:focus,
@@ -95,54 +80,26 @@ body {
 			outline: none;
 		}
 	}
-}
 
-#stickersToggle {
-	background: #fff;
-	box-shadow: none;
-	outline: none;
-	padding: 8px;
-
-	.icon {
-		height: 24px;
-		display: table;
-		opacity: .5;
-		width: 24px;
-
-		&,
-		>:hover,
-		&:focus,
-		&:active {
-			background: url("../img/sticker.png");
-			background-size: 48px 24px;
-
-			@media
-			only screen and (-webkit-min-device-pixel-ratio: 2),
-			only screen and (   min--moz-device-pixel-ratio: 2),
-			only screen and (     -o-min-device-pixel-ratio: 2/1) {
-				background: url("../img/sticker@2x.png");
-				background-size: 48px 24px;
-			}
-		}
+	.textarea {
+		max-height: 300px;
+		min-height: 40px;
+		padding-top: 11px;
 	}
 
-	&:hover {
-		.icon {
+	.input-group-btn {
+		vertical-align: top;
+
+		button:hover .icon {
 			opacity: .7;
 		}
 	}
+}
 
-
+#stickersToggle {
 	&.active {
-		.icon {
-			opacity: .9;
-
-			&,
-			&:hover,
-			&:focus,
-			&:active {
-				background-position: 24px 0;
-			}
+		.icon-smile {
+			@include retina-sprite($icon-sticker-group);
 		}
 	}
 }
@@ -231,11 +188,10 @@ body {
 	}
 
 	.navbar-toggle {
-		border-color: white;
 
 		&:hover,
 		&:focus {
-			background-color: $purpleDark;
+			background-color: transparent;
 
 			.icon-bar {
 				background-color: white;
@@ -247,3 +203,6 @@ body {
 		}
 	}
 }
+
+@include sprites($spritesheet-sprites);
+@include retina-sprites($retina-groups);

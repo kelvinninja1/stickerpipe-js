@@ -2040,7 +2040,7 @@ if ("document" in self) {
 
 window.StickersModule.Service = {};
 
-(function(Plugin, Module) {
+(function(Module) {
 
 	function buildStoreUrl(uri) {
 		var params = {
@@ -2144,7 +2144,7 @@ window.StickersModule.Service = {};
 		}
 
 	};
-})(window, window.StickersModule);
+})(window.StickersModule);
 
 // todo: rename file baseService --> BaseService
 
@@ -2154,30 +2154,9 @@ window.StickersModule.Service = {};
 
 	Module.BaseService = {
 
-		getPacksFromStorage: function() {
-			var expireDate = (+new Date()),
-				packsObj = Module.Storage.getPacks();
-
-			if(typeof packsObj === "undefined"
-				|| packsObj.expireDate < expireDate
-				|| Module.Configs.debug
-			) {
-
-				return {
-					actual: false,
-					packs: typeof packsObj == "object" && packsObj.packs ? packsObj.packs : []
-				};
-			} else {
-
-				return {
-					actual: true,
-					packs: packsObj.packs
-				};
-			}
-		},
-
-		markNewPacks: function(oldPacks, newPacks) {
-			var globalNew = false;
+		markNewPacks: function(newPacks) {
+			var globalNew = false,
+				oldPacks = Module.Storage.getPacks();
 
 			if (oldPacks.length != 0){
 
@@ -2291,22 +2270,7 @@ window.StickersModule.Service = {};
 			ga('stickerTracker.send', 'event', category, action, label);
 		},
 
-		isExistPackInStorage: function(packName) {
-			var packs = this.getPacksFromStorage()['packs'];
-
-			for (var i = 0; i < packs.length; i++) {
-				if (packs[i].pack_name == packName) {
-					return true;
-				}
-			}
-
-			return false;
-		},
-
 		updatePacks: function(successCallback) {
-			var storageStickerData;
-
-			storageStickerData = this.getPacksFromStorage();
 
 			Module.Api.getPacks(
 				(function(response) {
@@ -2314,12 +2278,20 @@ window.StickersModule.Service = {};
 						return;
 					}
 
-					var stickerPacks = response.data;
+					var packs = response.data;
 
-					stickerPacks = this.markNewPacks(storageStickerData.packs, stickerPacks);
-					Module.Storage.setPacks(stickerPacks);
+					// show only active packs
+					for (var i = 0; i < packs.length; i++) {
+						if (packs[i].user_status != 'active') {
+							packs.splice(i, 1);
+						}
+					}
 
-					successCallback && successCallback(stickerPacks);
+					packs = this.markNewPacks(packs);
+
+					Module.Storage.setPacks(packs);
+
+					successCallback && successCallback(packs);
 				}).bind(this)
 			);
 		},
@@ -2400,7 +2372,7 @@ window.StickersModule.Service = {};
 
 })(window.StickersModule);
 
-(function(Plugin, Module) {
+(function(Module) {
 
 	Module.El = {
 
@@ -2419,7 +2391,7 @@ window.StickersModule.Service = {};
 			return width;
 		}
 	};
-})(window, window.StickersModule);
+})(window.StickersModule);
 
 (function(Module) {
 
@@ -2454,7 +2426,7 @@ window.StickersModule.Service = {};
 
 })(window.StickersModule);
 
-(function(Plugin, Module) {
+(function(Module) {
 
 	Module.Http = {
 
@@ -2509,7 +2481,7 @@ window.StickersModule.Service = {};
 			options.headers.Localization = Module.Configs.lang;
 
 			if (Module.Configs.userId !== null) {
-				options.headers.UserId = Module.Configs.userId;
+				options.headers.UserId = Module.StickerHelper.md5(Module.Configs.userId + Module.Configs.apiKey);
 			}
 
 			if (options.type == 'POST' || options.type == 'PUT') {
@@ -2540,7 +2512,7 @@ window.StickersModule.Service = {};
 			xmlhttp.send(JSON.stringify(options.data));
 		}
 	};
-})(window, window.StickersModule);
+})(window.StickersModule);
 
 // todo: StatisticService
 
@@ -2586,17 +2558,19 @@ window.StickersModule.Service = {};
 		},
 
 		getPacks: function() {
-			return this.lockr.get('sticker_packs');
+			var packs = this.lockr.get('sticker_packs');
+
+			if (typeof packs == 'object' && packs.packs) {
+				packs = packs.packs;
+			} else if (Object.prototype.toString.call(packs) !== '[object Array]') {
+				packs = [];
+			}
+
+			return packs;
 		},
 
 		setPacks: function(packs) {
-			var expireDate = new Date(),
-				saveObj = {
-					packs: packs,
-					expireDate: ( expireDate.setDate( expireDate.getDate() + 1) )
-				};
-
-			return this.lockr.set('sticker_packs', saveObj)
+			return this.lockr.set('sticker_packs', packs)
 		},
 
 		getUniqUserId: function() {
@@ -4387,17 +4361,16 @@ window.StickersModule.View = {};
 				}
 			} else {
 				this.modal.modalEl.style.height = '';
-				if (parseInt(Module.El.css(this.modal.modalEl, 'height'), 10) < window.innerHeight) {
-					var newHeight = window.innerHeight
-						- parseInt(Module.El.css(this.modal.modalEl, 'marginTop'), 10)
-						- parseInt(Module.El.css(this.modal.modalEl, 'marginBottom'), 10);
 
-					if (newHeight == window.innerHeight) {
-						return;
-					}
+				var newHeight = window.innerHeight
+					- parseInt(Module.El.css(this.modal.modalEl, 'marginTop'), 10)
+					- parseInt(Module.El.css(this.modal.modalEl, 'marginBottom'), 10);
 
-					this.modal.modalEl.style.height = newHeight + 'px';
+				if (newHeight == window.innerHeight) {
+					return;
 				}
+
+				this.modal.modalEl.style.height = newHeight + 'px';
 			}
 		}
 	});
@@ -4771,22 +4744,15 @@ window.StickersModule.View = {};
 
 			var callback = onload || null;
 
-			var onPacksLoadCallback = (function() {
+			this.fetchPacks((function() {
 				this.view.render(this.stickersModel);
 
 				callback && callback();
-			}).bind(this);
+			}).bind(this));
 
-			var storageStickerData = Module.BaseService.getPacksFromStorage();
-
-			if (storageStickerData.actual) {
-
-				this.stickersModel = storageStickerData.packs;
-
-				onPacksLoadCallback.apply();
-			} else {
-				this.fetchPacks(onPacksLoadCallback);
-			}
+			setInterval((function() {
+				this.fetchPacks();
+			}).bind(this), 1000 * 60 * 60); // hour
 		},
 
 		delegateEvents: function() {

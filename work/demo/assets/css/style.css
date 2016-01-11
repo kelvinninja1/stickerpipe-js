@@ -1,3 +1,56 @@
+/*
+SCSS variables are information about icon's compiled state, stored under its original file name
+
+.icon-home {
+  width: $icon-home-width;
+}
+
+The large array-like variables contain all information about a single icon
+$icon-home: x y offset_x offset_y width height total_width total_height image_path;
+
+At the bottom of this section, we provide information about the spritesheet itself
+$spritesheet: width height image $spritesheet-sprites;
+*/
+/*
+These "retina group" variables are mappings for the naming and pairing of normal and retina sprites.
+
+The list formatted variables are intended for mixins like `retina-sprite` and `retina-sprites`.
+*/
+/*
+The provided mixins are intended to be used with the array-like variables
+
+.icon-home {
+  @include sprite-width($icon-home);
+}
+
+.icon-email {
+  @include sprite($icon-email);
+}
+*/
+/*
+The `retina-sprite` mixin sets up rules and a media query for a sprite/retina sprite.
+  It should be used with a "retina group" variable.
+
+The media query is from CSS Tricks: https://css-tricks.com/snippets/css/retina-display-media-query/
+
+$icon-home-group: ('icon-home', $icon-home, $icon-home-2x, );
+
+.icon-home {
+  @include retina-sprite($icon-home-group);
+}
+*/
+/*
+The `sprites` mixin generates identical output to the CSS template
+  but can be overridden inside of SCSS
+
+@include sprites($spritesheet-sprites);
+*/
+/*
+The `retina-sprites` mixin generates a CSS rule and media query for retina groups
+  This yields the same output as CSS retina template but can be overridden in SCSS
+
+@include retina-sprites($retina-groups);
+*/
 body {
   background: rgba(0, 0, 0, 0.1);
   padding-top: 50px;
@@ -87,6 +140,10 @@ body {
   color: #9e9e9e;
   font-size: 14px; }
 
+.icon {
+  display: table;
+  opacity: .5; }
+
 .emoji {
   height: 1em;
   margin: 0 .2em;
@@ -103,22 +160,13 @@ body {
 
 #messageBox {
   background: white; }
-  #messageBox .textarea {
-    box-shadow: none;
-    max-height: 300px;
-    padding-top: 10px; }
-    #messageBox .textarea + .input-group-btn {
-      padding-top: 4px; }
-  #messageBox .input-group-btn {
-    vertical-align: top; }
-    #messageBox .input-group-btn button:hover {
-      color: #646464; }
-    #messageBox .input-group-btn button:active {
-      color: orange; }
   #messageBox .textarea,
   #messageBox .input-group-btn button {
+    background: #fff;
     border: 0;
-    outline: none; }
+    box-shadow: none;
+    outline: none;
+    padding: 8px; }
     #messageBox .textarea:hover, #messageBox .textarea:focus, #messageBox .textarea:active,
     #messageBox .input-group-btn button:hover,
     #messageBox .input-group-btn button:focus,
@@ -126,32 +174,24 @@ body {
       background: #fff;
       box-shadow: none;
       outline: none; }
+  #messageBox .textarea {
+    max-height: 300px;
+    min-height: 40px;
+    padding-top: 11px; }
+  #messageBox .input-group-btn {
+    vertical-align: top; }
+    #messageBox .input-group-btn button:hover .icon {
+      opacity: .7; }
 
-#stickersToggle {
-  background: #fff;
-  box-shadow: none;
-  outline: none;
-  padding: 8px; }
-  #stickersToggle .icon {
-    height: 24px;
-    display: table;
-    opacity: .5;
-    width: 24px; }
-    #stickersToggle .icon,
-    #stickersToggle .icon > :hover, #stickersToggle .icon:focus, #stickersToggle .icon:active {
-      background: url("../img/sticker.png");
-      background-size: 48px 24px; }
-      @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2 / 1) {
-        #stickersToggle .icon,
-        #stickersToggle .icon > :hover, #stickersToggle .icon:focus, #stickersToggle .icon:active {
-          background: url("../img/sticker@2x.png");
-          background-size: 48px 24px; } }
-  #stickersToggle:hover .icon {
-    opacity: .7; }
-  #stickersToggle.active .icon {
-    opacity: .9; }
-    #stickersToggle.active .icon, #stickersToggle.active .icon:hover, #stickersToggle.active .icon:focus, #stickersToggle.active .icon:active {
-      background-position: 24px 0; }
+#stickersToggle.active .icon-smile {
+  background-image: url(../img/icons_sprite.png);
+  background-position: 0px -24px;
+  width: 24px;
+  height: 24px; }
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    #stickersToggle.active .icon-smile {
+      background-image: url(../img/icons_sprite@2x.png);
+      background-size: 48px 48px; } }
 
 #stickerPipe {
   border-radius: 3px 3px 0 0;
@@ -206,11 +246,57 @@ body {
   .navbar-custom .navbar-nav .active > a, .navbar-custom .navbar-nav .active > a:hover, .navbar-custom .navbar-nav .active > a:focus {
     color: white;
     background-color: #6607b5; }
-  .navbar-custom .navbar-toggle {
-    border-color: white; }
-    .navbar-custom .navbar-toggle:hover, .navbar-custom .navbar-toggle:focus {
-      background-color: #4527a0; }
-      .navbar-custom .navbar-toggle:hover .icon-bar, .navbar-custom .navbar-toggle:focus .icon-bar {
-        background-color: white; }
-    .navbar-custom .navbar-toggle .icon-bar {
+  .navbar-custom .navbar-toggle:hover, .navbar-custom .navbar-toggle:focus {
+    background-color: transparent; }
+    .navbar-custom .navbar-toggle:hover .icon-bar, .navbar-custom .navbar-toggle:focus .icon-bar {
       background-color: white; }
+  .navbar-custom .navbar-toggle .icon-bar {
+    background-color: white; }
+
+.icon-send {
+  background-image: url(../img/icons_sprite.png);
+  background-position: 0px 0px;
+  width: 24px;
+  height: 24px; }
+
+.icon-smile {
+  background-image: url(../img/icons_sprite.png);
+  background-position: -24px 0px;
+  width: 24px;
+  height: 24px; }
+
+.icon-sticker {
+  background-image: url(../img/icons_sprite.png);
+  background-position: 0px -24px;
+  width: 24px;
+  height: 24px; }
+
+.icon-send {
+  background-image: url(../img/icons_sprite.png);
+  background-position: 0px 0px;
+  width: 24px;
+  height: 24px; }
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .icon-send {
+      background-image: url(../img/icons_sprite@2x.png);
+      background-size: 48px 48px; } }
+
+.icon-smile {
+  background-image: url(../img/icons_sprite.png);
+  background-position: -24px 0px;
+  width: 24px;
+  height: 24px; }
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .icon-smile {
+      background-image: url(../img/icons_sprite@2x.png);
+      background-size: 48px 48px; } }
+
+.icon-sticker {
+  background-image: url(../img/icons_sprite.png);
+  background-position: 0px -24px;
+  width: 24px;
+  height: 24px; }
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .icon-sticker {
+      background-image: url(../img/icons_sprite@2x.png);
+      background-size: 48px 48px; } }

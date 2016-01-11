@@ -23,6 +23,7 @@ var App = _makeClass(function(options) {
 	currentUser: {},
 
 	$window: $(window),
+	$body: $('body'),
 	$navbar: $('.navbar'),
 	$messages: $('#messages'),
 	$messageBox: $('#messageBox'),
@@ -271,7 +272,10 @@ var App = _makeClass(function(options) {
 			text: text,
 			date: this.getDateString(0),
 			sticker: parseSticker
-		})).animate({ scrollTop: this.$messages[0].scrollHeight }, 0);
+		}));
+
+		this.$body.animate({ scrollTop: this.$body[0].scrollHeight }, 0);
+		console.log(this.$body[0].scrollHeight);
 	},
 
 	getUrlParameter: function(name) {
