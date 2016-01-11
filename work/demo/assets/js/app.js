@@ -275,7 +275,6 @@ var App = _makeClass(function(options) {
 		}));
 
 		this.$body.animate({ scrollTop: this.$body[0].scrollHeight }, 0);
-		console.log(this.$body[0].scrollHeight);
 	},
 
 	getUrlParameter: function(name) {
