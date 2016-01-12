@@ -54,7 +54,7 @@
 			options.headers.Localization = Module.Configs.lang;
 
 			if (Module.Configs.userId !== null) {
-				options.headers.UserId = Module.StickerHelper.md5(Module.Configs.userId + Module.Configs.apiKey);
+				options.headers.UserId = Module.Configs.userId;
 			}
 
 			if (options.type == 'POST' || options.type == 'PUT') {

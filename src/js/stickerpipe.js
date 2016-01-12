@@ -33,6 +33,11 @@ window.StickersModule.View = {};
 			}
 
 			Module.StickerHelper.setConfig(config);
+
+			if (Module.Configs.userId) {
+				Module.Configs.userId = Module.StickerHelper.md5(Module.Configs.userId + Module.Configs.apiKey);
+			}
+
 			Module.Storage.setPrefix(Module.Configs.storagePrefix);
 
 			Module.BaseService.trackUserData();

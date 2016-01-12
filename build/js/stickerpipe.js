@@ -2489,7 +2489,7 @@ window.StickersModule.Service = {};
 			options.headers.Localization = Module.Configs.lang;
 
 			if (Module.Configs.userId !== null) {
-				options.headers.UserId = Module.StickerHelper.md5(Module.Configs.userId + Module.Configs.apiKey);
+				options.headers.UserId = Module.Configs.userId;
 			}
 
 			if (options.type == 'POST' || options.type == 'PUT') {
@@ -4773,6 +4773,11 @@ window.StickersModule.View = {};
 			}
 
 			Module.StickerHelper.setConfig(config);
+
+			if (Module.Configs.userId) {
+				Module.Configs.userId = Module.StickerHelper.md5(Module.Configs.userId + Module.Configs.apiKey);
+			}
+
 			Module.Storage.setPrefix(Module.Configs.storagePrefix);
 
 			Module.BaseService.trackUserData();
