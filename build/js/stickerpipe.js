@@ -1241,6 +1241,14 @@ if ("document" in self) {
 			return self;
 		};
 
+		this._isAtEnd = function() {
+			return _isAtEnd();
+		};
+
+		this._isAtBegin = function() {
+			return _isAtBegin();
+		};
+
 		/**
 		 * @method _setCss
 		 * @private
@@ -3586,6 +3594,9 @@ window.StickersModule.View = {};
 
 	Module.BlockView = Module.Class({
 
+		emojisOffset: 0,
+		emojisLimit: 100,
+
 		// todo
 		isRendered: false,
 
@@ -3605,6 +3616,12 @@ window.StickersModule.View = {};
 
 			this.tabsView = new Module.TabsView();
 			this.scrollView = new Module.ScrollView();
+
+			this.scrollView.onScroll((function() {
+				if (this.contentEl.classList.contains('sp-emojis') && this.scrollView.isAtEnd()) {
+					this.renderEmojis(this.emojisOffset);
+				}
+			}).bind(this));
 
 			window.addEventListener('resize', (function() {
 				this.onWindowResize();
@@ -3644,8 +3661,12 @@ window.StickersModule.View = {};
 
 			this.clearBlock(this.contentEl);
 
+			this.contentEl.classList.remove('sp-stickers');
+			this.contentEl.classList.remove('sp-emojis');
+
 			if (usedStickers.length == 0) {
 				this.contentEl.innerHTML += Module.Configs.htmlForEmptyRecent;
+				this.scrollView.update();
 				return false;
 			}
 
@@ -3663,15 +3684,8 @@ window.StickersModule.View = {};
 			this.contentEl.classList.remove('sp-stickers');
 			this.contentEl.classList.add('sp-emojis');
 
-			StickerHelper.forEach(Module.Configs.emojiList, (function(emoji) {
-				var emojiEl = document.createElement('span'),
-					emojiImgHtml = this.emojiService.parseEmojiFromText(emoji);
-
-				emojiEl.className = Module.Configs.emojiItemClass;
-				emojiEl.innerHTML = emojiImgHtml;
-
-				this.contentEl.appendChild(emojiEl);
-			}).bind(this));
+			this.emojisOffset = 0;
+			this.renderEmojis(this.emojisOffset);
 
 			this.scrollView.update();
 		},
@@ -3716,6 +3730,32 @@ window.StickersModule.View = {};
 			});
 
 			this.scrollView.update();
+		},
+		renderEmojis: function(offset) {
+
+			if (offset > Module.Configs.emojiList.length - 1) {
+				return;
+			}
+
+			var limit = offset + this.emojisLimit;
+			if (limit > Module.Configs.emojiList.length - 1) {
+				limit = Module.Configs.emojiList.length;
+			}
+
+			for (var i = offset; i < limit; i++) {
+				var emoji = Module.Configs.emojiList[i],
+					emojiEl = document.createElement('span'),
+					emojiImgHtml = this.emojiService.parseEmojiFromText(emoji);
+
+				emojiEl.className = Module.Configs.emojiItemClass;
+				emojiEl.innerHTML = emojiImgHtml;
+
+				this.contentEl.appendChild(emojiEl);
+			}
+
+			this.emojisOffset = limit;
+
+			this.scrollView.update('relative');
 		},
 
 
@@ -4276,8 +4316,22 @@ window.StickersModule.View = {};
 			return this.overviewEl;
 		},
 
-		update: function() {
-			this.scrollbar.update();
+		update: function(scrollTo) {
+			this.scrollbar.update(scrollTo);
+		},
+
+		onScroll: function(callback) {
+			this.el.addEventListener('move', (function() {
+				callback && callback();
+			}).bind(this));
+		},
+
+		isAtBegin: function() {
+			return !this.scrollbar._isAtBegin();
+		},
+
+		isAtEnd: function() {
+			return !this.scrollbar._isAtEnd();
 		}
 	});
 
@@ -4655,6 +4709,7 @@ window.StickersModule.View = {};
 			this.controls.history.el.click();
 			this.hasActiveTab = true;
 		},
+
 
 		handleClickOnEmojiTab: function(callback) {
 			Module.StickerHelper.setEvent('click', this.el, this.controls.emoji.class, callback);

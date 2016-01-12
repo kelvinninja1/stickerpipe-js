@@ -209,6 +209,14 @@
 			return self;
 		};
 
+		this._isAtEnd = function() {
+			return _isAtEnd();
+		};
+
+		this._isAtBegin = function() {
+			return _isAtBegin();
+		};
+
 		/**
 		 * @method _setCss
 		 * @private

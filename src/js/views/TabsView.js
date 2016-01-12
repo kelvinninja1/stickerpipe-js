@@ -278,6 +278,7 @@
 			this.hasActiveTab = true;
 		},
 
+
 		handleClickOnEmojiTab: function(callback) {
 			Module.StickerHelper.setEvent('click', this.el, this.controls.emoji.class, callback);
 		},

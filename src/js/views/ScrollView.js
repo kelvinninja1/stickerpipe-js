@@ -46,8 +46,22 @@
 			return this.overviewEl;
 		},
 
-		update: function() {
-			this.scrollbar.update();
+		update: function(scrollTo) {
+			this.scrollbar.update(scrollTo);
+		},
+
+		onScroll: function(callback) {
+			this.el.addEventListener('move', (function() {
+				callback && callback();
+			}).bind(this));
+		},
+
+		isAtBegin: function() {
+			return !this.scrollbar._isAtBegin();
+		},
+
+		isAtEnd: function() {
+			return !this.scrollbar._isAtEnd();
 		}
 	});
 
