@@ -23,6 +23,7 @@ var App = _makeClass(function(options) {
 	currentUser: {},
 
 	$window: $(window),
+	$body: $('body'),
 	$navbar: $('.navbar'),
 	$messages: $('#messages'),
 	$messageBox: $('#messageBox'),
@@ -266,7 +267,9 @@ var App = _makeClass(function(options) {
 			text: text,
 			date: this.getDateString(0),
 			sticker: parseSticker
-		})).animate({ scrollTop: this.$messages[0].scrollHeight }, 0);
+		}));
+
+		this.$body.animate({ scrollTop: this.$body[0].scrollHeight }, 0);
 	},
 
 	getUrlParameter: function(name) {
@@ -364,12 +367,12 @@ var App = _makeClass(function(options) {
 
 	resizeWindow: function() {
 
-		this.$messages.height(
-			this.$window.outerHeight(true) -
-			this.$navbar.offset().top -
-			this.$navbar.outerHeight(true) -
-			this.$messageBox.parent().outerHeight(true) -
-			parseInt(this.$messages.css('margin-bottom'), 10)
-		);
+		//this.$messages.height(
+		//	this.$window.outerHeight(true) -
+		//	this.$navbar.offset().top -
+		//	this.$navbar.outerHeight(true) -
+		//	this.$messageBox.parent().outerHeight(true) -
+		//	parseInt(this.$messages.css('margin-bottom'), 10)
+		//);
 	}
 });
