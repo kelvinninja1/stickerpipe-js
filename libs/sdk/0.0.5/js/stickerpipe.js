@@ -1241,6 +1241,14 @@ if ("document" in self) {
 			return self;
 		};
 
+		this._isAtEnd = function() {
+			return _isAtEnd();
+		};
+
+		this._isAtBegin = function() {
+			return _isAtBegin();
+		};
+
 		/**
 		 * @method _setCss
 		 * @private
@@ -2481,7 +2489,7 @@ window.StickersModule.Service = {};
 			options.headers.Localization = Module.Configs.lang;
 
 			if (Module.Configs.userId !== null) {
-				options.headers.UserId = Module.StickerHelper.md5(Module.Configs.userId + Module.Configs.apiKey);
+				options.headers.UserId = Module.Configs.userId;
 			}
 
 			if (options.type == 'POST' || options.type == 'PUT') {
@@ -3609,6 +3617,12 @@ window.StickersModule.View = {};
 			this.tabsView = new Module.TabsView();
 			this.scrollView = new Module.ScrollView();
 
+			this.scrollView.onScroll((function() {
+				if (this.contentEl.classList.contains('sp-emojis') && this.scrollView.isAtEnd()) {
+					this.renderEmojis(this.emojisOffset);
+				}
+			}).bind(this));
+
 			window.addEventListener('resize', (function() {
 				this.onWindowResize();
 			}).bind(this));
@@ -3647,8 +3661,12 @@ window.StickersModule.View = {};
 
 			this.clearBlock(this.contentEl);
 
+			this.contentEl.classList.remove('sp-stickers');
+			this.contentEl.classList.remove('sp-emojis');
+
 			if (usedStickers.length == 0) {
 				this.contentEl.innerHTML += Module.Configs.htmlForEmptyRecent;
+				this.scrollView.update();
 				return false;
 			}
 
@@ -3666,37 +3684,10 @@ window.StickersModule.View = {};
 			this.contentEl.classList.remove('sp-stickers');
 			this.contentEl.classList.add('sp-emojis');
 
-			for (var i = 0; i < Module.Configs.emojiList.length; i++) {
-				var emoji = Module.Configs.emojiList[i],
-					emojiEl = document.createElement('span'),
-					emojiImgHtml = this.emojiService.parseEmojiFromText(emoji);
+			this.emojisOffset = 0;
+			this.renderEmojis(this.emojisOffset);
 
-				emojiEl.className = Module.Configs.emojiItemClass;
-				emojiEl.innerHTML = emojiImgHtml;
-
-				this.contentEl.appendChild(emojiEl);
-			}
 			this.scrollView.update();
-
-			//this.emojisOffset = 0;
-			//this.renderEmojis(this.emojisOffset);
-
-			//StickerHelper.forEach(Module.Configs.emojiList, (function(emoji) {
-			//	var emojiEl = document.createElement('span'),
-			//		emojiImgHtml = this.emojiService.parseEmojiFromText(emoji);
-			//
-			//	emojiEl.className = Module.Configs.emojiItemClass;
-			//	emojiEl.innerHTML = emojiImgHtml;
-			//
-			//	this.contentEl.appendChild(emojiEl);
-			//}).bind(this));
-
-
-
-			//this.scrollView.el.addEventListener('move', (function() {
-			//	console.log('move', this.scrollView.isAtEnd());
-			//}).bind(this));
-
 		},
 		renderPack: function(pack) {
 
@@ -3764,7 +3755,7 @@ window.StickersModule.View = {};
 
 			this.emojisOffset = limit;
 
-			this.scrollView.update();
+			this.scrollView.update('relative');
 		},
 
 
@@ -4325,12 +4316,22 @@ window.StickersModule.View = {};
 			return this.overviewEl;
 		},
 
-		update: function() {
-			this.scrollbar.update();
+		update: function(scrollTo) {
+			this.scrollbar.update(scrollTo);
+		},
+
+		onScroll: function(callback) {
+			this.el.addEventListener('move', (function() {
+				callback && callback();
+			}).bind(this));
+		},
+
+		isAtBegin: function() {
+			return !this.scrollbar._isAtBegin();
 		},
 
 		isAtEnd: function() {
-
+			return !this.scrollbar._isAtEnd();
 		}
 	});
 
@@ -4709,6 +4710,7 @@ window.StickersModule.View = {};
 			this.hasActiveTab = true;
 		},
 
+
 		handleClickOnEmojiTab: function(callback) {
 			Module.StickerHelper.setEvent('click', this.el, this.controls.emoji.class, callback);
 		},
@@ -4771,6 +4773,11 @@ window.StickersModule.View = {};
 			}
 
 			Module.StickerHelper.setConfig(config);
+
+			if (Module.Configs.userId) {
+				Module.Configs.userId = Module.StickerHelper.md5(Module.Configs.userId + Module.Configs.apiKey);
+			}
+
 			Module.Storage.setPrefix(Module.Configs.storagePrefix);
 
 			Module.BaseService.trackUserData();
