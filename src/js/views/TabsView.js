@@ -124,7 +124,7 @@
 				classes.push(this.classes.newPack);
 			}
 
-			var iconSrc = Module.Api.getPackTabIconUrl(pack.pack_name);
+			var iconSrc = Module.Url.getPackTabIconUrl(pack.pack_name);
 
 			var content = '<img src=' + iconSrc + '>';
 

@@ -2050,66 +2050,30 @@ window.StickersModule.Service = {};
 
 (function(Module) {
 
-	function buildStoreUrl(uri) {
-		var params = {
-			apiKey: Module.Configs.apiKey,
-			platform: 'JS',
-			userId: Module.Configs.userId,
-			density: Module.Configs.stickerResolutionType,
-			priceB: Module.Configs.priceB,
-			priceC: Module.Configs.priceC,
-			is_subscriber: (Module.Configs.userPremium ? 1 : 0),
-			localization: Module.Configs.lang
-		};
-
-		return Module.Configs.storeUrl + ((Module.Configs.storeUrl.indexOf('?') == -1) ? '?' : '&')
-			+ Module.StickerHelper.urlParamsSerialize(params) + '#/' + uri;
-	}
-
-	function getCdnUrl() {
-		return Module.Configs.cdnUrl + '/stk/';
-	}
-
-	function getApiUrl(uri) {
-		return Module.Configs.apiUrl + '/api/v1/' + uri;
-	}
+	var API_VERSION = 1;
 
 	Module.Api = {
 
-		getStickerUrl: function(packName, stickerName) {
-			return getCdnUrl() + packName + '/' + stickerName +
-				'_' + Module.Configs.stickerResolutionType + '.png';
+		getApiVersion: function() {
+			return API_VERSION;
 		},
 
-		getPackTabIconUrl: function(packName) {
-			return getCdnUrl() + packName + '/' +
-				'tab_icon_' + Module.Configs.tabResolutionType + '.png';
-		},
-
-		getPacks: function(successCallback) {
-			var url = getApiUrl('client-packs');
-
-			if (Module.Configs.userId !== null) {
-				url = getApiUrl('packs');
-
-				if (Module.Configs.userPremium) {
-					url += '?is_subscriber=1';
-				}
-			}
+		getPacks: function(doneCallback) {
+			var url = Module.Url.getPacksUrl();
 
 			Module.Http.get(url, {
-				success: successCallback
+				success: doneCallback
 			});
 		},
 
 		sendStatistic: function(statistic) {
-			Module.Http.post(getApiUrl('track-statistic'), statistic);
+			Module.Http.post(Module.Url.getStatisticUrl(), statistic);
 		},
 
 		updateUserData: function(userData) {
 			return Module.Http.ajax({
 				type: 'PUT',
-				url: getApiUrl('user'),
+				url: Module.Url.getUserDataUrl(),
 				data: userData,
 				headers: {
 					'Content-Type': 'application/json'
@@ -2117,38 +2081,22 @@ window.StickersModule.Service = {};
 			});
 		},
 
-		changeUserPackStatus: function(packName, status, pricePoint, callbacks) {
-			var url = getApiUrl('user/pack/' + packName),
-				purchaseType = 'free';
+		changeUserPackStatus: function(packName, status, pricePoint, doneCallback) {
 
-			if (pricePoint == 'B') {
-				purchaseType = 'oneoff';
-				if (Module.Configs.userPremium) {
-					purchaseType = 'subscription';
-				}
-			} else if (pricePoint == 'C') {
-				purchaseType = 'oneoff';
-			}
-
-			url += '?' + Module.StickerHelper.urlParamsSerialize({
-					purchase_type: purchaseType
-				});
+			var url = Module.Url.getUserPackUrl(packName, pricePoint);
 
 			Module.Http.post(url, {
 				status: status
-			}, callbacks, {
+			}, {
+				success: function() {
+					doneCallback && doneCallback();
+				},
+				error: function() {
+					console.log('error');
+				}
+			}, {
 				'Content-Type': 'application/json'
 			});
-		},
-
-		store: {
-			getStoreUrl: function() {
-				return buildStoreUrl('store/');
-			},
-
-			getPackUrl: function(packName) {
-				return buildStoreUrl('packs/' + packName);
-			}
 		}
 
 	};
@@ -2251,7 +2199,7 @@ window.StickersModule.Service = {};
 
 			if (matchData) {
 				outData.isSticker = true;
-				outData.url = Module.Api.getStickerUrl(matchData[1], matchData[2]);
+				outData.url = Module.Url.getStickerUrl(matchData[1], matchData[2]);
 
 
 				outData.pack = matchData[1];
@@ -2522,6 +2470,25 @@ window.StickersModule.Service = {};
 	};
 })(window.StickersModule);
 
+(function(Module) {
+
+	//function addTask() {
+	//
+	//}
+	//
+	//Module.PendingRequest = {
+	//
+	//	init: function() {
+	//
+	//	},
+	//
+	//	aсtiveUserPack: function(packName, pricePoint) {
+	//		Module.Store.downloadPack(packName, pricePoint);
+	//	}
+	//
+	//};
+})(window.StickersModule);
+
 // todo: StatisticService
 
 (function(Module) {
@@ -2630,16 +2597,14 @@ window.StickersModule.Service = {};
 		},
 
 		downloadPack: function(packName, pricePoint) {
-			Module.Api.changeUserPackStatus(packName, true, pricePoint, {
-				success: (function () {
-					this.stickerpipe.fetchPacks((function() {
-						sendAPIMessage('reload');
-						sendAPIMessage('onPackDownloaded', {
-							packName: packName
-						});
-					}).bind(this));
-				}).bind(this)
-			});
+			Module.Api.changeUserPackStatus(packName, true, pricePoint, (function() {
+				this.stickerpipe.fetchPacks(function() {
+					sendAPIMessage('reload');
+					sendAPIMessage('onPackDownloaded', {
+						packName: packName
+					});
+				});
+			}).bind(this));
 		},
 
 		purchaseSuccess: function(packName, pricePoint) {
@@ -2677,6 +2642,109 @@ window.StickersModule.Service = {};
 
 })(StickersModule);
 
+
+(function(Module) {
+
+	Module.Url = {
+
+		buildStoreUrl: function(uri) {
+			uri = uri || '';
+
+			var params = {
+				apiKey: Module.Configs.apiKey,
+				platform: 'JS',
+				userId: Module.Configs.userId,
+				density: Module.Configs.stickerResolutionType,
+				priceB: Module.Configs.priceB,
+				priceC: Module.Configs.priceC,
+				is_subscriber: (Module.Configs.userPremium ? 1 : 0),
+				localization: Module.Configs.lang
+			};
+
+			return Module.Configs.storeUrl + ((Module.Configs.storeUrl.indexOf('?') == -1) ? '?' : '&')
+				+ Module.StickerHelper.urlParamsSerialize(params) + '#/' + uri;
+		},
+
+		buildCdnUrl: function(uri) {
+			uri = uri || '';
+
+			return Module.Configs.cdnUrl + '/stk/' + uri;
+		},
+
+		buildApiUrl: function(uri) {
+			uri = uri || '';
+
+			return Module.Configs.apiUrl + '/api/v' + Module.Api.getApiVersion() + '/' + uri;
+		},
+
+		getStickerUrl: function(packName, stickerName) {
+			return this.buildCdnUrl(
+				packName + '/' + stickerName +
+				'_' + Module.Configs.stickerResolutionType + '.png'
+			);
+		},
+
+		getPackTabIconUrl: function(packName) {
+			return this.buildCdnUrl(
+				packName + '/' +
+				'tab_icon_' + Module.Configs.tabResolutionType + '.png'
+			);
+		},
+
+		getPacksUrl: function() {
+			var url = this.buildApiUrl('client-packs');
+
+			if (Module.Configs.userId !== null) {
+				url = this.buildApiUrl('packs');
+
+				if (Module.Configs.userPremium) {
+					url += '?is_subscriber=1';
+				}
+			}
+
+			return url;
+		},
+
+		getStatisticUrl: function() {
+			return this.buildApiUrl('track-statistic');
+		},
+
+		getUserDataUrl: function() {
+			return this.buildApiUrl('user');
+		},
+
+		getUserPackUrl: function(packName, pricePoint) {
+
+			// detect purchase type
+			var purchaseType = 'free';
+			if (pricePoint == 'B') {
+				purchaseType = 'oneoff';
+				if (Module.Configs.userPremium) {
+					purchaseType = 'subscription';
+				}
+			} else if (pricePoint == 'C') {
+				purchaseType = 'oneoff';
+			}
+
+			// build url
+			var url = this.buildApiUrl('user/pack/' + packName);
+			url += '?' + Module.StickerHelper.urlParamsSerialize({
+					purchase_type: purchaseType
+				});
+
+			return url;
+		},
+
+		getStoreUrl: function() {
+			return this.buildStoreUrl('store/');
+		},
+
+		getStorePackUrl: function(packName) {
+			return this.buildStoreUrl('packs/' + packName);
+		}
+
+	};
+})(window.StickersModule);
 
 window.StickersModule.Configs = {};
 
@@ -4387,12 +4455,12 @@ window.StickersModule.View = {};
 		},
 
 		renderStore: function() {
-			this.iframe.src = Module.Api.store.getStoreUrl();
+			this.iframe.src = Module.Url.getStoreUrl();
 			this.modal.open();
 		},
 
 		renderPack: function(packName) {
-			this.iframe.src = Module.Api.store.getPackUrl(packName);
+			this.iframe.src = Module.Url.getStorePackUrl(packName);
 			this.modal.open();
 		},
 
@@ -4556,7 +4624,7 @@ window.StickersModule.View = {};
 				classes.push(this.classes.newPack);
 			}
 
-			var iconSrc = Module.Api.getPackTabIconUrl(pack.pack_name);
+			var iconSrc = Module.Url.getPackTabIconUrl(pack.pack_name);
 
 			var content = '<img src=' + iconSrc + '>';
 

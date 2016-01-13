@@ -96,7 +96,7 @@
 
 			if (matchData) {
 				outData.isSticker = true;
-				outData.url = Module.Api.getStickerUrl(matchData[1], matchData[2]);
+				outData.url = Module.Url.getStickerUrl(matchData[1], matchData[2]);
 
 
 				outData.pack = matchData[1];

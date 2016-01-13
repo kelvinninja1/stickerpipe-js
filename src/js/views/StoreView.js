@@ -49,12 +49,12 @@
 		},
 
 		renderStore: function() {
-			this.iframe.src = Module.Api.store.getStoreUrl();
+			this.iframe.src = Module.Url.getStoreUrl();
 			this.modal.open();
 		},
 
 		renderPack: function(packName) {
-			this.iframe.src = Module.Api.store.getPackUrl(packName);
+			this.iframe.src = Module.Url.getStorePackUrl(packName);
 			this.modal.open();
 		},
 

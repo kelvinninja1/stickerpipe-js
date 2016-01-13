@@ -26,16 +26,14 @@
 		},
 
 		downloadPack: function(packName, pricePoint) {
-			Module.Api.changeUserPackStatus(packName, true, pricePoint, {
-				success: (function () {
-					this.stickerpipe.fetchPacks((function() {
-						sendAPIMessage('reload');
-						sendAPIMessage('onPackDownloaded', {
-							packName: packName
-						});
-					}).bind(this));
-				}).bind(this)
-			});
+			Module.Api.changeUserPackStatus(packName, true, pricePoint, (function() {
+				this.stickerpipe.fetchPacks(function() {
+					sendAPIMessage('reload');
+					sendAPIMessage('onPackDownloaded', {
+						packName: packName
+					});
+				});
+			}).bind(this));
 		},
 
 		purchaseSuccess: function(packName, pricePoint) {
