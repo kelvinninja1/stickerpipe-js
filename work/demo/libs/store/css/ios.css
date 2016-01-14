@@ -379,12 +379,14 @@ h6 {
       height: 80px;
       width: 80px; }
 
-.pack-stickers-preview {
-  text-align: center; }
-  .pack-stickers-preview img {
-    width: 360px; }
-  .pack-stickers-preview.landscape img {
-    width: 696px; }
+.pack-stickers-preview .pack-stickers-preview-image {
+  margin: auto;
+  max-width: 360px; }
+  .pack-stickers-preview .pack-stickers-preview-image img {
+    width: 100%; }
+
+.pack-stickers-preview.landscape .pack-stickers-preview-image {
+  max-width: 696px; }
 
 .btn-action {
   margin-bottom: 8px; }
