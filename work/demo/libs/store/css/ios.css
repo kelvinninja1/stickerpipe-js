@@ -379,6 +379,13 @@ h6 {
       height: 80px;
       width: 80px; }
 
+.pack-stickers-preview {
+  text-align: center; }
+  .pack-stickers-preview img {
+    width: 360px; }
+  .pack-stickers-preview.landscape img {
+    width: 696px; }
+
 .btn-action {
   margin-bottom: 8px; }
 
