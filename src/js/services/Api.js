@@ -43,7 +43,13 @@
 					doneCallback && doneCallback();
 				},
 				error: function() {
-					console.log('error');
+					if (status) {
+						var pr = Module.Service.PendingRequest;
+						pr.add(pr.tasks.activateUserPack, {
+							packName: packName,
+							pricePoint: pricePoint
+						});
+					}
 				}
 			}, {
 				'Content-Type': 'application/json'

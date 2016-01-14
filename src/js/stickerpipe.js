@@ -43,8 +43,11 @@ window.StickersModule.View = {};
 			Module.BaseService.trackUserData();
 
 			Module.Service.Store.init(this);
+			Module.Service.Pack.init(this);
 
 			this.emojiService = new Module.EmojiService(Module.Twemoji);
+
+			Module.Service.PendingRequest.run();
 		},
 
 		////////////////////

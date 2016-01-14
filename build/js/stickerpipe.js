@@ -2092,7 +2092,13 @@ window.StickersModule.Service = {};
 					doneCallback && doneCallback();
 				},
 				error: function() {
-					console.log('error');
+					if (status) {
+						var pr = Module.Service.PendingRequest;
+						pr.add(pr.tasks.activateUserPack, {
+							packName: packName,
+							pricePoint: pricePoint
+						});
+					}
 				}
 			}, {
 				'Content-Type': 'application/json'
@@ -2456,7 +2462,13 @@ window.StickersModule.Service = {};
 					if (xmlhttp.status == 200) {
 						options.success(JSON.parse(xmlhttp.responseText), xmlhttp);
 					} else {
-						options.error(JSON.parse(xmlhttp.responseText), xmlhttp);
+						var response = {};
+						try {
+							response = JSON.parse(xmlhttp.responseText);
+						} catch (ex) {
+							response = {}
+						}
+						options.error(response, xmlhttp);
 					}
 
 					options.complete(JSON.parse(xmlhttp.responseText), xmlhttp);
@@ -2470,21 +2482,63 @@ window.StickersModule.Service = {};
 
 (function(Module) {
 
-	//function addTask() {
-	//
-	//}
-	//
-	//Module.PendingRequest = {
-	//
-	//	init: function() {
-	//
-	//	},
-	//
-	//	aсtiveUserPack: function(packName, pricePoint) {
-	//		Module.Store.downloadPack(packName, pricePoint);
-	//	}
-	//
-	//};
+	var stickerpipe;
+
+	Module.Service.Pack = {
+
+		init: function(_stickerpipe) {
+			stickerpipe = _stickerpipe;
+		},
+
+		activateUserPack: function(packName, pricePoint, doneCallback) {
+			Module.Api.changeUserPackStatus(packName, true, pricePoint, function() {
+
+				// todo: add event ~ "packs fetched" & remove "stickerpipe" variable
+				stickerpipe.fetchPacks(function() {
+					doneCallback && doneCallback();
+				});
+
+			});
+		}
+	};
+})(window.StickersModule);
+
+(function(Module) {
+
+	function activateUserPack(taskData) {
+		Module.Service.Pack.activateUserPack(taskData.packName, taskData.pricePoint);
+	}
+
+	Module.Service.PendingRequest = {
+
+		tasks: {
+			activateUserPack: 'activateUserPack'
+		},
+
+		add: function(taskName, taskData) {
+			Module.Storage.addPendingRequestTask({
+				name: taskName,
+				data: taskData
+			});
+		},
+
+		run: function() {
+			var task = Module.Storage.popPendingRequestTask();
+
+			while(task) {
+				switch (task.name) {
+					case this.tasks.activateUserPack:
+						activateUserPack(task.data);
+						break;
+					default :
+						break;
+				}
+
+				task = Module.Storage.popPendingRequestTask();
+			}
+		}
+
+	};
 })(window.StickersModule);
 
 // todo: StatisticService
@@ -2499,14 +2553,13 @@ window.StickersModule.Service = {};
 			this.lockr.prefix = storagePrefix;
 		},
 
+
 		getUsedStickers: function() {
 			return this.lockr.get('sticker_latest_use') || [];
 		},
-
 		setUsedStickers: function(usedStickers) {
 			return this.lockr.set('sticker_latest_use', usedStickers);
 		},
-
 		addUsedSticker: function(stickerCode) {
 
 			var usedStickers = this.getUsedStickers(),
@@ -2530,6 +2583,7 @@ window.StickersModule.Service = {};
 			this.setUsedStickers(usedStickers);
 		},
 
+
 		getPacks: function() {
 			var packs = this.lockr.get('sticker_packs');
 
@@ -2541,10 +2595,10 @@ window.StickersModule.Service = {};
 
 			return packs;
 		},
-
 		setPacks: function(packs) {
 			return this.lockr.set('sticker_packs', packs)
 		},
+
 
 		getUniqUserId: function() {
 			var uniqUserId = this.lockr.get('uniqUserId');
@@ -2557,12 +2611,36 @@ window.StickersModule.Service = {};
 			return uniqUserId;
 		},
 
+
 		getUserData: function() {
 			return this.lockr.get('userData');
 		},
-
 		setUserData: function(userData) {
 			return this.lockr.set('userData', userData);
+		},
+
+
+		getPendingRequestTasks: function() {
+			return this.lockr.get('pending_request_tasks') || [];
+		},
+		setPendingRequestTasks: function(tasks) {
+			return this.lockr.set('pending_request_tasks', tasks);
+		},
+		addPendingRequestTask: function(task) {
+
+			var tasks = this.getPendingRequestTasks();
+
+			tasks.push(task);
+
+			this.setPendingRequestTasks(tasks);
+		},
+		popPendingRequestTask: function() {
+			var tasks = this.getPendingRequestTasks(),
+				task = tasks.pop();
+
+			this.setPendingRequestTasks(tasks);
+
+			return task;
 		}
 	};
 
@@ -2595,14 +2673,12 @@ window.StickersModule.Service = {};
 		},
 
 		downloadPack: function(packName, pricePoint) {
-			Module.Api.changeUserPackStatus(packName, true, pricePoint, (function() {
-				this.stickerpipe.fetchPacks(function() {
-					sendAPIMessage('reload');
-					sendAPIMessage('onPackDownloaded', {
-						packName: packName
-					});
+			Module.Service.Pack.activateUserPack(packName, pricePoint, function() {
+				sendAPIMessage('reload');
+				sendAPIMessage('onPackDownloaded', {
+					packName: packName
 				});
-			}).bind(this));
+			});
 		},
 
 		purchaseSuccess: function(packName, pricePoint) {
@@ -4849,8 +4925,11 @@ window.StickersModule.View = {};
 			Module.BaseService.trackUserData();
 
 			Module.Service.Store.init(this);
+			Module.Service.Pack.init(this);
 
 			this.emojiService = new Module.EmojiService(Module.Twemoji);
+
+			Module.Service.PendingRequest.run();
 		},
 
 		////////////////////

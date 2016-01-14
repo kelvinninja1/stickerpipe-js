@@ -75,7 +75,13 @@
 					if (xmlhttp.status == 200) {
 						options.success(JSON.parse(xmlhttp.responseText), xmlhttp);
 					} else {
-						options.error(JSON.parse(xmlhttp.responseText), xmlhttp);
+						var response = {};
+						try {
+							response = JSON.parse(xmlhttp.responseText);
+						} catch (ex) {
+							response = {}
+						}
+						options.error(response, xmlhttp);
 					}
 
 					options.complete(JSON.parse(xmlhttp.responseText), xmlhttp);
