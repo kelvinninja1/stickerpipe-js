@@ -52,7 +52,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 @include retina-sprites($retina-groups);
 */
 body {
-  background: #e6e6e6;
+  background: #d9d9d9;
   padding-top: 50px;
   padding-bottom: 40px; }
 
@@ -281,8 +281,8 @@ body {
   margin-right: 26px;
   position: relative;
   padding: 10px 20px;
-  color: white;
-  background: #0B93F6;
+  color: black;
+  background: #FFF;
   border-radius: 25px;
   float: right; }
   .message-bubble-from-me:before {
@@ -291,7 +291,7 @@ body {
     bottom: -2px;
     right: -7px;
     height: 23px;
-    border-right: 20px solid #0B93F6;
+    border-right: 20px solid #FFF;
     border-bottom-left-radius: 16px 14px;
     -webkit-transform: translate(0, -2px); }
   .message-bubble-from-me:after {
@@ -301,7 +301,7 @@ body {
     right: -56px;
     width: 26px;
     height: 23px;
-    background: #e6e6e6;
+    background: #d9d9d9;
     border-bottom-left-radius: 10px;
     -webkit-transform: translate(-30px, -2px); }
 
@@ -309,7 +309,7 @@ body {
   margin-left: 26px;
   position: relative;
   padding: 10px 20px;
-  background: #ccc;
+  background: #efefef;
   border-radius: 25px;
   color: black;
   float: left; }
@@ -319,7 +319,7 @@ body {
     bottom: -2px;
     left: -7px;
     height: 23px;
-    border-left: 20px solid #ccc;
+    border-left: 20px solid #efefef;
     border-bottom-right-radius: 16px 14px;
     -webkit-transform: translate(0, -2px); }
   .message-bubble-from-them:after {
@@ -329,7 +329,7 @@ body {
     left: 4px;
     width: 26px;
     height: 23px;
-    background: #e6e6e6;
+    background: #d9d9d9;
     border-bottom-right-radius: 10px;
     -webkit-transform: translate(-30px, -2px); }
 

@@ -51,14 +51,6 @@ var App = _makeClass(function(options) {
 
 		this.init();
 
-		this.$window.resize((function() {
-			this.resizeWindow();
-		}).bind(this));
-
-		this.$messageBox.find('.textarea').on('autosize:resized', (function() {
-			this.resizeWindow();
-		}).bind(this));
-
 		_.delay((function() {
 			this.$window.resize();
 		}).bind(this), 100);
@@ -83,14 +75,12 @@ var App = _makeClass(function(options) {
 	initStickers: function() {
 		this.stickerpipe = new Stickers({
 
-			debug: true,
-
 			elId: 'stickersToggle',
 
 			apiKey: '72921666b5ff8651f374747bfefaf7b2',
-			//apiKey: '52ed1358d7d09df5279147a5555061a9',
 
 			storagePrefix: 'stickerPipe',
+
 			enableEmojiTab: true,
 			enableHistoryTab: true,
 			enableStoreTab: true,
@@ -132,9 +122,6 @@ var App = _makeClass(function(options) {
 			}
 
 		}).bind(this));
-
-
-		this.resizeWindow();
 
 		this.$window.on('sp:content:highlight:show', (function() {
 			this.$stickersToggle.addClass('has-new-content');
@@ -368,16 +355,5 @@ var App = _makeClass(function(options) {
 		}
 
 		return dd + '.' + mm + '.' + yyyy + ' ' + hh + ':' + ii + ':' + ss;
-	},
-
-	resizeWindow: function() {
-
-		//this.$messages.height(
-		//	this.$window.outerHeight(true) -
-		//	this.$navbar.offset().top -
-		//	this.$navbar.outerHeight(true) -
-		//	this.$messageBox.parent().outerHeight(true) -
-		//	parseInt(this.$messages.css('margin-bottom'), 10)
-		//);
 	}
 });

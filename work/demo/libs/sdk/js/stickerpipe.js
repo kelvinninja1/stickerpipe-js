@@ -2050,66 +2050,30 @@ window.StickersModule.Service = {};
 
 (function(Module) {
 
-	function buildStoreUrl(uri) {
-		var params = {
-			apiKey: Module.Configs.apiKey,
-			platform: 'JS',
-			userId: Module.Configs.userId,
-			density: Module.Configs.stickerResolutionType,
-			priceB: Module.Configs.priceB,
-			priceC: Module.Configs.priceC,
-			is_subscriber: (Module.Configs.userPremium ? 1 : 0),
-			localization: Module.Configs.lang
-		};
-
-		return Module.Configs.storeUrl + ((Module.Configs.storeUrl.indexOf('?') == -1) ? '?' : '&')
-			+ Module.StickerHelper.urlParamsSerialize(params) + '#/' + uri;
-	}
-
-	function getCdnUrl() {
-		return Module.Configs.cdnUrl + '/stk/';
-	}
-
-	function getApiUrl(uri) {
-		return Module.Configs.apiUrl + '/api/v1/' + uri;
-	}
+	var API_VERSION = 1;
 
 	Module.Api = {
 
-		getStickerUrl: function(packName, stickerName) {
-			return getCdnUrl() + packName + '/' + stickerName +
-				'_' + Module.Configs.stickerResolutionType + '.png';
+		getApiVersion: function() {
+			return API_VERSION;
 		},
 
-		getPackTabIconUrl: function(packName) {
-			return getCdnUrl() + packName + '/' +
-				'tab_icon_' + Module.Configs.tabResolutionType + '.png';
-		},
-
-		getPacks: function(successCallback) {
-			var url = getApiUrl('client-packs');
-
-			if (Module.Configs.userId !== null) {
-				url = getApiUrl('packs');
-
-				if (Module.Configs.userPremium) {
-					url += '?is_subscriber=1';
-				}
-			}
+		getPacks: function(doneCallback) {
+			var url = Module.Url.getPacksUrl();
 
 			Module.Http.get(url, {
-				success: successCallback
+				success: doneCallback
 			});
 		},
 
 		sendStatistic: function(statistic) {
-			Module.Http.post(getApiUrl('track-statistic'), statistic);
+			Module.Http.post(Module.Url.getStatisticUrl(), statistic);
 		},
 
 		updateUserData: function(userData) {
 			return Module.Http.ajax({
 				type: 'PUT',
-				url: getApiUrl('user'),
+				url: Module.Url.getUserDataUrl(),
 				data: userData,
 				headers: {
 					'Content-Type': 'application/json'
@@ -2117,48 +2081,36 @@ window.StickersModule.Service = {};
 			});
 		},
 
-		changeUserPackStatus: function(packName, status, pricePoint, callbacks) {
-			var url = getApiUrl('user/pack/' + packName),
-				purchaseType = 'free';
+		changeUserPackStatus: function(packName, status, pricePoint, doneCallback) {
 
-			if (pricePoint == 'B') {
-				purchaseType = 'oneoff';
-				if (Module.Configs.userPremium) {
-					purchaseType = 'subscription';
-				}
-			} else if (pricePoint == 'C') {
-				purchaseType = 'oneoff';
-			}
-
-			url += '?' + Module.StickerHelper.urlParamsSerialize({
-					purchase_type: purchaseType
-				});
+			var url = Module.Url.getUserPackUrl(packName, pricePoint);
 
 			Module.Http.post(url, {
 				status: status
-			}, callbacks, {
+			}, {
+				success: function() {
+					doneCallback && doneCallback();
+				},
+				error: function() {
+					if (status) {
+						var pr = Module.Service.PendingRequest;
+						pr.add(pr.tasks.activateUserPack, {
+							packName: packName,
+							pricePoint: pricePoint
+						});
+					}
+				}
+			}, {
 				'Content-Type': 'application/json'
 			});
-		},
-
-		store: {
-			getStoreUrl: function() {
-				return buildStoreUrl('store/');
-			},
-
-			getPackUrl: function(packName) {
-				return buildStoreUrl('packs/' + packName);
-			}
 		}
 
 	};
 })(window.StickersModule);
 
-// todo: rename file baseService --> BaseService
-
 (function(Module) {
 
-    var StickerHelper = Module.StickerHelper;
+	var StickerHelper = Module.StickerHelper;
 
 	Module.BaseService = {
 
@@ -2251,7 +2203,7 @@ window.StickersModule.Service = {};
 
 			if (matchData) {
 				outData.isSticker = true;
-				outData.url = Module.Api.getStickerUrl(matchData[1], matchData[2]);
+				outData.url = Module.Url.getStickerUrl(matchData[1], matchData[2]);
 
 
 				outData.pack = matchData[1];
@@ -2510,7 +2462,13 @@ window.StickersModule.Service = {};
 					if (xmlhttp.status == 200) {
 						options.success(JSON.parse(xmlhttp.responseText), xmlhttp);
 					} else {
-						options.error(JSON.parse(xmlhttp.responseText), xmlhttp);
+						var response = {};
+						try {
+							response = JSON.parse(xmlhttp.responseText);
+						} catch (ex) {
+							response = {}
+						}
+						options.error(response, xmlhttp);
 					}
 
 					options.complete(JSON.parse(xmlhttp.responseText), xmlhttp);
@@ -2519,6 +2477,67 @@ window.StickersModule.Service = {};
 
 			xmlhttp.send(JSON.stringify(options.data));
 		}
+	};
+})(window.StickersModule);
+
+(function(Module) {
+
+	var stickerpipe;
+
+	Module.Service.Pack = {
+
+		init: function(_stickerpipe) {
+			stickerpipe = _stickerpipe;
+		},
+
+		activateUserPack: function(packName, pricePoint, doneCallback) {
+			Module.Api.changeUserPackStatus(packName, true, pricePoint, function() {
+
+				// todo: add event ~ "packs fetched" & remove "stickerpipe" variable
+				stickerpipe.fetchPacks(function() {
+					doneCallback && doneCallback();
+				});
+
+			});
+		}
+	};
+})(window.StickersModule);
+
+(function(Module) {
+
+	function activateUserPack(taskData) {
+		Module.Service.Pack.activateUserPack(taskData.packName, taskData.pricePoint);
+	}
+
+	Module.Service.PendingRequest = {
+
+		tasks: {
+			activateUserPack: 'activateUserPack'
+		},
+
+		add: function(taskName, taskData) {
+			Module.Storage.addPendingRequestTask({
+				name: taskName,
+				data: taskData
+			});
+		},
+
+		run: function() {
+			var task = Module.Storage.popPendingRequestTask();
+
+			while(task) {
+				switch (task.name) {
+					case this.tasks.activateUserPack:
+						activateUserPack(task.data);
+						break;
+					default :
+						break;
+				}
+
+				task = Module.Storage.popPendingRequestTask();
+			}
+		}
+
 	};
 })(window.StickersModule);
 
@@ -2534,14 +2553,13 @@ window.StickersModule.Service = {};
 			this.lockr.prefix = storagePrefix;
 		},
 
+
 		getUsedStickers: function() {
 			return this.lockr.get('sticker_latest_use') || [];
 		},
-
 		setUsedStickers: function(usedStickers) {
 			return this.lockr.set('sticker_latest_use', usedStickers);
 		},
-
 		addUsedSticker: function(stickerCode) {
 
 			var usedStickers = this.getUsedStickers(),
@@ -2565,6 +2583,7 @@ window.StickersModule.Service = {};
 			this.setUsedStickers(usedStickers);
 		},
 
+
 		getPacks: function() {
 			var packs = this.lockr.get('sticker_packs');
 
@@ -2576,10 +2595,10 @@ window.StickersModule.Service = {};
 
 			return packs;
 		},
-
 		setPacks: function(packs) {
 			return this.lockr.set('sticker_packs', packs)
 		},
+
 
 		getUniqUserId: function() {
 			var uniqUserId = this.lockr.get('uniqUserId');
@@ -2592,12 +2611,36 @@ window.StickersModule.Service = {};
 			return uniqUserId;
 		},
 
+
 		getUserData: function() {
 			return this.lockr.get('userData');
 		},
-
 		setUserData: function(userData) {
 			return this.lockr.set('userData', userData);
+		},
+
+
+		getPendingRequestTasks: function() {
+			return this.lockr.get('pending_request_tasks') || [];
+		},
+		setPendingRequestTasks: function(tasks) {
+			return this.lockr.set('pending_request_tasks', tasks);
+		},
+		addPendingRequestTask: function(task) {
+
+			var tasks = this.getPendingRequestTasks();
+
+			tasks.push(task);
+
+			this.setPendingRequestTasks(tasks);
+		},
+		popPendingRequestTask: function() {
+			var tasks = this.getPendingRequestTasks(),
+				task = tasks.pop();
+
+			this.setPendingRequestTasks(tasks);
+
+			return task;
 		}
 	};
 
@@ -2630,15 +2673,11 @@ window.StickersModule.Service = {};
 		},
 
 		downloadPack: function(packName, pricePoint) {
-			Module.Api.changeUserPackStatus(packName, true, pricePoint, {
-				success: (function () {
-					this.stickerpipe.fetchPacks((function() {
-						sendAPIMessage('reload');
-						sendAPIMessage('onPackDownloaded', {
-							packName: packName
-						});
-					}).bind(this));
-				}).bind(this)
+			Module.Service.Pack.activateUserPack(packName, pricePoint, function() {
+				sendAPIMessage('reload');
+				sendAPIMessage('onPackDownloaded', {
+					packName: packName
+				});
 			});
 		},
 
@@ -2677,6 +2716,109 @@ window.StickersModule.Service = {};
 
 })(StickersModule);
 
+
+(function(Module) {
+
+	Module.Url = {
+
+		buildStoreUrl: function(uri) {
+			uri = uri || '';
+
+			var params = {
+				apiKey: Module.Configs.apiKey,
+				platform: 'JS',
+				userId: Module.Configs.userId,
+				density: Module.Configs.stickerResolutionType,
+				priceB: Module.Configs.priceB,
+				priceC: Module.Configs.priceC,
+				is_subscriber: (Module.Configs.userPremium ? 1 : 0),
+				localization: Module.Configs.lang
+			};
+
+			return Module.Configs.storeUrl + ((Module.Configs.storeUrl.indexOf('?') == -1) ? '?' : '&')
+				+ Module.StickerHelper.urlParamsSerialize(params) + '#/' + uri;
+		},
+
+		buildCdnUrl: function(uri) {
+			uri = uri || '';
+
+			return Module.Configs.cdnUrl + '/stk/' + uri;
+		},
+
+		buildApiUrl: function(uri) {
+			uri = uri || '';
+
+			return Module.Configs.apiUrl + '/api/v' + Module.Api.getApiVersion() + '/' + uri;
+		},
+
+		getStickerUrl: function(packName, stickerName) {
+			return this.buildCdnUrl(
+				packName + '/' + stickerName +
+				'_' + Module.Configs.stickerResolutionType + '.png'
+			);
+		},
+
+		getPackTabIconUrl: function(packName) {
+			return this.buildCdnUrl(
+				packName + '/' +
+				'tab_icon_' + Module.Configs.tabResolutionType + '.png'
+			);
+		},
+
+		getPacksUrl: function() {
+			var url = this.buildApiUrl('client-packs');
+
+			if (Module.Configs.userId !== null) {
+				url = this.buildApiUrl('packs');
+
+				if (Module.Configs.userPremium) {
+					url += '?is_subscriber=1';
+				}
+			}
+
+			return url;
+		},
+
+		getStatisticUrl: function() {
+			return this.buildApiUrl('track-statistic');
+		},
+
+		getUserDataUrl: function() {
+			return this.buildApiUrl('user');
+		},
+
+		getUserPackUrl: function(packName, pricePoint) {
+
+			// detect purchase type
+			var purchaseType = 'free';
+			if (pricePoint == 'B') {
+				purchaseType = 'oneoff';
+				if (Module.Configs.userPremium) {
+					purchaseType = 'subscription';
+				}
+			} else if (pricePoint == 'C') {
+				purchaseType = 'oneoff';
+			}
+
+			// build url
+			var url = this.buildApiUrl('user/pack/' + packName);
+			url += '?' + Module.StickerHelper.urlParamsSerialize({
+					purchase_type: purchaseType
+				});
+
+			return url;
+		},
+
+		getStoreUrl: function() {
+			return this.buildStoreUrl('store/');
+		},
+
+		getStorePackUrl: function(packName) {
+			return this.buildStoreUrl('packs/' + packName);
+		}
+
+	};
+})(window.StickersModule);
 
 window.StickersModule.Configs = {};
 
@@ -4387,12 +4529,12 @@ window.StickersModule.View = {};
 		},
 
 		renderStore: function() {
-			this.iframe.src = Module.Api.store.getStoreUrl();
+			this.iframe.src = Module.Url.getStoreUrl();
 			this.modal.open();
 		},
 
 		renderPack: function(packName) {
-			this.iframe.src = Module.Api.store.getPackUrl(packName);
+			this.iframe.src = Module.Url.getStorePackUrl(packName);
 			this.modal.open();
 		},
 
@@ -4556,7 +4698,7 @@ window.StickersModule.View = {};
 				classes.push(this.classes.newPack);
 			}
 
-			var iconSrc = Module.Api.getPackTabIconUrl(pack.pack_name);
+			var iconSrc = Module.Url.getPackTabIconUrl(pack.pack_name);
 
 			var content = '<img src=' + iconSrc + '>';
 
@@ -4783,8 +4925,11 @@ window.StickersModule.View = {};
 			Module.BaseService.trackUserData();
 
 			Module.Service.Store.init(this);
+			Module.Service.Pack.init(this);
 
 			this.emojiService = new Module.EmojiService(Module.Twemoji);
+
+			Module.Service.PendingRequest.run();
 		},
 
 		////////////////////
