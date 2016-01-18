@@ -500,10 +500,6 @@ if ("document" in self) {
 
 }
 
-(function(Plugin, Module) {
-
-})(window, window.StickersModule);
-
 (function(Plugin) {
 
 	Plugin.StickersModule.Lockr = {
