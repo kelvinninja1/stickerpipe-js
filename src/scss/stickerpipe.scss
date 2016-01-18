@@ -5,20 +5,20 @@
 
 @import "modal";
 
-$tabContentSize: 36px;
-$borderRadius: 3px;
-
 .sp-popover {
-	background: #fafafa;
-	border: 1px solid rgba(0, 0, 0, 0.2);
-	border-radius: $borderRadius;
+	border: 1px solid $popoverBorderColor;
+	border-radius: $popoverBorderRadius;
 	position: absolute;
 	height: 350px; // todo remove
-	width: 320px;
+	width: $popoverWidth;
 
-	-webkit-box-shadow: 1px 1px 1px 0 rgba(0,0,0,0.15);
-	-moz-box-shadow: 1px 1px 1px 0 rgba(0,0,0,0.15);
 	box-shadow: 1px 1px 1px 0 rgba(0,0,0,0.15);
+	-moz-box-shadow: 1px 1px 1px 0 rgba(0,0,0,0.15);
+	-webkit-box-shadow: 1px 1px 1px 0 rgba(0,0,0,0.15);
+
+	> .sticker-pipe {
+		border-radius: $popoverBorderRadius;
+	}
 
 	.sp-arrow,
 	.sp-arrow:after {
@@ -48,7 +48,7 @@ $borderRadius: 3px;
 			bottom: 1px;
 			margin-left: -10px;
 			content: " ";
-			border-top-color: #fafafa;
+			border-top-color: $contentBackground;
 			border-width: 10px;
 			border-bottom-width: 0;
 		}
@@ -56,6 +56,7 @@ $borderRadius: 3px;
 }
 
 .sticker-pipe {
+	background: $contentBackground;
 
 	.sp-store {
 		background: white;
@@ -64,9 +65,9 @@ $borderRadius: 3px;
 	.sp-tabs {
 		@include flexbox();
 
-		background-color: #fff;
-		border-bottom: 1px solid rgb(200, 200, 200);
-		border-radius: $borderRadius $borderRadius 0 0;
+		background-color: white;
+		border-bottom: 1px solid $popoverBorderColor;
+		border-radius: $popoverBorderRadius $popoverBorderRadius 0 0;
 		width: 100%;
 		white-space: nowrap;
 
@@ -93,8 +94,8 @@ $borderRadius: 3px;
 
 			img {
 				border-radius: 50%;
-				height: $tabContentSize;
-				width: $tabContentSize;
+				height: $tabImageSize;
+				width: $tabImageSize;
 
 				opacity: .5;
 
@@ -136,13 +137,13 @@ $borderRadius: 3px;
 
 				&.sp-tab-next-packs,
 				&.sp-tab-store {
-					border-left: 1px solid #c8c8c8;
+					border-left: 1px solid $popoverBorderColor;
 					border-radius: 0;
 				}
 
 				&.sp-tab-prev-packs,
 				&.sp-tab-history {
-					border-right: 1px solid #c8c8c8;
+					border-right: 1px solid $popoverBorderColor;
 				}
 
 
@@ -239,8 +240,7 @@ $borderRadius: 3px;
 	}
 
 	.sp-content {
-		background: #fafafa;
-		border-radius: 0 0 $borderRadius $borderRadius;
+		border-radius: 0 0 $popoverBorderRadius $popoverBorderRadius;
 		display: table;
 
 		&.sp-emojis {
@@ -258,16 +258,13 @@ $borderRadius: 3px;
 				}
 
 				img {
-					$emojiSize: 24px;
-					height: $emojiSize;
-					width: $emojiSize;
+					height: $emojiImageSize;
+					width: $emojiImageSize;
 				}
 			}
 		}
 
 		&.sp-stickers {
-			$stickerSize: 80px;
-
 			.sp-sticker-item,
 			.sp-sticker-placeholder {
 				float: left;
@@ -275,13 +272,11 @@ $borderRadius: 3px;
 			}
 
 			.sp-sticker-placeholder {
-				$placeHolderSize: 40px;
-
 				background: rgba(0, 0, 0, 0.1);
 				border-radius: 50%;
-				height: $stickerSize / 2;
-				width: $stickerSize / 2;
-				margin: (($stickerSize - $placeHolderSize) / 2) + (2 * 6px);
+				height: $stickerPlaceholderSize / 2;
+				width: $stickerPlaceholderSize / 2;
+				margin: (($stickerImageSize - $stickerPlaceholderSize) / 2) + (2 * 6px);
 			}
 
 			.sp-sticker-item {
@@ -297,8 +292,8 @@ $borderRadius: 3px;
 				}
 
 				img {
-					height: $stickerSize;
-					width: $stickerSize;
+					height: $stickerImageSize;
+					width: $stickerImageSize;
 				}
 			}
 		}
