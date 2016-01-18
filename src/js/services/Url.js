@@ -18,7 +18,7 @@
 			};
 
 			return Module.Configs.storeUrl + ((Module.Configs.storeUrl.indexOf('?') == -1) ? '?' : '&')
-				+ Module.StickerHelper.urlParamsSerialize(params) + '#/' + uri;
+				+ Module.Service.Helper.urlParamsSerialize(params) + '#/' + uri;
 		},
 
 		buildCdnUrl: function(uri) {
@@ -84,7 +84,7 @@
 
 			// build url
 			var url = this.buildApiUrl('user/pack/' + packName);
-			url += '?' + Module.StickerHelper.urlParamsSerialize({
+			url += '?' + Module.Service.Helper.urlParamsSerialize({
 					purchase_type: purchaseType
 				});
 

@@ -1,7 +1,7 @@
 
 (function(Module) {
 
-	Module.StickerHelper.setConfig({
+	Module.Service.Helper.setConfig({
 
 		elId: 'stickerPipe',
 		storeContainerId: 'stickerPipeStore',

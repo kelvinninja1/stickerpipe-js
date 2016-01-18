@@ -27,15 +27,15 @@ window.StickersModule.View = {};
 
 		_constructor: function(config) {
 
-			var mobileOS = Module.StickerHelper.getMobileOS();
+			var mobileOS = Module.Service.Helper.getMobileOS();
 			if (mobileOS == 'ios' || mobileOS == 'android') {
 				config.enableEmojiTab = false;
 			}
 
-			Module.StickerHelper.setConfig(config);
+			Module.Service.Helper.setConfig(config);
 
 			if (Module.Configs.userId) {
-				Module.Configs.userId = Module.StickerHelper.md5(Module.Configs.userId + Module.Configs.apiKey);
+				Module.Configs.userId = Module.Service.Helper.md5(Module.Configs.userId + Module.Configs.apiKey);
 			}
 
 			Module.Storage.setPrefix(Module.Configs.storagePrefix);

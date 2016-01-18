@@ -154,7 +154,7 @@
 
 			tabEl.classList.add.apply(tabEl.classList, classes);
 
-			Module.StickerHelper.forEach(attrs, function(value, name) {
+			Module.Service.Helper.forEach(attrs, function(value, name) {
 				tabEl.setAttribute(name, value);
 			});
 
@@ -166,11 +166,11 @@
 					return;
 				}
 
-				Module.StickerHelper.forEach(this.packTabs, (function(tabEl) {
+				Module.Service.Helper.forEach(this.packTabs, (function(tabEl) {
 					tabEl.classList.remove(this.classes.tabActive);
 				}).bind(this));
 
-				Module.StickerHelper.forEach(this.controls, (function(controlTab) {
+				Module.Service.Helper.forEach(this.controls, (function(controlTab) {
 					if (controlTab && controlTab.el) {
 						controlTab.el.classList.remove(this.classes.tabActive);
 					}
@@ -219,11 +219,11 @@
 		},
 		renderPrevPacksTab: function() {
 			this.el.appendChild(this.renderControlButton(this.controls.prevPacks));
-			Module.StickerHelper.setEvent('click', this.el, this.controls.prevPacks.class, this.onClickPrevPacksButton.bind(this));
+			Module.Service.Helper.setEvent('click', this.el, this.controls.prevPacks.class, this.onClickPrevPacksButton.bind(this));
 		},
 		renderNextPacksTab: function() {
 			this.el.appendChild(this.renderControlButton(this.controls.nextPacks));
-			Module.StickerHelper.setEvent('click', this.el, this.controls.nextPacks.class, this.onClickNextPacksButton.bind(this));
+			Module.Service.Helper.setEvent('click', this.el, this.controls.nextPacks.class, this.onClickNextPacksButton.bind(this));
 		},
 
 
@@ -280,16 +280,16 @@
 
 
 		handleClickOnEmojiTab: function(callback) {
-			Module.StickerHelper.setEvent('click', this.el, this.controls.emoji.class, callback);
+			Module.Service.Helper.setEvent('click', this.el, this.controls.emoji.class, callback);
 		},
 		handleClickOnLastUsedPacksTab: function(callback) {
-			Module.StickerHelper.setEvent('click', this.el, this.controls.history.class, callback);
+			Module.Service.Helper.setEvent('click', this.el, this.controls.history.class, callback);
 		},
 		handleClickOnPackTab: function(callback) {
-			Module.StickerHelper.setEvent('click', this.el, this.classes.packTab, callback);
+			Module.Service.Helper.setEvent('click', this.el, this.classes.packTab, callback);
 		},
 		handleClickOnStoreTab: function(callback) {
-			Module.StickerHelper.setEvent('click', this.el, this.controls.store.class, callback);
+			Module.Service.Helper.setEvent('click', this.el, this.controls.store.class, callback);
 		},
 
 

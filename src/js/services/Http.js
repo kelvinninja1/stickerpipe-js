@@ -66,7 +66,7 @@
 			var xmlhttp = new XMLHttpRequest();
 			xmlhttp.open(options.type, options.url, true);
 
-			Module.StickerHelper.forEach(options.headers, function(value, name) {
+			Module.Service.Helper.forEach(options.headers, function(value, name) {
 				xmlhttp.setRequestHeader(name, value);
 			});
 

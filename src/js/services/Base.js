@@ -1,8 +1,6 @@
 
 (function(Module) {
 
-	var StickerHelper = Module.StickerHelper;
-
 	Module.BaseService = {
 
 		markNewPacks: function(newPacks) {
@@ -11,10 +9,10 @@
 
 			if (oldPacks.length != 0){
 
-				StickerHelper.forEach(newPacks, function(newPack, key) {
+				Module.Service.Helper.forEach(newPacks, function(newPack, key) {
 					var isNewPack = true;
 
-					StickerHelper.forEach(oldPacks, function(oldPack) {
+					Module.Service.Helper.forEach(oldPacks, function(oldPack) {
 
 
 						if(newPack.pack_name == oldPack.pack_name) {
@@ -154,7 +152,7 @@
 
 			var storedUserData = Module.Storage.getUserData() || {};
 
-			if (!Module.StickerHelper.deepCompare(Module.Configs.userData, storedUserData)) {
+			if (!Module.Service.Helper.deepCompare(Module.Configs.userData, storedUserData)) {
 				Module.Api.updateUserData(Module.Configs.userData);
 				Module.Storage.setUserData(Module.Configs.userData);
 			}

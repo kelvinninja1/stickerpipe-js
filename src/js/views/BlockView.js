@@ -83,7 +83,7 @@
 			}
 
 			var stickers = [];
-			Module.StickerHelper.forEach(usedStickers, function(sticker) {
+			Module.Service.Helper.forEach(usedStickers, function(sticker) {
 				stickers.push(sticker.code);
 			});
 
@@ -106,7 +106,7 @@
 			this.clearBlock(this.contentEl);
 
 			var stickers = [];
-			Module.StickerHelper.forEach(pack.stickers, function(sticker) {
+			Module.Service.Helper.forEach(pack.stickers, function(sticker) {
 				stickers.push(pack.pack_name + '_' + sticker.name);
 			});
 
@@ -118,7 +118,7 @@
 			this.contentEl.classList.remove('sp-emojis');
 			this.contentEl.classList.add('sp-stickers');
 
-			Module.StickerHelper.forEach(stickers, function(stickerCode) {
+			Module.Service.Helper.forEach(stickers, function(stickerCode) {
 
 				var placeHolderClass = 'sp-sticker-placeholder';
 
@@ -175,11 +175,11 @@
 
 		handleClickOnSticker: function(callback) {
 			// todo: create static Module.Configs.stickerItemClass
-			Module.StickerHelper.setEvent('click', this.contentEl, Module.Configs.stickerItemClass, callback);
+			Module.Service.Helper.setEvent('click', this.contentEl, Module.Configs.stickerItemClass, callback);
 		},
 		handleClickOnEmoji: function(callback) {
 			// todo: create static Module.Configs.emojiItemClass
-			Module.StickerHelper.setEvent('click', this.contentEl, Module.Configs.emojiItemClass, callback);
+			Module.Service.Helper.setEvent('click', this.contentEl, Module.Configs.emojiItemClass, callback);
 		},
 
 		open: function(tabName) {

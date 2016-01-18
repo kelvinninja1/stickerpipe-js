@@ -65,7 +65,7 @@
 		document.body.classList.add(classes.lock);
 		var scrollbarWidth = Module.El.outerWidth(document.body) - bodyOuterWidth;
 
-		if (Module.StickerHelper.isIE()) {
+		if (Module.Service.Helper.isIE()) {
 			ieBodyTopMargin = Module.El.css(document.body, 'marginTop');
 			document.body.style.marginTop = 0;
 		}
@@ -89,7 +89,7 @@
 		overlay.parentNode.removeChild(overlay);
 		overlay = null;
 
-		if (Module.StickerHelper.isIE()) {
+		if (Module.Service.Helper.isIE()) {
 			document.body.style.marginTop = ieBodyTopMargin + 'px';
 		}
 

@@ -22,7 +22,7 @@
 				newStorageDate = [];
 
 			// todo: rewrite function as for & slice
-			Module.StickerHelper.forEach(usedStickers, function(usedSticker) {
+			Module.Service.Helper.forEach(usedStickers, function(usedSticker) {
 
 				if (usedSticker.code != stickerCode) {
 					newStorageDate.push(usedSticker);

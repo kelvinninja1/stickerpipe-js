@@ -7,7 +7,7 @@
 		iframe && iframe.contentWindow.postMessage(JSON.stringify({
 			action: action,
 			attrs: attrs
-		}), Module.StickerHelper.getDomain(Module.Configs.storeUrl));
+		}), Module.Service.Helper.getDomain(Module.Configs.storeUrl));
 	}
 
 	Module.Service.Store = {
