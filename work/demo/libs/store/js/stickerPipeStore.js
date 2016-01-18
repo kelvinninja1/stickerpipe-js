@@ -107,6 +107,23 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/base-page/view.tpl',
+    '<div class="version">0.0.41</div>\n' +
+    '<div class="store" my-auto-scroll>\n' +
+    '	<div data-ng-show="!error && showContent" data-ui-view=""></div>\n' +
+    '	<div data-ng-show="error" data-error></div>\n' +
+    '	<div data-ng-show="preloader" data-preloader></div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/pack/PackView.tpl',
     '<div ng-class="{\'screen-header\': platformAPI.isJS()}" data-ng-show="platformAPI.isJS()">\n' +
     '	<a href="#/store">\n' +
@@ -155,7 +172,10 @@ module.run(['$templateCache', function($templateCache) {
     '\n' +
     '<div class="pack-stickers-preview {{ isLandscapeStickersPreview() ? \'landscape\' : \'\' }}">\n' +
     '	<div class="pack-stickers-preview-image">\n' +
-    '		<img data-ng-src="{{ getStickersPreview() }}" data-sb-load="onImgLoad($event)" alt="" />\n' +
+    '		<img data-ng-src="{{ getStickersPreview() }}"\n' +
+    '		     data-sb-load="onImgLoad($event)"\n' +
+    '		     data-ng-show="isPackPreviewImgLoad"\n' +
+    '		     alt="" />\n' +
     '	</div>\n' +
     '</div>\n' +
     '\n' +
@@ -166,23 +186,6 @@ module.run(['$templateCache', function($templateCache) {
     '		<!--</div>-->\n' +
     '	<!--</div>-->\n' +
     '<!--</div>-->');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/base-page/view.tpl',
-    '<div class="version">0.0.40</div>\n' +
-    '<div class="store" my-auto-scroll>\n' +
-    '	<div data-ng-show="!error && showContent" data-ui-view=""></div>\n' +
-    '	<div data-ng-show="error" data-error></div>\n' +
-    '	<div data-ng-show="preloader" data-preloader></div>\n' +
-    '</div>');
 }]);
 })();
 
@@ -527,6 +530,7 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 		i18n: i18n,
 		packService: PackService,
 		showActionProgress: false,
+		isPackPreviewImgLoad: false,
 
 		getStickerUrl: function(name) {
 			return EnvConfig.stickersStorageUrl + this.pack.pack_name + '/' + name + '_' + Config.resolutionType + '.png';
@@ -561,6 +565,7 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 
 		onImgLoad: function() {
 			PlatformAPI.showInProgress(false);
+			this.isPackPreviewImgLoad = true;
 		}
 	});
 
@@ -592,6 +597,22 @@ appStickerPipeStore.controller('StoreController', function($scope, packs, Config
 			return title;
 		}
 	});
+});
+
+appStickerPipeStore.value('En', {
+	download: 'Download',
+	open: 'Open',
+	buyPack: 'Buy pack',
+	unavailableContent: 'This content is currently unavailable',
+	get: 'Get'
+});
+
+appStickerPipeStore.value('Ru', {
+	download: 'Скачать',
+	open: 'Открыть',
+	buyPack: 'Купить',
+	unavailableContent: 'В данный момент этот контент недоступен',
+	get: 'Скачать'
 });
 
 appStickerPipeStore.factory('AndroidPlatform', function() {
@@ -710,22 +731,6 @@ appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout
 		}
 
 	});
-});
-
-appStickerPipeStore.value('En', {
-	download: 'Download',
-	open: 'Open',
-	buyPack: 'Buy pack',
-	unavailableContent: 'This content is currently unavailable',
-	get: 'Get'
-});
-
-appStickerPipeStore.value('Ru', {
-	download: 'Скачать',
-	open: 'Открыть',
-	buyPack: 'Купить',
-	unavailableContent: 'В данный момент этот контент недоступен',
-	get: 'Скачать'
 });
 
 // todo: rename
