@@ -1,8 +1,6 @@
 
 (function(Module) {
 
-	var StickerHelper = Module.StickerHelper;
-
 	Module.BlockView = Module.Class({
 
 		emojisOffset: 0,
@@ -52,9 +50,12 @@
 
 			this.el.innerHTML = '';
 			this.el.classList.add('sticker-pipe');
+			this.el.style.width = Module.Configs.width;
 
 			this.scrollView.el.setAttribute('class', 'sp-scroll-content');
 			this.scrollView.getOverview().appendChild(this.contentEl);
+
+			this.scrollView.viewportEl.style.height = Module.Configs.height;
 
 			this.contentEl.classList.add('sp-content');
 
@@ -82,7 +83,7 @@
 			}
 
 			var stickers = [];
-			StickerHelper.forEach(usedStickers, function(sticker) {
+			Module.StickerHelper.forEach(usedStickers, function(sticker) {
 				stickers.push(sticker.code);
 			});
 
@@ -105,7 +106,7 @@
 			this.clearBlock(this.contentEl);
 
 			var stickers = [];
-			StickerHelper.forEach(pack.stickers, function(sticker) {
+			Module.StickerHelper.forEach(pack.stickers, function(sticker) {
 				stickers.push(pack.pack_name + '_' + sticker.name);
 			});
 
@@ -117,7 +118,7 @@
 			this.contentEl.classList.remove('sp-emojis');
 			this.contentEl.classList.add('sp-stickers');
 
-			StickerHelper.forEach(stickers, function(stickerCode) {
+			Module.StickerHelper.forEach(stickers, function(stickerCode) {
 
 				var placeHolderClass = 'sp-sticker-placeholder';
 
@@ -140,7 +141,9 @@
 				self.contentEl.appendChild(stickersSpanEl);
 			});
 
-			this.scrollView.update();
+			setTimeout(function() {
+				self.scrollView.update();
+			}, 100);
 		},
 		renderEmojis: function(offset) {
 

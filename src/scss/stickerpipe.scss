@@ -9,8 +9,6 @@
 	border: 1px solid $popoverBorderColor;
 	border-radius: $popoverBorderRadius;
 	position: absolute;
-	height: 350px; // todo remove
-	width: $popoverWidth;
 
 	box-shadow: 1px 1px 1px 0 rgba(0,0,0,0.15);
 	-moz-box-shadow: 1px 1px 1px 0 rgba(0,0,0,0.15);
@@ -57,6 +55,7 @@
 
 .sticker-pipe {
 	background: $contentBackground;
+	width: 100%;
 
 	.sp-store {
 		background: white;
@@ -181,7 +180,7 @@
 		}
 
 		.viewport {
-			height: 298px; // todo --> js
+			height: 100%;
 			overflow: hidden;
 			position: relative;
 

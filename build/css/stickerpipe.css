@@ -136,8 +136,6 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   border: 1px solid #c8c8c8;
   border-radius: 3px;
   position: absolute;
-  height: 350px;
-  width: 320px;
   box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.15);
   -moz-box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.15);
   -webkit-box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.15);
@@ -182,6 +180,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 .sticker-pipe {
   background: #fafafa;
+  width: 100%;
 }
 
 .sticker-pipe .sp-store {
@@ -314,7 +313,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 }
 
 .sticker-pipe .sp-scroll-content .viewport {
-  height: 298px;
+  height: 100%;
   overflow: hidden;
   position: relative;
 }

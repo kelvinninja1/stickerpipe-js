@@ -2839,7 +2839,7 @@ window.StickersModule.Configs = {};
 
 		htmlForEmptyRecent: '<div class="emptyRecent">No recent stickers</div>',
 
-		apiKey: '', // 72921666b5ff8651f374747bfefaf7b2
+		apiKey: '', // example: 72921666b5ff8651f374747bfefaf7b2
 
 		cdnUrl: 'http://cdn.stickerpipe.com',
 		apiUrl: 'http://api.stickerpipe.com',
@@ -2861,6 +2861,7 @@ window.StickersModule.Configs = {};
 
 		// todo: block or popover
 		display: 'block',
+		height: '350px',
 		width: '320px',
 
 		lang: document.documentElement.lang.substr(0, 2) || 'en'
@@ -3732,8 +3733,6 @@ window.StickersModule.View = {};
 
 (function(Module) {
 
-	var StickerHelper = Module.StickerHelper;
-
 	Module.BlockView = Module.Class({
 
 		emojisOffset: 0,
@@ -3783,9 +3782,12 @@ window.StickersModule.View = {};
 
 			this.el.innerHTML = '';
 			this.el.classList.add('sticker-pipe');
+			this.el.style.width = Module.Configs.width;
 
 			this.scrollView.el.setAttribute('class', 'sp-scroll-content');
 			this.scrollView.getOverview().appendChild(this.contentEl);
+
+			this.scrollView.viewportEl.style.height = Module.Configs.height;
 
 			this.contentEl.classList.add('sp-content');
 
@@ -3813,7 +3815,7 @@ window.StickersModule.View = {};
 			}
 
 			var stickers = [];
-			StickerHelper.forEach(usedStickers, function(sticker) {
+			Module.StickerHelper.forEach(usedStickers, function(sticker) {
 				stickers.push(sticker.code);
 			});
 
@@ -3836,7 +3838,7 @@ window.StickersModule.View = {};
 			this.clearBlock(this.contentEl);
 
 			var stickers = [];
-			StickerHelper.forEach(pack.stickers, function(sticker) {
+			Module.StickerHelper.forEach(pack.stickers, function(sticker) {
 				stickers.push(pack.pack_name + '_' + sticker.name);
 			});
 
@@ -3848,7 +3850,7 @@ window.StickersModule.View = {};
 			this.contentEl.classList.remove('sp-emojis');
 			this.contentEl.classList.add('sp-stickers');
 
-			StickerHelper.forEach(stickers, function(stickerCode) {
+			Module.StickerHelper.forEach(stickers, function(stickerCode) {
 
 				var placeHolderClass = 'sp-sticker-placeholder';
 
@@ -3871,7 +3873,9 @@ window.StickersModule.View = {};
 				self.contentEl.appendChild(stickersSpanEl);
 			});
 
-			this.scrollView.update();
+			setTimeout(function() {
+				self.scrollView.update();
+			}, 100);
 		},
 		renderEmojis: function(offset) {
 

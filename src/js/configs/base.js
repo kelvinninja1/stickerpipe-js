@@ -16,7 +16,7 @@
 
 		htmlForEmptyRecent: '<div class="emptyRecent">No recent stickers</div>',
 
-		apiKey: '', // 72921666b5ff8651f374747bfefaf7b2
+		apiKey: '', // example: 72921666b5ff8651f374747bfefaf7b2
 
 		cdnUrl: 'http://cdn.stickerpipe.com',
 		apiUrl: 'http://api.stickerpipe.com',
@@ -38,6 +38,7 @@
 
 		// todo: block or popover
 		display: 'block',
+		height: '350px',
 		width: '320px',
 
 		lang: document.documentElement.lang.substr(0, 2) || 'en'
