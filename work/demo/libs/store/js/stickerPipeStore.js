@@ -16,7 +16,7 @@ appStickerPipeStore.run(function($rootScope, PlatformAPI, $window, $anchorScroll
 	});
 
 	$rootScope.$on('$stateChangeSuccess', function() {
-		PlatformAPI.showInProgress(false);
+		//PlatformAPI.showInProgress(false);
 		$rootScope.error = false;
 	});
 
@@ -108,7 +108,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/view.tpl',
-    '<div class="version">0.0.41</div>\n' +
+    '<div class="version">0.0.43</div>\n' +
     '<div class="store" my-auto-scroll>\n' +
     '	<div data-ng-show="!error && showContent" data-ui-view=""></div>\n' +
     '	<div data-ng-show="error" data-error></div>\n' +
@@ -125,57 +125,58 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/pack/PackView.tpl',
-    '<div ng-class="{\'screen-header\': platformAPI.isJS()}" data-ng-show="platformAPI.isJS()">\n' +
-    '	<a href="#/store">\n' +
-    '		<span class="icon icon-back"></span>\n' +
-    '	</a>\n' +
-    '</div>\n' +
-    '<div class="pack-header">\n' +
-    '	<div class="pack-main-sticker">\n' +
-    '		<img data-ng-src="{{ getMainStickerUrl() }}" alt="Main sticker">\n' +
+    '<div data-ng-show="showPage">\n' +
+    '	<div ng-class="{\'screen-header\': platformAPI.isJS()}" data-ng-show="platformAPI.isJS()">\n' +
+    '		<a href="#/store">\n' +
+    '			<span class="icon icon-back"></span>\n' +
+    '		</a>\n' +
     '	</div>\n' +
+    '	<div class="pack-header">\n' +
+    '		<div class="pack-main-sticker">\n' +
+    '			<img data-ng-src="{{ getMainStickerUrl() }}" alt="Main sticker">\n' +
+    '		</div>\n' +
     '\n' +
-    '	<div class="pack-info">\n' +
-    '		<div class="pack-owner">{{ pack.artist }}</div>\n' +
-    '		<div class="pack-title">{{ pack.title }}</div>\n' +
+    '		<div class="pack-info">\n' +
+    '			<div class="pack-owner">{{ pack.artist }}</div>\n' +
+    '			<div class="pack-title">{{ pack.title }}</div>\n' +
     '\n' +
-    '		<div data-ng-show="showActionProgress">\n' +
-    '			<div class="preloader2">\n' +
-    '				<div class="bounce1"></div>\n' +
-    '				<div class="bounce2"></div>\n' +
-    '				<div class="bounce3"></div>\n' +
+    '			<div data-ng-show="showActionProgress">\n' +
+    '				<div class="preloader2">\n' +
+    '					<div class="bounce1"></div>\n' +
+    '					<div class="bounce2"></div>\n' +
+    '					<div class="bounce3"></div>\n' +
+    '				</div>\n' +
+    '			</div>\n' +
+    '			<div data-ng-show="packService.isActive(pack) && !showActionProgress">\n' +
+    '				<button class="btn btn-purple btn-action" data-ng-click="showCollections()">{{ i18n.open.toUpperCase() }}</button>\n' +
+    '			</div>\n' +
+    '			<div data-ng-show="!packService.isActive(pack) && !showActionProgress">\n' +
+    '\n' +
+    '				<button class="btn btn-purple btn-action" data-ng-click="purchasePack()">\n' +
+    '					<span data-ng-show="packService.isHidden(pack) || (pack.pricepoint == \'A\') || (pack.pricepoint == \'B\' && config.isSubscriber)">\n' +
+    '						{{ i18n.download.toUpperCase() }}\n' +
+    '					</span>\n' +
+    '\n' +
+    '					<span data-ng-show="!packService.isHidden(pack) && (pack.pricepoint == \'C\' || (pack.pricepoint == \'B\' && !config.isSubscriber))">\n' +
+    '						<span data-ng-show="pack.pricepoint == \'B\' && !config.isSubscriber">{{ config.priceB }}</span>\n' +
+    '						<span data-ng-show="pack.pricepoint == \'C\'">{{ config.priceC }}</span>\n' +
+    '					</span>\n' +
+    '				</button>\n' +
     '			</div>\n' +
     '		</div>\n' +
-    '		<div data-ng-show="packService.isActive(pack) && !showActionProgress">\n' +
-    '			<button class="btn btn-purple btn-action" data-ng-click="showCollections()">{{ i18n.open.toUpperCase() }}</button>\n' +
-    '		</div>\n' +
-    '		<div data-ng-show="!packService.isActive(pack) && !showActionProgress">\n' +
     '\n' +
-    '			<button class="btn btn-purple btn-action" data-ng-click="purchasePack()">\n' +
-    '				<span data-ng-show="packService.isHidden(pack) || (pack.pricepoint == \'A\') || (pack.pricepoint == \'B\' && config.isSubscriber)">\n' +
-    '					{{ i18n.download.toUpperCase() }}\n' +
-    '				</span>\n' +
     '\n' +
-    '				<span data-ng-show="!packService.isHidden(pack) && (pack.pricepoint == \'C\' || (pack.pricepoint == \'B\' && !config.isSubscriber))">\n' +
-    '					<span data-ng-show="pack.pricepoint == \'B\' && !config.isSubscriber">{{ config.priceB }}</span>\n' +
-    '					<span data-ng-show="pack.pricepoint == \'C\'">{{ config.priceC }}</span>\n' +
-    '				</span>\n' +
-    '			</button>\n' +
-    '		</div>\n' +
+    '		<p class="pack-description" data-ng-show="pack.description">{{ pack.description || \'\' }}</p>\n' +
     '	</div>\n' +
     '\n' +
+    '	<div class="clearfix"></div>\n' +
     '\n' +
-    '	<p class="pack-description" data-ng-show="pack.description">{{ pack.description || \'\' }}</p>\n' +
-    '</div>\n' +
-    '\n' +
-    '<div class="clearfix"></div>\n' +
-    '\n' +
-    '<div class="pack-stickers-preview {{ isLandscapeStickersPreview() ? \'landscape\' : \'\' }}">\n' +
-    '	<div class="pack-stickers-preview-image">\n' +
-    '		<img data-ng-src="{{ getStickersPreview() }}"\n' +
-    '		     data-sb-load="onImgLoad($event)"\n' +
-    '		     data-ng-show="isPackPreviewImgLoad"\n' +
-    '		     alt="" />\n' +
+    '	<div class="pack-stickers-preview {{ isLandscapeStickersPreview() ? \'landscape\' : \'\' }}">\n' +
+    '		<div class="pack-stickers-preview-image">\n' +
+    '			<img data-ng-src="{{ getStickersPreview() }}"\n' +
+    '			     data-sb-load="onImgLoad($event)"\n' +
+    '			     alt="" />\n' +
+    '		</div>\n' +
     '	</div>\n' +
     '</div>\n' +
     '\n' +
@@ -521,8 +522,6 @@ appStickerPipeStore.directive('basePage', function() {
 
 appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack, $window) {
 
-	PlatformAPI.showInProgress(true);
-
 	angular.extend($scope, {
 		config: Config,
 		platformAPI: PlatformAPI,
@@ -530,7 +529,7 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 		i18n: i18n,
 		packService: PackService,
 		showActionProgress: false,
-		isPackPreviewImgLoad: false,
+		showPage: false,
 
 		getStickerUrl: function(name) {
 			return EnvConfig.stickersStorageUrl + this.pack.pack_name + '/' + name + '_' + Config.resolutionType + '.png';
@@ -565,7 +564,7 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 
 		onImgLoad: function() {
 			PlatformAPI.showInProgress(false);
-			this.isPackPreviewImgLoad = true;
+			this.showPage = true;
 		}
 	});
 
@@ -578,6 +577,8 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 });
 
 appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI) {
+
+	PlatformAPI.showInProgress(false);
 
 	angular.extend($scope, {
 		platformAPI: PlatformAPI,
