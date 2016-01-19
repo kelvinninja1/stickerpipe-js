@@ -294,6 +294,7 @@ h6 {
   .btn:hover,
   .btn:focus {
     box-shadow: none;
+    cursor: pointer;
     outline: none !important; }
 
 .btn-purple,
@@ -302,11 +303,11 @@ h6 {
   color: white; }
 
 .btn-purple:hover {
-  background: #9c27b0;
+  background: #4a148c;
   color: white; }
 
 .btn-purple:active {
-  background: #4a148c;
+  background: #9c27b0;
   color: white; }
 
 .error {
