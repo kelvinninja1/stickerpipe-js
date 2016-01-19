@@ -3989,9 +3989,9 @@ window.StickersModule.View = {};
 		var bodyOuterWidth = Module.El.outerWidth(document.body);
 		document.body.classList.add(classes.lock);
 		document.getElementsByTagName('html')[0].classList.add(classes.lock);
-		document.ontouchmove = function(event){
-			event.preventDefault();
-		};
+		//document.ontouchmove = function(event){
+		//	event.preventDefault();
+		//};
 
 		var scrollbarWidth = Module.El.outerWidth(document.body) - bodyOuterWidth;
 
@@ -4517,11 +4517,13 @@ window.StickersModule.View = {};
 			this.iframe.style.border = '0';
 
 			this.iframe = document.createElement('div');
-			this.iframe.innerHTML = '<p>123</p>';
+
+			for (var i = 0; i < 50; i++) {
+				this.iframe.innerHTML += '<p>1234</p>';
+			}
 
 			this.modal = Module.View.Modal.init(this.iframe, {
 				onOpen: (function(contentEl, modalEl, overlay) {
-					console.log(contentEl, modalEl, overlay);
 					this.overlay = overlay;
 					Module.DOMEventService.resize();
 					setWindowMessageListener.bind(this)();
@@ -4571,7 +4573,7 @@ window.StickersModule.View = {};
 					return;
 				}
 
-				this.modal.modalEl.style.height = newHeight + 'px';
+				//this.modal.modalEl.style.height = newHeight + 'px';
 			//}
 
 			self.overlay.style.webkitOverflowScrolling = 'touch';
