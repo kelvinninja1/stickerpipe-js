@@ -3988,6 +3988,7 @@ window.StickersModule.View = {};
 
 		var bodyOuterWidth = Module.El.outerWidth(document.body);
 		document.body.classList.add(classes.lock);
+		document.getElementsByTagName('html')[0].classList.add(classes.lock);
 		var scrollbarWidth = Module.El.outerWidth(document.body) - bodyOuterWidth;
 
 		if (Module.Service.Helper.isIE()) {
@@ -4020,6 +4021,7 @@ window.StickersModule.View = {};
 
 		var bodyOuterWidth = Module.El.outerWidth(document.body);
 		document.body.classList.remove(classes.lock);
+		document.getElementsByTagName('html')[0].classList.remove(classes.lock);
 		var scrollbarWidth = Module.El.outerWidth(document.body) - bodyOuterWidth;
 
 		if (scrollbarWidth != 0) {
