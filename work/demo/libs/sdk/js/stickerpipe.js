@@ -3989,9 +3989,9 @@ window.StickersModule.View = {};
 		var bodyOuterWidth = Module.El.outerWidth(document.body);
 		document.body.classList.add(classes.lock);
 		document.getElementsByTagName('html')[0].classList.add(classes.lock);
-		//document.ontouchmove = function(event){
-		//	event.preventDefault();
-		//};
+		document.ontouchmove = function(event){
+			event.preventDefault();
+		};
 
 		var scrollbarWidth = Module.El.outerWidth(document.body) - bodyOuterWidth;
 
