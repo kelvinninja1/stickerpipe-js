@@ -4227,34 +4227,38 @@ window.StickersModule.View = {};
 							}).bind(this));
 					}
 
+					//document.addEventListener('touchmove', (function(e) {
+					//	//helper function (see below)
+					//	function collectionHas(a, b) {
+					//		for(var i = 0, len = a.length; i < len; i ++) {
+					//			if(a[i] == b) return true;
+					//		}
+					//		return false;
+					//	}
+					//
+					//	function findParentBySelector(elm, selector) {
+					//		var all = document.querySelectorAll(selector),
+					//			cur = elm.parentNode;
+					//
+					//		//keep going up until you find a match
+					//		while (cur && !collectionHas(all, cur)) {
+					//			cur = cur.parentNode; //go up
+					//		}
+					//
+					//		//will return null if not found
+					//		return cur;
+					//	}
+					//
+					//	var selector = '.' + classes.overlay;
+					//	var parent = findParentBySelector(e.target, selector);
+					//
+					//	if(!parent) {
+					//		e.preventDefault();
+					//	}
+					//}).bind(this));
+
 					document.addEventListener('touchmove', (function(e) {
-						//helper function (see below)
-						function collectionHas(a, b) {
-							for(var i = 0, len = a.length; i < len; i ++) {
-								if(a[i] == b) return true;
-							}
-							return false;
-						}
-
-						function findParentBySelector(elm, selector) {
-							var all = document.querySelectorAll(selector),
-								cur = elm.parentNode;
-
-							//keep going up until you find a match
-							while (cur && !collectionHas(all, cur)) {
-								cur = cur.parentNode; //go up
-							}
-
-							//will return null if not found
-							return cur;
-						}
-
-						var selector = '.' + classes.overlay;
-						var parent = findParentBySelector(e.target, selector);
-
-						if(!parent) {
-							e.preventDefault();
-						}
+						e.preventDefault();
 					}).bind(this));
 
 					window.addEventListener('onSelectAll',function(e) {
