@@ -4516,8 +4516,12 @@ window.StickersModule.View = {};
 			this.iframe.style.height = '100%';
 			this.iframe.style.border = '0';
 
+			this.iframe = document.createElement('div');
+			this.iframe.innerHTML = '<p>123</p>';
+
 			this.modal = Module.View.Modal.init(this.iframe, {
 				onOpen: (function(contentEl, modalEl, overlay) {
+					console.log(contentEl, modalEl, overlay);
 					this.overlay = overlay;
 					Module.DOMEventService.resize();
 					setWindowMessageListener.bind(this)();
