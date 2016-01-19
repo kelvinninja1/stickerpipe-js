@@ -287,12 +287,14 @@ h6 {
   border-radius: 2px;
   font-size: 14px;
   font-weight: bolder;
+  line-height: 14px;
   margin-right: 10px;
   outline: none;
   padding: 0 18px; }
   .btn:hover,
   .btn:focus {
     box-shadow: none;
+    cursor: pointer;
     outline: none !important; }
 
 .btn-purple,
@@ -301,11 +303,11 @@ h6 {
   color: white; }
 
 .btn-purple:hover {
-  background: #9c27b0;
+  background: #4a148c;
   color: white; }
 
 .btn-purple:active {
-  background: #4a148c;
+  background: #9c27b0;
   color: white; }
 
 .error {
@@ -379,6 +381,15 @@ h6 {
       height: 80px;
       width: 80px; }
 
+.pack-stickers-preview .pack-stickers-preview-image {
+  margin: auto;
+  max-width: 360px; }
+  .pack-stickers-preview .pack-stickers-preview-image img {
+    width: 100%; }
+
+.pack-stickers-preview.landscape .pack-stickers-preview-image {
+  max-width: 696px; }
+
 .btn-action {
   margin-bottom: 8px; }
 
@@ -423,4 +434,12 @@ h6 {
       width: 20%; } }
 
 .btn {
-  min-height: 36px; }
+  min-height: 36px;
+  min-width: 64px;
+  padding: 8px; }
+  .btn,
+  .btn:hover,
+  .btn:focus {
+    box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.2); }
+  .btn:active {
+    box-shadow: none; }

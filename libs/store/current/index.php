@@ -19,7 +19,7 @@
 <!-- AngularJS -->
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.2/angular.min.js"></script>
 
-<script src="js/stickerPipeStore.js?v=1452506985011"></script>
+<script src="js/stickerPipeStore.js?v=1453212252871"></script>
 
 <script>
 	(function() {
@@ -27,7 +27,7 @@
 			apiKey: '<?=($_GET['apiKey'] ?: '1c0c4561cd005f6932f0de38934197ec');?>',
 			platform: '<?=($_GET['platform'] ?: 'Android');?>',
 			userId: '<?=($_GET['userId'] ?: '12345678901234567890123456789012');?>',
-			resolutionType: '<?=($_GET['density?'] ?: 'xxhdpi');?>',
+			resolutionType: '<?=($_GET['density'] ?: 'xxhdpi');?>',
 			lang: '<?=($_GET['localization'] ?: 'ru');?>',
 			clientDomain: '<?=($_SERVER['HTTP_HOST'] ?: 'localhost');?>',
 			priceB: '<?=($_GET['priceB'] ?: '');?>',
