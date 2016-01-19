@@ -3988,7 +3988,7 @@ window.StickersModule.View = {};
 
 		var bodyOuterWidth = Module.El.outerWidth(document.body);
 		document.body.classList.add(classes.lock);
-//		document.getElementsByTagName('html')[0].classList.add(classes.lock);
+		document.getElementsByTagName('html')[0].classList.add(classes.lock);
 
 		var scrollbarWidth = Module.El.outerWidth(document.body) - bodyOuterWidth;
 
@@ -4022,7 +4022,7 @@ window.StickersModule.View = {};
 
 		var bodyOuterWidth = Module.El.outerWidth(document.body);
 		document.body.classList.remove(classes.lock);
-//		document.getElementsByTagName('html')[0].classList.remove(classes.lock);
+		document.getElementsByTagName('html')[0].classList.remove(classes.lock);
 		var scrollbarWidth = Module.El.outerWidth(document.body) - bodyOuterWidth;
 
 		if (scrollbarWidth != 0) {
@@ -4513,11 +4513,11 @@ window.StickersModule.View = {};
 			this.iframe.style.height = '100%';
 			this.iframe.style.border = '0';
 
-			//this.iframe = document.createElement('div');
-			//
-			//for (var i = 0; i < 50; i++) {
-			//	this.iframe.innerHTML += '<p>1234</p>';
-			//}
+			this.iframe = document.createElement('div');
+
+			for (var i = 0; i < 50; i++) {
+				this.iframe.innerHTML += '<p>1234</p>';
+			}
 
 			this.modal = Module.View.Modal.init(this.iframe, {
 				onOpen: (function(contentEl, modalEl, overlay) {
@@ -4551,27 +4551,27 @@ window.StickersModule.View = {};
 
 			var self = this;
 
-			if (window.innerWidth < 544) {
-				this.modal.modalEl.style.height = ((window.innerHeight > height) ? window.innerHeight : height) + 'px';
-
-				if (this.overlay) {
-					setTimeout(function() {
-						self.overlay.style.webkitOverflowScrolling = 'touch';
-					}, 1000);
-				}
-			} else {
-				this.modal.modalEl.style.height = '';
-
-				var newHeight = window.innerHeight
-					- parseInt(Module.El.css(this.modal.modalEl, 'marginTop'), 10)
-					- parseInt(Module.El.css(this.modal.modalEl, 'marginBottom'), 10);
-
-				if (newHeight == window.innerHeight) {
-					return;
-				}
-
-				this.modal.modalEl.style.height = newHeight + 'px';
-			}
+			//if (window.innerWidth < 544) {
+			//	this.modal.modalEl.style.height = ((window.innerHeight > height) ? window.innerHeight : height) + 'px';
+			//
+			//	if (this.overlay) {
+			//		setTimeout(function() {
+			//			self.overlay.style.webkitOverflowScrolling = 'touch';
+			//		}, 1000);
+			//	}
+			//} else {
+			//	this.modal.modalEl.style.height = '';
+			//
+			//	var newHeight = window.innerHeight
+			//		- parseInt(Module.El.css(this.modal.modalEl, 'marginTop'), 10)
+			//		- parseInt(Module.El.css(this.modal.modalEl, 'marginBottom'), 10);
+			//
+			//	if (newHeight == window.innerHeight) {
+			//		return;
+			//	}
+			//
+			//	this.modal.modalEl.style.height = newHeight + 'px';
+			//}
 
 			//self.overlay.style.webkitOverflowScrolling = 'touch';
 		}
