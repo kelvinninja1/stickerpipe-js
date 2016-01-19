@@ -38,13 +38,6 @@
 		},
 
 
-		// todo: remove function
-		clearBlock: function(el) {
-			el.setAttribute('style', 'display:block');
-			el.innerHTML = '';
-		},
-
-
 		render: function(stickerPacks) {
 			this.tabsView.render(stickerPacks);
 
@@ -55,7 +48,7 @@
 			this.scrollView.el.setAttribute('class', 'sp-scroll-content');
 			this.scrollView.getOverview().appendChild(this.contentEl);
 
-			this.scrollView.viewportEl.style.height = Module.Configs.height;
+			this.scrollView.viewportEl.style.height = parseInt(Module.Configs.height, 10) - 49 + 'px';
 
 			this.contentEl.classList.add('sp-content');
 
@@ -71,7 +64,7 @@
 
 			var usedStickers = Module.Storage.getUsedStickers();
 
-			this.clearBlock(this.contentEl);
+			this.contentEl.innerHTML = '';
 
 			this.contentEl.classList.remove('sp-stickers');
 			this.contentEl.classList.remove('sp-emojis');
@@ -91,7 +84,7 @@
 		},
 		renderEmojiBlock: function() {
 
-			this.clearBlock(this.contentEl);
+			this.contentEl.innerHTML = '';
 
 			this.contentEl.classList.remove('sp-stickers');
 			this.contentEl.classList.add('sp-emojis');
@@ -103,7 +96,7 @@
 		},
 		renderPack: function(pack) {
 
-			this.clearBlock(this.contentEl);
+			this.contentEl.innerHTML = '';
 
 			var stickers = [];
 			Module.Service.Helper.forEach(pack.stickers, function(sticker) {
@@ -133,6 +126,8 @@
 					stickersSpanEl.classList.add(Module.Configs.stickerItemClass);
 					stickersSpanEl.setAttribute('data-sticker-string', stickerCode);
 					stickersSpanEl.appendChild(image);
+
+					self.scrollView.update('relative');
 				};
 				image.onerror = function() {};
 
@@ -141,9 +136,7 @@
 				self.contentEl.appendChild(stickersSpanEl);
 			});
 
-			setTimeout(function() {
-				self.scrollView.update();
-			}, 100);
+			self.scrollView.update();
 		},
 		renderEmojis: function(offset) {
 
