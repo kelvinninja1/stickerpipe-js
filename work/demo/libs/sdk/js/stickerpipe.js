@@ -2144,6 +2144,58 @@ window.StickersModule.Service = {};
 			var width = el.offsetWidth;
 			width += parseInt(this.css(el, 'marginLeft')) + parseInt(this.css(el, 'marginRight'));
 			return width;
+		},
+
+		getParents: function (elem, selector) {
+
+			var parents = [];
+			if ( selector ) {
+				var firstChar = selector.charAt(0);
+			}
+
+			// Get matches
+			for ( ; elem && elem !== document; elem = elem.parentNode ) {
+				if ( selector ) {
+
+					// If selector is a class
+					if ( firstChar === '.' ) {
+						if ( elem.classList.contains( selector.substr(1) ) ) {
+							parents.push( elem );
+						}
+					}
+
+					// If selector is an ID
+					if ( firstChar === '#' ) {
+						if ( elem.id === selector.substr(1) ) {
+							parents.push( elem );
+						}
+					}
+
+					// If selector is a data attribute
+					if ( firstChar === '[' ) {
+						if ( elem.hasAttribute( selector.substr(1, selector.length - 1) )) {
+							parents.push( elem );
+						}
+					}
+
+					// If selector is a tag
+					if ( elem.tagName.toLowerCase() === selector ) {
+						parents.push( elem );
+					}
+
+				} else {
+					parents.push( elem );
+				}
+
+			}
+
+			// Return parents if any exist
+			if ( parents.length === 0 ) {
+				return null;
+			} else {
+				return parents;
+			}
+
 		}
 	};
 })(window.StickersModule);
@@ -4175,35 +4227,35 @@ window.StickersModule.View = {};
 							}).bind(this));
 					}
 
-					//document.addEventListener('touchmove', (function(e) {
-					//	//helper function (see below)
-					//	function collectionHas(a, b) {
-					//		for(var i = 0, len = a.length; i < len; i ++) {
-					//			if(a[i] == b) return true;
-					//		}
-					//		return false;
-					//	}
-					//
-					//	function findParentBySelector(elm, selector) {
-					//		var all = document.querySelectorAll(selector),
-					//			cur = elm.parentNode;
-					//
-					//		//keep going up until you find a match
-					//		while (cur && !collectionHas(all, cur)) {
-					//			cur = cur.parentNode; //go up
-					//		}
-					//
-					//		//will return null if not found
-					//		return cur;
-					//	}
-					//
-					//	var selector = '.' + classes.overlay;
-					//	var parent = findParentBySelector(e.target, selector);
-					//
-					//	if(!parent) {
-					//		e.preventDefault();
-					//	}
-					//}).bind(this));
+					document.addEventListener('touchmove', (function(e) {
+						//helper function (see below)
+						function collectionHas(a, b) {
+							for(var i = 0, len = a.length; i < len; i ++) {
+								if(a[i] == b) return true;
+							}
+							return false;
+						}
+
+						function findParentBySelector(elm, selector) {
+							var all = document.querySelectorAll(selector),
+								cur = elm.parentNode;
+
+							//keep going up until you find a match
+							while (cur && !collectionHas(all, cur)) {
+								cur = cur.parentNode; //go up
+							}
+
+							//will return null if not found
+							return cur;
+						}
+
+						var selector = '.' + classes.overlay;
+						var parent = findParentBySelector(e.target, selector);
+
+						if(!parent) {
+							e.preventDefault();
+						}
+					}).bind(this));
 
 					window.addEventListener('onSelectAll',function(e) {
 						//e.parentEvent.preventDefault();
