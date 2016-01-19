@@ -4563,6 +4563,8 @@ window.StickersModule.View = {};
 
 				this.modal.modalEl.style.height = newHeight + 'px';
 			//}
+
+			self.overlay.style.webkitOverflowScrolling = 'touch';
 		}
 	});
 
