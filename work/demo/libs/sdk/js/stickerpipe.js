@@ -4040,6 +4040,7 @@ window.StickersModule.View = {};
 
 		var bodyOuterWidth = Module.El.outerWidth(document.body);
 		document.body.classList.add(classes.lock);
+		document.body.style.position = 'relative';
 		document.getElementsByTagName('html')[0].classList.add(classes.lock);
 
 		var scrollbarWidth = Module.El.outerWidth(document.body) - bodyOuterWidth;
@@ -4581,12 +4582,12 @@ window.StickersModule.View = {};
 			this.iframe.style.height = '100%';
 			this.iframe.style.border = '0';
 
-			//this.iframe = document.createElement('div');
-			//
-			//this.iframe.innerHTML += '<h1>v0.0.1</h1>';
-			//for (var i = 0; i < 50; i++) {
-			//	this.iframe.innerHTML += '<p>' + Math.floor(Math.random() * (101))+ '</p>';
-			//}
+			this.iframe = document.createElement('div');
+
+			this.iframe.innerHTML += '<h1>v0.0.2</h1>';
+			for (var i = 0; i < 50; i++) {
+				this.iframe.innerHTML += '<p>' + Math.floor(Math.random() * (101))+ '</p>';
+			}
 
 			this.modal = Module.View.Modal.init(this.iframe, {
 				onOpen: (function(contentEl, modalEl, overlay) {
