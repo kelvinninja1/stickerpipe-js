@@ -4542,15 +4542,15 @@ window.StickersModule.View = {};
 
 			var self = this;
 
-			if (window.innerWidth < 544) {
-				this.modal.modalEl.style.height = ((window.innerHeight > height) ? window.innerHeight : height) + 'px';
-
-				if (this.overlay) {
-					setTimeout(function() {
-						self.overlay.style.webkitOverflowScrolling = 'touch';
-					}, 1000);
-				}
-			} else {
+			//if (window.innerWidth < 544) {
+			//	this.modal.modalEl.style.height = ((window.innerHeight > height) ? window.innerHeight : height) + 'px';
+			//
+			//	if (this.overlay) {
+			//		setTimeout(function() {
+			//			self.overlay.style.webkitOverflowScrolling = 'touch';
+			//		}, 1000);
+			//	}
+			//} else {
 				this.modal.modalEl.style.height = '';
 
 				var newHeight = window.innerHeight
@@ -4562,7 +4562,7 @@ window.StickersModule.View = {};
 				}
 
 				this.modal.modalEl.style.height = newHeight + 'px';
-			}
+			//}
 		}
 	});
 
