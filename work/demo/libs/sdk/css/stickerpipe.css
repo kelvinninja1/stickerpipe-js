@@ -133,13 +133,16 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 }
 
 .sp-popover {
-  background: #fafafa;
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  border: 1px solid #c8c8c8;
   border-radius: 3px;
   position: absolute;
-  height: 350px;
-  width: 320px;
   box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.15);
+  -moz-box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.15);
+  -webkit-box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.15);
+}
+
+.sp-popover > .sticker-pipe {
+  border-radius: 3px;
 }
 
 .sp-popover .sp-arrow,
@@ -175,6 +178,11 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   border-bottom-width: 0;
 }
 
+.sticker-pipe {
+  background: #fafafa;
+  width: 100%;
+}
+
 .sticker-pipe .sp-store {
   background: white;
 }
@@ -184,7 +192,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   display: -ms-flexbox;
   display: -webkit-flex;
   display: flex;
-  background-color: #fff;
+  background-color: white;
   border-bottom: 1px solid #c8c8c8;
   border-radius: 3px 3px 0 0;
   width: 100%;
@@ -305,7 +313,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 }
 
 .sticker-pipe .sp-scroll-content .viewport {
-  height: 298px;
+  height: 100%;
   overflow: hidden;
   position: relative;
 }
@@ -365,7 +373,6 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 }
 
 .sticker-pipe .sp-content {
-  background: #fafafa;
   border-radius: 0 0 3px 3px;
   display: table;
 }
@@ -400,8 +407,8 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 .sticker-pipe .sp-content.sp-stickers .sp-sticker-placeholder {
   background: rgba(0, 0, 0, 0.1);
   border-radius: 50%;
-  height: 40px;
-  width: 40px;
+  height: 20px;
+  width: 20px;
   margin: 32px;
 }
 

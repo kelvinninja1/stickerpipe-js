@@ -287,6 +287,7 @@ h6 {
   border-radius: 2px;
   font-size: 14px;
   font-weight: bolder;
+  line-height: 14px;
   margin-right: 10px;
   outline: none;
   padding: 0 18px; }
@@ -432,4 +433,12 @@ h6 {
       width: 20%; } }
 
 .btn {
-  min-height: 36px; }
+  min-height: 36px;
+  min-width: 64px;
+  padding: 8px; }
+  .btn,
+  .btn:hover,
+  .btn:focus {
+    box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.2); }
+  .btn:active {
+    box-shadow: none; }

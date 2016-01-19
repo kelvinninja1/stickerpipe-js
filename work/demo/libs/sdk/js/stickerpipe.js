@@ -500,209 +500,6 @@ if ("document" in self) {
 
 }
 
-(function(Plugin, Module) {
-
-	Module.StickerHelper = {
-
-		forEach: function(data, callback) {
-			for (var x in data) {
-				callback(data[x], x);
-			}
-		},
-
-		merge: function(obj1, obj2) {
-			var obj3 = {};
-
-			for(var attrname in obj1) {
-				obj3[attrname] = obj1[attrname];
-			}
-
-			for(var attrname in obj2) {
-				obj3[attrname] = obj2[attrname];
-			}
-
-			return obj3;
-		},
-
-		setConfig: function(config) {
-			Module.Configs = this.merge(Module.Configs || {}, config);
-		},
-
-		setEvent: function(eventType, el, className, callback) {
-
-			el.addEventListener(eventType, function (event) {
-
-				var el = event.target, found;
-
-				while (el && !(found = el.className.match(className))) {
-					el = el.parentElement;
-				}
-
-				if (found) {
-					callback(el, event);
-				}
-			});
-		},
-
-		urlParamsSerialize: function(params) {
-			var str = [];
-			for(var p in params)
-				if (params.hasOwnProperty(p)) {
-					str.push(encodeURIComponent(p) + "=" + encodeURIComponent(params[p]));
-				}
-			return str.join('&');
-		},
-
-		isIE: function() {
-			return ((navigator.appName == 'Microsoft Internet Explorer') ||
-			(navigator.userAgent.match(/MSIE\s+\d+\.\d+/)) ||
-			(navigator.userAgent.match(/Trident\/\d+\.\d+/)));
-		},
-
-		// todo: maybe remove
-		deepCompare: function() {
-			var i, l, leftChain, rightChain;
-
-			function compare2Objects (x, y) {
-				var p;
-
-				// remember that NaN === NaN returns false
-				// and isNaN(undefined) returns true
-				if (isNaN(x) && isNaN(y) && typeof x === 'number' && typeof y === 'number') {
-					return true;
-				}
-
-				// Compare primitives and functions.
-				// Check if both arguments link to the same object.
-				// Especially useful on step when comparing prototypes
-				if (x === y) {
-					return true;
-				}
-
-				// Works in case when functions are created in constructor.
-				// Comparing dates is a common scenario. Another built-ins?
-				// We can even handle functions passed across iframes
-				if ((typeof x === 'function' && typeof y === 'function') ||
-					(x instanceof Date && y instanceof Date) ||
-					(x instanceof RegExp && y instanceof RegExp) ||
-					(x instanceof String && y instanceof String) ||
-					(x instanceof Number && y instanceof Number)) {
-					return x.toString() === y.toString();
-				}
-
-				// At last checking prototypes as good a we can
-				if (!(x instanceof Object && y instanceof Object)) {
-					return false;
-				}
-
-				if (x.isPrototypeOf(y) || y.isPrototypeOf(x)) {
-					return false;
-				}
-
-				if (x.constructor !== y.constructor) {
-					return false;
-				}
-
-				if (x.prototype !== y.prototype) {
-					return false;
-				}
-
-				// Check for infinitive linking loops
-				if (leftChain.indexOf(x) > -1 || rightChain.indexOf(y) > -1) {
-					return false;
-				}
-
-				// Quick checking of one object beeing a subset of another.
-				for (p in y) {
-					if (y.hasOwnProperty(p) !== x.hasOwnProperty(p)) {
-						return false;
-					}
-					else if (typeof y[p] !== typeof x[p]) {
-						return false;
-					}
-				}
-
-				for (p in x) {
-					if (y.hasOwnProperty(p) !== x.hasOwnProperty(p)) {
-						return false;
-					}
-					else if (typeof y[p] !== typeof x[p]) {
-						return false;
-					}
-
-					switch (typeof (x[p])) {
-						case 'object':
-						case 'function':
-
-							leftChain.push(x);
-							rightChain.push(y);
-
-							if (!compare2Objects (x[p], y[p])) {
-								return false;
-							}
-
-							leftChain.pop();
-							rightChain.pop();
-							break;
-
-						default:
-							if (x[p] !== y[p]) {
-								return false;
-							}
-							break;
-					}
-				}
-
-				return true;
-			}
-
-			if (arguments.length < 1) {
-				return true; //Die silently? Don't know how to handle such case, please help...
-				// throw "Need two or more arguments to compare";
-			}
-
-			for (i = 1, l = arguments.length; i < l; i++) {
-
-				leftChain = [];
-				rightChain = [];
-
-				if (!compare2Objects(arguments[0], arguments[i])) {
-					return false;
-				}
-			}
-
-			return true;
-		},
-
-		md5: function(string) {
-			return Module.MD5(string);
-		},
-
-		getLocation: function(url) {
-			var location = document.createElement('a');
-			location.href = url;
-			return location;
-		},
-
-		getDomain: function(url) {
-			var location = this.getLocation(url);
-			return location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '');
-		},
-
-		getMobileOS: function() {
-			var userAgent = navigator.userAgent || navigator.vendor || window.opera;
-
-			if(userAgent.match( /iPad/i ) || userAgent.match( /iPhone/i ) || userAgent.match( /iPod/i )) {
-				return 'ios';
-			} else if(userAgent.match( /Android/i )) {
-				return 'android';
-			} else {
-				return 'other';
-			}
-		}
-	};
-})(window, window.StickersModule);
-
 (function(Plugin) {
 
 	Plugin.StickersModule.Lockr = {
@@ -2110,8 +1907,6 @@ window.StickersModule.Service = {};
 
 (function(Module) {
 
-	var StickerHelper = Module.StickerHelper;
-
 	Module.BaseService = {
 
 		markNewPacks: function(newPacks) {
@@ -2120,10 +1915,10 @@ window.StickersModule.Service = {};
 
 			if (oldPacks.length != 0){
 
-				StickerHelper.forEach(newPacks, function(newPack, key) {
+				Module.Service.Helper.forEach(newPacks, function(newPack, key) {
 					var isNewPack = true;
 
-					StickerHelper.forEach(oldPacks, function(oldPack) {
+					Module.Service.Helper.forEach(oldPacks, function(oldPack) {
 
 
 						if(newPack.pack_name == oldPack.pack_name) {
@@ -2263,7 +2058,7 @@ window.StickersModule.Service = {};
 
 			var storedUserData = Module.Storage.getUserData() || {};
 
-			if (!Module.StickerHelper.deepCompare(Module.Configs.userData, storedUserData)) {
+			if (!Module.Service.Helper.deepCompare(Module.Configs.userData, storedUserData)) {
 				Module.Api.updateUserData(Module.Configs.userData);
 				Module.Storage.setUserData(Module.Configs.userData);
 			}
@@ -2388,6 +2183,209 @@ window.StickersModule.Service = {};
 
 (function(Module) {
 
+	Module.Service.Helper = {
+		forEach: function(data, callback) {
+			for (var x in data) {
+				callback(data[x], x);
+			}
+		},
+
+		merge: function(obj1, obj2) {
+			var obj3 = {};
+
+			for(var attrname in obj1) {
+				obj3[attrname] = obj1[attrname];
+			}
+
+			for(var attrname in obj2) {
+				obj3[attrname] = obj2[attrname];
+			}
+
+			return obj3;
+		},
+
+		setConfig: function(config) {
+			Module.Configs = this.merge(Module.Configs || {}, config);
+		},
+
+		setEvent: function(eventType, el, className, callback) {
+
+			el.addEventListener(eventType, function (event) {
+
+				var el = event.target, found;
+
+				while (el && !(found = el.className.match(className))) {
+					el = el.parentElement;
+				}
+
+				if (found) {
+					callback(el, event);
+				}
+			});
+		},
+
+		urlParamsSerialize: function(params) {
+			var str = [];
+			for(var p in params)
+				if (params.hasOwnProperty(p)) {
+					str.push(encodeURIComponent(p) + "=" + encodeURIComponent(params[p]));
+				}
+			return str.join('&');
+		},
+
+		isIE: function() {
+			return ((navigator.appName == 'Microsoft Internet Explorer') ||
+			(navigator.userAgent.match(/MSIE\s+\d+\.\d+/)) ||
+			(navigator.userAgent.match(/Trident\/\d+\.\d+/)));
+		},
+
+		// todo: maybe remove
+		deepCompare: function() {
+			var i, l, leftChain, rightChain;
+
+			function compare2Objects (x, y) {
+				var p;
+
+				// remember that NaN === NaN returns false
+				// and isNaN(undefined) returns true
+				if (isNaN(x) && isNaN(y) && typeof x === 'number' && typeof y === 'number') {
+					return true;
+				}
+
+				// Compare primitives and functions.
+				// Check if both arguments link to the same object.
+				// Especially useful on step when comparing prototypes
+				if (x === y) {
+					return true;
+				}
+
+				// Works in case when functions are created in constructor.
+				// Comparing dates is a common scenario. Another built-ins?
+				// We can even handle functions passed across iframes
+				if ((typeof x === 'function' && typeof y === 'function') ||
+					(x instanceof Date && y instanceof Date) ||
+					(x instanceof RegExp && y instanceof RegExp) ||
+					(x instanceof String && y instanceof String) ||
+					(x instanceof Number && y instanceof Number)) {
+					return x.toString() === y.toString();
+				}
+
+				// At last checking prototypes as good a we can
+				if (!(x instanceof Object && y instanceof Object)) {
+					return false;
+				}
+
+				if (x.isPrototypeOf(y) || y.isPrototypeOf(x)) {
+					return false;
+				}
+
+				if (x.constructor !== y.constructor) {
+					return false;
+				}
+
+				if (x.prototype !== y.prototype) {
+					return false;
+				}
+
+				// Check for infinitive linking loops
+				if (leftChain.indexOf(x) > -1 || rightChain.indexOf(y) > -1) {
+					return false;
+				}
+
+				// Quick checking of one object beeing a subset of another.
+				for (p in y) {
+					if (y.hasOwnProperty(p) !== x.hasOwnProperty(p)) {
+						return false;
+					}
+					else if (typeof y[p] !== typeof x[p]) {
+						return false;
+					}
+				}
+
+				for (p in x) {
+					if (y.hasOwnProperty(p) !== x.hasOwnProperty(p)) {
+						return false;
+					}
+					else if (typeof y[p] !== typeof x[p]) {
+						return false;
+					}
+
+					switch (typeof (x[p])) {
+						case 'object':
+						case 'function':
+
+							leftChain.push(x);
+							rightChain.push(y);
+
+							if (!compare2Objects (x[p], y[p])) {
+								return false;
+							}
+
+							leftChain.pop();
+							rightChain.pop();
+							break;
+
+						default:
+							if (x[p] !== y[p]) {
+								return false;
+							}
+							break;
+					}
+				}
+
+				return true;
+			}
+
+			if (arguments.length < 1) {
+				return true; //Die silently? Don't know how to handle such case, please help...
+				// throw "Need two or more arguments to compare";
+			}
+
+			for (i = 1, l = arguments.length; i < l; i++) {
+
+				leftChain = [];
+				rightChain = [];
+
+				if (!compare2Objects(arguments[0], arguments[i])) {
+					return false;
+				}
+			}
+
+			return true;
+		},
+
+		md5: function(string) {
+			return Module.MD5(string);
+		},
+
+		getLocation: function(url) {
+			var location = document.createElement('a');
+			location.href = url;
+			return location;
+		},
+
+		getDomain: function(url) {
+			var location = this.getLocation(url);
+			return location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '');
+		},
+
+		getMobileOS: function() {
+			var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+			if(userAgent.match( /iPad/i ) || userAgent.match( /iPhone/i ) || userAgent.match( /iPod/i )) {
+				return 'ios';
+			} else if(userAgent.match( /Android/i )) {
+				return 'android';
+			} else {
+				return 'other';
+			}
+		}
+	};
+
+})(window.StickersModule);
+
+(function(Module) {
+
 	Module.Http = {
 
 		// todo: refactor post(options) & get(options)
@@ -2453,7 +2451,7 @@ window.StickersModule.Service = {};
 			var xmlhttp = new XMLHttpRequest();
 			xmlhttp.open(options.type, options.url, true);
 
-			Module.StickerHelper.forEach(options.headers, function(value, name) {
+			Module.Service.Helper.forEach(options.headers, function(value, name) {
 				xmlhttp.setRequestHeader(name, value);
 			});
 
@@ -2566,7 +2564,7 @@ window.StickersModule.Service = {};
 				newStorageDate = [];
 
 			// todo: rewrite function as for & slice
-			Module.StickerHelper.forEach(usedStickers, function(usedSticker) {
+			Module.Service.Helper.forEach(usedStickers, function(usedSticker) {
 
 				if (usedSticker.code != stickerCode) {
 					newStorageDate.push(usedSticker);
@@ -2654,7 +2652,7 @@ window.StickersModule.Service = {};
 		iframe && iframe.contentWindow.postMessage(JSON.stringify({
 			action: action,
 			attrs: attrs
-		}), Module.StickerHelper.getDomain(Module.Configs.storeUrl));
+		}), Module.Service.Helper.getDomain(Module.Configs.storeUrl));
 	}
 
 	Module.Service.Store = {
@@ -2736,7 +2734,7 @@ window.StickersModule.Service = {};
 			};
 
 			return Module.Configs.storeUrl + ((Module.Configs.storeUrl.indexOf('?') == -1) ? '?' : '&')
-				+ Module.StickerHelper.urlParamsSerialize(params) + '#/' + uri;
+				+ Module.Service.Helper.urlParamsSerialize(params) + '#/' + uri;
 		},
 
 		buildCdnUrl: function(uri) {
@@ -2802,7 +2800,7 @@ window.StickersModule.Service = {};
 
 			// build url
 			var url = this.buildApiUrl('user/pack/' + packName);
-			url += '?' + Module.StickerHelper.urlParamsSerialize({
+			url += '?' + Module.Service.Helper.urlParamsSerialize({
 					purchase_type: purchaseType
 				});
 
@@ -2824,7 +2822,7 @@ window.StickersModule.Configs = {};
 
 (function(Module) {
 
-	Module.StickerHelper.setConfig({
+	Module.Service.Helper.setConfig({
 
 		elId: 'stickerPipe',
 		storeContainerId: 'stickerPipeStore',
@@ -2839,7 +2837,7 @@ window.StickersModule.Configs = {};
 
 		htmlForEmptyRecent: '<div class="emptyRecent">No recent stickers</div>',
 
-		apiKey: '', // 72921666b5ff8651f374747bfefaf7b2
+		apiKey: '', // example: 72921666b5ff8651f374747bfefaf7b2
 
 		cdnUrl: 'http://cdn.stickerpipe.com',
 		apiUrl: 'http://api.stickerpipe.com',
@@ -2861,6 +2859,7 @@ window.StickersModule.Configs = {};
 
 		// todo: block or popover
 		display: 'block',
+		height: '350px',
 		width: '320px',
 
 		lang: document.documentElement.lang.substr(0, 2) || 'en'
@@ -2870,7 +2869,7 @@ window.StickersModule.Configs = {};
 
 (function(Module) {
 
-	Module.StickerHelper.setConfig({
+	Module.Service.Helper.setConfig({
 		emojiList: [
 			// Emoticons		
 			"😊",
@@ -3732,8 +3731,6 @@ window.StickersModule.View = {};
 
 (function(Module) {
 
-	var StickerHelper = Module.StickerHelper;
-
 	Module.BlockView = Module.Class({
 
 		emojisOffset: 0,
@@ -3771,21 +3768,17 @@ window.StickersModule.View = {};
 		},
 
 
-		// todo: remove function
-		clearBlock: function(el) {
-			el.setAttribute('style', 'display:block');
-			el.innerHTML = '';
-		},
-
-
 		render: function(stickerPacks) {
 			this.tabsView.render(stickerPacks);
 
 			this.el.innerHTML = '';
 			this.el.classList.add('sticker-pipe');
+			this.el.style.width = Module.Configs.width;
 
 			this.scrollView.el.setAttribute('class', 'sp-scroll-content');
 			this.scrollView.getOverview().appendChild(this.contentEl);
+
+			this.scrollView.viewportEl.style.height = parseInt(Module.Configs.height, 10) - 49 + 'px';
 
 			this.contentEl.classList.add('sp-content');
 
@@ -3801,7 +3794,7 @@ window.StickersModule.View = {};
 
 			var usedStickers = Module.Storage.getUsedStickers();
 
-			this.clearBlock(this.contentEl);
+			this.contentEl.innerHTML = '';
 
 			this.contentEl.classList.remove('sp-stickers');
 			this.contentEl.classList.remove('sp-emojis');
@@ -3813,7 +3806,7 @@ window.StickersModule.View = {};
 			}
 
 			var stickers = [];
-			StickerHelper.forEach(usedStickers, function(sticker) {
+			Module.Service.Helper.forEach(usedStickers, function(sticker) {
 				stickers.push(sticker.code);
 			});
 
@@ -3821,7 +3814,7 @@ window.StickersModule.View = {};
 		},
 		renderEmojiBlock: function() {
 
-			this.clearBlock(this.contentEl);
+			this.contentEl.innerHTML = '';
 
 			this.contentEl.classList.remove('sp-stickers');
 			this.contentEl.classList.add('sp-emojis');
@@ -3833,10 +3826,10 @@ window.StickersModule.View = {};
 		},
 		renderPack: function(pack) {
 
-			this.clearBlock(this.contentEl);
+			this.contentEl.innerHTML = '';
 
 			var stickers = [];
-			StickerHelper.forEach(pack.stickers, function(sticker) {
+			Module.Service.Helper.forEach(pack.stickers, function(sticker) {
 				stickers.push(pack.pack_name + '_' + sticker.name);
 			});
 
@@ -3848,7 +3841,7 @@ window.StickersModule.View = {};
 			this.contentEl.classList.remove('sp-emojis');
 			this.contentEl.classList.add('sp-stickers');
 
-			StickerHelper.forEach(stickers, function(stickerCode) {
+			Module.Service.Helper.forEach(stickers, function(stickerCode) {
 
 				var placeHolderClass = 'sp-sticker-placeholder';
 
@@ -3863,6 +3856,8 @@ window.StickersModule.View = {};
 					stickersSpanEl.classList.add(Module.Configs.stickerItemClass);
 					stickersSpanEl.setAttribute('data-sticker-string', stickerCode);
 					stickersSpanEl.appendChild(image);
+
+					self.scrollView.update('relative');
 				};
 				image.onerror = function() {};
 
@@ -3871,7 +3866,7 @@ window.StickersModule.View = {};
 				self.contentEl.appendChild(stickersSpanEl);
 			});
 
-			this.scrollView.update();
+			self.scrollView.update();
 		},
 		renderEmojis: function(offset) {
 
@@ -3903,11 +3898,11 @@ window.StickersModule.View = {};
 
 		handleClickOnSticker: function(callback) {
 			// todo: create static Module.Configs.stickerItemClass
-			Module.StickerHelper.setEvent('click', this.contentEl, Module.Configs.stickerItemClass, callback);
+			Module.Service.Helper.setEvent('click', this.contentEl, Module.Configs.stickerItemClass, callback);
 		},
 		handleClickOnEmoji: function(callback) {
 			// todo: create static Module.Configs.emojiItemClass
-			Module.StickerHelper.setEvent('click', this.contentEl, Module.Configs.emojiItemClass, callback);
+			Module.Service.Helper.setEvent('click', this.contentEl, Module.Configs.emojiItemClass, callback);
 		},
 
 		open: function(tabName) {
@@ -3995,7 +3990,7 @@ window.StickersModule.View = {};
 		document.body.classList.add(classes.lock);
 		var scrollbarWidth = Module.El.outerWidth(document.body) - bodyOuterWidth;
 
-		if (Module.StickerHelper.isIE()) {
+		if (Module.Service.Helper.isIE()) {
 			ieBodyTopMargin = Module.El.css(document.body, 'marginTop');
 			document.body.style.marginTop = 0;
 		}
@@ -4019,7 +4014,7 @@ window.StickersModule.View = {};
 		overlay.parentNode.removeChild(overlay);
 		overlay = null;
 
-		if (Module.StickerHelper.isIE()) {
+		if (Module.Service.Helper.isIE()) {
 			document.body.style.marginTop = ieBodyTopMargin + 'px';
 		}
 
@@ -4728,7 +4723,7 @@ window.StickersModule.View = {};
 
 			tabEl.classList.add.apply(tabEl.classList, classes);
 
-			Module.StickerHelper.forEach(attrs, function(value, name) {
+			Module.Service.Helper.forEach(attrs, function(value, name) {
 				tabEl.setAttribute(name, value);
 			});
 
@@ -4740,11 +4735,11 @@ window.StickersModule.View = {};
 					return;
 				}
 
-				Module.StickerHelper.forEach(this.packTabs, (function(tabEl) {
+				Module.Service.Helper.forEach(this.packTabs, (function(tabEl) {
 					tabEl.classList.remove(this.classes.tabActive);
 				}).bind(this));
 
-				Module.StickerHelper.forEach(this.controls, (function(controlTab) {
+				Module.Service.Helper.forEach(this.controls, (function(controlTab) {
 					if (controlTab && controlTab.el) {
 						controlTab.el.classList.remove(this.classes.tabActive);
 					}
@@ -4793,11 +4788,11 @@ window.StickersModule.View = {};
 		},
 		renderPrevPacksTab: function() {
 			this.el.appendChild(this.renderControlButton(this.controls.prevPacks));
-			Module.StickerHelper.setEvent('click', this.el, this.controls.prevPacks.class, this.onClickPrevPacksButton.bind(this));
+			Module.Service.Helper.setEvent('click', this.el, this.controls.prevPacks.class, this.onClickPrevPacksButton.bind(this));
 		},
 		renderNextPacksTab: function() {
 			this.el.appendChild(this.renderControlButton(this.controls.nextPacks));
-			Module.StickerHelper.setEvent('click', this.el, this.controls.nextPacks.class, this.onClickNextPacksButton.bind(this));
+			Module.Service.Helper.setEvent('click', this.el, this.controls.nextPacks.class, this.onClickNextPacksButton.bind(this));
 		},
 
 
@@ -4854,16 +4849,16 @@ window.StickersModule.View = {};
 
 
 		handleClickOnEmojiTab: function(callback) {
-			Module.StickerHelper.setEvent('click', this.el, this.controls.emoji.class, callback);
+			Module.Service.Helper.setEvent('click', this.el, this.controls.emoji.class, callback);
 		},
 		handleClickOnLastUsedPacksTab: function(callback) {
-			Module.StickerHelper.setEvent('click', this.el, this.controls.history.class, callback);
+			Module.Service.Helper.setEvent('click', this.el, this.controls.history.class, callback);
 		},
 		handleClickOnPackTab: function(callback) {
-			Module.StickerHelper.setEvent('click', this.el, this.classes.packTab, callback);
+			Module.Service.Helper.setEvent('click', this.el, this.classes.packTab, callback);
 		},
 		handleClickOnStoreTab: function(callback) {
-			Module.StickerHelper.setEvent('click', this.el, this.controls.store.class, callback);
+			Module.Service.Helper.setEvent('click', this.el, this.controls.store.class, callback);
 		},
 
 
@@ -4909,15 +4904,15 @@ window.StickersModule.View = {};
 
 		_constructor: function(config) {
 
-			var mobileOS = Module.StickerHelper.getMobileOS();
+			var mobileOS = Module.Service.Helper.getMobileOS();
 			if (mobileOS == 'ios' || mobileOS == 'android') {
 				config.enableEmojiTab = false;
 			}
 
-			Module.StickerHelper.setConfig(config);
+			Module.Service.Helper.setConfig(config);
 
 			if (Module.Configs.userId) {
-				Module.Configs.userId = Module.StickerHelper.md5(Module.Configs.userId + Module.Configs.apiKey);
+				Module.Configs.userId = Module.Service.Helper.md5(Module.Configs.userId + Module.Configs.apiKey);
 			}
 
 			Module.Storage.setPrefix(Module.Configs.storagePrefix);

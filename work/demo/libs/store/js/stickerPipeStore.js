@@ -108,8 +108,8 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/view.tpl',
-    '<div class="version">0.0.43</div>\n' +
-    '<div class="store" my-auto-scroll>\n' +
+    '<!--<div class="version">0.0.43</div>-->\n' +
+    '<div class="store" data-sb-auto-scroll>\n' +
     '	<div data-ng-show="!error && showContent" data-ui-view=""></div>\n' +
     '	<div data-ng-show="error" data-error></div>\n' +
     '	<div data-ng-show="preloader" data-preloader></div>\n' +
@@ -734,9 +734,51 @@ appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout
 	});
 });
 
-// todo: rename
+appStickerPipeStore.directive('preloader', function($rootScope) {
 
-appStickerPipeStore.directive('myAutoScroll', function ($document, $timeout, $location, $window, $rootScope) {
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/preloader/view.tpl',
+		link: function($scope, $el, attrs) {
+
+			$rootScope.$on('preloaderShow', function() {
+				$scope.preloader = true;
+				document.body.style.overflow = 'hidden';
+
+				if(!$scope.$$phase) {
+					$scope.$apply();
+				}
+			});
+
+			$rootScope.$on('preloaderHide', function() {
+				$scope.preloader = false;
+				document.body.style.overflow = 'auto';
+
+				if(!$scope.$$phase) {
+					$scope.$apply();
+				}
+			});
+
+		}
+
+	};
+});
+
+appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
+	
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/error/view.tpl',
+		link: function($scope, $el, attrs) {
+
+			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
+			$scope.i18n = i18n;
+		}
+
+	};
+});
+
+appStickerPipeStore.directive('sbAutoScroll', function ($document, $timeout, $location, $window, $rootScope) {
 	return {
 		restrict: 'A',
 		link: function (scope, element, attrs) {
@@ -804,50 +846,6 @@ appStickerPipeStore.directive('myAutoScroll', function ($document, $timeout, $lo
 				}
 			});
 		}
-	};
-});
-
-appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
-	
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/error/view.tpl',
-		link: function($scope, $el, attrs) {
-
-			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
-			$scope.i18n = i18n;
-		}
-
-	};
-});
-
-appStickerPipeStore.directive('preloader', function($rootScope) {
-
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/preloader/view.tpl',
-		link: function($scope, $el, attrs) {
-
-			$rootScope.$on('preloaderShow', function() {
-				$scope.preloader = true;
-				document.body.style.overflow = 'hidden';
-
-				if(!$scope.$$phase) {
-					$scope.$apply();
-				}
-			});
-
-			$rootScope.$on('preloaderHide', function() {
-				$scope.preloader = false;
-				document.body.style.overflow = 'auto';
-
-				if(!$scope.$$phase) {
-					$scope.$apply();
-				}
-			});
-
-		}
-
 	};
 });
 appStickerPipeStore.directive('sbLoad', ['$parse', function ($parse) {
