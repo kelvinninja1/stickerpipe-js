@@ -4416,7 +4416,7 @@ window.StickersModule.View = {};
 						this.options.onClose(this.contentEl, this.modalEl, overlay, this.options);
 					}
 
-					overlay.removeChild(this.modalEl);
+					document.body.removeChild(this.modalEl);
 					modalsStack.pop();
 
 					if (!modalsStack.length) {
