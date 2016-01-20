@@ -4608,6 +4608,9 @@ window.StickersModule.View = {};
 					this.overlay = overlay;
 					Module.DOMEventService.resize();
 					setWindowMessageListener.bind(this)();
+
+
+					this.iframe.style.height = window.innerHeight - 20 + 'px';
 				}).bind(this)
 			});
 
