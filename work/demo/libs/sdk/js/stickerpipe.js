@@ -4192,6 +4192,8 @@ window.StickersModule.View = {};
 
 					lockContainer();
 
+					return;
+
 					overlay.appendChild(this.modalEl); // openedModalElement
 
 					this.modalEl.style.display = 'block';
