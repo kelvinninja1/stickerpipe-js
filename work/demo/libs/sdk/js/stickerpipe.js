@@ -3993,6 +3993,7 @@ window.StickersModule.View = {};
 			lock: 'sp-modal-lock',
 			overlay: 'sp-modal-overlay',
 			modal: 'sp-modal',
+			modalDialog: 'sp-modal-dialog',
 			modalBody: 'sp-modal-body',
 			iconClose: 'sp-icon-close',
 			close: 'sp-modal-close'
@@ -4040,7 +4041,7 @@ window.StickersModule.View = {};
 
 		var bodyOuterWidth = Module.El.outerWidth(document.body);
 		document.body.classList.add(classes.lock);
-		document.body.style.position = 'relative';
+		//document.body.style.position = 'relative';
 		document.getElementsByTagName('html')[0].classList.add(classes.lock);
 
 		var scrollbarWidth = Module.El.outerWidth(document.body) - bodyOuterWidth;
@@ -4096,10 +4097,18 @@ window.StickersModule.View = {};
 		modalEl.className = classes.modal;
 
 
+		var modalDialogEl = document.createElement('div');
+		modalDialogEl.className = classes.modalDialog;
+
+
 		var modalBody = document.createElement('div');
 		modalBody.className = classes.modalBody;
 
-		modalEl.appendChild(modalBody);
+
+
+		modalDialogEl.appendChild(modalBody);
+		modalEl.appendChild(modalDialogEl);
+
 
 		var closeIcon = document.createElement('div');
 		closeIcon.className = classes.iconClose;
@@ -4112,9 +4121,13 @@ window.StickersModule.View = {};
 
 
 		closeButton.appendChild(closeIcon);
-		modalEl.appendChild(closeButton);
+		modalDialogEl.appendChild(closeButton);
 
 		return modalEl;
+	}
+
+	function insertAfter(newNode, referenceNode) {
+		referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
 	}
 
 
@@ -4192,9 +4205,9 @@ window.StickersModule.View = {};
 
 					lockContainer();
 
-					return;
 
-					overlay.appendChild(this.modalEl); // openedModalElement
+					//overlay.appendChild(this.modalEl); // openedModalElement
+					insertAfter(this.modalEl, overlay);
 
 					this.modalEl.style.display = 'block';
 

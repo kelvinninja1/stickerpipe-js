@@ -1,5 +1,3 @@
-@charset "UTF-8";
-
 /*
 SCSS variables are information about icon's compiled state, stored under its original file name
 
@@ -64,7 +62,6 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 }
 
 .sp-modal-overlay {
-  padding: 10px;
   background: rgba(0, 0, 0, 0.5);
   bottom: 0;
   left: 0;
@@ -72,38 +69,35 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   top: 0;
   right: 0;
   z-index: 100;
-  /* if modal content doesn't fit inside the overlay, display scrollbars */
   overflow: auto;
-  /* allow one-finger iPad scrolling */
-  /* IE6–IE8 */
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = #7F000000, endColorstr = #7F000000);
   zoom: 1;
-  /* fix for iPad glitches */
 }
 
 .sp-modal-overlay > * {
   -webkit-transform: translateZ(0px);
 }
 
-/* modal box style, can be anything you want */
-
 .sp-modal {
-  padding: 10px;
-  background: white;
-  border-radius: 3px;
-  box-shadow: 1px 1px 2px 0 rgba(50, 50, 50, 0.5);
-  margin: 45px auto;
-  max-width: 700px;
-  overflow: hidden;
-  -webkit-overflow-scrolling: touch;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 1000;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
-@media (max-width: 544px) {
-  .sp-modal {
-    border-radius: 0;
-    box-sizing: border-box;
-    width: 100%;
-  }
+.sp-modal-dialog {
+  background: white;
+  position: relative;
+  margin: 10px;
+}
+
+.sp-modal-dialog:before {
+  display: table;
+  content: " ";
 }
 
 .sp-modal-header {
@@ -112,11 +106,6 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   width: 100%;
   padding: 10px;
   position: absolute;
-}
-
-.sp-modal-body {
-  height: 100%;
-  width: 100%;
 }
 
 .sp-modal-close {
