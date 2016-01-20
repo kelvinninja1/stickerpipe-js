@@ -108,6 +108,10 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   position: absolute;
 }
 
+.sp-modal-body {
+  padding: 10px;
+}
+
 .sp-modal-close {
   cursor: pointer;
   opacity: 0.5;

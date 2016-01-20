@@ -4041,7 +4041,6 @@ window.StickersModule.View = {};
 
 		var bodyOuterWidth = Module.El.outerWidth(document.body);
 		document.body.classList.add(classes.lock);
-		//document.body.style.position = 'relative';
 		document.getElementsByTagName('html')[0].classList.add(classes.lock);
 
 		var scrollbarWidth = Module.El.outerWidth(document.body) - bodyOuterWidth;
@@ -4279,10 +4278,10 @@ window.StickersModule.View = {};
 
 					document.addEventListener('touchmove', function(e) {
 
-						var q = Module.El.getParents(e.target, '.' + classes.overlay);
-						if (!q.length) {
-							e.preventDefault();
-						}
+						//var q = Module.El.getParents(e.target, '.' + classes.overlay);
+						//if (!q.length) {
+						//	e.preventDefault();
+						//}
 
 						//if(!$(e).parents('.' + localOptions.overlayClass)) {
 						//	e.preventDefault();
@@ -4599,7 +4598,7 @@ window.StickersModule.View = {};
 
 			this.iframe = document.createElement('div');
 
-			this.iframe.innerHTML += '<h1>v0.0.3</h1>';
+			this.iframe.innerHTML += '<h1 style="margin-top: 0;">v0.0.4</h1>';
 			for (var i = 0; i < 50; i++) {
 				this.iframe.innerHTML += '<p>' + Math.floor(Math.random() * (101))+ '</p>';
 			}
