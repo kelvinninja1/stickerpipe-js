@@ -4610,7 +4610,7 @@ window.StickersModule.View = {};
 					setWindowMessageListener.bind(this)();
 
 
-					this.iframe.style.height = window.innerHeight - 20 + 'px';
+					this.iframe.style.height = '480px';
 				}).bind(this)
 			});
 
