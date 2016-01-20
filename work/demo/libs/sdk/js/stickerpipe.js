@@ -4598,7 +4598,7 @@ window.StickersModule.View = {};
 
 			this.iframe = document.createElement('div');
 
-			this.iframe.innerHTML += '<h1 style="margin-top: 0;">v0.0.6</h1>';
+			this.iframe.innerHTML += '<h1 style="margin-top: 0;">v0.0.7</h1>';
 			for (var i = 0; i < 50; i++) {
 				this.iframe.innerHTML += '<p>' + Math.floor(Math.random() * (101))+ '</p>';
 			}

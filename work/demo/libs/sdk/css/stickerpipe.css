@@ -59,7 +59,6 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 .sp-modal-lock {
   overflow: hidden;
-  position: fixed;
 }
 
 .sp-modal-overlay {
