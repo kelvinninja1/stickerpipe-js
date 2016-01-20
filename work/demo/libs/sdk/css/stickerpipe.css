@@ -61,6 +61,10 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   overflow: hidden;
 }
 
+.sp-modal-lock > *:not(.sp-modal):not(.sp-modal-overlay) {
+  display: none;
+}
+
 .sp-modal-overlay {
   background: rgba(0, 0, 0, 0.5);
   bottom: 0;
