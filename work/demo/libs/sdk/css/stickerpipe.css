@@ -94,6 +94,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   background: white;
   position: relative;
   margin: 10px;
+  height: 500px;
 }
 
 .sp-modal-dialog:before {
@@ -110,7 +111,9 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 }
 
 .sp-modal-body {
+  height: 100%;
   padding: 10px;
+  width: 100%;
 }
 
 .sp-modal-close {

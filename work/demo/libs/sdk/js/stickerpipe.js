@@ -4596,12 +4596,12 @@ window.StickersModule.View = {};
 			this.iframe.style.height = '100%';
 			this.iframe.style.border = '0';
 
-			this.iframe = document.createElement('div');
+			//this.iframe = document.createElement('div');
 
-			this.iframe.innerHTML += '<h1 style="margin-top: 0;">v0.0.7</h1>';
-			for (var i = 0; i < 50; i++) {
-				this.iframe.innerHTML += '<p>' + Math.floor(Math.random() * (101))+ '</p>';
-			}
+			//this.iframe.innerHTML += '<h1 style="margin-top: 0;">v0.0.7</h1>';
+			//for (var i = 0; i < 50; i++) {
+			//	this.iframe.innerHTML += '<p>' + Math.floor(Math.random() * (101))+ '</p>';
+			//}
 
 			this.modal = Module.View.Modal.init(this.iframe, {
 				onOpen: (function(contentEl, modalEl, overlay) {
