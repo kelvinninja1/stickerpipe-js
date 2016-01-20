@@ -835,8 +835,8 @@ if ("document" in self) {
 	document.addEventListener('touchstart', function(e) {
 		clearInterval(scrollanim);
 		// Get Touch target
-		obj_x = e.target
-		obj_y = e.target
+		obj_x = e.target;
+		obj_y = e.target;
 		// Get the target parent that is scrollable
 		while ((window.getComputedStyle(obj_x)['overflow-x'] != "auto" && window.getComputedStyle(obj_x)['overflow-x'] != "scroll") || obj_x.parentNode == null) {
 			obj_x = obj_x.parentNode
@@ -863,12 +863,12 @@ if ("document" in self) {
 
 		// Scroll according to movement
 		var touch = e.touches[0];
-		obj_x.scrollLeft = obj_x.scrollLeft - (touch.pageX - touch_x)
-		obj_y.scrollTop = obj_y.scrollTop - (touch.pageY - touch_y)
+		obj_x.scrollLeft = obj_x.scrollLeft - (touch.pageX - touch_x);
+		obj_y.scrollTop = obj_y.scrollTop - (touch.pageY - touch_y);
 
 		// Set speed speed
-		speed_x = (touch.pageX - touch_x)
-		speed_y = (touch.pageY - touch_y)
+		speed_x = (touch.pageX - touch_x);
+		speed_y = (touch.pageY - touch_y);
 
 		// Set new positon
 		touch_x = touch.pageX;
@@ -882,8 +882,8 @@ if ("document" in self) {
 
 		// Animate
 		scrollanim = setInterval(function() {
-			obj_x.scrollLeft = obj_x.scrollLeft - speed_x
-			obj_y.scrollTop = obj_y.scrollTop - speed_y
+			obj_x.scrollLeft = obj_x.scrollLeft - speed_x;
+			obj_y.scrollTop = obj_y.scrollTop - speed_y;
 			// Decelerate
 			speed_x = speed_x * 0.9;
 			speed_y = speed_y * 0.9;
@@ -4169,7 +4169,6 @@ window.StickersModule.View = {};
 
 		var modalBody = document.createElement('div');
 		modalBody.className = classes.modalBody;
-
 
 
 		modalDialogEl.appendChild(modalBody);
