@@ -3,6 +3,7 @@
 window.StickersModule = {};
 
 
+window.StickersModule.Libs = {};
 window.StickersModule.Utils = {};
 document.addEventListener("DOMContentLoaded", function(event) {
 
@@ -827,12 +828,12 @@ if ("document" in self) {
 	};
 
 })(window);
-// JavaScript Document
-(function(){
-	// Declare variables
+
+(function(Module) {
+
 	var touch_x, touch_y, obj_x, obj_y, speed_x=0, speed_y=0, scrollanim;
 
-	document.addEventListener('touchstart', function(e) {
+	function onTouchStart(e) {
 		clearInterval(scrollanim);
 		// Get Touch target
 		obj_x = e.target;
@@ -852,9 +853,9 @@ if ("document" in self) {
 		var touch = e.touches[0];
 		touch_x = touch.pageX;
 		touch_y = touch.pageY;
-	}, false);
+	}
 
-	document.addEventListener('touchmove', function(e) {
+	function onTouchMove(e) {
 		// Clear animation
 		clearInterval(scrollanim);
 
@@ -873,10 +874,9 @@ if ("document" in self) {
 		// Set new positon
 		touch_x = touch.pageX;
 		touch_y = touch.pageY;
-	}, false);
+	}
 
-	// Add a final animation as in iOS
-	document.addEventListener('touchend', function(e) {
+	function onTouchEnd(e) {
 		// Clear previous animations
 		clearInterval(scrollanim);
 
@@ -891,9 +891,22 @@ if ("document" in self) {
 			// Stop animation at the end
 			if (speed_x < 1 && speed_x > -1 && speed_y < 1 && speed_y > -1) clearInterval(scrollanim)
 		},15)
+	}
 
-	}, false);
-})();
+	Module.Libs.Overscroll = {
+		start: function() {
+			document.addEventListener('touchstart', onTouchStart, false);
+
+			document.addEventListener('touchmove', onTouchMove, false);
+
+			document.addEventListener('touchend', onTouchEnd, false);
+		},
+
+		stop: function() {
+
+		}
+	};
+})(window.StickersModule);
 ;(function(window, undefined) {
 	"use strict";
 
