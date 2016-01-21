@@ -4712,12 +4712,17 @@ window.StickersModule.View = {};
 					this.overlay = overlay;
 					Module.DOMEventService.resize();
 					setWindowMessageListener.bind(this)();
+
+					if (Module.Service.Helper.getMobileOS() == 'ios') {
+						modalEl.getElementsByClassName('sp-modal-body')[0].style.overflowY = 'scroll';
+					}
 				}).bind(this)
 			});
 
 			this.modal.backButton.addEventListener('click', (function() {
 				Module.Service.Store.goBack();
 			}).bind(this));
+
 
 			window.addEventListener('resize', (function() {
 				this.resize();
