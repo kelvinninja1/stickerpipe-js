@@ -4074,7 +4074,8 @@ window.StickersModule.View = {};
 			overlay: 'sp-modal-overlay',
 			modal: 'sp-modal',
 			modalDialog: 'sp-modal-dialog',
-			modalBody: 'sp-modal-body',
+			dialogHeader: 'sp-modal-header',
+			dialogBody: 'sp-modal-body',
 			iconClose: 'sp-icon-close',
 			close: 'sp-modal-close'
 		},
@@ -4171,21 +4172,31 @@ window.StickersModule.View = {};
 
 	function initModalEl(context) {
 
+		// MODAL
 		var modalEl = document.createElement('div');
 		modalEl.style.display = 'none';
 		modalEl.className = classes.modal;
 
 
-		var modalDialogEl = document.createElement('div');
-		modalDialogEl.className = classes.modalDialog;
+		// DIALOG
+		var dialogEl = document.createElement('div');
+		dialogEl.className = classes.modalDialog;
 
 
-		var modalBody = document.createElement('div');
-		modalBody.className = classes.modalBody;
+		// HEADER
+		var dialogHeader = document.createElement('div');
+		dialogHeader.className = classes.dialogHeader;
 
 
-		modalDialogEl.appendChild(modalBody);
-		modalEl.appendChild(modalDialogEl);
+		// BODY
+		var dialogBody = document.createElement('div');
+		dialogBody.className = classes.dialogBody;
+
+
+		modalEl.appendChild(dialogEl);
+
+		dialogEl.appendChild(dialogHeader);
+		dialogEl.appendChild(dialogBody);
 
 
 		var closeIcon = document.createElement('div');
@@ -4198,7 +4209,7 @@ window.StickersModule.View = {};
 		}).bind(context));
 
 		closeButton.appendChild(closeIcon);
-		modalDialogEl.appendChild(closeButton);
+		dialogHeader.appendChild(closeButton);
 
 		return modalEl;
 	}
@@ -4231,8 +4242,8 @@ window.StickersModule.View = {};
 				}
 			}
 
-			var modalBody = modalInstance.modalEl.getElementsByClassName(classes.modalBody)[0];
-			modalBody.appendChild(contentEl);
+			var dialogBody = modalInstance.modalEl.getElementsByClassName(classes.dialogBody)[0];
+			dialogBody.appendChild(contentEl);
 
 			document.body.appendChild(modalInstance.modalEl);
 

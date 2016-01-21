@@ -261,23 +261,8 @@ h6 {
     .store {
       width: 100%; } }
 
-.screen-header {
-  background: rgba(255, 255, 255, 0.9);
-  box-sizing: border-box;
-  height: 48px;
-  left: 0;
-  padding: 12px;
-  position: fixed;
-  top: 0;
-  width: 100%; }
-  .screen-header .icon {
-    cursor: pointer;
-    float: left;
-    opacity: 0.5; }
-    .screen-header .icon:hover {
-      opacity: 0.7; }
-  .screen-header + div {
-    margin-top: 49px; }
+.screen-header + div {
+  margin-top: 48px; }
 
 .icon {
   display: table; }
