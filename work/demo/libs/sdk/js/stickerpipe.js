@@ -4195,8 +4195,8 @@ window.StickersModule.View = {};
 
 		modalEl.appendChild(dialogEl);
 
-		dialogEl.appendChild(dialogHeader);
 		dialogEl.appendChild(dialogBody);
+		dialogEl.appendChild(dialogHeader);
 
 
 		var closeIcon = document.createElement('div');
