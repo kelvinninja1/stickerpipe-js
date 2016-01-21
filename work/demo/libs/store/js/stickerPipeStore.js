@@ -32,8 +32,6 @@ appStickerPipeStore.controller('AppController', function(Config, envService, $ti
 
 	document.body.addEventListener('touchstart',function() {},false);
 
-	document.body.style.overflow = 'hidden';
-
 	var userAgent = navigator.userAgent || navigator.vendor || window.opera;
 
 	if (envService.is('local') || envService.is('development')) {
@@ -596,15 +594,6 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 	});
 });
 
-appStickerPipeStore.directive('basePage', function() {
-
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/view.tpl',
-		link: function($scope, $el, attrs) {}
-	};
-});
-
 appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI) {
 
 	PlatformAPI.showInProgress(false);
@@ -627,6 +616,15 @@ appStickerPipeStore.controller('StoreController', function($scope, packs, Config
 			return title;
 		}
 	});
+});
+
+appStickerPipeStore.directive('basePage', function() {
+
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/view.tpl',
+		link: function($scope, $el, attrs) {}
+	};
 });
 
 appStickerPipeStore.value('En', {
@@ -769,6 +767,20 @@ appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout
 	});
 });
 
+appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
+	
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/error/view.tpl',
+		link: function($scope, $el, attrs) {
+
+			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
+			$scope.i18n = i18n;
+		}
+
+	};
+});
+
 appStickerPipeStore.directive('preloader', function($rootScope) {
 
 	return {
@@ -867,20 +879,6 @@ appStickerPipeStore.directive('sbAutoScroll', function ($document, $timeout, $lo
 				}
 			});
 		}
-	};
-});
-
-appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
-	
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/error/view.tpl',
-		link: function($scope, $el, attrs) {
-
-			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
-			$scope.i18n = i18n;
-		}
-
 	};
 });
 appStickerPipeStore.directive('sbLoad', ['$parse', function ($parse) {
