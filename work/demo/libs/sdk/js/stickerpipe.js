@@ -4694,7 +4694,6 @@ window.StickersModule.View = {};
 
 			this.modal = Module.View.Modal.init(this.iframe, {
 				onOpen: (function(contentEl, modalEl, overlay) {
-					Module.Libs.Overscroll.start();
 					this.overlay = overlay;
 					Module.DOMEventService.resize();
 					setWindowMessageListener.bind(this)();
