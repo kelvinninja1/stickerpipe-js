@@ -119,6 +119,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   height: 48px;
   width: 100%;
   position: absolute;
+  top: 0;
 }
 
 .sp-modal-body {
