@@ -4692,6 +4692,8 @@ window.StickersModule.View = {};
 			//	this.iframe.innerHTML += '<p>' + Math.floor(Math.random() * (101))+ '</p>';
 			//}
 
+			Module.Libs.Overscroll.start();
+
 			this.modal = Module.View.Modal.init(this.iframe, {
 				onOpen: (function(contentEl, modalEl, overlay) {
 					this.overlay = overlay;
