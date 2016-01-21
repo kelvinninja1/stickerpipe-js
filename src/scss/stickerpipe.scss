@@ -273,8 +273,8 @@
 			.sp-sticker-placeholder {
 				background: rgba(0, 0, 0, 0.1);
 				border-radius: 50%;
-				height: $stickerPlaceholderSize / 2;
-				width: $stickerPlaceholderSize / 2;
+				height: $stickerPlaceholderSize;
+				width: $stickerPlaceholderSize;
 				margin: (($stickerImageSize - $stickerPlaceholderSize) / 2) + (2 * 6px);
 			}
 

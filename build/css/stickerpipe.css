@@ -1,5 +1,3 @@
-@charset "UTF-8";
-
 /*
 SCSS variables are information about icon's compiled state, stored under its original file name
 
@@ -71,65 +69,84 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   top: 0;
   right: 0;
   z-index: 100;
-  /* if modal content doesn't fit inside the overlay, display scrollbars */
   overflow: auto;
-  /* allow one-finger iPad scrolling */
-  /* IE6–IE8 */
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = #7F000000, endColorstr = #7F000000);
   zoom: 1;
-  /* fix for iPad glitches */
 }
 
 .sp-modal-overlay > * {
   -webkit-transform: translateZ(0px);
 }
 
-/* modal box style, can be anything you want */
-
 .sp-modal {
-  background: white;
-  border-radius: 3px;
-  box-shadow: 1px 1px 2px 0 rgba(50, 50, 50, 0.5);
-  margin: 45px auto;
-  height: 606px;
-  max-width: 700px;
-  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 1000;
+  overflow-x: hidden;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
 
-@media (max-width: 544px) {
-  .sp-modal {
+.sp-modal-dialog {
+  background: white;
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 3px;
+  margin: 40px auto;
+  max-width: 700px;
+}
+
+.sp-modal-dialog:before {
+  display: table;
+  content: " ";
+}
+
+@media (max-width: 700px) {
+  .sp-modal-dialog {
     border-radius: 0;
-    box-sizing: border-box;
     margin: 0;
     width: 100%;
   }
 }
 
 .sp-modal-header {
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.8);
   display: table;
+  height: 48px;
   width: 100%;
-  padding: 10px;
   position: absolute;
+  top: 0;
 }
 
 .sp-modal-body {
   height: 100%;
   width: 100%;
+  overflow-y: hidden;
 }
 
+.sp-modal-back,
 .sp-modal-close {
   cursor: pointer;
   opacity: 0.5;
   padding: 12px;
-  position: absolute;
-  top: 0;
-  right: 0;
 }
 
+.sp-modal-back:hover,
 .sp-modal-close:hover {
   opacity: 0.7;
+}
+
+.sp-modal-back {
+  float: left;
+  display: none;
+}
+
+.sp-modal-close {
+  float: right;
 }
 
 .sp-popover {
@@ -407,8 +424,8 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 .sticker-pipe .sp-content.sp-stickers .sp-sticker-placeholder {
   background: rgba(0, 0, 0, 0.1);
   border-radius: 50%;
-  height: 20px;
-  width: 20px;
+  height: 40px;
+  width: 40px;
   margin: 32px;
 }
 
@@ -444,44 +461,51 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   height: 24px;
 }
 
-.sp-icon-clock {
+.sp-icon-back {
   background-image: url("../img/icons_sprite.png");
   background-position: 0px -24px;
   width: 24px;
   height: 24px;
 }
 
-.sp-icon-close {
+.sp-icon-clock {
   background-image: url("../img/icons_sprite.png");
   background-position: -24px -24px;
   width: 24px;
   height: 24px;
 }
 
-.sp-icon-face {
+.sp-icon-close {
   background-image: url("../img/icons_sprite.png");
   background-position: -48px 0px;
   width: 24px;
   height: 24px;
 }
 
-.sp-icon-mall {
+.sp-icon-face {
   background-image: url("../img/icons_sprite.png");
   background-position: -48px -24px;
   width: 24px;
   height: 24px;
 }
 
-.sp-icon-plus {
+.sp-icon-mall {
   background-image: url("../img/icons_sprite.png");
   background-position: 0px -48px;
   width: 24px;
   height: 24px;
 }
 
-.sp-icon-settings {
+.sp-icon-plus {
   background-image: url("../img/icons_sprite.png");
   background-position: -24px -48px;
+  width: 24px;
+  height: 24px;
+}
+
+.sp-icon-settings {
+  background-image: url("../img/icons_sprite.png");
+  background-position: -48px -48px;
   width: 24px;
   height: 24px;
 }
@@ -514,9 +538,23 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   }
 }
 
-.sp-icon-clock {
+.sp-icon-back {
   background-image: url("../img/icons_sprite.png");
   background-position: 0px -24px;
+  width: 24px;
+  height: 24px;
+}
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .sp-icon-back {
+    background-image: url("../img/icons_sprite@2x.png");
+    background-size: 72px 72px;
+  }
+}
+
+.sp-icon-clock {
+  background-image: url("../img/icons_sprite.png");
+  background-position: -24px -24px;
   width: 24px;
   height: 24px;
 }
@@ -530,7 +568,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 .sp-icon-close {
   background-image: url("../img/icons_sprite.png");
-  background-position: -24px -24px;
+  background-position: -48px 0px;
   width: 24px;
   height: 24px;
 }
@@ -544,7 +582,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 .sp-icon-face {
   background-image: url("../img/icons_sprite.png");
-  background-position: -48px 0px;
+  background-position: -48px -24px;
   width: 24px;
   height: 24px;
 }
@@ -558,7 +596,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 .sp-icon-mall {
   background-image: url("../img/icons_sprite.png");
-  background-position: -48px -24px;
+  background-position: 0px -48px;
   width: 24px;
   height: 24px;
 }
@@ -572,7 +610,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 .sp-icon-plus {
   background-image: url("../img/icons_sprite.png");
-  background-position: 0px -48px;
+  background-position: -24px -48px;
   width: 24px;
   height: 24px;
 }
@@ -586,7 +624,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 .sp-icon-settings {
   background-image: url("../img/icons_sprite.png");
-  background-position: -24px -48px;
+  background-position: -48px -48px;
   width: 24px;
   height: 24px;
 }

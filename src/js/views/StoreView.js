@@ -40,8 +40,17 @@
 					this.overlay = overlay;
 					Module.DOMEventService.resize();
 					setWindowMessageListener.bind(this)();
+
+					if (Module.Service.Helper.getMobileOS() == 'ios') {
+						modalEl.getElementsByClassName('sp-modal-body')[0].style.overflowY = 'scroll';
+					}
 				}).bind(this)
 			});
+
+			this.modal.backButton.addEventListener('click', (function() {
+				Module.Service.Store.goBack();
+			}).bind(this));
+
 
 			window.addEventListener('resize', (function() {
 				this.resize();
@@ -63,30 +72,17 @@
 		},
 
 		resize: function(height) {
-			height = height || 0;
+			var dialog = this.modal.modalEl.getElementsByClassName('sp-modal-dialog')[0];
+			dialog.style.height = '';
 
-			var self = this;
+			if (window.innerWidth > 700) {
 
-			if (window.innerWidth < 544) {
-				this.modal.modalEl.style.height = ((window.innerHeight > height) ? window.innerHeight : height) + 'px';
+				var marginTop = parseInt(Module.El.css(dialog, 'marginTop'), 10),
+					marginBottom = parseInt(Module.El.css(dialog, 'marginBottom'), 10);
 
-				if (this.overlay) {
-					setTimeout(function() {
-						self.overlay.style.webkitOverflowScrolling = 'touch';
-					}, 1000);
-				}
-			} else {
-				this.modal.modalEl.style.height = '';
+				var minHeight = window.innerHeight - marginTop - marginBottom;
 
-				var newHeight = window.innerHeight
-					- parseInt(Module.El.css(this.modal.modalEl, 'marginTop'), 10)
-					- parseInt(Module.El.css(this.modal.modalEl, 'marginBottom'), 10);
-
-				if (newHeight == window.innerHeight) {
-					return;
-				}
-
-				this.modal.modalEl.style.height = newHeight + 'px';
+				dialog.style.height = minHeight + 'px';
 			}
 		}
 	});

@@ -4,6 +4,7 @@
 }
 
 .sp-modal-overlay {
+
 	background: rgba(0, 0, 0, 0.5);
 	bottom: 0;
 	left: 0;
@@ -12,47 +13,81 @@
 	right: 0;
 	z-index: 100;
 
-	/* if modal content doesn't fit inside the overlay, display scrollbars */
 	overflow: auto;
 
-	// todo
-	/* allow one-finger iPad scrolling */
-	//-webkit-overflow-scrolling: touch;
-
-	/* IE6–IE8 */
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = #7F000000, endColorstr = #7F000000);
 	zoom: 1;
 
-	/* fix for iPad glitches */
 	& > * {
 		-webkit-transform: translateZ(0px);
 	}
 }
 
 
-/* modal box style, can be anything you want */
 .sp-modal {
-	background: white;
-	border-radius: 3px;
+	position: fixed;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	z-index: 1000;
 
-	-webkit-box-shadow: 1px 1px 2px 0 rgba(50, 50, 50, 0.5);
-	-moz-box-shadow:    1px 1px 2px 0 rgba(50, 50, 50, 0.5);
-	box-shadow:         1px 1px 2px 0 rgba(50, 50, 50, 0.5);
 
-	margin: 45px auto;
-	height: 606px;
-	max-width: 700px;
-	overflow: hidden;
+	overflow-x: hidden;
+	overflow-y: auto;
 
 	-webkit-overflow-scrolling: touch;
 
-	@media (max-width: $screen-sm-min) {
+
+	//padding: 10px;
+	//
+	//background: white;
+	//border-radius: 3px;
+	//
+	//-webkit-box-shadow: 1px 1px 2px 0 rgba(50, 50, 50, 0.5);
+	//-moz-box-shadow:    1px 1px 2px 0 rgba(50, 50, 50, 0.5);
+	//box-shadow:         1px 1px 2px 0 rgba(50, 50, 50, 0.5);
+	//
+	//margin: 45px auto;
+	//max-width: 700px;
+	//overflow: hidden;
+	//
+	//-webkit-overflow-scrolling: touch;
+	//
+	//@media (max-width: $screen-sm-min) {
+	//	& {
+	//		border-radius: 0;
+	//		box-sizing: border-box;
+	//		//min-height: 100% !important;
+	//		//max-height: 100% !important;
+	//		//height: 100% !important;
+	//		//margin: 0;
+	//		width: 100%;
+	//	}
+	//}
+}
+
+.sp-modal-dialog {
+	background: white;
+	position: relative;
+
+	//height: 600px;
+	height: 100%;
+	overflow: hidden;
+
+	border-radius: 3px;
+	margin: 40px auto;
+	max-width: 700px;
+
+
+	&:before {
+		display: table;
+		content: " ";
+	}
+
+	@media (max-width: 700px) {
 		& {
 			border-radius: 0;
-			box-sizing: border-box;
-			//min-height: 100% !important;
-			//max-height: 100% !important;
-			//height: 100% !important;
 			margin: 0;
 			width: 100%;
 		}
@@ -60,30 +95,40 @@
 }
 
 .sp-modal-header {
-	background: rgba(255, 255, 255, 0.5);
+	background: rgba(255, 255, 255, 0.8);
 	display: table;
+	height: 48px;
 	width: 100%;
-	padding: 10px;
 	position: absolute;
+	top: 0;
 }
 
 .sp-modal-body {
 	height: 100%;
 	width: 100%;
+	//overflow-y: scroll;
+	overflow-y: hidden;
 }
 
-.sp-modal-close {
 
+.sp-modal-back,
+.sp-modal-close {
 	$modalCloseButtonOpacity: 0.5;
 
 	cursor: pointer;
 	opacity: $modalCloseButtonOpacity;
 	padding: 12px;
-	position: absolute;
-	top: 0;
-	right: 0;
 
 	&:hover {
 		opacity: $modalCloseButtonOpacity + 0.2;
 	}
+}
+
+.sp-modal-back {
+	float: left;
+	display: none;
+}
+
+.sp-modal-close {
+	float: right;
 }

@@ -42,6 +42,10 @@
 			sendAPIMessage('hideActionProgress');
 		},
 
+		goBack: function() {
+			sendAPIMessage('goBack');
+		},
+
 		api: {
 			showCollections: function(data) {
 				Module.Service.Store.showCollections(data.attrs.packName);
@@ -63,6 +67,16 @@
 
 			resizeStore: function(data) {
 				Module.Service.Store.stickerpipe.storeView.resize(data.attrs.height);
+			},
+
+			showBackButton: function(data) {
+				var modal = Module.Service.Store.stickerpipe.storeView.modal;
+
+				if (data.attrs.show) {
+					modal.backButton.style.display = 'block';
+				} else {
+					modal.backButton.style.display = 'none';
+				}
 			}
 		}
 	};

@@ -2144,6 +2144,58 @@ window.StickersModule.Service = {};
 			var width = el.offsetWidth;
 			width += parseInt(this.css(el, 'marginLeft')) + parseInt(this.css(el, 'marginRight'));
 			return width;
+		},
+
+		getParents: function (elem, selector) {
+
+			var parents = [];
+			if ( selector ) {
+				var firstChar = selector.charAt(0);
+			}
+
+			// Get matches
+			for ( ; elem && elem !== document; elem = elem.parentNode ) {
+				if ( selector ) {
+
+					// If selector is a class
+					if ( firstChar === '.' ) {
+						if ( elem.classList.contains( selector.substr(1) ) ) {
+							parents.push( elem );
+						}
+					}
+
+					// If selector is an ID
+					if ( firstChar === '#' ) {
+						if ( elem.id === selector.substr(1) ) {
+							parents.push( elem );
+						}
+					}
+
+					// If selector is a data attribute
+					if ( firstChar === '[' ) {
+						if ( elem.hasAttribute( selector.substr(1, selector.length - 1) )) {
+							parents.push( elem );
+						}
+					}
+
+					// If selector is a tag
+					if ( elem.tagName.toLowerCase() === selector ) {
+						parents.push( elem );
+					}
+
+				} else {
+					parents.push( elem );
+				}
+
+			}
+
+			// Return parents if any exist
+			if ( parents.length === 0 ) {
+				return null;
+			} else {
+				return parents;
+			}
+
 		}
 	};
 })(window.StickersModule);
@@ -2687,6 +2739,10 @@ window.StickersModule.Service = {};
 			sendAPIMessage('hideActionProgress');
 		},
 
+		goBack: function() {
+			sendAPIMessage('goBack');
+		},
+
 		api: {
 			showCollections: function(data) {
 				Module.Service.Store.showCollections(data.attrs.packName);
@@ -2708,6 +2764,16 @@ window.StickersModule.Service = {};
 
 			resizeStore: function(data) {
 				Module.Service.Store.stickerpipe.storeView.resize(data.attrs.height);
+			},
+
+			showBackButton: function(data) {
+				var modal = Module.Service.Store.stickerpipe.storeView.modal;
+
+				if (data.attrs.show) {
+					modal.backButton.style.display = 'block';
+				} else {
+					modal.backButton.style.display = 'none';
+				}
 			}
 		}
 	};
@@ -3941,8 +4007,10 @@ window.StickersModule.View = {};
 			lock: 'sp-modal-lock',
 			overlay: 'sp-modal-overlay',
 			modal: 'sp-modal',
-			modalBody: 'sp-modal-body',
-			iconClose: 'sp-icon-close',
+			modalDialog: 'sp-modal-dialog',
+			dialogHeader: 'sp-modal-header',
+			dialogBody: 'sp-modal-body',
+			back: 'sp-modal-back',
 			close: 'sp-modal-close'
 		},
 
@@ -3988,6 +4056,8 @@ window.StickersModule.View = {};
 
 		var bodyOuterWidth = Module.El.outerWidth(document.body);
 		document.body.classList.add(classes.lock);
+		document.getElementsByTagName('html')[0].classList.add(classes.lock);
+
 		var scrollbarWidth = Module.El.outerWidth(document.body) - bodyOuterWidth;
 
 		if (Module.Service.Helper.isIE()) {
@@ -4020,6 +4090,7 @@ window.StickersModule.View = {};
 
 		var bodyOuterWidth = Module.El.outerWidth(document.body);
 		document.body.classList.remove(classes.lock);
+		document.getElementsByTagName('html')[0].classList.remove(classes.lock);
 		var scrollbarWidth = Module.El.outerWidth(document.body) - bodyOuterWidth;
 
 		if (scrollbarWidth != 0) {
@@ -4033,32 +4104,8 @@ window.StickersModule.View = {};
 		}
 	}
 
-	function initModalEl(context) {
-
-		var modalEl = document.createElement('div');
-		modalEl.style.display = 'none';
-		modalEl.className = classes.modal;
-
-
-		var modalBody = document.createElement('div');
-		modalBody.className = classes.modalBody;
-
-		modalEl.appendChild(modalBody);
-
-		var closeIcon = document.createElement('div');
-		closeIcon.className = classes.iconClose;
-
-		var closeButton = document.createElement('div');
-		closeButton.className = classes.close;
-		closeButton.addEventListener('click', (function() {
-			this.close();
-		}).bind(context));
-
-
-		closeButton.appendChild(closeIcon);
-		modalEl.appendChild(closeButton);
-
-		return modalEl;
+	function insertAfter(newNode, referenceNode) {
+		referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
 	}
 
 
@@ -4072,7 +4119,53 @@ window.StickersModule.View = {};
 
 			var modalInstance = {};
 
-			modalInstance.modalEl = initModalEl(modalInstance);
+
+			// ****************************************************************************
+
+			// MODAL
+			var modalEl = document.createElement('div');
+			modalEl.style.display = 'none';
+			modalEl.className = classes.modal;
+
+
+			// DIALOG
+			var dialogEl = document.createElement('div');
+			dialogEl.className = classes.modalDialog;
+
+
+			// HEADER
+			var dialogHeader = document.createElement('div');
+			dialogHeader.className = classes.dialogHeader;
+
+
+			// BODY
+			var dialogBody = document.createElement('div');
+			dialogBody.className = classes.dialogBody;
+
+
+			modalEl.appendChild(dialogEl);
+
+			dialogEl.appendChild(dialogBody);
+			dialogEl.appendChild(dialogHeader);
+
+			var backButton = document.createElement('div');
+			backButton.className = classes.back;
+			backButton.innerHTML = '<div class="sp-icon-back"></div>';
+			modalInstance.backButton = backButton;
+
+			var closeButton = document.createElement('div');
+			closeButton.className = classes.close;
+			closeButton.innerHTML = '<div class="sp-icon-close"></div>';
+			closeButton.addEventListener('click', (function() {
+				this.close();
+			}).bind(modalInstance));
+
+			dialogHeader.appendChild(backButton);
+			dialogHeader.appendChild(closeButton);
+
+			modalInstance.modalEl = modalEl;
+
+			// ****************************************************************************
 
 			if (!contentEl || !contentEl.nodeType) {
 
@@ -4085,8 +4178,7 @@ window.StickersModule.View = {};
 				}
 			}
 
-			var modalBody = modalInstance.modalEl.getElementsByClassName(classes.modalBody)[0];
-			modalBody.appendChild(contentEl);
+			dialogBody.appendChild(contentEl);
 
 			document.body.appendChild(modalInstance.modalEl);
 
@@ -4136,7 +4228,9 @@ window.StickersModule.View = {};
 
 					lockContainer();
 
-					overlay.appendChild(this.modalEl); // openedModalElement
+
+					//overlay.appendChild(this.modalEl); // openedModalElement
+					insertAfter(this.modalEl, overlay);
 
 					this.modalEl.style.display = 'block';
 
@@ -4202,6 +4296,22 @@ window.StickersModule.View = {};
 					//	}
 					//}).bind(this));
 
+					//document.addEventListener('touchmove', (function(e) {
+					//	e.preventDefault();
+					//}).bind(this));
+
+					document.addEventListener('touchmove', function(e) {
+
+						//var q = Module.El.getParents(e.target, '.' + classes.overlay);
+						//if (!q.length) {
+						//	e.preventDefault();
+						//}
+
+						//if(!$(e).parents('.' + localOptions.overlayClass)) {
+						//	e.preventDefault();
+						//}
+					});
+
 					window.addEventListener('onSelectAll',function(e) {
 						//e.parentEvent.preventDefault();
 
@@ -4251,7 +4361,7 @@ window.StickersModule.View = {};
 						this.options.onClose(this.contentEl, this.modalEl, overlay, this.options);
 					}
 
-					overlay.removeChild(this.modalEl);
+					document.body.removeChild(this.modalEl);
 					modalsStack.pop();
 
 					if (!modalsStack.length) {
@@ -4515,8 +4625,17 @@ window.StickersModule.View = {};
 					this.overlay = overlay;
 					Module.DOMEventService.resize();
 					setWindowMessageListener.bind(this)();
+
+					if (Module.Service.Helper.getMobileOS() == 'ios') {
+						modalEl.getElementsByClassName('sp-modal-body')[0].style.overflowY = 'scroll';
+					}
 				}).bind(this)
 			});
+
+			this.modal.backButton.addEventListener('click', (function() {
+				Module.Service.Store.goBack();
+			}).bind(this));
+
 
 			window.addEventListener('resize', (function() {
 				this.resize();
@@ -4538,30 +4657,17 @@ window.StickersModule.View = {};
 		},
 
 		resize: function(height) {
-			height = height || 0;
+			var dialog = this.modal.modalEl.getElementsByClassName('sp-modal-dialog')[0];
+			dialog.style.height = '';
 
-			var self = this;
+			if (window.innerWidth > 700) {
 
-			if (window.innerWidth < 544) {
-				this.modal.modalEl.style.height = ((window.innerHeight > height) ? window.innerHeight : height) + 'px';
+				var marginTop = parseInt(Module.El.css(dialog, 'marginTop'), 10),
+					marginBottom = parseInt(Module.El.css(dialog, 'marginBottom'), 10);
 
-				if (this.overlay) {
-					setTimeout(function() {
-						self.overlay.style.webkitOverflowScrolling = 'touch';
-					}, 1000);
-				}
-			} else {
-				this.modal.modalEl.style.height = '';
+				var minHeight = window.innerHeight - marginTop - marginBottom;
 
-				var newHeight = window.innerHeight
-					- parseInt(Module.El.css(this.modal.modalEl, 'marginTop'), 10)
-					- parseInt(Module.El.css(this.modal.modalEl, 'marginBottom'), 10);
-
-				if (newHeight == window.innerHeight) {
-					return;
-				}
-
-				this.modal.modalEl.style.height = newHeight + 'px';
+				dialog.style.height = minHeight + 'px';
 			}
 		}
 	});

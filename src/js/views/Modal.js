@@ -16,8 +16,10 @@
 			lock: 'sp-modal-lock',
 			overlay: 'sp-modal-overlay',
 			modal: 'sp-modal',
-			modalBody: 'sp-modal-body',
-			iconClose: 'sp-icon-close',
+			modalDialog: 'sp-modal-dialog',
+			dialogHeader: 'sp-modal-header',
+			dialogBody: 'sp-modal-body',
+			back: 'sp-modal-back',
 			close: 'sp-modal-close'
 		},
 
@@ -63,6 +65,8 @@
 
 		var bodyOuterWidth = Module.El.outerWidth(document.body);
 		document.body.classList.add(classes.lock);
+		document.getElementsByTagName('html')[0].classList.add(classes.lock);
+
 		var scrollbarWidth = Module.El.outerWidth(document.body) - bodyOuterWidth;
 
 		if (Module.Service.Helper.isIE()) {
@@ -95,6 +99,7 @@
 
 		var bodyOuterWidth = Module.El.outerWidth(document.body);
 		document.body.classList.remove(classes.lock);
+		document.getElementsByTagName('html')[0].classList.remove(classes.lock);
 		var scrollbarWidth = Module.El.outerWidth(document.body) - bodyOuterWidth;
 
 		if (scrollbarWidth != 0) {
@@ -108,32 +113,8 @@
 		}
 	}
 
-	function initModalEl(context) {
-
-		var modalEl = document.createElement('div');
-		modalEl.style.display = 'none';
-		modalEl.className = classes.modal;
-
-
-		var modalBody = document.createElement('div');
-		modalBody.className = classes.modalBody;
-
-		modalEl.appendChild(modalBody);
-
-		var closeIcon = document.createElement('div');
-		closeIcon.className = classes.iconClose;
-
-		var closeButton = document.createElement('div');
-		closeButton.className = classes.close;
-		closeButton.addEventListener('click', (function() {
-			this.close();
-		}).bind(context));
-
-
-		closeButton.appendChild(closeIcon);
-		modalEl.appendChild(closeButton);
-
-		return modalEl;
+	function insertAfter(newNode, referenceNode) {
+		referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
 	}
 
 
@@ -147,7 +128,53 @@
 
 			var modalInstance = {};
 
-			modalInstance.modalEl = initModalEl(modalInstance);
+
+			// ****************************************************************************
+
+			// MODAL
+			var modalEl = document.createElement('div');
+			modalEl.style.display = 'none';
+			modalEl.className = classes.modal;
+
+
+			// DIALOG
+			var dialogEl = document.createElement('div');
+			dialogEl.className = classes.modalDialog;
+
+
+			// HEADER
+			var dialogHeader = document.createElement('div');
+			dialogHeader.className = classes.dialogHeader;
+
+
+			// BODY
+			var dialogBody = document.createElement('div');
+			dialogBody.className = classes.dialogBody;
+
+
+			modalEl.appendChild(dialogEl);
+
+			dialogEl.appendChild(dialogBody);
+			dialogEl.appendChild(dialogHeader);
+
+			var backButton = document.createElement('div');
+			backButton.className = classes.back;
+			backButton.innerHTML = '<div class="sp-icon-back"></div>';
+			modalInstance.backButton = backButton;
+
+			var closeButton = document.createElement('div');
+			closeButton.className = classes.close;
+			closeButton.innerHTML = '<div class="sp-icon-close"></div>';
+			closeButton.addEventListener('click', (function() {
+				this.close();
+			}).bind(modalInstance));
+
+			dialogHeader.appendChild(backButton);
+			dialogHeader.appendChild(closeButton);
+
+			modalInstance.modalEl = modalEl;
+
+			// ****************************************************************************
 
 			if (!contentEl || !contentEl.nodeType) {
 
@@ -160,8 +187,7 @@
 				}
 			}
 
-			var modalBody = modalInstance.modalEl.getElementsByClassName(classes.modalBody)[0];
-			modalBody.appendChild(contentEl);
+			dialogBody.appendChild(contentEl);
 
 			document.body.appendChild(modalInstance.modalEl);
 
@@ -211,7 +237,9 @@
 
 					lockContainer();
 
-					overlay.appendChild(this.modalEl); // openedModalElement
+
+					//overlay.appendChild(this.modalEl); // openedModalElement
+					insertAfter(this.modalEl, overlay);
 
 					this.modalEl.style.display = 'block';
 
@@ -277,6 +305,22 @@
 					//	}
 					//}).bind(this));
 
+					//document.addEventListener('touchmove', (function(e) {
+					//	e.preventDefault();
+					//}).bind(this));
+
+					document.addEventListener('touchmove', function(e) {
+
+						//var q = Module.El.getParents(e.target, '.' + classes.overlay);
+						//if (!q.length) {
+						//	e.preventDefault();
+						//}
+
+						//if(!$(e).parents('.' + localOptions.overlayClass)) {
+						//	e.preventDefault();
+						//}
+					});
+
 					window.addEventListener('onSelectAll',function(e) {
 						//e.parentEvent.preventDefault();
 
@@ -326,7 +370,7 @@
 						this.options.onClose(this.contentEl, this.modalEl, overlay, this.options);
 					}
 
-					overlay.removeChild(this.modalEl);
+					document.body.removeChild(this.modalEl);
 					modalsStack.pop();
 
 					if (!modalsStack.length) {
