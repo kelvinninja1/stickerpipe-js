@@ -4751,7 +4751,8 @@ window.StickersModule.View = {};
 
 				var minHeight = window.innerHeight - marginTop - marginBottom;
 
-				dialog.style.height = ((height < minHeight) ? minHeight : height) + 'px';
+				//dialog.style.height = ((height < minHeight) ? minHeight : height) + 'px';
+				dialog.style.height = minHeight + 'px';
 			}
 		}
 	});

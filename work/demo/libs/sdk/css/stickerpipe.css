@@ -125,7 +125,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 .sp-modal-body {
   height: 100%;
   width: 100%;
-  overflow-y: scroll;
+  overflow-y: hidden;
 }
 
 .sp-modal-back,
