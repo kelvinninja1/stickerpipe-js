@@ -4712,32 +4712,6 @@ window.StickersModule.View = {};
 		resize: function(height) {
 			height = height || 0;
 
-			var self = this;
-
-			//if (window.innerWidth < 544) {
-			//	this.modal.modalEl.style.height = ((window.innerHeight > height) ? window.innerHeight : height) + 'px';
-			//
-			//	if (this.overlay) {
-			//		setTimeout(function() {
-			//			self.overlay.style.webkitOverflowScrolling = 'touch';
-			//		}, 1000);
-			//	}
-			//} else {
-			//	this.modal.modalEl.style.height = '';
-			//
-			//	var newHeight = window.innerHeight
-			//		- parseInt(Module.El.css(this.modal.modalEl, 'marginTop'), 10)
-			//		- parseInt(Module.El.css(this.modal.modalEl, 'marginBottom'), 10);
-			//
-			//	if (newHeight == window.innerHeight) {
-			//		return;
-			//	}
-			//
-			//	this.modal.modalEl.style.height = newHeight + 'px';
-			//}
-
-			//self.overlay.style.webkitOverflowScrolling = 'touch';
-
 			var dialog = this.modal.modalEl.getElementsByClassName('sp-modal-dialog')[0];
 			dialog.style.height = '';
 
@@ -4746,24 +4720,9 @@ window.StickersModule.View = {};
 				var marginTop = parseInt(Module.El.css(dialog, 'marginTop'), 10),
 					marginBottom = parseInt(Module.El.css(dialog, 'marginBottom'), 10);
 
-				var newHeight = height;
-				if (height < window.innerHeight - marginTop - marginBottom) {
-					newHeight = window.innerHeight - marginTop - marginBottom;
-				}
+				var minHeight = window.innerHeight - marginTop - marginBottom;
 
-				dialog.style.height = newHeight + 'px';
-
-				//this.modal.modalEl.style.height = '';
-				//
-				//var newHeight = window.innerHeight
-				//	- parseInt(Module.El.css(this.modal.modalEl, 'marginTop'), 10)
-				//	- parseInt(Module.El.css(this.modal.modalEl, 'marginBottom'), 10);
-				//
-				//if (newHeight == window.innerHeight) {
-				//	return;
-				//}
-				//
-				//this.modal.modalEl.style.height = newHeight + 'px';
+				dialog.style.height = ((height < minHeight) ? minHeight : height) + 'px';
 			}
 		}
 	});
