@@ -4198,7 +4198,7 @@ window.StickersModule.View = {};
 		}).bind(context));
 
 		closeButton.appendChild(closeIcon);
-		modalBody.appendChild(closeButton);
+		modalDialogEl.appendChild(closeButton);
 
 		return modalEl;
 	}
