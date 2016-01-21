@@ -533,18 +533,9 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $rootScop
 
 });
 
-appStickerPipeStore.directive('basePage', function() {
-
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/view.tpl',
-		link: function($scope, $el, attrs) {}
-	};
-});
-
 appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack, $window) {
 
-	PlatformAPI.showBackButton('#/store1');
+	PlatformAPI.showBackButton('#/store');
 
 	angular.extend($scope, {
 		config: Config,
@@ -603,6 +594,15 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 	angular.element($window).bind('resize', function () {
 		$scope.$apply();
 	});
+});
+
+appStickerPipeStore.directive('basePage', function() {
+
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/view.tpl',
+		link: function($scope, $el, attrs) {}
+	};
 });
 
 appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI) {
@@ -799,20 +799,6 @@ appStickerPipeStore.directive('preloader', function($rootScope) {
 	};
 });
 
-appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
-	
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/error/view.tpl',
-		link: function($scope, $el, attrs) {
-
-			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
-			$scope.i18n = i18n;
-		}
-
-	};
-});
-
 appStickerPipeStore.directive('sbAutoScroll', function ($document, $timeout, $location, $window, $rootScope) {
 	return {
 		restrict: 'A',
@@ -881,6 +867,20 @@ appStickerPipeStore.directive('sbAutoScroll', function ($document, $timeout, $lo
 				}
 			});
 		}
+	};
+});
+
+appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
+	
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/error/view.tpl',
+		link: function($scope, $el, attrs) {
+
+			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
+			$scope.i18n = i18n;
+		}
+
 	};
 });
 appStickerPipeStore.directive('sbLoad', ['$parse', function ($parse) {
