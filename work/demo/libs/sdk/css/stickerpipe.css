@@ -128,26 +128,25 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   overflow-y: scroll;
 }
 
-.sp-modal-back {
-  cursor: pointer;
-  opacity: 0.5;
-  padding: 12px;
-  float: left;
-}
-
-.sp-modal-back:hover {
-  opacity: 0.7;
-}
-
+.sp-modal-back,
 .sp-modal-close {
   cursor: pointer;
   opacity: 0.5;
   padding: 12px;
-  float: right;
 }
 
+.sp-modal-back:hover,
 .sp-modal-close:hover {
   opacity: 0.7;
+}
+
+.sp-modal-back {
+  float: left;
+  display: none;
+}
+
+.sp-modal-close {
+  float: right;
 }
 
 .sp-popover {

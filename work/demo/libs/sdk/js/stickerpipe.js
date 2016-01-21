@@ -2819,6 +2819,10 @@ window.StickersModule.Service = {};
 			sendAPIMessage('hideActionProgress');
 		},
 
+		goBack: function() {
+			sendAPIMessage('goBack');
+		},
+
 		api: {
 			showCollections: function(data) {
 				Module.Service.Store.showCollections(data.attrs.packName);
@@ -2840,6 +2844,16 @@ window.StickersModule.Service = {};
 
 			resizeStore: function(data) {
 				Module.Service.Store.stickerpipe.storeView.resize(data.attrs.height);
+			},
+
+			showBackButton: function(data) {
+				var modal = Module.Service.Store.stickerpipe.storeView.modal;
+
+				if (data.attrs.show) {
+					modal.backButton.style.display = 'block';
+				} else {
+					modal.backButton.style.display = 'none';
+				}
 			}
 		}
 	};
@@ -4170,54 +4184,6 @@ window.StickersModule.View = {};
 		}
 	}
 
-	function initModalEl(context) {
-
-		// MODAL
-		var modalEl = document.createElement('div');
-		modalEl.style.display = 'none';
-		modalEl.className = classes.modal;
-
-
-		// DIALOG
-		var dialogEl = document.createElement('div');
-		dialogEl.className = classes.modalDialog;
-
-
-		// HEADER
-		var dialogHeader = document.createElement('div');
-		dialogHeader.className = classes.dialogHeader;
-
-
-		// BODY
-		var dialogBody = document.createElement('div');
-		dialogBody.className = classes.dialogBody;
-
-
-		modalEl.appendChild(dialogEl);
-
-		dialogEl.appendChild(dialogBody);
-		dialogEl.appendChild(dialogHeader);
-
-		var backButton = document.createElement('div');
-		backButton.className = classes.back;
-		backButton.innerHTML = '<div class="sp-icon-back"></div>';
-		backButton.addEventListener('click', (function() {
-			//this.close();
-		}).bind(context));
-
-		var closeButton = document.createElement('div');
-		closeButton.className = classes.close;
-		closeButton.innerHTML = '<div class="sp-icon-close"></div>';
-		closeButton.addEventListener('click', (function() {
-			this.close();
-		}).bind(context));
-
-		dialogHeader.appendChild(backButton);
-		dialogHeader.appendChild(closeButton);
-
-		return modalEl;
-	}
-
 	function insertAfter(newNode, referenceNode) {
 		referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
 	}
@@ -4233,7 +4199,53 @@ window.StickersModule.View = {};
 
 			var modalInstance = {};
 
-			modalInstance.modalEl = initModalEl(modalInstance);
+
+			// ****************************************************************************
+
+			// MODAL
+			var modalEl = document.createElement('div');
+			modalEl.style.display = 'none';
+			modalEl.className = classes.modal;
+
+
+			// DIALOG
+			var dialogEl = document.createElement('div');
+			dialogEl.className = classes.modalDialog;
+
+
+			// HEADER
+			var dialogHeader = document.createElement('div');
+			dialogHeader.className = classes.dialogHeader;
+
+
+			// BODY
+			var dialogBody = document.createElement('div');
+			dialogBody.className = classes.dialogBody;
+
+
+			modalEl.appendChild(dialogEl);
+
+			dialogEl.appendChild(dialogBody);
+			dialogEl.appendChild(dialogHeader);
+
+			var backButton = document.createElement('div');
+			backButton.className = classes.back;
+			backButton.innerHTML = '<div class="sp-icon-back"></div>';
+			modalInstance.backButton = backButton;
+
+			var closeButton = document.createElement('div');
+			closeButton.className = classes.close;
+			closeButton.innerHTML = '<div class="sp-icon-close"></div>';
+			closeButton.addEventListener('click', (function() {
+				this.close();
+			}).bind(modalInstance));
+
+			dialogHeader.appendChild(backButton);
+			dialogHeader.appendChild(closeButton);
+
+			modalInstance.modalEl = modalEl;
+
+			// ****************************************************************************
 
 			if (!contentEl || !contentEl.nodeType) {
 
@@ -4246,7 +4258,6 @@ window.StickersModule.View = {};
 				}
 			}
 
-			var dialogBody = modalInstance.modalEl.getElementsByClassName(classes.dialogBody)[0];
 			dialogBody.appendChild(contentEl);
 
 			document.body.appendChild(modalInstance.modalEl);
@@ -4703,6 +4714,10 @@ window.StickersModule.View = {};
 					setWindowMessageListener.bind(this)();
 				}).bind(this)
 			});
+
+			this.modal.backButton.addEventListener('click', (function() {
+				Module.Service.Store.goBack();
+			}).bind(this));
 
 			window.addEventListener('resize', (function() {
 				this.resize();
