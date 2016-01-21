@@ -4076,7 +4076,7 @@ window.StickersModule.View = {};
 			modalDialog: 'sp-modal-dialog',
 			dialogHeader: 'sp-modal-header',
 			dialogBody: 'sp-modal-body',
-			iconClose: 'sp-icon-close',
+			back: 'sp-modal-back',
 			close: 'sp-modal-close'
 		},
 
@@ -4198,17 +4198,21 @@ window.StickersModule.View = {};
 		dialogEl.appendChild(dialogBody);
 		dialogEl.appendChild(dialogHeader);
 
-
-		var closeIcon = document.createElement('div');
-		closeIcon.className = classes.iconClose;
+		var backButton = document.createElement('div');
+		backButton.className = classes.back;
+		backButton.innerHTML = '<div class="sp-icon-back"></div>';
+		backButton.addEventListener('click', (function() {
+			//this.close();
+		}).bind(context));
 
 		var closeButton = document.createElement('div');
 		closeButton.className = classes.close;
+		closeButton.innerHTML = '<div class="sp-icon-close"></div>';
 		closeButton.addEventListener('click', (function() {
 			this.close();
 		}).bind(context));
 
-		closeButton.appendChild(closeIcon);
+		dialogHeader.appendChild(backButton);
 		dialogHeader.appendChild(closeButton);
 
 		return modalEl;
