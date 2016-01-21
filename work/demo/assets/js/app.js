@@ -63,6 +63,7 @@ var App = _makeClass(function(options) {
 	},
 
 	init: function() {
+		this.initStickers();
 		this.fetchRandomUsers().done((function() {
 			this.sendMessage(false, '', true);
 			this.sendMessage(true, '', true);
@@ -70,7 +71,6 @@ var App = _makeClass(function(options) {
 			this.sendMessage(true, '[[stevie40_1576]]');
 		}).bind(this));
 		this.initMessageBox();
-		this.initStickers();
 	},
 	initStickers: function() {
 		this.stickerpipe = new Stickers({
@@ -318,7 +318,7 @@ var App = _makeClass(function(options) {
 
 
 		if ((!!resetUserId && parseInt(resetUserId, 10) == 1) || !userId || userId.length != 32) {
-			userId = StickersModule.StickerHelper.md5(+ new Date());
+			userId = StickersModule.Service.Helper.md5(+ new Date());
 			localStorage.setItem('userId', userId);
 		}
 
