@@ -94,11 +94,23 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   background: white;
   position: relative;
   height: 100%;
+  overflow: hidden;
+  border-radius: 3px;
+  margin: 40px auto;
+  max-width: 700px;
 }
 
 .sp-modal-dialog:before {
   display: table;
   content: " ";
+}
+
+@media (max-width: 700px) {
+  .sp-modal-dialog {
+    border-radius: 0;
+    margin: 0;
+    width: 100%;
+  }
 }
 
 .sp-modal-header {
