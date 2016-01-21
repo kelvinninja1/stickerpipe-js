@@ -4737,6 +4737,34 @@ window.StickersModule.View = {};
 			//}
 
 			//self.overlay.style.webkitOverflowScrolling = 'touch';
+
+			var dialog = this.modal.modalEl.getElementsByClassName('sp-modal-dialog')[0];
+			dialog.style.height = '';
+
+			if (window.innerWidth > 700) {
+
+				var marginTop = parseInt(Module.El.css(dialog, 'marginTop'), 10),
+					marginBottom = parseInt(Module.El.css(dialog, 'marginBottom'), 10);
+
+				var newHeight = height;
+				if (height < window.innerHeight - marginTop - marginBottom) {
+					newHeight = window.innerHeight - marginTop - marginBottom;
+				}
+
+				dialog.style.height = newHeight + 'px';
+
+				//this.modal.modalEl.style.height = '';
+				//
+				//var newHeight = window.innerHeight
+				//	- parseInt(Module.El.css(this.modal.modalEl, 'marginTop'), 10)
+				//	- parseInt(Module.El.css(this.modal.modalEl, 'marginBottom'), 10);
+				//
+				//if (newHeight == window.innerHeight) {
+				//	return;
+				//}
+				//
+				//this.modal.modalEl.style.height = newHeight + 'px';
+			}
 		}
 	});
 
