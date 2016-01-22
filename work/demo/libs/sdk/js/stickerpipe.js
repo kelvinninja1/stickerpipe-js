@@ -1193,10 +1193,12 @@ if ("document" in self) {
 
 				var thumbPositionDelta = mousePositionNew - mousePosition;
 				if (hasTouchEvents) {
-					if (mousePositionNew - lastMousePositionNew > 5) {
-						mousePositionNew = lastMousePositionNew + 5;
-					} else if (mousePositionNew - lastMousePositionNew < -5) {
-						mousePositionNew = lastMousePositionNew - 5;
+					if (lastMousePositionNew) {
+						if (mousePositionNew - lastMousePositionNew > 5) {
+							mousePositionNew = lastMousePositionNew + 5;
+						} else if (mousePositionNew - lastMousePositionNew < -5) {
+							mousePositionNew = lastMousePositionNew - 5;
+						}
 					}
 					thumbPositionDelta = mousePosition - mousePositionNew;
 				}
