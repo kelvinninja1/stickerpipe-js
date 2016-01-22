@@ -1150,6 +1150,24 @@ if ("document" in self) {
 					,   multiply = (evntObj.deltaMode === 1) ? self.options.wheelSpeed : 1
 					;
 
+				// bugfix
+				wheelSpeedDelta = wheelSpeedDelta || 0;
+
+				// todo
+				if ((navigator.userAgent.toLowerCase().indexOf('firefox') > -1 &&
+					navigator.platform.indexOf('Win') > -1) ||
+						window.StickersModule.Service.Helper.getMobileOS() == 'ios'
+				) {
+
+					if (wheelSpeedDelta > 0) {
+						wheelSpeedDelta = 2.5;
+					} else {
+						wheelSpeedDelta = -2.5;
+					}
+				}
+
+				//console.log(wheelSpeedDelta, self.options.wheelSpeed, self.contentSize, self.viewportSize, self.contentPosition);
+
 				self.contentPosition -= wheelSpeedDelta * self.options.wheelSpeed;
 				self.contentPosition = Math.min((self.contentSize - self.viewportSize), Math.max(0, self.contentPosition));
 				self.thumbPosition = self.contentPosition / self.trackRatio;
