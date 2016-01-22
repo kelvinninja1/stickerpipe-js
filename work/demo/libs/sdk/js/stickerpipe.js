@@ -1187,7 +1187,7 @@ if ("document" in self) {
 			if(self.hasContentToSroll)
 			{
 				var mousePositionNew = isHorizontal ? event.clientX : event.clientY
-					,   thumbPositionDelta = 0.2//hasTouchEvents ? (mousePosition - mousePositionNew) : (mousePositionNew - mousePosition)
+					,   thumbPositionDelta = hasTouchEvents ? (mousePosition - mousePositionNew) : (mousePositionNew - mousePosition)
 					,   thumbPositionNew = Math.min((self.trackSize - self.thumbSize), Math.max(0, self.thumbPosition + thumbPositionDelta))
 					;
 
@@ -1197,7 +1197,7 @@ if ("document" in self) {
 				//	self.trackRatio = (self.trackRatio > 0) ? speed : speed * -1;
 				//}
 				var log = document.getElementById('log');
-				log.innerHTML += thumbPositionNew + ' ' + self.trackRatio + '<br/>';
+				log.innerHTML += thumbPositionDelta + '<br/>';
 
 				self.contentPosition = thumbPositionNew * self.trackRatio;
 
