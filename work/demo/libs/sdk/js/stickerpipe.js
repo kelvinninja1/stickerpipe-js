@@ -1191,11 +1191,14 @@ if ("document" in self) {
 					,   thumbPositionNew = Math.min((self.trackSize - self.thumbSize), Math.max(0, self.thumbPosition + thumbPositionDelta))
 					;
 
-				if (window.StickersModule.Service.Helper.getMobileOS() == 'ios') {
+				//if (window.StickersModule.Service.Helper.getMobileOS() == 'ios') {
+				//
+				//	var speed = 1.5;
+				//	self.trackRatio = (self.trackRatio > 0) ? speed : speed * -1;
+				//}
+				var log = document.getElementById('log');
+				log.innerHTML += thumbPositionNew + ' ' + self.trackRatio + '<br/>';
 
-					var speed = 1.5;
-					self.trackRatio = (self.trackRatio > 0) ? speed : speed * -1;
-				}
 				self.contentPosition = thumbPositionNew * self.trackRatio;
 
 				$container.dispatchEvent(moveEvent);
