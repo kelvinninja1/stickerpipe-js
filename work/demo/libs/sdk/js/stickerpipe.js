@@ -1179,6 +1179,8 @@ if ("document" in self) {
 			event.stopPropagation();
 		}
 
+		var lastMousePositionNew = null;
+
 		/**
 		 * @method _drag
 		 * @private
@@ -1191,17 +1193,15 @@ if ("document" in self) {
 
 				var thumbPositionDelta = mousePositionNew - mousePosition;
 				if (hasTouchEvents) {
-					var _q = mousePosition - mousePositionNew;
-					if (_q > 5) {
-						_q = 5;
-					} else if (_q < -5) {
-						_q = -5;
+					if (mousePositionNew - lastMousePositionNew > 5) {
+						mousePositionNew = lastMousePositionNew + 5;
+					} else if (mousePositionNew - lastMousePositionNew < -5) {
+						mousePositionNew = lastMousePositionNew - 5;
 					}
-					thumbPositionDelta = _q;
+					thumbPositionDelta = mousePosition - mousePositionNew;
 				}
 
-				var thumbPositionNew = Math.min((self.trackSize - self.thumbSize), Math.max(0, self.thumbPosition + thumbPositionDelta))
-					;
+				var thumbPositionNew = Math.min((self.trackSize - self.thumbSize), Math.max(0, self.thumbPosition + thumbPositionDelta));
 
 				//if (window.StickersModule.Service.Helper.getMobileOS() == 'ios') {
 				//
@@ -1217,6 +1217,8 @@ if ("document" in self) {
 
 				$thumb.style[posiLabel] = thumbPositionNew + "px";
 				$overview.style[posiLabel] = -self.contentPosition + "px";
+
+				lastMousePositionNew = mousePositionNew;
 			}
 		}
 
