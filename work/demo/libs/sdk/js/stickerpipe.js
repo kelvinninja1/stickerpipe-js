@@ -1162,6 +1162,7 @@ if ("document" in self) {
 				}
 
 				if (window.StickersModule.Service.Helper.getMobileOS() == 'ios') {
+					document.write('123');
 					var speed = 1.5;
 					wheelSpeedDelta = (wheelSpeedDelta > 0) ? speed : speed * -1;
 				}
