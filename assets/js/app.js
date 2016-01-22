@@ -51,14 +51,6 @@ var App = _makeClass(function(options) {
 
 		this.init();
 
-		this.$window.resize((function() {
-			this.resizeWindow();
-		}).bind(this));
-
-		this.$messageBox.find('.textarea').on('autosize:resized', (function() {
-			this.resizeWindow();
-		}).bind(this));
-
 		_.delay((function() {
 			this.$window.resize();
 		}).bind(this), 100);
@@ -76,20 +68,19 @@ var App = _makeClass(function(options) {
 			this.sendMessage(false, '', true);
 			this.sendMessage(true, '', true);
 			this.sendMessage(false, '', true);
-			this.sendMessage(true, '[[cat4_iloveyou]]');
+			this.sendMessage(true, '[[stevie40_1576]]');
 		}).bind(this));
 		this.initMessageBox();
 	},
 	initStickers: function() {
 		this.stickerpipe = new Stickers({
 
-			debug: true,
-
 			elId: 'stickersToggle',
 
 			apiKey: '72921666b5ff8651f374747bfefaf7b2',
 
 			storagePrefix: 'stickerPipe',
+
 			enableEmojiTab: true,
 			enableHistoryTab: true,
 			enableStoreTab: true,
@@ -127,9 +118,6 @@ var App = _makeClass(function(options) {
 			}
 
 		}).bind(this));
-
-
-		this.resizeWindow();
 
 		this.$window.on('sp:content:highlight:show', (function() {
 			this.$stickersToggle.addClass('has-new-content');
@@ -310,10 +298,10 @@ var App = _makeClass(function(options) {
 			'Those an equal point no years do. Depend warmth fat but her but played. Shy and subjects wondered trifling pleasant. Prudent cordial comfort do no on colonel as assured chicken. Smart mrs day which begin. Snug do sold mr it if such. Terminated uncommonly at at estimating. Man behaviour met moonlight extremity acuteness direction.',
 			'Name were we at hope. Remainder household direction zealously the unwilling bed sex. Lose and gay ham sake met that. Stood her place one ten spoke yet. Head case knew ever set why over. Marianne returned of peculiar replying in moderate. Roused get enable garret estate old county. Entreaties you devonshire law dissimilar terminated.',
 			'Received shutters expenses ye he pleasant. Drift as blind above at up. No up simple county stairs do should praise as. Drawings sir gay together landlord had law smallest. Formerly welcomed attended declared met say unlocked. Jennings outlived no dwelling denoting in peculiar as he believed. Behaviour excellent middleton be as it curiosity departure ourselves.',
-			'[[mems_sadness]]',
 			'At every tiled on ye defer do. No attention suspected oh difficult. Fond his say old meet cold find come whom. The sir park sake bred. Wonder matter now can estate esteem assure fat roused. Am performed on existence as discourse is. Pleasure friendly at marriage blessing or.',
 			'[[pinkgorilla_bike]]',
 			'No depending be convinced in unfeeling he. Excellence she unaffected and too sentiments her. Rooms he doors there ye aware in by shall. Education remainder in so cordially. His remainder and own dejection daughters sportsmen. Is easy took he shed to kind.',
+			'At every tiled on ye defer do. No attention suspected oh difficult. Fond his say old meet cold find come whom. The sir park sake bred. Wonder matter now can estate esteem assure fat roused. Am performed on existence as discourse is. Pleasure friendly at marriage blessing or.',
 			'By impossible of in difficulty discovered celebrated ye. Justice joy manners boy met resolve produce. Bed head loud next plan rent had easy add him. As earnestly shameless elsewhere defective estimable fulfilled of. Esteem my advice it an excuse enable. Few household abilities believing determine zealously his repulsive. To open draw dear be by side like.'
 		];
 
@@ -363,16 +351,5 @@ var App = _makeClass(function(options) {
 		}
 
 		return dd + '.' + mm + '.' + yyyy + ' ' + hh + ':' + ii + ':' + ss;
-	},
-
-	resizeWindow: function() {
-
-		//this.$messages.height(
-		//	this.$window.outerHeight(true) -
-		//	this.$navbar.offset().top -
-		//	this.$navbar.outerHeight(true) -
-		//	this.$messageBox.parent().outerHeight(true) -
-		//	parseInt(this.$messages.css('margin-bottom'), 10)
-		//);
 	}
 });
