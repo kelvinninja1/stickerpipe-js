@@ -1188,7 +1188,7 @@ if ("document" in self) {
 			{
 				var mousePositionNew = isHorizontal ? event.clientX : event.clientY
 					,   thumbPositionDelta = hasTouchEvents ? (mousePosition - mousePositionNew) : (mousePositionNew - mousePosition)
-					,   thumbPositionDelta = hasTouchEvents ? mousePosition + 5 : mousePosition - 5
+					,   thumbPositionDelta = hasTouchEvents ? mousePositionNew + 5 : mousePosition - 5
 					,   thumbPositionNew = Math.min((self.trackSize - self.thumbSize), Math.max(0, self.thumbPosition + thumbPositionDelta))
 					;
 
