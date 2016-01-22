@@ -1161,6 +1161,7 @@ if ("document" in self) {
 					wheelSpeedDelta = (wheelSpeedDelta > 0) ? speed : speed * -1;
 				}
 
+				alert(window.StickersModule.Service.Helper.getMobileOS());
 				if (window.StickersModule.Service.Helper.getMobileOS() == 'ios') {
 					alert(123);
 					var speed = 1.5;
