@@ -1187,7 +1187,7 @@ if ("document" in self) {
 			if(self.hasContentToSroll)
 			{
 				var mousePositionNew = isHorizontal ? event.clientX : event.clientY
-					,   thumbPositionDelta = hasTouchEvents ? (mousePosition - mousePositionNew) : (mousePositionNew - mousePosition)
+					,   thumbPositionDelta = 0.2//hasTouchEvents ? (mousePosition - mousePositionNew) : (mousePositionNew - mousePosition)
 					,   thumbPositionNew = Math.min((self.trackSize - self.thumbSize), Math.max(0, self.thumbPosition + thumbPositionDelta))
 					;
 
