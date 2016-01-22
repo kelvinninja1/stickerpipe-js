@@ -1196,14 +1196,14 @@ if ("document" in self) {
 
 				var thumbPositionDelta = mousePositionNew - mousePosition;
 				if (hasTouchEvents) {
-					//if (lastMousePositionNew) {
-					//	var maxSpeedDelay = 2;
-					//	if (mousePositionNew - lastMousePositionNew > maxSpeedDelay) {
-					//		mousePositionNew = lastMousePositionNew + maxSpeedDelay;
-					//	} else if (mousePositionNew - lastMousePositionNew < -maxSpeedDelay) {
-					//		mousePositionNew = lastMousePositionNew - maxSpeedDelay;
-					//	}
-					//}
+					if (lastMousePositionNew) {
+						var maxSpeedDelay = 1.5;
+						if (mousePositionNew - lastMousePositionNew > maxSpeedDelay) {
+							mousePositionNew = lastMousePositionNew + maxSpeedDelay;
+						} else if (mousePositionNew - lastMousePositionNew < -maxSpeedDelay) {
+							mousePositionNew = lastMousePositionNew - maxSpeedDelay;
+						}
+					}
 					thumbPositionDelta = mousePosition - mousePositionNew;
 				}
 
