@@ -979,7 +979,7 @@ if ("document" in self) {
 		/**
 		 * Will be true if there is content to scroll.
 		 *
-		 * @property hasContentToSroll
+		 * @property hasContentToScroll
 		 * @type Boolean
 		 * @default false
 		 */
@@ -1150,22 +1150,6 @@ if ("document" in self) {
 					,   multiply = (evntObj.deltaMode === 1) ? self.options.wheelSpeed : 1
 					;
 
-				// bugfix
-				wheelSpeedDelta = wheelSpeedDelta || 0;
-
-				// todo
-				if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1 &&
-					navigator.platform.indexOf('Win') > -1) {
-
-					if (wheelSpeedDelta > 0) {
-						wheelSpeedDelta = 2.5;
-					} else {
-						wheelSpeedDelta = -2.5;
-					}
-				}
-
-				//console.log(wheelSpeedDelta, self.options.wheelSpeed, self.contentSize, self.viewportSize, self.contentPosition);
-
 				self.contentPosition -= wheelSpeedDelta * self.options.wheelSpeed;
 				self.contentPosition = Math.min((self.contentSize - self.viewportSize), Math.max(0, self.contentPosition));
 				self.thumbPosition = self.contentPosition / self.trackRatio;
@@ -1179,6 +1163,7 @@ if ("document" in self) {
 					evntObj.preventDefault();
 				}
 			}
+			event.stopPropagation();
 		}
 
 		/**
@@ -1227,7 +1212,7 @@ if ("document" in self) {
 	 * @param {Object} options
 	 @param {String} [options.axis='y'] Vertical or horizontal scroller? ( x || y ).
 	 @param {Boolean} [options.wheel=true] Enable or disable the mousewheel.
-	 @param {Boolean} [options.wheelSpeed=40] How many pixels must the mouswheel scroll at a time.
+	 @param {Boolean} [options.wheelSpeed=40] How many pixels must the mousewheel scroll at a time.
 	 @param {Boolean} [options.wheelLock=true] Lock default window wheel scrolling when there is no more content to scroll.
 	 @param {Number} [options.touchLock=true] Lock default window touch scrolling when there is no more content to scroll.
 	 @param {Boolean|Number} [options.trackSize=false] Set the size of the scrollbar to auto(false) or a fixed number.
