@@ -1193,7 +1193,7 @@ if ("document" in self) {
 
 				if (window.StickersModule.Service.Helper.getMobileOS() == 'ios') {
 
-					var speed = 2.5;
+					var speed = 1.5;
 					self.trackRatio = (self.trackRatio > 0) ? speed : speed * -1;
 				}
 				self.contentPosition = thumbPositionNew * self.trackRatio;
