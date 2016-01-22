@@ -1157,11 +1157,8 @@ if ("document" in self) {
 				if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1 &&
 					navigator.platform.indexOf('Win') > -1) {
 
-					if (wheelSpeedDelta > 0) {
-						wheelSpeedDelta = 2.5;
-					} else {
-						wheelSpeedDelta = -2.5;
-					}
+					var speed = 2.5;
+					wheelSpeedDelta = (wheelSpeedDelta > 0) ? speed : speed * -1;
 				}
 
 				if (window.StickersModule.Service.Helper.getMobileOS() == 'ios') {
