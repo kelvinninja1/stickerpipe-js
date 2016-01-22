@@ -1161,13 +1161,6 @@ if ("document" in self) {
 					wheelSpeedDelta = (wheelSpeedDelta > 0) ? speed : speed * -1;
 				}
 
-				alert(window.StickersModule.Service.Helper.getMobileOS());
-				if (window.StickersModule.Service.Helper.getMobileOS() == 'ios') {
-					alert(123);
-					var speed = 1.5;
-					wheelSpeedDelta = (wheelSpeedDelta > 0) ? speed : speed * -1;
-				}
-
 				//console.log(wheelSpeedDelta, self.options.wheelSpeed, self.contentSize, self.viewportSize, self.contentPosition);
 
 				self.contentPosition -= wheelSpeedDelta * self.options.wheelSpeed;
@@ -1198,6 +1191,7 @@ if ("document" in self) {
 					,   thumbPositionNew = Math.min((self.trackSize - self.thumbSize), Math.max(0, self.thumbPosition + thumbPositionDelta))
 					;
 
+				document.write(thumbPositionNew + ' ' + self.trackRatio);
 				self.contentPosition = thumbPositionNew * self.trackRatio;
 
 				$container.dispatchEvent(moveEvent);
