@@ -1188,7 +1188,7 @@ if ("document" in self) {
 			{
 				var mousePositionNew = isHorizontal ? event.clientX : event.clientY
 					,   thumbPositionDelta = hasTouchEvents ? (mousePosition - mousePositionNew) : (mousePositionNew - mousePosition)
-					,   thumbPositionDelta = hasTouchEvents ? mousePositionNew + 5 : mousePosition - 5
+					//,   thumbPositionDelta = hasTouchEvents ? mousePositionNew + 5 : mousePosition - 5
 					,   thumbPositionNew = Math.min((self.trackSize - self.thumbSize), Math.max(0, self.thumbPosition + thumbPositionDelta))
 					;
 
@@ -1198,7 +1198,7 @@ if ("document" in self) {
 				//	self.trackRatio = (self.trackRatio > 0) ? speed : speed * -1;
 				//}
 				var log = document.getElementById('log');
-				log.innerHTML += 'm1: ' + mousePositionNew + '<br/>';
+				log.innerHTML += 'm: ' + hasTouchEvents + ', ' + mousePosition + ', ' + mousePositionNew + '<br/>';
 
 				self.contentPosition = thumbPositionNew * self.trackRatio;
 
