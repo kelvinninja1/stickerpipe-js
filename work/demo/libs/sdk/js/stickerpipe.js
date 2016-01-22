@@ -1198,9 +1198,9 @@ if ("document" in self) {
 				if (hasTouchEvents) {
 					if (lastMousePositionNew) {
 						if (mousePositionNew - lastMousePositionNew > 5) {
-							mousePositionNew = lastMousePositionNew + 5;
-						} else if (mousePositionNew - lastMousePositionNew < -5) {
 							mousePositionNew = lastMousePositionNew - 5;
+						} else if (mousePositionNew - lastMousePositionNew < -5) {
+							mousePositionNew = lastMousePositionNew + 5;
 						}
 					}
 					thumbPositionDelta = mousePosition - mousePositionNew;
