@@ -882,6 +882,8 @@ if ("document" in self) {
 		 */
 		this._name = pluginName;
 
+		var lastMousePositionNew = null;
+
 		var self = this
 			,   $body = document.querySelectorAll("body")[0]
 			,   $viewport = $container.querySelectorAll(".viewport")[0]
@@ -1116,6 +1118,8 @@ if ("document" in self) {
 		 */
 		function _start(event, gotoMouse) {
 			if(self.hasContentToSroll) {
+				lastMousePositionNew = null;
+
 				var posiLabelCap = posiLabel.charAt(0).toUpperCase() + posiLabel.slice(1).toLowerCase();
 				mousePosition = gotoMouse ? $thumb.getBoundingClientRect()[posiLabel] : (isHorizontal ? event.clientX : event.clientY);
 
@@ -1179,7 +1183,6 @@ if ("document" in self) {
 			event.stopPropagation();
 		}
 
-		var lastMousePositionNew = null;
 
 		/**
 		 * @method _drag
