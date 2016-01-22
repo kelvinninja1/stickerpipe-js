@@ -4598,7 +4598,8 @@ window.StickersModule.View = {};
 					return;
 				}
 
-				Module.Service.Store.api[data.action](data);
+				var StoreService = Module.Service.Store;
+				StoreService.api[data.action] && StoreService.api[data.action](data);
 
 			}).bind(this));
 
