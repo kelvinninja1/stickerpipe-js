@@ -1154,16 +1154,19 @@ if ("document" in self) {
 				wheelSpeedDelta = wheelSpeedDelta || 0;
 
 				// todo
-				if ((navigator.userAgent.toLowerCase().indexOf('firefox') > -1 &&
-					navigator.platform.indexOf('Win') > -1) ||
-						window.StickersModule.Service.Helper.getMobileOS() == 'ios'
-				) {
+				if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1 &&
+					navigator.platform.indexOf('Win') > -1) {
 
 					if (wheelSpeedDelta > 0) {
 						wheelSpeedDelta = 2.5;
 					} else {
 						wheelSpeedDelta = -2.5;
 					}
+				}
+
+				if (window.StickersModule.Service.Helper.getMobileOS() == 'ios') {
+					var speed = 1.5;
+					wheelSpeedDelta = (wheelSpeedDelta > 0) ? speed : speed * -1;
 				}
 
 				//console.log(wheelSpeedDelta, self.options.wheelSpeed, self.contentSize, self.viewportSize, self.contentPosition);
