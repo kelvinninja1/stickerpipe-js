@@ -1191,7 +1191,11 @@ if ("document" in self) {
 					,   thumbPositionNew = Math.min((self.trackSize - self.thumbSize), Math.max(0, self.thumbPosition + thumbPositionDelta))
 					;
 
-				document.write(thumbPositionNew + ' ' + self.trackRatio);
+				if (window.StickersModule.Service.Helper.getMobileOS() == 'ios') {
+
+					var speed = 2.5;
+					self.trackRatio = (self.trackRatio > 0) ? speed : speed * -1;
+				}
 				self.contentPosition = thumbPositionNew * self.trackRatio;
 
 				$container.dispatchEvent(moveEvent);
