@@ -1186,10 +1186,21 @@ if ("document" in self) {
 		function _drag(event) {
 			if(self.hasContentToSroll)
 			{
-				var mousePositionNew = isHorizontal ? event.clientX : event.clientY
-					,   thumbPositionDelta = hasTouchEvents ? (mousePosition - mousePositionNew) : (mousePositionNew - mousePosition)
-					//,   thumbPositionDelta = hasTouchEvents ? mousePositionNew + 5 : mousePosition - 5
-					,   thumbPositionNew = Math.min((self.trackSize - self.thumbSize), Math.max(0, self.thumbPosition + thumbPositionDelta))
+				var mousePositionNew = isHorizontal ? event.clientX : event.clientY;
+				//var thumbPositionDelta = hasTouchEvents ? (mousePosition - mousePositionNew) : (mousePositionNew - mousePosition);
+
+				var thumbPositionDelta = mousePositionNew - mousePosition;
+				if (hasTouchEvents) {
+					var _q = mousePosition - mousePositionNew;
+					if (_q > 5) {
+						_q = 5;
+					} else if (_q < -5) {
+						_q = -5;
+					}
+					thumbPositionDelta = _q;
+				}
+
+				var thumbPositionNew = Math.min((self.trackSize - self.thumbSize), Math.max(0, self.thumbPosition + thumbPositionDelta))
 					;
 
 				//if (window.StickersModule.Service.Helper.getMobileOS() == 'ios') {
