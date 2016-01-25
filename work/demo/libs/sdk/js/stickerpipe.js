@@ -882,8 +882,6 @@ if ("document" in self) {
 		 */
 		this._name = pluginName;
 
-		var lastMousePositionNew = null;
-
 		var self = this
 			,   $body = document.querySelectorAll("body")[0]
 			,   $viewport = $container.querySelectorAll(".viewport")[0]
@@ -981,7 +979,7 @@ if ("document" in self) {
 		/**
 		 * Will be true if there is content to scroll.
 		 *
-		 * @property hasContentToScroll
+		 * @property hasContentToSroll
 		 * @type Boolean
 		 * @default false
 		 */
@@ -1118,8 +1116,6 @@ if ("document" in self) {
 		 */
 		function _start(event, gotoMouse) {
 			if(self.hasContentToSroll) {
-				lastMousePositionNew = null;
-
 				var posiLabelCap = posiLabel.charAt(0).toUpperCase() + posiLabel.slice(1).toLowerCase();
 				mousePosition = gotoMouse ? $thumb.getBoundingClientRect()[posiLabel] : (isHorizontal ? event.clientX : event.clientY);
 
@@ -1161,8 +1157,11 @@ if ("document" in self) {
 				if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1 &&
 					navigator.platform.indexOf('Win') > -1) {
 
-					var speed = 2.5;
-					wheelSpeedDelta = (wheelSpeedDelta > 0) ? speed : speed * -1;
+					if (wheelSpeedDelta > 0) {
+						wheelSpeedDelta = 2.5;
+					} else {
+						wheelSpeedDelta = -2.5;
+					}
 				}
 
 				//console.log(wheelSpeedDelta, self.options.wheelSpeed, self.contentSize, self.viewportSize, self.contentPosition);
@@ -1180,9 +1179,7 @@ if ("document" in self) {
 					evntObj.preventDefault();
 				}
 			}
-			event.stopPropagation();
 		}
-
 
 		/**
 		 * @method _drag
@@ -1191,31 +1188,10 @@ if ("document" in self) {
 		function _drag(event) {
 			if(self.hasContentToSroll)
 			{
-				var mousePositionNew = isHorizontal ? event.clientX : event.clientY;
-				//var thumbPositionDelta = hasTouchEvents ? (mousePosition - mousePositionNew) : (mousePositionNew - mousePosition);
-
-				var thumbPositionDelta = mousePositionNew - mousePosition;
-				if (hasTouchEvents) {
-					if (lastMousePositionNew) {
-						var maxSpeedDelay = 2.5;
-						if (mousePositionNew - lastMousePositionNew > maxSpeedDelay) {
-							mousePositionNew = lastMousePositionNew + maxSpeedDelay;
-						} else if (mousePositionNew - lastMousePositionNew < -maxSpeedDelay) {
-							mousePositionNew = lastMousePositionNew - maxSpeedDelay;
-						}
-					}
-					thumbPositionDelta = mousePosition - mousePositionNew;
-				}
-
-				var thumbPositionNew = Math.min((self.trackSize - self.thumbSize), Math.max(0, self.thumbPosition + thumbPositionDelta));
-
-				//if (window.StickersModule.Service.Helper.getMobileOS() == 'ios') {
-				//
-				//	var speed = 1.5;
-				//	self.trackRatio = (self.trackRatio > 0) ? speed : speed * -1;
-				//}
-				var log = document.getElementById('log');
-				log.innerHTML += 'm: ' + hasTouchEvents + ', ' + mousePosition + ', ' + mousePositionNew + '<br/>';
+				var mousePositionNew = isHorizontal ? event.clientX : event.clientY
+					,   thumbPositionDelta = hasTouchEvents ? (mousePosition - mousePositionNew) : (mousePositionNew - mousePosition)
+					,   thumbPositionNew = Math.min((self.trackSize - self.thumbSize), Math.max(0, self.thumbPosition + thumbPositionDelta))
+					;
 
 				self.contentPosition = thumbPositionNew * self.trackRatio;
 
@@ -1223,8 +1199,6 @@ if ("document" in self) {
 
 				$thumb.style[posiLabel] = thumbPositionNew + "px";
 				$overview.style[posiLabel] = -self.contentPosition + "px";
-
-				lastMousePositionNew = mousePositionNew;
 			}
 		}
 
@@ -1253,7 +1227,7 @@ if ("document" in self) {
 	 * @param {Object} options
 	 @param {String} [options.axis='y'] Vertical or horizontal scroller? ( x || y ).
 	 @param {Boolean} [options.wheel=true] Enable or disable the mousewheel.
-	 @param {Boolean} [options.wheelSpeed=40] How many pixels must the mousewheel scroll at a time.
+	 @param {Boolean} [options.wheelSpeed=40] How many pixels must the mouswheel scroll at a time.
 	 @param {Boolean} [options.wheelLock=true] Lock default window wheel scrolling when there is no more content to scroll.
 	 @param {Number} [options.touchLock=true] Lock default window touch scrolling when there is no more content to scroll.
 	 @param {Boolean|Number} [options.trackSize=false] Set the size of the scrollbar to auto(false) or a fixed number.
@@ -2522,7 +2496,7 @@ window.StickersModule.Service = {};
 
 			if (options.type == 'POST' || options.type == 'PUT') {
 				options.headers['Content-Type'] = options.headers['Content-Type'] || 'application/x-www-form-urlencoded';
-				options.headers['DeviceId'] = Module.Storage.getUniqUserId();
+				options.headers['DeviceId'] = Module.Storage.getDeviceId();
 			}
 
 
@@ -2629,7 +2603,9 @@ window.StickersModule.Service = {};
 			this.lockr.prefix = storagePrefix;
 		},
 
-
+		///////////////////////////////////////
+		// Used stickers
+		///////////////////////////////////////
 		getUsedStickers: function() {
 			return this.lockr.get('sticker_latest_use') || [];
 		},
@@ -2659,7 +2635,9 @@ window.StickersModule.Service = {};
 			this.setUsedStickers(usedStickers);
 		},
 
-
+		///////////////////////////////////////
+		// Packs
+		///////////////////////////////////////
 		getPacks: function() {
 			var packs = this.lockr.get('sticker_packs');
 
@@ -2675,27 +2653,43 @@ window.StickersModule.Service = {};
 			return this.lockr.set('sticker_packs', packs)
 		},
 
+		///////////////////////////////////////
+		// Device ID
+		///////////////////////////////////////
+		getDeviceId: function() {
+			var deviceId = this.lockr.get('device_id');
 
-		getUniqUserId: function() {
-			var uniqUserId = this.lockr.get('uniqUserId');
-
-			if (typeof uniqUserId == 'undefined') {
-				uniqUserId = + new Date();
-				this.lockr.set('uniqUserId', uniqUserId);
+			if (typeof deviceId == 'undefined') {
+				deviceId = + new Date();
+				this.lockr.set('device_id', deviceId);
 			}
 
-			return uniqUserId;
+			return deviceId;
 		},
 
+		///////////////////////////////////////
+		// User ID
+		///////////////////////////////////////
+		getUserId: function() {
+			return this.lockr.get('user_id');
+		},
+		setUserId: function(userId) {
+			return this.lockr.set('user_id', userId);
+		},
 
+		///////////////////////////////////////
+		// User data
+		///////////////////////////////////////
 		getUserData: function() {
-			return this.lockr.get('userData');
+			return this.lockr.get('user_data');
 		},
 		setUserData: function(userData) {
-			return this.lockr.set('userData', userData);
+			return this.lockr.set('user_data', userData);
 		},
 
-
+		///////////////////////////////////////
+		// Pending request
+		///////////////////////////////////////
 		getPendingRequestTasks: function() {
 			return this.lockr.get('pending_request_tasks') || [];
 		},
@@ -2929,13 +2923,13 @@ window.StickersModule.Configs = {};
 
 		htmlForEmptyRecent: '<div class="emptyRecent">No recent stickers</div>',
 
-		apiKey: '', // example: 72921666b5ff8651f374747bfefaf7b2
+		apiKey: null, // example: 72921666b5ff8651f374747bfefaf7b2
 
 		cdnUrl: 'http://cdn.stickerpipe.com',
 		apiUrl: 'http://api.stickerpipe.com',
 		storeUrl: 'http://api.stickerpipe.com/api/v1/web',
 
-		storagePrefix: 'stickerPipe',
+		storagePrefix: 'stickerpipe_',
 
 		enableEmojiTab: false,
 		enableHistoryTab: false,
@@ -5037,21 +5031,36 @@ window.StickersModule.View = {};
 
 		_constructor: function(config) {
 
+			Module.Service.Helper.setConfig(config);
+
+			// ***** Init Storage ******
+			Module.Storage.setPrefix(Module.Configs.storagePrefix);
+
+			// ***** Init Emoji tab *****
 			var mobileOS = Module.Service.Helper.getMobileOS();
 			if (mobileOS == 'ios' || mobileOS == 'android') {
 				config.enableEmojiTab = false;
 			}
 
-			Module.Service.Helper.setConfig(config);
+			// ***** Check ApiKey *****
+			if (!Module.Configs.apiKey) {
+				throw new Error('Empty apiKey');
+			}
+
+
+			// ***** Init UserId *****
+			var savedUserId = Module.Storage.getUserId();
 
 			if (Module.Configs.userId) {
 				Module.Configs.userId = Module.Service.Helper.md5(Module.Configs.userId + Module.Configs.apiKey);
+				Module.Storage.setUserId(Module.Configs.userId);
 			}
 
-			Module.Storage.setPrefix(Module.Configs.storagePrefix);
+			if (Module.Configs.userId != savedUserId) {
+				Module.Storage.setUsedStickers([]);
+			}
 
-			Module.BaseService.trackUserData();
-
+			// ***** Init services ******
 			Module.Service.Store.init(this);
 			Module.Service.Pack.init(this);
 
@@ -5078,6 +5087,9 @@ window.StickersModule.View = {};
 			var callback = onload || null;
 
 			this.fetchPacks((function() {
+				// todo: move to initialize (with API v2)
+				Module.BaseService.trackUserData();
+
 				this.view.render(this.stickersModel);
 
 				callback && callback();
@@ -5099,7 +5111,7 @@ window.StickersModule.View = {};
 			}).bind(this));
 
 			this.view.tabsView.handleClickOnStoreTab((function() {
-				this.storeView.renderStore();
+				this.openStore();
 			}).bind(this));
 
 			this.view.tabsView.handleClickOnPackTab((function(el) {
@@ -5222,6 +5234,14 @@ window.StickersModule.View = {};
 
 		close: function() {
 			this.view.close();
+		},
+
+		openStore: function() {
+			this.storeView.renderStore();
+		},
+
+		closeStore: function() {
+			this.storeView.close();
 		},
 
 		////////////////////

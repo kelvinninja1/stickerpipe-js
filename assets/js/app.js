@@ -79,8 +79,6 @@ var App = _makeClass(function(options) {
 
 			apiKey: '72921666b5ff8651f374747bfefaf7b2',
 
-			storagePrefix: 'stickerPipe',
-
 			enableEmojiTab: true,
 			enableHistoryTab: true,
 			enableStoreTab: true,
@@ -313,8 +311,8 @@ var App = _makeClass(function(options) {
 			resetUserId = this.getUrlParameter('resetUserId');
 
 
-		if ((!!resetUserId && parseInt(resetUserId, 10) == 1) || !userId || userId.length != 32) {
-			userId = StickersModule.Service.Helper.md5(+ new Date());
+		if ((!!resetUserId && parseInt(resetUserId, 10) == 1) || !userId) {
+			userId = this.getRandom(1, 1000);
 			localStorage.setItem('userId', userId);
 		}
 

@@ -448,70 +448,70 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 }
 
 .sp-icon-arrow-back {
-  background-image: url("../img/icons_sprite.png");
+  background-image: url("../img/icons/icons_sprite.1453724705945.png");
   background-position: 0px 0px;
   width: 24px;
   height: 24px;
 }
 
 .sp-icon-arrow-forward {
-  background-image: url("../img/icons_sprite.png");
+  background-image: url("../img/icons/icons_sprite.1453724705945.png");
   background-position: -24px 0px;
   width: 24px;
   height: 24px;
 }
 
 .sp-icon-back {
-  background-image: url("../img/icons_sprite.png");
+  background-image: url("../img/icons/icons_sprite.1453724705945.png");
   background-position: 0px -24px;
   width: 24px;
   height: 24px;
 }
 
 .sp-icon-clock {
-  background-image: url("../img/icons_sprite.png");
+  background-image: url("../img/icons/icons_sprite.1453724705945.png");
   background-position: -24px -24px;
   width: 24px;
   height: 24px;
 }
 
 .sp-icon-close {
-  background-image: url("../img/icons_sprite.png");
+  background-image: url("../img/icons/icons_sprite.1453724705945.png");
   background-position: -48px 0px;
   width: 24px;
   height: 24px;
 }
 
 .sp-icon-face {
-  background-image: url("../img/icons_sprite.png");
+  background-image: url("../img/icons/icons_sprite.1453724705945.png");
   background-position: -48px -24px;
   width: 24px;
   height: 24px;
 }
 
 .sp-icon-mall {
-  background-image: url("../img/icons_sprite.png");
+  background-image: url("../img/icons/icons_sprite.1453724705945.png");
   background-position: 0px -48px;
   width: 24px;
   height: 24px;
 }
 
 .sp-icon-plus {
-  background-image: url("../img/icons_sprite.png");
+  background-image: url("../img/icons/icons_sprite.1453724705945.png");
   background-position: -24px -48px;
   width: 24px;
   height: 24px;
 }
 
 .sp-icon-settings {
-  background-image: url("../img/icons_sprite.png");
+  background-image: url("../img/icons/icons_sprite.1453724705945.png");
   background-position: -48px -48px;
   width: 24px;
   height: 24px;
 }
 
 .sp-icon-arrow-back {
-  background-image: url("../img/icons_sprite.png");
+  background-image: url("../img/icons/icons_sprite.1453724705945.png");
   background-position: 0px 0px;
   width: 24px;
   height: 24px;
@@ -519,13 +519,13 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   .sp-icon-arrow-back {
-    background-image: url("../img/icons_sprite@2x.png");
+    background-image: url("../img/icons/icons_sprite@2x.1453724705945.png");
     background-size: 72px 72px;
   }
 }
 
 .sp-icon-arrow-forward {
-  background-image: url("../img/icons_sprite.png");
+  background-image: url("../img/icons/icons_sprite.1453724705945.png");
   background-position: -24px 0px;
   width: 24px;
   height: 24px;
@@ -533,13 +533,13 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   .sp-icon-arrow-forward {
-    background-image: url("../img/icons_sprite@2x.png");
+    background-image: url("../img/icons/icons_sprite@2x.1453724705945.png");
     background-size: 72px 72px;
   }
 }
 
 .sp-icon-back {
-  background-image: url("../img/icons_sprite.png");
+  background-image: url("../img/icons/icons_sprite.1453724705945.png");
   background-position: 0px -24px;
   width: 24px;
   height: 24px;
@@ -547,13 +547,13 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   .sp-icon-back {
-    background-image: url("../img/icons_sprite@2x.png");
+    background-image: url("../img/icons/icons_sprite@2x.1453724705945.png");
     background-size: 72px 72px;
   }
 }
 
 .sp-icon-clock {
-  background-image: url("../img/icons_sprite.png");
+  background-image: url("../img/icons/icons_sprite.1453724705945.png");
   background-position: -24px -24px;
   width: 24px;
   height: 24px;
@@ -561,13 +561,13 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   .sp-icon-clock {
-    background-image: url("../img/icons_sprite@2x.png");
+    background-image: url("../img/icons/icons_sprite@2x.1453724705945.png");
     background-size: 72px 72px;
   }
 }
 
 .sp-icon-close {
-  background-image: url("../img/icons_sprite.png");
+  background-image: url("../img/icons/icons_sprite.1453724705945.png");
   background-position: -48px 0px;
   width: 24px;
   height: 24px;
@@ -575,13 +575,13 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   .sp-icon-close {
-    background-image: url("../img/icons_sprite@2x.png");
+    background-image: url("../img/icons/icons_sprite@2x.1453724705945.png");
     background-size: 72px 72px;
   }
 }
 
 .sp-icon-face {
-  background-image: url("../img/icons_sprite.png");
+  background-image: url("../img/icons/icons_sprite.1453724705945.png");
   background-position: -48px -24px;
   width: 24px;
   height: 24px;
@@ -589,13 +589,13 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   .sp-icon-face {
-    background-image: url("../img/icons_sprite@2x.png");
+    background-image: url("../img/icons/icons_sprite@2x.1453724705945.png");
     background-size: 72px 72px;
   }
 }
 
 .sp-icon-mall {
-  background-image: url("../img/icons_sprite.png");
+  background-image: url("../img/icons/icons_sprite.1453724705945.png");
   background-position: 0px -48px;
   width: 24px;
   height: 24px;
@@ -603,13 +603,13 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   .sp-icon-mall {
-    background-image: url("../img/icons_sprite@2x.png");
+    background-image: url("../img/icons/icons_sprite@2x.1453724705945.png");
     background-size: 72px 72px;
   }
 }
 
 .sp-icon-plus {
-  background-image: url("../img/icons_sprite.png");
+  background-image: url("../img/icons/icons_sprite.1453724705945.png");
   background-position: -24px -48px;
   width: 24px;
   height: 24px;
@@ -617,13 +617,13 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   .sp-icon-plus {
-    background-image: url("../img/icons_sprite@2x.png");
+    background-image: url("../img/icons/icons_sprite@2x.1453724705945.png");
     background-size: 72px 72px;
   }
 }
 
 .sp-icon-settings {
-  background-image: url("../img/icons_sprite.png");
+  background-image: url("../img/icons/icons_sprite.1453724705945.png");
   background-position: -48px -48px;
   width: 24px;
   height: 24px;
@@ -631,7 +631,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   .sp-icon-settings {
-    background-image: url("../img/icons_sprite@2x.png");
+    background-image: url("../img/icons/icons_sprite@2x.1453724705945.png");
     background-size: 72px 72px;
   }
 }
