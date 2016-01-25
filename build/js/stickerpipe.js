@@ -2496,7 +2496,7 @@ window.StickersModule.Service = {};
 
 			if (options.type == 'POST' || options.type == 'PUT') {
 				options.headers['Content-Type'] = options.headers['Content-Type'] || 'application/x-www-form-urlencoded';
-				options.headers['DeviceId'] = Module.Storage.getUniqUserId();
+				options.headers['DeviceId'] = Module.Storage.getDeviceId();
 			}
 
 
@@ -2603,7 +2603,9 @@ window.StickersModule.Service = {};
 			this.lockr.prefix = storagePrefix;
 		},
 
-
+		///////////////////////////////////////
+		// Used stickers
+		///////////////////////////////////////
 		getUsedStickers: function() {
 			return this.lockr.get('sticker_latest_use') || [];
 		},
@@ -2633,7 +2635,9 @@ window.StickersModule.Service = {};
 			this.setUsedStickers(usedStickers);
 		},
 
-
+		///////////////////////////////////////
+		// Packs
+		///////////////////////////////////////
 		getPacks: function() {
 			var packs = this.lockr.get('sticker_packs');
 
@@ -2649,27 +2653,43 @@ window.StickersModule.Service = {};
 			return this.lockr.set('sticker_packs', packs)
 		},
 
+		///////////////////////////////////////
+		// Device ID
+		///////////////////////////////////////
+		getDeviceId: function() {
+			var deviceId = this.lockr.get('device_id');
 
-		getUniqUserId: function() {
-			var uniqUserId = this.lockr.get('uniqUserId');
-
-			if (typeof uniqUserId == 'undefined') {
-				uniqUserId = + new Date();
-				this.lockr.set('uniqUserId', uniqUserId);
+			if (typeof deviceId == 'undefined') {
+				deviceId = + new Date();
+				this.lockr.set('device_id', deviceId);
 			}
 
-			return uniqUserId;
+			return deviceId;
 		},
 
+		///////////////////////////////////////
+		// User ID
+		///////////////////////////////////////
+		getUserId: function() {
+			return this.lockr.get('user_id');
+		},
+		setUserId: function(userId) {
+			return this.lockr.set('user_id', userId);
+		},
 
+		///////////////////////////////////////
+		// User data
+		///////////////////////////////////////
 		getUserData: function() {
-			return this.lockr.get('userData');
+			return this.lockr.get('user_data');
 		},
 		setUserData: function(userData) {
-			return this.lockr.set('userData', userData);
+			return this.lockr.set('user_data', userData);
 		},
 
-
+		///////////////////////////////////////
+		// Pending request
+		///////////////////////////////////////
 		getPendingRequestTasks: function() {
 			return this.lockr.get('pending_request_tasks') || [];
 		},
@@ -2903,13 +2923,13 @@ window.StickersModule.Configs = {};
 
 		htmlForEmptyRecent: '<div class="emptyRecent">No recent stickers</div>',
 
-		apiKey: '', // example: 72921666b5ff8651f374747bfefaf7b2
+		apiKey: null, // example: 72921666b5ff8651f374747bfefaf7b2
 
 		cdnUrl: 'http://cdn.stickerpipe.com',
 		apiUrl: 'http://api.stickerpipe.com',
 		storeUrl: 'http://api.stickerpipe.com/api/v1/web',
 
-		storagePrefix: 'stickerPipe',
+		storagePrefix: 'stickerpipe_',
 
 		enableEmojiTab: false,
 		enableHistoryTab: false,
@@ -5011,21 +5031,36 @@ window.StickersModule.View = {};
 
 		_constructor: function(config) {
 
+			Module.Service.Helper.setConfig(config);
+
+			// ***** Init Storage ******
+			Module.Storage.setPrefix(Module.Configs.storagePrefix);
+
+			// ***** Init Emoji tab *****
 			var mobileOS = Module.Service.Helper.getMobileOS();
 			if (mobileOS == 'ios' || mobileOS == 'android') {
 				config.enableEmojiTab = false;
 			}
 
-			Module.Service.Helper.setConfig(config);
+			// ***** Check ApiKey *****
+			if (!Module.Configs.apiKey) {
+				throw new Error('Empty apiKey');
+			}
+
+
+			// ***** Init UserId *****
+			var savedUserId = Module.Storage.getUserId();
 
 			if (Module.Configs.userId) {
 				Module.Configs.userId = Module.Service.Helper.md5(Module.Configs.userId + Module.Configs.apiKey);
+				Module.Storage.setUserId(Module.Configs.userId);
 			}
 
-			Module.Storage.setPrefix(Module.Configs.storagePrefix);
+			if (Module.Configs.userId != savedUserId) {
+				Module.Storage.setUsedStickers([]);
+			}
 
-			Module.BaseService.trackUserData();
-
+			// ***** Init services ******
 			Module.Service.Store.init(this);
 			Module.Service.Pack.init(this);
 
@@ -5052,6 +5087,9 @@ window.StickersModule.View = {};
 			var callback = onload || null;
 
 			this.fetchPacks((function() {
+				// todo: move to initialize (with API v2)
+				Module.BaseService.trackUserData();
+
 				this.view.render(this.stickersModel);
 
 				callback && callback();
@@ -5073,7 +5111,7 @@ window.StickersModule.View = {};
 			}).bind(this));
 
 			this.view.tabsView.handleClickOnStoreTab((function() {
-				this.storeView.renderStore();
+				this.openStore();
 			}).bind(this));
 
 			this.view.tabsView.handleClickOnPackTab((function(el) {
@@ -5196,6 +5234,14 @@ window.StickersModule.View = {};
 
 		close: function() {
 			this.view.close();
+		},
+
+		openStore: function() {
+			this.storeView.renderStore();
+		},
+
+		closeStore: function() {
+			this.storeView.close();
 		},
 
 		////////////////////

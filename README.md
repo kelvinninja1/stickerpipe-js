@@ -81,42 +81,51 @@ js
 
 ## Methods
 
--  rendering sticker pipe keyboard
+-  **render** - rendering sticker pipe keyboard
 
 ```js
     sticker.render([onRender, elId]);
 ```
 
--  parse text and return img url if text is sticker
+-  **parseStickerFromText** - parse text and return img url if text is sticker
 ```js
     sticker.parseStickerFromText(text);
 ```
 
--  parse text and return text with replaced emoji to html
+-  **parseEmojiFromText** - parse text and return text with replaced emoji to html
 ```js
     sticker.parseEmojiFromText(text);
 ```
 
--  parse html and return text with replaced html to emoji text
+-  **parseEmojiFromHtml** - parse html and return text with replaced html to emoji text
 ```js
     sticker.parseEmojiFromHtml(html);
 ```
 
--  open (by default - history tab) or open pack tab
+- **onUserMessageSent** - when message send (for statistic)
+
+```js
+    sticker.onUserMessageSent(isSticker);
+```
+
+-  **open** - open pack tab or by default - history tab
 ```js
     sticker.open([packName]);
 ```
 
-- return - are the new content flag
-
+-  **close** - close sticker pipe popover
 ```js
-    sticker.getNewStickersFlag();
+    sticker.close();
 ```
 
-- when message send (for statistic)
-
+-  **openStore** - open store in modal window
 ```js
-    sticker.onUserMessageSent(isSticker);
+    sticker.openStore();
+```
+
+-  **closeStore** - close store modal window
+```js
+    sticker.closeStore();
 ```
 
 ## Events
@@ -144,19 +153,19 @@ js
 
 ## Callbacks
 
-- when user click on sticker
+- **onClickSticker** - fired when user click on sticker
     
 ```js
     sticker.onClickSticker(function(text) {...}, context);
 ```
 
-- when user click on emoji
+- **onClickEmoji** - fired when user click on emoji
 
 ```js
     sticker.onClickEmoji(function(text) {...}, context);
 ```
 
-- when user click on custom tab
+- **onClickCustomTab** - fired when user click on custom tab
     
 ```js
     sticker.onClickCustomTab(function(el) {...}, context);

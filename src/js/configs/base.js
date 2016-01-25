@@ -16,13 +16,13 @@
 
 		htmlForEmptyRecent: '<div class="emptyRecent">No recent stickers</div>',
 
-		apiKey: '', // example: 72921666b5ff8651f374747bfefaf7b2
+		apiKey: null, // example: 72921666b5ff8651f374747bfefaf7b2
 
 		cdnUrl: 'http://cdn.stickerpipe.com',
 		apiUrl: 'http://api.stickerpipe.com',
 		storeUrl: 'http://api.stickerpipe.com/api/v1/web',
 
-		storagePrefix: 'stickerPipe',
+		storagePrefix: 'stickerpipe_',
 
 		enableEmojiTab: false,
 		enableHistoryTab: false,

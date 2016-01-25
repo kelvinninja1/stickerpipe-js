@@ -59,7 +59,7 @@
 
 			if (options.type == 'POST' || options.type == 'PUT') {
 				options.headers['Content-Type'] = options.headers['Content-Type'] || 'application/x-www-form-urlencoded';
-				options.headers['DeviceId'] = Module.Storage.getUniqUserId();
+				options.headers['DeviceId'] = Module.Storage.getDeviceId();
 			}
 
 

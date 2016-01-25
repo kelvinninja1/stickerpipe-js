@@ -9,7 +9,9 @@
 			this.lockr.prefix = storagePrefix;
 		},
 
-
+		///////////////////////////////////////
+		// Used stickers
+		///////////////////////////////////////
 		getUsedStickers: function() {
 			return this.lockr.get('sticker_latest_use') || [];
 		},
@@ -39,7 +41,9 @@
 			this.setUsedStickers(usedStickers);
 		},
 
-
+		///////////////////////////////////////
+		// Packs
+		///////////////////////////////////////
 		getPacks: function() {
 			var packs = this.lockr.get('sticker_packs');
 
@@ -55,27 +59,43 @@
 			return this.lockr.set('sticker_packs', packs)
 		},
 
+		///////////////////////////////////////
+		// Device ID
+		///////////////////////////////////////
+		getDeviceId: function() {
+			var deviceId = this.lockr.get('device_id');
 
-		getUniqUserId: function() {
-			var uniqUserId = this.lockr.get('uniqUserId');
-
-			if (typeof uniqUserId == 'undefined') {
-				uniqUserId = + new Date();
-				this.lockr.set('uniqUserId', uniqUserId);
+			if (typeof deviceId == 'undefined') {
+				deviceId = + new Date();
+				this.lockr.set('device_id', deviceId);
 			}
 
-			return uniqUserId;
+			return deviceId;
 		},
 
+		///////////////////////////////////////
+		// User ID
+		///////////////////////////////////////
+		getUserId: function() {
+			return this.lockr.get('user_id');
+		},
+		setUserId: function(userId) {
+			return this.lockr.set('user_id', userId);
+		},
 
+		///////////////////////////////////////
+		// User data
+		///////////////////////////////////////
 		getUserData: function() {
-			return this.lockr.get('userData');
+			return this.lockr.get('user_data');
 		},
 		setUserData: function(userData) {
-			return this.lockr.set('userData', userData);
+			return this.lockr.set('user_data', userData);
 		},
 
-
+		///////////////////////////////////////
+		// Pending request
+		///////////////////////////////////////
 		getPendingRequestTasks: function() {
 			return this.lockr.get('pending_request_tasks') || [];
 		},

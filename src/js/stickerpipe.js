@@ -27,21 +27,36 @@ window.StickersModule.View = {};
 
 		_constructor: function(config) {
 
+			Module.Service.Helper.setConfig(config);
+
+			// ***** Init Storage ******
+			Module.Storage.setPrefix(Module.Configs.storagePrefix);
+
+			// ***** Init Emoji tab *****
 			var mobileOS = Module.Service.Helper.getMobileOS();
 			if (mobileOS == 'ios' || mobileOS == 'android') {
 				config.enableEmojiTab = false;
 			}
 
-			Module.Service.Helper.setConfig(config);
+			// ***** Check ApiKey *****
+			if (!Module.Configs.apiKey) {
+				throw new Error('Empty apiKey');
+			}
+
+
+			// ***** Init UserId *****
+			var savedUserId = Module.Storage.getUserId();
 
 			if (Module.Configs.userId) {
 				Module.Configs.userId = Module.Service.Helper.md5(Module.Configs.userId + Module.Configs.apiKey);
+				Module.Storage.setUserId(Module.Configs.userId);
 			}
 
-			Module.Storage.setPrefix(Module.Configs.storagePrefix);
+			if (Module.Configs.userId != savedUserId) {
+				Module.Storage.setUsedStickers([]);
+			}
 
-			Module.BaseService.trackUserData();
-
+			// ***** Init services ******
 			Module.Service.Store.init(this);
 			Module.Service.Pack.init(this);
 
@@ -68,6 +83,9 @@ window.StickersModule.View = {};
 			var callback = onload || null;
 
 			this.fetchPacks((function() {
+				// todo: move to initialize (with API v2)
+				Module.BaseService.trackUserData();
+
 				this.view.render(this.stickersModel);
 
 				callback && callback();
@@ -89,7 +107,7 @@ window.StickersModule.View = {};
 			}).bind(this));
 
 			this.view.tabsView.handleClickOnStoreTab((function() {
-				this.storeView.renderStore();
+				this.openStore();
 			}).bind(this));
 
 			this.view.tabsView.handleClickOnPackTab((function(el) {
@@ -212,6 +230,14 @@ window.StickersModule.View = {};
 
 		close: function() {
 			this.view.close();
+		},
+
+		openStore: function() {
+			this.storeView.renderStore();
+		},
+
+		closeStore: function() {
+			this.storeView.close();
 		},
 
 		////////////////////
