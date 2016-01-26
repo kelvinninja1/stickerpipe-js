@@ -5411,6 +5411,7 @@ window.StickersModule.View = {};
 			scrollableEl.appendChild(this.contentEl);
 			scrollableEl.style.height = parseInt(Module.Configs.height, 10) - 49 + 'px';
 			scrollableEl.style.overflow = 'hidden';
+			scrollableEl.style.position = 'relative';
 
 			this.contentEl.classList.add('sp-content');
 
