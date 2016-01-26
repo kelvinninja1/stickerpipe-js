@@ -365,9 +365,9 @@ window.StickersModule.Libs = {};
 		function _drag(event) {
 			if(self.hasContentToSroll)
 			{
-				var mousePositionNew = isHorizontal ? event.clientX : event.clientY
+				var mousePositionNew = isHorizontal ? event.pageX : event.pageY
 					,   thumbPositionDelta = hasTouchEvents ? (mousePosition - mousePositionNew) : (mousePositionNew - mousePosition)
-					,   thumbPositionNew = Math.min((self.trackSize - self.thumbSize), Math.max(0, self.thumbPosition + 1))
+					,   thumbPositionNew = Math.min((self.trackSize - self.thumbSize), Math.max(0, self.thumbPosition + thumbPositionDelta))
 					;
 
 				self.contentPosition = thumbPositionNew * self.trackRatio;
