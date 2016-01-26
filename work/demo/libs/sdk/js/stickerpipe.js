@@ -367,7 +367,7 @@ window.StickersModule.Libs = {};
 			{
 				var mousePositionNew = isHorizontal ? event.clientX : event.clientY
 					,   thumbPositionDelta = hasTouchEvents ? (mousePosition - mousePositionNew) : (mousePositionNew - mousePosition)
-					,   thumbPositionNew = Math.min((self.trackSize - self.thumbSize), Math.max(0, self.thumbPosition))
+					,   thumbPositionNew = Math.min((self.trackSize - self.thumbSize), Math.max(0, self.thumbPosition + 1))
 					;
 
 				self.contentPosition = thumbPositionNew * self.trackRatio;
