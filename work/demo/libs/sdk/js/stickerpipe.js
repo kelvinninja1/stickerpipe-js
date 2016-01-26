@@ -188,7 +188,7 @@ window.StickersModule.Libs = {};
 			this.contentSize = $overview['scroll'+ sizeLabelCap];
 			this.contentRatio = this.viewportSize / this.contentSize;
 			this.trackSize = this.options.trackSize || this.viewportSize;
-			//this.trackSize -= 2; // bugfix (for css - top: 2px)
+			this.trackSize -= 2; // bugfix (for css - top: 2px)
 			this.thumbSize = Math.min(this.trackSize, Math.max(this.options.thumbSizeMin, (this.options.thumbSize || (this.trackSize * this.contentRatio))));
 			this.trackRatio = (this.contentSize - this.viewportSize) / (this.trackSize - this.thumbSize);
 			this.hasContentToSroll = this.contentRatio < 1;
@@ -367,7 +367,7 @@ window.StickersModule.Libs = {};
 			{
 				var mousePositionNew = isHorizontal ? event.clientX : event.clientY
 					,   thumbPositionDelta = hasTouchEvents ? (mousePosition - mousePositionNew) : (mousePositionNew - mousePosition)
-					,   thumbPositionNew = Math.min((self.trackSize - self.thumbSize), Math.max(0, self.thumbPosition + thumbPositionDelta))
+					,   thumbPositionNew = Math.min((self.trackSize - self.thumbSize), Math.max(0, self.thumbPosition))
 					;
 
 				self.contentPosition = thumbPositionNew * self.trackRatio;
