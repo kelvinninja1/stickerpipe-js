@@ -234,7 +234,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   right: 3px;
   /* there must be 'right' for ps-scrollbar-y-rail */
   width: 7px;
-  margin-right: 2px;
+  margin-right: 1px;
 }
 
 .ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y {
