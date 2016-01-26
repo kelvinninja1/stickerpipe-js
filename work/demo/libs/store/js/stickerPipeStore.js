@@ -301,123 +301,6 @@ appStickerPipeStore.config(function($stateProvider, $urlRouterProvider) {
 			}
 		});
 });
-
-appStickerPipeStore.directive('spAutoScroll', function ($document, $timeout, $location, $window, $rootScope) {
-	return {
-		restrict: 'A',
-		link: function (scope, element, attrs) {
-
-			$rootScope.showContent = true;
-			scope.okSaveScroll = true;
-			scope.history = [];
-
-			$document.bind('scroll', function () {
-				if (scope.okSaveScroll && scope.history.length > 0) {
-					scope.history[scope.history.length - 1].y = $window.scrollY;
-				}
-			});
-
-			scope.$on('$locationChangeStart', function () {
-				scope.okSaveScroll = false;
-				$rootScope.showContent = false;
-			});
-
-			// ************************
-
-
-			function onContentLoad() {
-				$rootScope.showContent = true;
-
-				$timeout(function() {
-					scope.okSaveScroll = true;
-
-					var y = scope.history[scope.history.length - 1].y;
-
-					$window.scrollTo(0, y);
-				}, 100);
-			}
-
-			$rootScope.$on('$stateChangeSuccess', function() {
-				onContentLoad();
-			});
-
-			$rootScope.$on('$stateChangeError', function() {
-				onContentLoad();
-			});
-
-			$rootScope.$watch(function () { return $location.path() }, function (newLocation, oldLocation) {
-
-				function forward() {
-					scope.history[scope.history.length] = {
-						url: newLocation,
-						y: 0
-					};
-				}
-
-				function back() {
-					scope.history.splice(scope.history.length - 1, 1);
-				}
-
-				if (scope.history.length > 1) {
-					if (newLocation == scope.history[scope.history.length - 2].url ||
-						newLocation + '/' == scope.history[scope.history.length - 2].url) {
-						back();
-					} else {
-						forward();
-					}
-				} else {
-					forward();
-				}
-			});
-		}
-	};
-});
-appStickerPipeStore.directive('spLoad', ['$parse', function ($parse) {
-	return {
-		restrict: 'A',
-		link: function (scope, elem, attrs) {
-			var fn = $parse(attrs.spLoad);
-			elem.on('load', function (event) {
-				scope.$apply(function() {
-					fn(scope, { $event: event });
-				});
-			});
-		}
-	};
-}]);
-appStickerPipeStore.directive('spOnLongPress', function($timeout) {
-	return {
-		restrict: 'A',
-		link: function($scope, $elm, $attrs) {
-			$elm.bind('touchstart', function(evt) {
-				// Locally scoped variable that will keep track of the long press
-				$scope.longPress = true;
-
-				// We'll set a timeout for 600 ms for a long press
-				$timeout(function() {
-					if ($scope.longPress) {
-						// If the touchend event hasn't fired,
-						// apply the function given in on the element's on-long-press attribute
-						$scope.$apply(function() {
-							$scope.$eval($attrs.onLongPress)
-						});
-					}
-				}, 600);
-			});
-
-			$elm.bind('touchend', function(evt) {
-				// Prevent the onLongPress event from firing
-				$scope.longPress = false;
-				// If there is an on-touch-end function attached to this element, apply it
-				if ($attrs.spOnTouchEnd) {
-					$scope.$apply(function() {
-						$scope.$eval($attrs.spOnTouchEnd)
-					});
-				}
-			});
-		}
-	};
-});
 appStickerPipeStore.factory('EnvConfig', ['envService', function(envService) {
 	return envService.read('all');
 }]);
@@ -661,105 +544,121 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $rootScop
 
 });
 
-appStickerPipeStore.directive('basePage', function() {
-
+appStickerPipeStore.directive('spAutoScroll', function ($document, $timeout, $location, $window, $rootScope) {
 	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/view.tpl',
-		link: function($scope, $el, attrs) {}
+		restrict: 'A',
+		link: function (scope, element, attrs) {
+
+			$rootScope.showContent = true;
+			scope.okSaveScroll = true;
+			scope.history = [];
+
+			$document.bind('scroll', function () {
+				if (scope.okSaveScroll && scope.history.length > 0) {
+					scope.history[scope.history.length - 1].y = $window.scrollY;
+				}
+			});
+
+			scope.$on('$locationChangeStart', function () {
+				scope.okSaveScroll = false;
+				$rootScope.showContent = false;
+			});
+
+			// ************************
+
+
+			function onContentLoad() {
+				$rootScope.showContent = true;
+
+				$timeout(function() {
+					scope.okSaveScroll = true;
+
+					var y = scope.history[scope.history.length - 1].y;
+
+					$window.scrollTo(0, y);
+				}, 100);
+			}
+
+			$rootScope.$on('$stateChangeSuccess', function() {
+				onContentLoad();
+			});
+
+			$rootScope.$on('$stateChangeError', function() {
+				onContentLoad();
+			});
+
+			$rootScope.$watch(function () { return $location.path() }, function (newLocation, oldLocation) {
+
+				function forward() {
+					scope.history[scope.history.length] = {
+						url: newLocation,
+						y: 0
+					};
+				}
+
+				function back() {
+					scope.history.splice(scope.history.length - 1, 1);
+				}
+
+				if (scope.history.length > 1) {
+					if (newLocation == scope.history[scope.history.length - 2].url ||
+						newLocation + '/' == scope.history[scope.history.length - 2].url) {
+						back();
+					} else {
+						forward();
+					}
+				} else {
+					forward();
+				}
+			});
+		}
 	};
 });
-
-appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack, $window) {
-
-	PlatformAPI.showBackButton('#/store');
-
-	angular.extend($scope, {
-		config: Config,
-		platformAPI: PlatformAPI,
-		pack: pack,
-		i18n: i18n,
-		packService: PackService,
-		showActionProgress: false,
-		showPage: false,
-
-		getStickerUrl: function(name) {
-			return EnvConfig.stickersStorageUrl + this.pack.pack_name + '/' + name + '_' + Config.resolutionType + '.png';
-		},
-
-		getMainStickerUrl: function() {
-			return $scope.getStickerUrl('main_icon');
-		},
-
-		showCollections: function() {
-			PlatformAPI.showCollections(pack.pack_name);
-		},
-
-		purchasePack: function() {
-			$scope.showActionProgress = true;
-			PlatformAPI.purchasePack(pack.title, pack.pack_name, pack.pricepoint);
-		},
-
-		isLandscapeStickersPreview: function() {
-			return ($window.innerWidth > $window.innerHeight || $window.innerWidth > 544);
-		},
-
-		getStickersPreview: function() {
-			var image = this.pack.preview;
-
-			if (this.isLandscapeStickersPreview()) {
-				image = this.pack.preview_landscape;
-			}
-
-			return image[Config.resolutionType];
-		},
-
-		onImgLoad: function() {
-			PlatformAPI.showInProgress(false);
-			this.showPage = true;
+appStickerPipeStore.directive('spLoad', ['$parse', function ($parse) {
+	return {
+		restrict: 'A',
+		link: function (scope, elem, attrs) {
+			var fn = $parse(attrs.spLoad);
+			elem.on('load', function (event) {
+				scope.$apply(function() {
+					fn(scope, { $event: event });
+				});
+			});
 		}
-	});
+	};
+}]);
+appStickerPipeStore.directive('spOnLongPress', function($timeout) {
+	return {
+		restrict: 'A',
+		link: function($scope, $elm, $attrs) {
+			$elm.bind('touchstart', function(evt) {
+				// Locally scoped variable that will keep track of the long press
+				$scope.longPress = true;
 
-	$rootScope.$on('hideActionProgress', function() {
-		$scope.showActionProgress = false;
-		if(!$scope.$$phase) {
-			$scope.$apply();
+				// We'll set a timeout for 600 ms for a long press
+				$timeout(function() {
+					if ($scope.longPress) {
+						// If the touchend event hasn't fired,
+						// apply the function given in on the element's on-long-press attribute
+						$scope.$apply(function() {
+							$scope.$eval($attrs.onLongPress)
+						});
+					}
+				}, 600);
+			});
+
+			$elm.bind('touchend', function(evt) {
+				// Prevent the onLongPress event from firing
+				$scope.longPress = false;
+				// If there is an on-touch-end function attached to this element, apply it
+				if ($attrs.spOnTouchEnd) {
+					$scope.$apply(function() {
+						$scope.$eval($attrs.spOnTouchEnd)
+					});
+				}
+			});
 		}
-	});
-
-
-	angular.element($window).bind('resize', function () {
-		$scope.$apply();
-	});
-});
-
-appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI, $location) {
-
-	PlatformAPI.showInProgress(false);
-
-	angular.extend($scope, {
-		platformAPI: PlatformAPI,
-		packs: packs.packs,
-
-		getPackMainIcon: function(pack) {
-			return pack.main_icon[Config.resolutionType];
-		},
-
-		getPackTitle: function(pack) {
-			var title = pack.title;
-			if (title.length > 15) {
-				title = title.substr(0, 15);
-				title += '...';
-			}
-
-			return title;
-		},
-
-		openPack: function(packName) {
-			// #/packs/{{ pack.pack_name }}
-			$location.path('/packs/' + packName);
-		}
-	});
+	};
 });
 
 appStickerPipeStore.value('En', {
@@ -899,6 +798,106 @@ appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout
 			this.showCollections(attrs.packName)
 		}
 
+	});
+});
+
+appStickerPipeStore.directive('basePage', function() {
+
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/view.tpl',
+		link: function($scope, $el, attrs) {}
+	};
+});
+
+appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack, $window) {
+
+	PlatformAPI.showBackButton('#/store');
+
+	angular.extend($scope, {
+		config: Config,
+		platformAPI: PlatformAPI,
+		pack: pack,
+		i18n: i18n,
+		packService: PackService,
+		showActionProgress: false,
+		showPage: false,
+
+		getStickerUrl: function(name) {
+			return EnvConfig.stickersStorageUrl + this.pack.pack_name + '/' + name + '_' + Config.resolutionType + '.png';
+		},
+
+		getMainStickerUrl: function() {
+			return $scope.getStickerUrl('main_icon');
+		},
+
+		showCollections: function() {
+			PlatformAPI.showCollections(pack.pack_name);
+		},
+
+		purchasePack: function() {
+			$scope.showActionProgress = true;
+			PlatformAPI.purchasePack(pack.title, pack.pack_name, pack.pricepoint);
+		},
+
+		isLandscapeStickersPreview: function() {
+			return ($window.innerWidth > $window.innerHeight || $window.innerWidth > 544);
+		},
+
+		getStickersPreview: function() {
+			var image = this.pack.preview;
+
+			if (this.isLandscapeStickersPreview()) {
+				image = this.pack.preview_landscape;
+			}
+
+			return image[Config.resolutionType];
+		},
+
+		onImgLoad: function() {
+			PlatformAPI.showInProgress(false);
+			this.showPage = true;
+		}
+	});
+
+	$rootScope.$on('hideActionProgress', function() {
+		$scope.showActionProgress = false;
+		if(!$scope.$$phase) {
+			$scope.$apply();
+		}
+	});
+
+
+	angular.element($window).bind('resize', function () {
+		$scope.$apply();
+	});
+});
+
+appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI, $location) {
+
+	PlatformAPI.showInProgress(false);
+
+	angular.extend($scope, {
+		platformAPI: PlatformAPI,
+		packs: packs.packs,
+
+		getPackMainIcon: function(pack) {
+			return pack.main_icon[Config.resolutionType];
+		},
+
+		getPackTitle: function(pack) {
+			var title = pack.title;
+			if (title.length > 15) {
+				title = title.substr(0, 15);
+				title += '...';
+			}
+
+			return title;
+		},
+
+		openPack: function(packName) {
+			$location.path('/packs/' + packName);
+		}
 	});
 });
 
