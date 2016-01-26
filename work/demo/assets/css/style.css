@@ -199,7 +199,6 @@ body {
 
 #messages {
   overflow: hidden;
-  overflow-y: scroll;
   margin-top: 20px; }
   #messages img[data-sticker] {
     height: 160px;
