@@ -15,7 +15,8 @@
 		contentEl: null,
 
 		tabsView: null,
-		scrollView: null,
+
+		scrollableEl: null,
 
 		_constructor: function(emojiService) {
 			this.emojiService = emojiService;
@@ -24,36 +25,37 @@
 			this.contentEl = document.createElement('div');
 
 			this.tabsView = new Module.TabsView();
-			this.scrollView = new Module.ScrollView();
-
-			this.scrollView.onScroll((function() {
-				if (this.contentEl.classList.contains('sp-emojis') && this.scrollView.isAtEnd()) {
-					this.renderEmojis(this.emojisOffset);
-				}
-			}).bind(this));
 
 			window.addEventListener('resize', (function() {
 				this.onWindowResize();
 			}).bind(this));
 		},
 
-
 		render: function(stickerPacks) {
+
 			this.tabsView.render(stickerPacks);
 
 			this.el.innerHTML = '';
 			this.el.classList.add('sticker-pipe');
 			this.el.style.width = Module.Configs.width;
 
-			this.scrollView.el.setAttribute('class', 'sp-scroll-content');
-			this.scrollView.getOverview().appendChild(this.contentEl);
+			this.scrollableEl = document.createElement('div');
+			this.scrollableEl.className = 'sp-scroll-content';
+			this.scrollableEl.style.height = parseInt(Module.Configs.height, 10) - 49 + 'px';
+			this.scrollableEl.appendChild(this.contentEl);
 
-			this.scrollView.viewportEl.style.height = parseInt(Module.Configs.height, 10) - 49 + 'px';
+			this.scrollableEl.addEventListener('ps-y-reach-end', (function () {
+				if (this.contentEl.classList.contains('sp-emojis')) {
+					this.renderEmojis(this.emojisOffset);
+				}
+			}).bind(this));
 
 			this.contentEl.classList.add('sp-content');
 
 			this.el.appendChild(this.tabsView.el);
-			this.el.appendChild(this.scrollView.el);
+			this.el.appendChild(this.scrollableEl);
+
+			Module.Libs.PerfectScrollbar.initialize(this.scrollableEl);
 
 			this.isRendered = true;
 
@@ -71,7 +73,7 @@
 
 			if (usedStickers.length == 0) {
 				this.contentEl.innerHTML += Module.Configs.htmlForEmptyRecent;
-				this.scrollView.update();
+				this.updateScroll('top');
 				return false;
 			}
 
@@ -92,7 +94,7 @@
 			this.emojisOffset = 0;
 			this.renderEmojis(this.emojisOffset);
 
-			this.scrollView.update();
+			this.updateScroll('top');
 		},
 		renderPack: function(pack) {
 
@@ -126,8 +128,6 @@
 					stickersSpanEl.classList.add(Module.Configs.stickerItemClass);
 					stickersSpanEl.setAttribute('data-sticker-string', stickerCode);
 					stickersSpanEl.appendChild(image);
-
-					self.scrollView.update('relative');
 				};
 				image.onerror = function() {};
 
@@ -136,7 +136,7 @@
 				self.contentEl.appendChild(stickersSpanEl);
 			});
 
-			self.scrollView.update();
+			this.updateScroll('top');
 		},
 		renderEmojis: function(offset) {
 
@@ -162,9 +162,8 @@
 
 			this.emojisOffset = limit;
 
-			this.scrollView.update('relative');
+			this.updateScroll();
 		},
-
 
 		handleClickOnSticker: function(callback) {
 			// todo: create static Module.Configs.stickerItemClass
@@ -188,6 +187,15 @@
 		},
 		close: function() {},
 
+		updateScroll: function(position) {
+			position = position || 'relative';
+
+			if (position == 'top') {
+				this.scrollableEl.scrollTop = 0;
+			}
+
+			Module.Libs.PerfectScrollbar.update(this.scrollableEl);
+		},
 
 		onWindowResize: function() {}
 	});

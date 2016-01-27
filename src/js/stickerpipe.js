@@ -3,6 +3,9 @@
 window.StickersModule = {};
 
 
+window.StickersModule.Libs = {};
+//=include libs/**/*.js
+
 window.StickersModule.Utils = {};
 //=include utils/**/*.js
 
