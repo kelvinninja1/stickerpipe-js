@@ -5388,14 +5388,15 @@ window.StickersModule.View = {};
 							}
 						}).bind(this));
 
+						// todo
 						// if iframe
-						if (this.contentEl && this.contentEl.contentWindow) {
-							this.contentEl.contentWindow.addEventListener('keyup', (function(e) {
-								if(e.keyCode === KEY_CODE_ESC && isOpen) {
-									this.close(this.options);
-								}
-							}).bind(this));
-						}
+						//if (this.contentEl && this.contentEl.contentWindow) {
+						//	this.contentEl.contentWindow.addEventListener('keyup', (function(e) {
+						//		if(e.keyCode === KEY_CODE_ESC && isOpen) {
+						//			this.close(this.options);
+						//		}
+						//	}).bind(this));
+						//}
 					}
 
 					if (this.options.closeOnOverlayClick) {
