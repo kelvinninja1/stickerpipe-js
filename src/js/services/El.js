@@ -1,7 +1,7 @@
 
 (function(Module) {
 
-	Module.El = {
+	Module.Service.El = {
 
 		css: function(el, property) {
 			// todo: getComputedStyle add IE 8 supporting

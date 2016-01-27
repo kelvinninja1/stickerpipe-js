@@ -1,7 +1,7 @@
 
 (function(Module) {
 
-	Module.Url = {
+	Module.Service.Url = {
 
 		buildStoreUrl: function(uri) {
 			uri = uri || '';
@@ -30,7 +30,7 @@
 		buildApiUrl: function(uri) {
 			uri = uri || '';
 
-			return Module.Configs.apiUrl + '/api/v' + Module.Api.getApiVersion() + '/' + uri;
+			return Module.Configs.apiUrl + '/api/v' + Module.Service.Api.getApiVersion() + '/' + uri;
 		},
 
 		getStickerUrl: function(packName, stickerName) {

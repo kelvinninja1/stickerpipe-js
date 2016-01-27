@@ -22,7 +22,7 @@
 		}
 	}
 
-	Module.StoreView = Module.Class({
+	Module.View.Store = Module.Class({
 
 		modal: null,
 		iframe: null,
@@ -39,7 +39,7 @@
 			this.modal = Module.View.Modal.init(this.iframe, {
 				onOpen: (function(contentEl, modalEl, overlay) {
 					this.overlay = overlay;
-					Module.DOMEventService.resize();
+					Module.Service.Event.resize();
 					setWindowMessageListener.bind(this)();
 
 					if (Module.Service.Helper.getMobileOS() == 'ios') {
@@ -59,12 +59,12 @@
 		},
 
 		renderStore: function() {
-			this.iframe.src = Module.Url.getStoreUrl();
+			this.iframe.src = Module.Service.Url.getStoreUrl();
 			this.modal.open();
 		},
 
 		renderPack: function(packName) {
-			this.iframe.src = Module.Url.getStorePackUrl(packName);
+			this.iframe.src = Module.Service.Url.getStorePackUrl(packName);
 			this.modal.open();
 		},
 
@@ -81,8 +81,8 @@
 
 			if (window.innerWidth > 700) {
 
-				var marginTop = parseInt(Module.El.css(dialog, 'marginTop'), 10),
-					marginBottom = parseInt(Module.El.css(dialog, 'marginBottom'), 10);
+				var marginTop = parseInt(Module.Service.El.css(dialog, 'marginTop'), 10),
+					marginBottom = parseInt(Module.Service.El.css(dialog, 'marginBottom'), 10);
 
 				var minHeight = window.innerHeight - marginTop - marginBottom;
 

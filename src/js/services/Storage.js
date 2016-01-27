@@ -1,7 +1,7 @@
 
 (function(Module) {
 
-	Module.Storage = {
+	Module.Service.Storage = {
 
 		lockr: Module.Lockr,
 

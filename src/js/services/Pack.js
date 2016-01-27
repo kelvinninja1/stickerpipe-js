@@ -10,7 +10,7 @@
 		},
 
 		activateUserPack: function(packName, pricePoint, doneCallback) {
-			Module.Api.changeUserPackStatus(packName, true, pricePoint, function() {
+			Module.Service.Api.changeUserPackStatus(packName, true, pricePoint, function() {
 
 				// todo: add event ~ "packs fetched" & remove "stickerpipe" variable
 				stickerpipe.fetchPacks(function() {

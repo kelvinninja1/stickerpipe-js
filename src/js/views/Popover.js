@@ -1,9 +1,9 @@
 
 (function(Module) {
 
-	var parent = Module.BlockView;
+	var parent = Module.View.Block;
 
-	Module.PopoverView = parent.extend({
+	Module.View.Popover = parent.extend({
 
 		popoverEl: null,
 		triangleEl: null,
@@ -57,12 +57,12 @@
 
 			// todo: addEventListener --> DOMEventService
 			if (window.addEventListener) {
-				window.addEventListener(Module.DOMEventService.events.popoverShown, function() {
-					Module.DOMEventService.resize();
+				window.addEventListener(Module.Service.Event.events.popoverShown, function() {
+					Module.Service.Event.resize();
 				});
 			} else {
-				window.attachEvent('on' + Module.DOMEventService.events.popoverShown, function() {
-					Module.DOMEventService.resize();
+				window.attachEvent('on' + Module.Service.Event.events.popoverShown, function() {
+					Module.Service.Event.resize();
 				});
 			}
 		},
@@ -82,7 +82,7 @@
 
 				this.toggleEl.parentElement.appendChild(this.popoverEl);
 				this.positioned();
-				Module.DOMEventService.popoverShown();
+				Module.Service.Event.popoverShown();
 			}
 
 			parent.prototype.open.apply(this, arguments);
@@ -91,7 +91,7 @@
 		close: function() {
 			this.active = false;
 			this.toggleEl.parentElement.removeChild(this.popoverEl);
-			Module.DOMEventService.popoverHidden();
+			Module.Service.Event.popoverHidden();
 			// todo
 			this.popoverEl.style.marginTop = 0;
 		},

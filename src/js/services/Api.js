@@ -3,28 +3,28 @@
 
 	var API_VERSION = 1;
 
-	Module.Api = {
+	Module.Service.Api = {
 
 		getApiVersion: function() {
 			return API_VERSION;
 		},
 
 		getPacks: function(doneCallback) {
-			var url = Module.Url.getPacksUrl();
+			var url = Module.Service.Url.getPacksUrl();
 
-			Module.Http.get(url, {
+			Module.Service.Http.get(url, {
 				success: doneCallback
 			});
 		},
 
 		sendStatistic: function(statistic) {
-			Module.Http.post(Module.Url.getStatisticUrl(), statistic);
+			Module.Service.Http.post(Module.Service.Url.getStatisticUrl(), statistic);
 		},
 
 		updateUserData: function(userData) {
-			return Module.Http.ajax({
+			return Module.Service.Http.ajax({
 				type: 'PUT',
-				url: Module.Url.getUserDataUrl(),
+				url: Module.Service.Url.getUserDataUrl(),
 				data: userData,
 				headers: {
 					'Content-Type': 'application/json'
@@ -34,9 +34,9 @@
 
 		changeUserPackStatus: function(packName, status, pricePoint, doneCallback) {
 
-			var url = Module.Url.getUserPackUrl(packName, pricePoint);
+			var url = Module.Service.Url.getUserPackUrl(packName, pricePoint);
 
-			Module.Http.post(url, {
+			Module.Service.Http.post(url, {
 				status: status
 			}, {
 				success: function() {

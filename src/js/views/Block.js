@@ -1,7 +1,7 @@
 
 (function(Module) {
 
-	Module.BlockView = Module.Class({
+	Module.View.Block = Module.Class({
 
 		emojisOffset: 0,
 		emojisLimit: 100,
@@ -24,7 +24,7 @@
 			this.el = document.getElementById(Module.Configs.elId);
 			this.contentEl = document.createElement('div');
 
-			this.tabsView = new Module.TabsView();
+			this.tabsView = new Module.View.Tabs();
 
 			window.addEventListener('resize', (function() {
 				this.onWindowResize();
@@ -64,7 +64,7 @@
 		},
 		renderUsedStickers: function() {
 
-			var usedStickers = Module.Storage.getUsedStickers();
+			var usedStickers = Module.Service.Storage.getUsedStickers();
 
 			this.contentEl.innerHTML = '';
 
@@ -117,7 +117,7 @@
 
 				var placeHolderClass = 'sp-sticker-placeholder';
 
-				var stickerImgSrc = Module.BaseService.parseStickerFromText('[[' + stickerCode + ']]');
+				var stickerImgSrc = Module.Service.Base.parseStickerFromText('[[' + stickerCode + ']]');
 
 				var stickersSpanEl = document.createElement('span');
 				stickersSpanEl.classList.add(placeHolderClass);

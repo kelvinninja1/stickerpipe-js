@@ -12,6 +12,9 @@ window.StickersModule.Utils = {};
 window.StickersModule.Service = {};
 //=include services/**/*.js
 
+window.StickersModule.Module = {};
+//=include modules/**/*.js
+
 window.StickersModule.Configs = {};
 //=include configs/**/*.js
 
@@ -33,7 +36,7 @@ window.StickersModule.View = {};
 			Module.Service.Helper.setConfig(config);
 
 			// ***** Init Storage ******
-			Module.Storage.setPrefix(Module.Configs.storagePrefix);
+			Module.Service.Storage.setPrefix(Module.Configs.storagePrefix);
 
 			// ***** Init Emoji tab *****
 			var mobileOS = Module.Service.Helper.getMobileOS();
@@ -48,22 +51,22 @@ window.StickersModule.View = {};
 
 
 			// ***** Init UserId *****
-			var savedUserId = Module.Storage.getUserId();
+			var savedUserId = Module.Service.Storage.getUserId();
 
 			if (Module.Configs.userId) {
 				Module.Configs.userId = Module.Service.Helper.md5(Module.Configs.userId + Module.Configs.apiKey);
-				Module.Storage.setUserId(Module.Configs.userId);
+				Module.Service.Storage.setUserId(Module.Configs.userId);
 			}
 
 			if (Module.Configs.userId != savedUserId) {
-				Module.Storage.setUsedStickers([]);
+				Module.Service.Storage.setUsedStickers([]);
 			}
 
 			// ***** Init services ******
 			Module.Service.Store.init(this);
 			Module.Service.Pack.init(this);
 
-			this.emojiService = new Module.EmojiService(Module.Twemoji);
+			this.emojiService = new Module.Service.Emoji(Module.Twemoji);
 
 			Module.Service.PendingRequest.run();
 		},
@@ -75,8 +78,8 @@ window.StickersModule.View = {};
 		render: function(onload, elId) {
 			Module.Configs.elId = elId || Module.Configs.elId;
 
-			this.view = new Module.PopoverView(this.emojiService);
-			this.storeView = new Module.StoreView();
+			this.view = new Module.View.Popover(this.emojiService);
+			this.storeView = new Module.View.Store();
 
 			this.delegateEvents();
 
@@ -87,7 +90,7 @@ window.StickersModule.View = {};
 
 			this.fetchPacks((function() {
 				// todo: move to initialize (with API v2)
-				Module.BaseService.trackUserData();
+				Module.Service.Base.trackUserData();
 
 				this.view.render(this.stickersModel);
 
@@ -127,7 +130,7 @@ window.StickersModule.View = {};
 						// set newPack - false
 						changed = true;
 						this.stickersModel[i].newPack = false;
-						Module.Storage.setPacks(this.stickersModel);
+						Module.Service.Storage.setPacks(this.stickersModel);
 
 						pack = this.stickersModel[i];
 					}
@@ -137,8 +140,8 @@ window.StickersModule.View = {};
 					}
 				}
 
-				if (changed == true && Module.Storage.getUsedStickers().length != 0 && hasNewContent == false) {
-					Module.DOMEventService.changeContentHighlight(false);
+				if (changed == true && Module.Service.Storage.getUsedStickers().length != 0 && hasNewContent == false) {
+					Module.Service.Event.changeContentHighlight(false);
 				}
 
 				pack && this.view.renderPack(pack);
@@ -149,7 +152,7 @@ window.StickersModule.View = {};
 				var stickerAttribute = el.getAttribute('data-sticker-string'),
 					nowDate = new Date().getTime() / 1000|0;
 
-				Module.Api.sendStatistic([{
+				Module.Service.Api.sendStatistic([{
 					action: 'use',
 					category: 'sticker',
 					label: '[[' + stickerAttribute + ']]',
@@ -158,7 +161,7 @@ window.StickersModule.View = {};
 
 				ga('stickerTracker.send', 'event', 'sticker', stickerAttribute.split('_')[0], stickerAttribute.split('_')[1], 1);
 
-				Module.Storage.addUsedSticker(stickerAttribute);
+				Module.Service.Storage.addUsedSticker(stickerAttribute);
 
 				// todo: rewrite
 				// new content mark
@@ -171,8 +174,8 @@ window.StickersModule.View = {};
 					}
 				}
 
-				if (Module.Storage.getUsedStickers().length != 0 && hasNewContent == false) {
-					Module.DOMEventService.changeContentHighlight(false);
+				if (Module.Service.Storage.getUsedStickers().length != 0 && hasNewContent == false) {
+					Module.Service.Event.changeContentHighlight(false);
 				}
 			}).bind(this));
 
@@ -180,7 +183,7 @@ window.StickersModule.View = {};
 				var nowDate = new Date().getTime() / 1000| 0,
 					emoji = this.emojiService.parseEmojiFromHtml(el.innerHTML);
 
-				Module.Api.sendStatistic([{
+				Module.Service.Api.sendStatistic([{
 					action: 'use',
 					category: 'emoji',
 					label: emoji,
@@ -192,7 +195,7 @@ window.StickersModule.View = {};
 		},
 
 		fetchPacks: function(callback) {
-			Module.BaseService.updatePacks((function(stickerPacks) {
+			Module.Service.Base.updatePacks((function(stickerPacks) {
 				this.stickersModel = stickerPacks;
 
 				if (this.view.isRendered) {
@@ -204,7 +207,7 @@ window.StickersModule.View = {};
 		},
 
 		parseStickerFromText: function(text) {
-			return Module.BaseService.parseStickerFromText(text);
+			return Module.Service.Base.parseStickerFromText(text);
 		},
 
 		parseEmojiFromText: function(text) {
@@ -216,7 +219,7 @@ window.StickersModule.View = {};
 		},
 
 		onUserMessageSent: function(isSticker) {
-			return Module.BaseService.onUserMessageSent(isSticker);
+			return Module.Service.Base.onUserMessageSent(isSticker);
 		},
 
 		purchaseSuccess: function(packName, pricePoint) {

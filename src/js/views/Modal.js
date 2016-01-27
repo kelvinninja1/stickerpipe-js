@@ -63,14 +63,14 @@
 
 		document.body.insertBefore(overlay, document.body.firstChild);
 
-		var bodyOuterWidth = Module.El.outerWidth(document.body);
+		var bodyOuterWidth = Module.Service.El.outerWidth(document.body);
 		document.body.classList.add(classes.lock);
 		document.getElementsByTagName('html')[0].classList.add(classes.lock);
 
-		var scrollbarWidth = Module.El.outerWidth(document.body) - bodyOuterWidth;
+		var scrollbarWidth = Module.Service.El.outerWidth(document.body) - bodyOuterWidth;
 
 		if (Module.Service.Helper.isIE()) {
-			ieBodyTopMargin = Module.El.css(document.body, 'marginTop');
+			ieBodyTopMargin = Module.Service.El.css(document.body, 'marginTop');
 			document.body.style.marginTop = 0;
 		}
 
@@ -80,7 +80,7 @@
 				var tag = tags[i],
 					tagEl = document.getElementsByTagName(tag)[0];
 
-				oMargin[tag.toLowerCase()] = parseInt(Module.El.css(tagEl, 'marginRight'));
+				oMargin[tag.toLowerCase()] = parseInt(Module.Service.El.css(tagEl, 'marginRight'));
 			}
 
 			document.getElementsByTagName('html')[0].style.marginRight = oMargin['html'] + scrollbarWidth + 'px';
@@ -97,10 +97,10 @@
 			document.body.style.marginTop = ieBodyTopMargin + 'px';
 		}
 
-		var bodyOuterWidth = Module.El.outerWidth(document.body);
+		var bodyOuterWidth = Module.Service.El.outerWidth(document.body);
 		document.body.classList.remove(classes.lock);
 		document.getElementsByTagName('html')[0].classList.remove(classes.lock);
-		var scrollbarWidth = Module.El.outerWidth(document.body) - bodyOuterWidth;
+		var scrollbarWidth = Module.Service.El.outerWidth(document.body) - bodyOuterWidth;
 
 		if (scrollbarWidth != 0) {
 			var tags = ['html', 'body'];
@@ -117,8 +117,6 @@
 		referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
 	}
 
-
-	Module.View = Module.View || {};
 
 	Module.View.Modal = {
 
@@ -312,7 +310,7 @@
 
 					document.addEventListener('touchmove', function(e) {
 
-						//var q = Module.El.getParents(e.target, '.' + classes.overlay);
+						//var q = Module.Service.El.getParents(e.target, '.' + classes.overlay);
 						//if (!q.length) {
 						//	e.preventDefault();
 						//}

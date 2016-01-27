@@ -2,7 +2,7 @@
 (function(Module) {
 
 
-	Module.TabsView = Module.Class({
+	Module.View.Tabs = Module.Class({
 
 		el: null,
 		scrollableContainerEl: null,
@@ -124,7 +124,7 @@
 				classes.push(this.classes.newPack);
 			}
 
-			var iconSrc = Module.Url.getPackTabIconUrl(pack.pack_name);
+			var iconSrc = Module.Service.Url.getPackTabIconUrl(pack.pack_name);
 
 			var content = '<img src=' + iconSrc + '>';
 

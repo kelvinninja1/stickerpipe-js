@@ -12,14 +12,14 @@
 		},
 
 		add: function(taskName, taskData) {
-			Module.Storage.addPendingRequestTask({
+			Module.Service.Storage.addPendingRequestTask({
 				name: taskName,
 				data: taskData
 			});
 		},
 
 		run: function() {
-			var task = Module.Storage.popPendingRequestTask();
+			var task = Module.Service.Storage.popPendingRequestTask();
 
 			while(task) {
 				switch (task.name) {
@@ -30,7 +30,7 @@
 						break;
 				}
 
-				task = Module.Storage.popPendingRequestTask();
+				task = Module.Service.Storage.popPendingRequestTask();
 			}
 		}
 

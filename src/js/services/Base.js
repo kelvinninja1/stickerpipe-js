@@ -1,11 +1,11 @@
 
 (function(Module) {
 
-	Module.BaseService = {
+	Module.Service.Base = {
 
 		markNewPacks: function(newPacks) {
 			var globalNew = false,
-				oldPacks = Module.Storage.getPacks();
+				oldPacks = Module.Service.Storage.getPacks();
 
 			if (oldPacks.length != 0){
 
@@ -30,10 +30,10 @@
 				// todo: check & fix
 				//if (globalNew) {
 
-				if (globalNew == false && Module.Storage.getUsedStickers().length == 0) {
+				if (globalNew == false && Module.Service.Storage.getUsedStickers().length == 0) {
 					globalNew = true;
 				}
-				Module.DOMEventService.changeContentHighlight(globalNew);
+				Module.Service.Event.changeContentHighlight(globalNew);
 				//}
 
 
@@ -41,7 +41,7 @@
 				// todo: do in other function
 				// update used stickers
 
-				var used = Module.Storage.getUsedStickers();
+				var used = Module.Service.Storage.getUsedStickers();
 
 				for (var i = 0; i < used.length; i++) {
 					var sticker = this.parseStickerFromText('[[' + used[i].code + ']]');
@@ -73,11 +73,11 @@
 					}
 				}
 
-				Module.Storage.setUsedStickers(used);
+				Module.Service.Storage.setUsedStickers(used);
 
 				// *****************************************************************************************************
 			} else {
-				Module.DOMEventService.changeContentHighlight(true);
+				Module.Service.Event.changeContentHighlight(true);
 			}
 
 			return newPacks;
@@ -92,7 +92,7 @@
 
 			if (matchData) {
 				outData.isSticker = true;
-				outData.url = Module.Url.getStickerUrl(matchData[1], matchData[2]);
+				outData.url = Module.Service.Url.getStickerUrl(matchData[1], matchData[2]);
 
 
 				outData.pack = matchData[1];
@@ -109,7 +109,7 @@
 				label = (isSticker) ? 'sticker' : 'text';
 
 
-			Module.Api.sendStatistic([{
+			Module.Service.Api.sendStatistic([{
 				action: action,
 				category: category,
 				label: label,
@@ -121,7 +121,7 @@
 
 		updatePacks: function(successCallback) {
 
-			Module.Api.getPacks(
+			Module.Service.Api.getPacks(
 				(function(response) {
 					if(response.status != 'success') {
 						return;
@@ -138,7 +138,7 @@
 
 					packs = this.markNewPacks(packs);
 
-					Module.Storage.setPacks(packs);
+					Module.Service.Storage.setPacks(packs);
 
 					successCallback && successCallback(packs);
 				}).bind(this)
@@ -150,11 +150,11 @@
 				return;
 			}
 
-			var storedUserData = Module.Storage.getUserData() || {};
+			var storedUserData = Module.Service.Storage.getUserData() || {};
 
 			if (!Module.Service.Helper.deepCompare(Module.Configs.userData, storedUserData)) {
-				Module.Api.updateUserData(Module.Configs.userData);
-				Module.Storage.setUserData(Module.Configs.userData);
+				Module.Service.Api.updateUserData(Module.Configs.userData);
+				Module.Service.Storage.setUserData(Module.Configs.userData);
 			}
 		}
 	};

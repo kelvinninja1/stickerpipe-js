@@ -1,7 +1,7 @@
 
 (function(Module) {
 
-	Module.DOMEventService = {
+	Module.Service.Event = {
 
 		events: {
 			resize: 'resize',

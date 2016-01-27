@@ -2968,28 +2968,28 @@ window.StickersModule.Service = {};
 
 	var API_VERSION = 1;
 
-	Module.Api = {
+	Module.Service.Api = {
 
 		getApiVersion: function() {
 			return API_VERSION;
 		},
 
 		getPacks: function(doneCallback) {
-			var url = Module.Url.getPacksUrl();
+			var url = Module.Service.Url.getPacksUrl();
 
-			Module.Http.get(url, {
+			Module.Service.Http.get(url, {
 				success: doneCallback
 			});
 		},
 
 		sendStatistic: function(statistic) {
-			Module.Http.post(Module.Url.getStatisticUrl(), statistic);
+			Module.Service.Http.post(Module.Service.Url.getStatisticUrl(), statistic);
 		},
 
 		updateUserData: function(userData) {
-			return Module.Http.ajax({
+			return Module.Service.Http.ajax({
 				type: 'PUT',
-				url: Module.Url.getUserDataUrl(),
+				url: Module.Service.Url.getUserDataUrl(),
 				data: userData,
 				headers: {
 					'Content-Type': 'application/json'
@@ -2999,9 +2999,9 @@ window.StickersModule.Service = {};
 
 		changeUserPackStatus: function(packName, status, pricePoint, doneCallback) {
 
-			var url = Module.Url.getUserPackUrl(packName, pricePoint);
+			var url = Module.Service.Url.getUserPackUrl(packName, pricePoint);
 
-			Module.Http.post(url, {
+			Module.Service.Http.post(url, {
 				status: status
 			}, {
 				success: function() {
@@ -3026,11 +3026,11 @@ window.StickersModule.Service = {};
 
 (function(Module) {
 
-	Module.BaseService = {
+	Module.Service.Base = {
 
 		markNewPacks: function(newPacks) {
 			var globalNew = false,
-				oldPacks = Module.Storage.getPacks();
+				oldPacks = Module.Service.Storage.getPacks();
 
 			if (oldPacks.length != 0){
 
@@ -3055,10 +3055,10 @@ window.StickersModule.Service = {};
 				// todo: check & fix
 				//if (globalNew) {
 
-				if (globalNew == false && Module.Storage.getUsedStickers().length == 0) {
+				if (globalNew == false && Module.Service.Storage.getUsedStickers().length == 0) {
 					globalNew = true;
 				}
-				Module.DOMEventService.changeContentHighlight(globalNew);
+				Module.Service.Event.changeContentHighlight(globalNew);
 				//}
 
 
@@ -3066,7 +3066,7 @@ window.StickersModule.Service = {};
 				// todo: do in other function
 				// update used stickers
 
-				var used = Module.Storage.getUsedStickers();
+				var used = Module.Service.Storage.getUsedStickers();
 
 				for (var i = 0; i < used.length; i++) {
 					var sticker = this.parseStickerFromText('[[' + used[i].code + ']]');
@@ -3098,11 +3098,11 @@ window.StickersModule.Service = {};
 					}
 				}
 
-				Module.Storage.setUsedStickers(used);
+				Module.Service.Storage.setUsedStickers(used);
 
 				// *****************************************************************************************************
 			} else {
-				Module.DOMEventService.changeContentHighlight(true);
+				Module.Service.Event.changeContentHighlight(true);
 			}
 
 			return newPacks;
@@ -3117,7 +3117,7 @@ window.StickersModule.Service = {};
 
 			if (matchData) {
 				outData.isSticker = true;
-				outData.url = Module.Url.getStickerUrl(matchData[1], matchData[2]);
+				outData.url = Module.Service.Url.getStickerUrl(matchData[1], matchData[2]);
 
 
 				outData.pack = matchData[1];
@@ -3134,7 +3134,7 @@ window.StickersModule.Service = {};
 				label = (isSticker) ? 'sticker' : 'text';
 
 
-			Module.Api.sendStatistic([{
+			Module.Service.Api.sendStatistic([{
 				action: action,
 				category: category,
 				label: label,
@@ -3146,7 +3146,7 @@ window.StickersModule.Service = {};
 
 		updatePacks: function(successCallback) {
 
-			Module.Api.getPacks(
+			Module.Service.Api.getPacks(
 				(function(response) {
 					if(response.status != 'success') {
 						return;
@@ -3163,7 +3163,7 @@ window.StickersModule.Service = {};
 
 					packs = this.markNewPacks(packs);
 
-					Module.Storage.setPacks(packs);
+					Module.Service.Storage.setPacks(packs);
 
 					successCallback && successCallback(packs);
 				}).bind(this)
@@ -3175,11 +3175,11 @@ window.StickersModule.Service = {};
 				return;
 			}
 
-			var storedUserData = Module.Storage.getUserData() || {};
+			var storedUserData = Module.Service.Storage.getUserData() || {};
 
 			if (!Module.Service.Helper.deepCompare(Module.Configs.userData, storedUserData)) {
-				Module.Api.updateUserData(Module.Configs.userData);
-				Module.Storage.setUserData(Module.Configs.userData);
+				Module.Service.Api.updateUserData(Module.Configs.userData);
+				Module.Service.Storage.setUserData(Module.Configs.userData);
 			}
 		}
 	};
@@ -3188,67 +3188,7 @@ window.StickersModule.Service = {};
 
 (function(Module) {
 
-	Module.DOMEventService = {
-
-		events: {
-			resize: 'resize',
-			popoverShown: 'sp:popover:shown',
-			popoverHidden: 'sp:popover:hidden',
-			showContentHighlight: 'sp:content:highlight:show',
-			hideContentHighlight: 'sp:content:highlight:hide'
-		},
-
-		dispatch: function(eventName, el) {
-			if (!eventName) {
-				return;
-			}
-
-			el = el || window;
-
-			var event;
-			if (document.createEvent) {
-				event = document.createEvent('HTMLEvents');
-				event.initEvent(eventName, true, true);
-			} else if (document.createEventObject) { // IE < 9
-				event = document.createEventObject();
-				event.eventType = eventName;
-			}
-
-			event.eventName = eventName;
-
-			if (el.dispatchEvent) {
-				el.dispatchEvent(event);
-			} else if (el.fireEvent) { // IE < 9
-				el.fireEvent('on' + event.eventType, event);// can trigger only real event (e.g. 'click')
-			} else if (el[eventName]) {
-				el[eventName]();
-			} else if (el['on' + eventName]) {
-				el['on' + eventName]();
-			}
-		},
-
-		popoverShown: function() {
-			this.dispatch(this.events.popoverShown);
-		},
-
-		popoverHidden: function() {
-			this.dispatch(this.events.popoverHidden);
-		},
-
-		changeContentHighlight: function(value) {
-			this.dispatch((value) ? this.events.showContentHighlight : this.events.hideContentHighlight);
-		},
-
-		resize: function(el) {
-			this.dispatch(this.events.resize, el);
-		}
-	};
-
-})(window.StickersModule);
-
-(function(Module) {
-
-	Module.El = {
+	Module.Service.El = {
 
 		css: function(el, property) {
 			// todo: getComputedStyle add IE 8 supporting
@@ -3321,7 +3261,7 @@ window.StickersModule.Service = {};
 
 (function(Module) {
 
-	Module.EmojiService = Module.Class({
+	Module.Service.Emoji = Module.Class({
 
 		emojiProvider: null,
 
@@ -3349,6 +3289,66 @@ window.StickersModule.Service = {};
 			return content.innerHTML;
 		}
 	});
+
+})(window.StickersModule);
+
+(function(Module) {
+
+	Module.Service.Event = {
+
+		events: {
+			resize: 'resize',
+			popoverShown: 'sp:popover:shown',
+			popoverHidden: 'sp:popover:hidden',
+			showContentHighlight: 'sp:content:highlight:show',
+			hideContentHighlight: 'sp:content:highlight:hide'
+		},
+
+		dispatch: function(eventName, el) {
+			if (!eventName) {
+				return;
+			}
+
+			el = el || window;
+
+			var event;
+			if (document.createEvent) {
+				event = document.createEvent('HTMLEvents');
+				event.initEvent(eventName, true, true);
+			} else if (document.createEventObject) { // IE < 9
+				event = document.createEventObject();
+				event.eventType = eventName;
+			}
+
+			event.eventName = eventName;
+
+			if (el.dispatchEvent) {
+				el.dispatchEvent(event);
+			} else if (el.fireEvent) { // IE < 9
+				el.fireEvent('on' + event.eventType, event);// can trigger only real event (e.g. 'click')
+			} else if (el[eventName]) {
+				el[eventName]();
+			} else if (el['on' + eventName]) {
+				el['on' + eventName]();
+			}
+		},
+
+		popoverShown: function() {
+			this.dispatch(this.events.popoverShown);
+		},
+
+		popoverHidden: function() {
+			this.dispatch(this.events.popoverHidden);
+		},
+
+		changeContentHighlight: function(value) {
+			this.dispatch((value) ? this.events.showContentHighlight : this.events.hideContentHighlight);
+		},
+
+		resize: function(el) {
+			this.dispatch(this.events.resize, el);
+		}
+	};
 
 })(window.StickersModule);
 
@@ -3557,7 +3557,7 @@ window.StickersModule.Service = {};
 
 (function(Module) {
 
-	Module.Http = {
+	Module.Service.Http = {
 
 		// todo: refactor post(options) & get(options)
 
@@ -3615,7 +3615,7 @@ window.StickersModule.Service = {};
 
 			if (options.type == 'POST' || options.type == 'PUT') {
 				options.headers['Content-Type'] = options.headers['Content-Type'] || 'application/x-www-form-urlencoded';
-				options.headers['DeviceId'] = Module.Storage.getDeviceId();
+				options.headers['DeviceId'] = Module.Service.Storage.getDeviceId();
 			}
 
 
@@ -3660,7 +3660,7 @@ window.StickersModule.Service = {};
 		},
 
 		activateUserPack: function(packName, pricePoint, doneCallback) {
-			Module.Api.changeUserPackStatus(packName, true, pricePoint, function() {
+			Module.Service.Api.changeUserPackStatus(packName, true, pricePoint, function() {
 
 				// todo: add event ~ "packs fetched" & remove "stickerpipe" variable
 				stickerpipe.fetchPacks(function() {
@@ -3685,14 +3685,14 @@ window.StickersModule.Service = {};
 		},
 
 		add: function(taskName, taskData) {
-			Module.Storage.addPendingRequestTask({
+			Module.Service.Storage.addPendingRequestTask({
 				name: taskName,
 				data: taskData
 			});
 		},
 
 		run: function() {
-			var task = Module.Storage.popPendingRequestTask();
+			var task = Module.Service.Storage.popPendingRequestTask();
 
 			while(task) {
 				switch (task.name) {
@@ -3703,18 +3703,24 @@ window.StickersModule.Service = {};
 						break;
 				}
 
-				task = Module.Storage.popPendingRequestTask();
+				task = Module.Service.Storage.popPendingRequestTask();
 			}
 		}
 
 	};
 })(window.StickersModule);
 
-// todo: StatisticService
+(function(Module) {
+
+	Module.Service.Statistic = {
+	};
+
+})(StickersModule);
+
 
 (function(Module) {
 
-	Module.Storage = {
+	Module.Service.Storage = {
 
 		lockr: Module.Lockr,
 
@@ -3922,7 +3928,7 @@ window.StickersModule.Service = {};
 
 (function(Module) {
 
-	Module.Url = {
+	Module.Service.Url = {
 
 		buildStoreUrl: function(uri) {
 			uri = uri || '';
@@ -3951,7 +3957,7 @@ window.StickersModule.Service = {};
 		buildApiUrl: function(uri) {
 			uri = uri || '';
 
-			return Module.Configs.apiUrl + '/api/v' + Module.Api.getApiVersion() + '/' + uri;
+			return Module.Configs.apiUrl + '/api/v' + Module.Service.Api.getApiVersion() + '/' + uri;
 		},
 
 		getStickerUrl: function(packName, stickerName) {
@@ -4022,6 +4028,10 @@ window.StickersModule.Service = {};
 
 	};
 })(window.StickersModule);
+
+window.StickersModule.Module = {};
+
+
 
 window.StickersModule.Configs = {};
 
@@ -4936,7 +4946,7 @@ window.StickersModule.View = {};
 
 (function(Module) {
 
-	Module.BlockView = Module.Class({
+	Module.View.Block = Module.Class({
 
 		emojisOffset: 0,
 		emojisLimit: 100,
@@ -4959,7 +4969,7 @@ window.StickersModule.View = {};
 			this.el = document.getElementById(Module.Configs.elId);
 			this.contentEl = document.createElement('div');
 
-			this.tabsView = new Module.TabsView();
+			this.tabsView = new Module.View.Tabs();
 
 			window.addEventListener('resize', (function() {
 				this.onWindowResize();
@@ -4999,7 +5009,7 @@ window.StickersModule.View = {};
 		},
 		renderUsedStickers: function() {
 
-			var usedStickers = Module.Storage.getUsedStickers();
+			var usedStickers = Module.Service.Storage.getUsedStickers();
 
 			this.contentEl.innerHTML = '';
 
@@ -5052,7 +5062,7 @@ window.StickersModule.View = {};
 
 				var placeHolderClass = 'sp-sticker-placeholder';
 
-				var stickerImgSrc = Module.BaseService.parseStickerFromText('[[' + stickerCode + ']]');
+				var stickerImgSrc = Module.Service.Base.parseStickerFromText('[[' + stickerCode + ']]');
 
 				var stickersSpanEl = document.createElement('span');
 				stickersSpanEl.classList.add(placeHolderClass);
@@ -5201,14 +5211,14 @@ window.StickersModule.View = {};
 
 		document.body.insertBefore(overlay, document.body.firstChild);
 
-		var bodyOuterWidth = Module.El.outerWidth(document.body);
+		var bodyOuterWidth = Module.Service.El.outerWidth(document.body);
 		document.body.classList.add(classes.lock);
 		document.getElementsByTagName('html')[0].classList.add(classes.lock);
 
-		var scrollbarWidth = Module.El.outerWidth(document.body) - bodyOuterWidth;
+		var scrollbarWidth = Module.Service.El.outerWidth(document.body) - bodyOuterWidth;
 
 		if (Module.Service.Helper.isIE()) {
-			ieBodyTopMargin = Module.El.css(document.body, 'marginTop');
+			ieBodyTopMargin = Module.Service.El.css(document.body, 'marginTop');
 			document.body.style.marginTop = 0;
 		}
 
@@ -5218,7 +5228,7 @@ window.StickersModule.View = {};
 				var tag = tags[i],
 					tagEl = document.getElementsByTagName(tag)[0];
 
-				oMargin[tag.toLowerCase()] = parseInt(Module.El.css(tagEl, 'marginRight'));
+				oMargin[tag.toLowerCase()] = parseInt(Module.Service.El.css(tagEl, 'marginRight'));
 			}
 
 			document.getElementsByTagName('html')[0].style.marginRight = oMargin['html'] + scrollbarWidth + 'px';
@@ -5235,10 +5245,10 @@ window.StickersModule.View = {};
 			document.body.style.marginTop = ieBodyTopMargin + 'px';
 		}
 
-		var bodyOuterWidth = Module.El.outerWidth(document.body);
+		var bodyOuterWidth = Module.Service.El.outerWidth(document.body);
 		document.body.classList.remove(classes.lock);
 		document.getElementsByTagName('html')[0].classList.remove(classes.lock);
-		var scrollbarWidth = Module.El.outerWidth(document.body) - bodyOuterWidth;
+		var scrollbarWidth = Module.Service.El.outerWidth(document.body) - bodyOuterWidth;
 
 		if (scrollbarWidth != 0) {
 			var tags = ['html', 'body'];
@@ -5255,8 +5265,6 @@ window.StickersModule.View = {};
 		referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
 	}
 
-
-	Module.View = Module.View || {};
 
 	Module.View.Modal = {
 
@@ -5450,7 +5458,7 @@ window.StickersModule.View = {};
 
 					document.addEventListener('touchmove', function(e) {
 
-						//var q = Module.El.getParents(e.target, '.' + classes.overlay);
+						//var q = Module.Service.El.getParents(e.target, '.' + classes.overlay);
 						//if (!q.length) {
 						//	e.preventDefault();
 						//}
@@ -5536,9 +5544,9 @@ window.StickersModule.View = {};
 
 (function(Module) {
 
-	var parent = Module.BlockView;
+	var parent = Module.View.Block;
 
-	Module.PopoverView = parent.extend({
+	Module.View.Popover = parent.extend({
 
 		popoverEl: null,
 		triangleEl: null,
@@ -5592,12 +5600,12 @@ window.StickersModule.View = {};
 
 			// todo: addEventListener --> DOMEventService
 			if (window.addEventListener) {
-				window.addEventListener(Module.DOMEventService.events.popoverShown, function() {
-					Module.DOMEventService.resize();
+				window.addEventListener(Module.Service.Event.events.popoverShown, function() {
+					Module.Service.Event.resize();
 				});
 			} else {
-				window.attachEvent('on' + Module.DOMEventService.events.popoverShown, function() {
-					Module.DOMEventService.resize();
+				window.attachEvent('on' + Module.Service.Event.events.popoverShown, function() {
+					Module.Service.Event.resize();
 				});
 			}
 		},
@@ -5617,7 +5625,7 @@ window.StickersModule.View = {};
 
 				this.toggleEl.parentElement.appendChild(this.popoverEl);
 				this.positioned();
-				Module.DOMEventService.popoverShown();
+				Module.Service.Event.popoverShown();
 			}
 
 			parent.prototype.open.apply(this, arguments);
@@ -5626,7 +5634,7 @@ window.StickersModule.View = {};
 		close: function() {
 			this.active = false;
 			this.toggleEl.parentElement.removeChild(this.popoverEl);
-			Module.DOMEventService.popoverHidden();
+			Module.Service.Event.popoverHidden();
 			// todo
 			this.popoverEl.style.marginTop = 0;
 		},
@@ -5691,7 +5699,7 @@ window.StickersModule.View = {};
 		}
 	}
 
-	Module.StoreView = Module.Class({
+	Module.View.Store = Module.Class({
 
 		modal: null,
 		iframe: null,
@@ -5708,7 +5716,7 @@ window.StickersModule.View = {};
 			this.modal = Module.View.Modal.init(this.iframe, {
 				onOpen: (function(contentEl, modalEl, overlay) {
 					this.overlay = overlay;
-					Module.DOMEventService.resize();
+					Module.Service.Event.resize();
 					setWindowMessageListener.bind(this)();
 
 					if (Module.Service.Helper.getMobileOS() == 'ios') {
@@ -5728,12 +5736,12 @@ window.StickersModule.View = {};
 		},
 
 		renderStore: function() {
-			this.iframe.src = Module.Url.getStoreUrl();
+			this.iframe.src = Module.Service.Url.getStoreUrl();
 			this.modal.open();
 		},
 
 		renderPack: function(packName) {
-			this.iframe.src = Module.Url.getStorePackUrl(packName);
+			this.iframe.src = Module.Service.Url.getStorePackUrl(packName);
 			this.modal.open();
 		},
 
@@ -5750,8 +5758,8 @@ window.StickersModule.View = {};
 
 			if (window.innerWidth > 700) {
 
-				var marginTop = parseInt(Module.El.css(dialog, 'marginTop'), 10),
-					marginBottom = parseInt(Module.El.css(dialog, 'marginBottom'), 10);
+				var marginTop = parseInt(Module.Service.El.css(dialog, 'marginTop'), 10),
+					marginBottom = parseInt(Module.Service.El.css(dialog, 'marginBottom'), 10);
 
 				var minHeight = window.innerHeight - marginTop - marginBottom;
 
@@ -5765,7 +5773,7 @@ window.StickersModule.View = {};
 (function(Module) {
 
 
-	Module.TabsView = Module.Class({
+	Module.View.Tabs = Module.Class({
 
 		el: null,
 		scrollableContainerEl: null,
@@ -5887,7 +5895,7 @@ window.StickersModule.View = {};
 				classes.push(this.classes.newPack);
 			}
 
-			var iconSrc = Module.Url.getPackTabIconUrl(pack.pack_name);
+			var iconSrc = Module.Service.Url.getPackTabIconUrl(pack.pack_name);
 
 			var content = '<img src=' + iconSrc + '>';
 
@@ -6101,7 +6109,7 @@ window.StickersModule.View = {};
 			Module.Service.Helper.setConfig(config);
 
 			// ***** Init Storage ******
-			Module.Storage.setPrefix(Module.Configs.storagePrefix);
+			Module.Service.Storage.setPrefix(Module.Configs.storagePrefix);
 
 			// ***** Init Emoji tab *****
 			var mobileOS = Module.Service.Helper.getMobileOS();
@@ -6116,22 +6124,22 @@ window.StickersModule.View = {};
 
 
 			// ***** Init UserId *****
-			var savedUserId = Module.Storage.getUserId();
+			var savedUserId = Module.Service.Storage.getUserId();
 
 			if (Module.Configs.userId) {
 				Module.Configs.userId = Module.Service.Helper.md5(Module.Configs.userId + Module.Configs.apiKey);
-				Module.Storage.setUserId(Module.Configs.userId);
+				Module.Service.Storage.setUserId(Module.Configs.userId);
 			}
 
 			if (Module.Configs.userId != savedUserId) {
-				Module.Storage.setUsedStickers([]);
+				Module.Service.Storage.setUsedStickers([]);
 			}
 
 			// ***** Init services ******
 			Module.Service.Store.init(this);
 			Module.Service.Pack.init(this);
 
-			this.emojiService = new Module.EmojiService(Module.Twemoji);
+			this.emojiService = new Module.Service.Emoji(Module.Twemoji);
 
 			Module.Service.PendingRequest.run();
 		},
@@ -6143,8 +6151,8 @@ window.StickersModule.View = {};
 		render: function(onload, elId) {
 			Module.Configs.elId = elId || Module.Configs.elId;
 
-			this.view = new Module.PopoverView(this.emojiService);
-			this.storeView = new Module.StoreView();
+			this.view = new Module.View.Popover(this.emojiService);
+			this.storeView = new Module.View.Store();
 
 			this.delegateEvents();
 
@@ -6155,7 +6163,7 @@ window.StickersModule.View = {};
 
 			this.fetchPacks((function() {
 				// todo: move to initialize (with API v2)
-				Module.BaseService.trackUserData();
+				Module.Service.Base.trackUserData();
 
 				this.view.render(this.stickersModel);
 
@@ -6195,7 +6203,7 @@ window.StickersModule.View = {};
 						// set newPack - false
 						changed = true;
 						this.stickersModel[i].newPack = false;
-						Module.Storage.setPacks(this.stickersModel);
+						Module.Service.Storage.setPacks(this.stickersModel);
 
 						pack = this.stickersModel[i];
 					}
@@ -6205,8 +6213,8 @@ window.StickersModule.View = {};
 					}
 				}
 
-				if (changed == true && Module.Storage.getUsedStickers().length != 0 && hasNewContent == false) {
-					Module.DOMEventService.changeContentHighlight(false);
+				if (changed == true && Module.Service.Storage.getUsedStickers().length != 0 && hasNewContent == false) {
+					Module.Service.Event.changeContentHighlight(false);
 				}
 
 				pack && this.view.renderPack(pack);
@@ -6217,7 +6225,7 @@ window.StickersModule.View = {};
 				var stickerAttribute = el.getAttribute('data-sticker-string'),
 					nowDate = new Date().getTime() / 1000|0;
 
-				Module.Api.sendStatistic([{
+				Module.Service.Api.sendStatistic([{
 					action: 'use',
 					category: 'sticker',
 					label: '[[' + stickerAttribute + ']]',
@@ -6226,7 +6234,7 @@ window.StickersModule.View = {};
 
 				ga('stickerTracker.send', 'event', 'sticker', stickerAttribute.split('_')[0], stickerAttribute.split('_')[1], 1);
 
-				Module.Storage.addUsedSticker(stickerAttribute);
+				Module.Service.Storage.addUsedSticker(stickerAttribute);
 
 				// todo: rewrite
 				// new content mark
@@ -6239,8 +6247,8 @@ window.StickersModule.View = {};
 					}
 				}
 
-				if (Module.Storage.getUsedStickers().length != 0 && hasNewContent == false) {
-					Module.DOMEventService.changeContentHighlight(false);
+				if (Module.Service.Storage.getUsedStickers().length != 0 && hasNewContent == false) {
+					Module.Service.Event.changeContentHighlight(false);
 				}
 			}).bind(this));
 
@@ -6248,7 +6256,7 @@ window.StickersModule.View = {};
 				var nowDate = new Date().getTime() / 1000| 0,
 					emoji = this.emojiService.parseEmojiFromHtml(el.innerHTML);
 
-				Module.Api.sendStatistic([{
+				Module.Service.Api.sendStatistic([{
 					action: 'use',
 					category: 'emoji',
 					label: emoji,
@@ -6260,7 +6268,7 @@ window.StickersModule.View = {};
 		},
 
 		fetchPacks: function(callback) {
-			Module.BaseService.updatePacks((function(stickerPacks) {
+			Module.Service.Base.updatePacks((function(stickerPacks) {
 				this.stickersModel = stickerPacks;
 
 				if (this.view.isRendered) {
@@ -6272,7 +6280,7 @@ window.StickersModule.View = {};
 		},
 
 		parseStickerFromText: function(text) {
-			return Module.BaseService.parseStickerFromText(text);
+			return Module.Service.Base.parseStickerFromText(text);
 		},
 
 		parseEmojiFromText: function(text) {
@@ -6284,7 +6292,7 @@ window.StickersModule.View = {};
 		},
 
 		onUserMessageSent: function(isSticker) {
-			return Module.BaseService.onUserMessageSent(isSticker);
+			return Module.Service.Base.onUserMessageSent(isSticker);
 		},
 
 		purchaseSuccess: function(packName, pricePoint) {
