@@ -384,6 +384,10 @@
 			});
 		},
 
+		hasOpened: function() {
+			return isOpen;
+		},
+
 		setDefaultOptions: function(options) {
 			defaultOptions = extend({}, defaultOptions, options);
 		}

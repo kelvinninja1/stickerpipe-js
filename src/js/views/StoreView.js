@@ -69,7 +69,10 @@
 		},
 
 		close: function() {
-			this.modal.close();
+			// todo: сделать hasOpened функцией конкретного окна
+			if (Module.View.Modal.hasOpened()) {
+				this.modal.close();
+			}
 		},
 
 		resize: function(height) {
