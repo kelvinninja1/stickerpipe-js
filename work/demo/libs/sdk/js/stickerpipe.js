@@ -5389,13 +5389,13 @@ window.StickersModule.View = {};
 						}).bind(this));
 
 						// if iframe
-						if (this.contentEl && this.contentEl.contentWindow) {
-							this.contentEl.contentWindow.addEventListener('keyup', (function(e) {
-								if(e.keyCode === KEY_CODE_ESC && isOpen) {
-									this.close(this.options);
-								}
-							}).bind(this));
-						}
+						//if (this.contentEl && this.contentEl.contentWindow) {
+						//	this.contentEl.contentWindow.addEventListener('keyup', (function(e) {
+						//		if(e.keyCode === KEY_CODE_ESC && isOpen) {
+						//			this.close(this.options);
+						//		}
+						//	}).bind(this));
+						//}
 					}
 
 					if (this.options.closeOnOverlayClick) {
@@ -5520,6 +5520,10 @@ window.StickersModule.View = {};
 					isOpen = false;
 				}
 			});
+		},
+
+		hasOpened: function() {
+			return isOpen;
 		},
 
 		setDefaultOptions: function(options) {
@@ -5733,7 +5737,10 @@ window.StickersModule.View = {};
 		},
 
 		close: function() {
-			this.modal.close();
+			// todo: сделать hasOpened функцией конкретного окна
+			if (Module.View.Modal.hasOpened()) {
+				this.modal.close();
+			}
 		},
 
 		resize: function(height) {
