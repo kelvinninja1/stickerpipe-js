@@ -11,6 +11,10 @@
 			activateUserPack: 'activateUserPack'
 		},
 
+		init: function() {
+			this.run();
+		},
+
 		add: function(taskName, taskData) {
 			Plugin.Service.Storage.addPendingRequestTask({
 				name: taskName,

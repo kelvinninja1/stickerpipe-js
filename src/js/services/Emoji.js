@@ -1,11 +1,11 @@
 
 (function(Plugin) {
 
-	Plugin.Service.Emoji = Plugin.Libs.Class({
+	Plugin.Service.Emoji = {
 
 		emojiProvider: null,
 
-		_constructor: function(emojiProvider) {
+		init: function(emojiProvider) {
 			this.emojiProvider = emojiProvider;
 		},
 
@@ -28,6 +28,6 @@
 
 			return content.innerHTML;
 		}
-	});
+	};
 
 })(window.StickersModule);

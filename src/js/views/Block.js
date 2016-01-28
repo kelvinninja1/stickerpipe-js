@@ -9,8 +9,6 @@
 		// todo
 		isRendered: false,
 
-		emojiService: null,
-
 		el: null,
 		contentEl: null,
 
@@ -18,8 +16,7 @@
 
 		scrollableEl: null,
 
-		_constructor: function(emojiService) {
-			this.emojiService = emojiService;
+		_constructor: function() {
 
 			this.el = document.getElementById(Plugin.Configs.elId);
 			this.contentEl = document.createElement('div');
@@ -152,7 +149,7 @@
 			for (var i = offset; i < limit; i++) {
 				var emoji = Plugin.Configs.emojiList[i],
 					emojiEl = document.createElement('span'),
-					emojiImgHtml = this.emojiService.parseEmojiFromText(emoji);
+					emojiImgHtml = Plugin.Service.Emoji.parseEmojiFromText(emoji);
 
 				emojiEl.className = Plugin.Configs.emojiItemClass;
 				emojiEl.innerHTML = emojiImgHtml;

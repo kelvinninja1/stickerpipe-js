@@ -25,7 +25,6 @@ window.StickersModule.View = {};
 	// todo: rename Stickers --> StickerPipe
 	window.Stickers = Plugin.Libs.Class({
 
-		emojiService: null,
 		stickersModel: {},
 		view: null,
 		storeView: null,
@@ -48,7 +47,6 @@ window.StickersModule.View = {};
 				throw new Error('Empty apiKey');
 			}
 
-
 			// ***** Init UserId *****
 			var savedUserId = Plugin.Service.Storage.getUserId();
 
@@ -64,10 +62,8 @@ window.StickersModule.View = {};
 			// ***** Init services ******
 			Plugin.Service.Store.init(this);
 			Plugin.Service.Pack.init(this);
-
-			this.emojiService = new Plugin.Service.Emoji(Plugin.Libs.Twemoji);
-
-			Plugin.Service.PendingRequest.run();
+			Plugin.Service.Emoji.init(Plugin.Libs.Twemoji);
+			Plugin.Service.PendingRequest.init();
 		},
 
 		////////////////////
@@ -77,7 +73,7 @@ window.StickersModule.View = {};
 		render: function(onload, elId) {
 			Plugin.Configs.elId = elId || Plugin.Configs.elId;
 
-			this.view = new Plugin.View.Popover(this.emojiService);
+			this.view = new Plugin.View.Popover();
 			this.storeView = new Plugin.Module.Store.View();
 
 			this.delegateEvents();
@@ -180,7 +176,7 @@ window.StickersModule.View = {};
 
 			this.view.handleClickOnEmoji((function(el) {
 				var nowDate = new Date().getTime() / 1000| 0,
-					emoji = this.emojiService.parseEmojiFromHtml(el.innerHTML);
+					emoji = this.parseEmojiFromHtml(el.innerHTML);
 
 				Plugin.Service.Api.sendStatistic([{
 					action: 'use',
@@ -210,11 +206,11 @@ window.StickersModule.View = {};
 		},
 
 		parseEmojiFromText: function(text) {
-			return this.emojiService.parseEmojiFromText(text);
+			return Plugin.Service.Emoji.parseEmojiFromText(text);
 		},
 
 		parseEmojiFromHtml: function(html) {
-			return this.emojiService.parseEmojiFromHtml(html);
+			return Plugin.Service.Emoji.parseEmojiFromHtml(html);
 		},
 
 		onUserMessageSent: function(isSticker) {
@@ -257,7 +253,7 @@ window.StickersModule.View = {};
 
 		onClickEmoji: function(callback, context) {
 			this.view.handleClickOnEmoji((function(el) {
-				var emoji = this.emojiService.parseEmojiFromHtml(el.innerHTML);
+				var emoji = this.parseEmojiFromHtml(el.innerHTML);
 
 				callback.call(context, emoji);
 			}).bind(this));
