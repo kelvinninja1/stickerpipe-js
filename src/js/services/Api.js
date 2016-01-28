@@ -1,30 +1,30 @@
 
-(function(Module) {
+(function(Plugin) {
 
 	var API_VERSION = 1;
 
-	Module.Service.Api = {
+	Plugin.Service.Api = {
 
 		getApiVersion: function() {
 			return API_VERSION;
 		},
 
 		getPacks: function(doneCallback) {
-			var url = Module.Service.Url.getPacksUrl();
+			var url = Plugin.Service.Url.getPacksUrl();
 
-			Module.Service.Http.get(url, {
+			Plugin.Service.Http.get(url, {
 				success: doneCallback
 			});
 		},
 
 		sendStatistic: function(statistic) {
-			Module.Service.Http.post(Module.Service.Url.getStatisticUrl(), statistic);
+			Plugin.Service.Http.post(Plugin.Service.Url.getStatisticUrl(), statistic);
 		},
 
 		updateUserData: function(userData) {
-			return Module.Service.Http.ajax({
+			return Plugin.Service.Http.ajax({
 				type: 'PUT',
-				url: Module.Service.Url.getUserDataUrl(),
+				url: Plugin.Service.Url.getUserDataUrl(),
 				data: userData,
 				headers: {
 					'Content-Type': 'application/json'
@@ -34,9 +34,9 @@
 
 		changeUserPackStatus: function(packName, status, pricePoint, doneCallback) {
 
-			var url = Module.Service.Url.getUserPackUrl(packName, pricePoint);
+			var url = Plugin.Service.Url.getUserPackUrl(packName, pricePoint);
 
-			Module.Service.Http.post(url, {
+			Plugin.Service.Http.post(url, {
 				status: status
 			}, {
 				success: function() {
@@ -44,7 +44,7 @@
 				},
 				error: function() {
 					if (status) {
-						var pr = Module.Service.PendingRequest;
+						var pr = Plugin.Service.PendingRequest;
 						pr.add(pr.tasks.activateUserPack, {
 							packName: packName,
 							pricePoint: pricePoint

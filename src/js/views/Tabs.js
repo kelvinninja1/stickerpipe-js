@@ -1,8 +1,8 @@
 
-(function(Module) {
+(function(Plugin) {
 
 
-	Module.View.Tabs = Module.Libs.Class({
+	Plugin.View.Tabs = Plugin.Libs.Class({
 
 		el: null,
 		scrollableContainerEl: null,
@@ -124,7 +124,7 @@
 				classes.push(this.classes.newPack);
 			}
 
-			var iconSrc = Module.Service.Url.getPackTabIconUrl(pack.pack_name);
+			var iconSrc = Plugin.Service.Url.getPackTabIconUrl(pack.pack_name);
 
 			var content = '<img src=' + iconSrc + '>';
 
@@ -150,11 +150,11 @@
 				tabEl.id = id;
 			}
 
-			classes.push(Module.Configs.tabItemClass);
+			classes.push(Plugin.Configs.tabItemClass);
 
 			tabEl.classList.add.apply(tabEl.classList, classes);
 
-			Module.Service.Helper.forEach(attrs, function(value, name) {
+			Plugin.Service.Helper.forEach(attrs, function(value, name) {
 				tabEl.setAttribute(name, value);
 			});
 
@@ -166,11 +166,11 @@
 					return;
 				}
 
-				Module.Service.Helper.forEach(this.packTabs, (function(tabEl) {
+				Plugin.Service.Helper.forEach(this.packTabs, (function(tabEl) {
 					tabEl.classList.remove(this.classes.tabActive);
 				}).bind(this));
 
-				Module.Service.Helper.forEach(this.controls, (function(controlTab) {
+				Plugin.Service.Helper.forEach(this.controls, (function(controlTab) {
 					if (controlTab && controlTab.el) {
 						controlTab.el.classList.remove(this.classes.tabActive);
 					}
@@ -198,32 +198,32 @@
 			this.renderSettingsTab();
 		},
 		renderEmojiTab: function() {
-			if (Module.Configs.enableEmojiTab) {
+			if (Plugin.Configs.enableEmojiTab) {
 				this.scrollableContentEl.appendChild(this.renderControlButton(this.controls.emoji));
 			}
 		},
 		renderHistoryTab: function() {
-			if (Module.Configs.enableHistoryTab) {
+			if (Plugin.Configs.enableHistoryTab) {
 				this.scrollableContentEl.appendChild(this.renderControlButton(this.controls.history));
 			}
 		},
 		renderSettingsTab: function() {
-			if (Module.Configs.enableSettingsTab) {
+			if (Plugin.Configs.enableSettingsTab) {
 				this.scrollableContentEl.appendChild(this.renderControlButton(this.controls.settings));
 			}
 		},
 		renderStoreTab: function() {
-			if (Module.Configs.enableStoreTab) {
+			if (Plugin.Configs.enableStoreTab) {
 				this.el.appendChild(this.renderControlButton(this.controls.store));
 			}
 		},
 		renderPrevPacksTab: function() {
 			this.el.appendChild(this.renderControlButton(this.controls.prevPacks));
-			Module.Service.Helper.setEvent('click', this.el, this.controls.prevPacks.class, this.onClickPrevPacksButton.bind(this));
+			Plugin.Service.Helper.setEvent('click', this.el, this.controls.prevPacks.class, this.onClickPrevPacksButton.bind(this));
 		},
 		renderNextPacksTab: function() {
 			this.el.appendChild(this.renderControlButton(this.controls.nextPacks));
-			Module.Service.Helper.setEvent('click', this.el, this.controls.nextPacks.class, this.onClickNextPacksButton.bind(this));
+			Plugin.Service.Helper.setEvent('click', this.el, this.controls.nextPacks.class, this.onClickNextPacksButton.bind(this));
 		},
 
 
@@ -253,10 +253,10 @@
 		activeTab: function(tabName) {
 			var i = this.packTabsIndexes[tabName];
 
-			if (Module.Configs.enableEmojiTab) {
+			if (Plugin.Configs.enableEmojiTab) {
 				i++;
 			}
-			if (Module.Configs.enableHistoryTab) {
+			if (Plugin.Configs.enableHistoryTab) {
 				i++;
 			}
 
@@ -280,16 +280,16 @@
 
 
 		handleClickOnEmojiTab: function(callback) {
-			Module.Service.Helper.setEvent('click', this.el, this.controls.emoji.class, callback);
+			Plugin.Service.Helper.setEvent('click', this.el, this.controls.emoji.class, callback);
 		},
 		handleClickOnLastUsedPacksTab: function(callback) {
-			Module.Service.Helper.setEvent('click', this.el, this.controls.history.class, callback);
+			Plugin.Service.Helper.setEvent('click', this.el, this.controls.history.class, callback);
 		},
 		handleClickOnPackTab: function(callback) {
-			Module.Service.Helper.setEvent('click', this.el, this.classes.packTab, callback);
+			Plugin.Service.Helper.setEvent('click', this.el, this.classes.packTab, callback);
 		},
 		handleClickOnStoreTab: function(callback) {
-			Module.Service.Helper.setEvent('click', this.el, this.controls.store.class, callback);
+			Plugin.Service.Helper.setEvent('click', this.el, this.controls.store.class, callback);
 		},
 
 

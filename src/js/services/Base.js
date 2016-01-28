@@ -1,18 +1,18 @@
 
-(function(Module) {
+(function(Plugin) {
 
-	Module.Service.Base = {
+	Plugin.Service.Base = {
 
 		markNewPacks: function(newPacks) {
 			var globalNew = false,
-				oldPacks = Module.Service.Storage.getPacks();
+				oldPacks = Plugin.Service.Storage.getPacks();
 
 			if (oldPacks.length != 0){
 
-				Module.Service.Helper.forEach(newPacks, function(newPack, key) {
+				Plugin.Service.Helper.forEach(newPacks, function(newPack, key) {
 					var isNewPack = true;
 
-					Module.Service.Helper.forEach(oldPacks, function(oldPack) {
+					Plugin.Service.Helper.forEach(oldPacks, function(oldPack) {
 
 
 						if(newPack.pack_name == oldPack.pack_name) {
@@ -30,10 +30,10 @@
 				// todo: check & fix
 				//if (globalNew) {
 
-				if (globalNew == false && Module.Service.Storage.getUsedStickers().length == 0) {
+				if (globalNew == false && Plugin.Service.Storage.getUsedStickers().length == 0) {
 					globalNew = true;
 				}
-				Module.Service.Event.changeContentHighlight(globalNew);
+				Plugin.Service.Event.changeContentHighlight(globalNew);
 				//}
 
 
@@ -41,7 +41,7 @@
 				// todo: do in other function
 				// update used stickers
 
-				var used = Module.Service.Storage.getUsedStickers();
+				var used = Plugin.Service.Storage.getUsedStickers();
 
 				for (var i = 0; i < used.length; i++) {
 					var sticker = this.parseStickerFromText('[[' + used[i].code + ']]');
@@ -73,11 +73,11 @@
 					}
 				}
 
-				Module.Service.Storage.setUsedStickers(used);
+				Plugin.Service.Storage.setUsedStickers(used);
 
 				// *****************************************************************************************************
 			} else {
-				Module.Service.Event.changeContentHighlight(true);
+				Plugin.Service.Event.changeContentHighlight(true);
 			}
 
 			return newPacks;
@@ -92,7 +92,7 @@
 
 			if (matchData) {
 				outData.isSticker = true;
-				outData.url = Module.Service.Url.getStickerUrl(matchData[1], matchData[2]);
+				outData.url = Plugin.Service.Url.getStickerUrl(matchData[1], matchData[2]);
 
 
 				outData.pack = matchData[1];
@@ -109,7 +109,7 @@
 				label = (isSticker) ? 'sticker' : 'text';
 
 
-			Module.Service.Api.sendStatistic([{
+			Plugin.Service.Api.sendStatistic([{
 				action: action,
 				category: category,
 				label: label,
@@ -121,7 +121,7 @@
 
 		updatePacks: function(successCallback) {
 
-			Module.Service.Api.getPacks(
+			Plugin.Service.Api.getPacks(
 				(function(response) {
 					if(response.status != 'success') {
 						return;
@@ -138,7 +138,7 @@
 
 					packs = this.markNewPacks(packs);
 
-					Module.Service.Storage.setPacks(packs);
+					Plugin.Service.Storage.setPacks(packs);
 
 					successCallback && successCallback(packs);
 				}).bind(this)
@@ -146,15 +146,15 @@
 		},
 
 		trackUserData: function() {
-			if (!Module.Configs.userId || !Module.Configs.userData) {
+			if (!Plugin.Configs.userId || !Plugin.Configs.userData) {
 				return;
 			}
 
-			var storedUserData = Module.Service.Storage.getUserData() || {};
+			var storedUserData = Plugin.Service.Storage.getUserData() || {};
 
-			if (!Module.Service.Helper.deepCompare(Module.Configs.userData, storedUserData)) {
-				Module.Service.Api.updateUserData(Module.Configs.userData);
-				Module.Service.Storage.setUserData(Module.Configs.userData);
+			if (!Plugin.Service.Helper.deepCompare(Plugin.Configs.userData, storedUserData)) {
+				Plugin.Service.Api.updateUserData(Plugin.Configs.userData);
+				Plugin.Service.Storage.setUserData(Plugin.Configs.userData);
 			}
 		}
 	};

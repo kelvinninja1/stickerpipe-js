@@ -1,9 +1,9 @@
 
-(function(Module) {
+(function(Plugin) {
 
-	var parent = Module.View.Block;
+	var parent = Plugin.View.Block;
 
-	Module.View.Popover = parent.extend({
+	Plugin.View.Popover = parent.extend({
 
 		popoverEl: null,
 		triangleEl: null,
@@ -14,7 +14,7 @@
 		_constructor: function() {
 			parent.prototype._constructor.apply(this, arguments);
 
-			this.toggleEl = document.getElementById(Module.Configs.elId);
+			this.toggleEl = document.getElementById(Plugin.Configs.elId);
 			this.toggleEl.addEventListener('click', (function() {
 				this.toggle();
 			}).bind(this));
@@ -57,12 +57,12 @@
 
 			// todo: addEventListener --> DOMEventService
 			if (window.addEventListener) {
-				window.addEventListener(Module.Service.Event.events.popoverShown, function() {
-					Module.Service.Event.resize();
+				window.addEventListener(Plugin.Service.Event.events.popoverShown, function() {
+					Plugin.Service.Event.resize();
 				});
 			} else {
-				window.attachEvent('on' + Module.Service.Event.events.popoverShown, function() {
-					Module.Service.Event.resize();
+				window.attachEvent('on' + Plugin.Service.Event.events.popoverShown, function() {
+					Plugin.Service.Event.resize();
 				});
 			}
 		},
@@ -82,7 +82,7 @@
 
 				this.toggleEl.parentElement.appendChild(this.popoverEl);
 				this.positioned();
-				Module.Service.Event.popoverShown();
+				Plugin.Service.Event.popoverShown();
 			}
 
 			parent.prototype.open.apply(this, arguments);
@@ -91,7 +91,7 @@
 		close: function() {
 			this.active = false;
 			this.toggleEl.parentElement.removeChild(this.popoverEl);
-			Module.Service.Event.popoverHidden();
+			Plugin.Service.Event.popoverHidden();
 			// todo
 			this.popoverEl.style.marginTop = 0;
 		},

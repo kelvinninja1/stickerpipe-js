@@ -1,9 +1,9 @@
 
-(function(Module) {
+(function(Plugin) {
 
-	Module.Service.Storage = {
+	Plugin.Service.Storage = {
 
-		lockr: Module.Libs.Lockr,
+		lockr: Plugin.Libs.Lockr,
 
 		setPrefix: function(storagePrefix) {
 			this.lockr.prefix = storagePrefix;
@@ -24,7 +24,7 @@
 				newStorageDate = [];
 
 			// todo: rewrite function as for & slice
-			Module.Service.Helper.forEach(usedStickers, function(usedSticker) {
+			Plugin.Service.Helper.forEach(usedStickers, function(usedSticker) {
 
 				if (usedSticker.code != stickerCode) {
 					newStorageDate.push(usedSticker);

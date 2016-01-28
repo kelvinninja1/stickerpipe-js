@@ -1,25 +1,25 @@
 
-(function(Module) {
+(function(Plugin) {
 
 	function activateUserPack(taskData) {
-		Module.Service.Pack.activateUserPack(taskData.packName, taskData.pricePoint);
+		Plugin.Service.Pack.activateUserPack(taskData.packName, taskData.pricePoint);
 	}
 
-	Module.Service.PendingRequest = {
+	Plugin.Service.PendingRequest = {
 
 		tasks: {
 			activateUserPack: 'activateUserPack'
 		},
 
 		add: function(taskName, taskData) {
-			Module.Service.Storage.addPendingRequestTask({
+			Plugin.Service.Storage.addPendingRequestTask({
 				name: taskName,
 				data: taskData
 			});
 		},
 
 		run: function() {
-			var task = Module.Service.Storage.popPendingRequestTask();
+			var task = Plugin.Service.Storage.popPendingRequestTask();
 
 			while(task) {
 				switch (task.name) {
@@ -30,7 +30,7 @@
 						break;
 				}
 
-				task = Module.Service.Storage.popPendingRequestTask();
+				task = Plugin.Service.Storage.popPendingRequestTask();
 			}
 		}
 

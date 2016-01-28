@@ -1,7 +1,7 @@
 
-(function(Module) {
+(function(Plugin) {
 
-	Module.Service.Helper = {
+	Plugin.Service.Helper = {
 		forEach: function(data, callback) {
 			for (var x in data) {
 				callback(data[x], x);
@@ -23,7 +23,7 @@
 		},
 
 		setConfig: function(config) {
-			Module.Configs = this.merge(Module.Configs || {}, config);
+			Plugin.Configs = this.merge(Plugin.Configs || {}, config);
 		},
 
 		setEvent: function(eventType, el, className, callback) {
@@ -173,7 +173,7 @@
 		},
 
 		md5: function(string) {
-			return Module.Libs.MD5(string);
+			return Plugin.Libs.MD5(string);
 		},
 
 		getLocation: function(url) {

@@ -1,7 +1,7 @@
 
-(function(Module) {
+(function(Plugin) {
 
-	Module.View.Block = Module.Libs.Class({
+	Plugin.View.Block = Plugin.Libs.Class({
 
 		emojisOffset: 0,
 		emojisLimit: 100,
@@ -21,10 +21,10 @@
 		_constructor: function(emojiService) {
 			this.emojiService = emojiService;
 
-			this.el = document.getElementById(Module.Configs.elId);
+			this.el = document.getElementById(Plugin.Configs.elId);
 			this.contentEl = document.createElement('div');
 
-			this.tabsView = new Module.View.Tabs();
+			this.tabsView = new Plugin.View.Tabs();
 
 			window.addEventListener('resize', (function() {
 				this.onWindowResize();
@@ -37,11 +37,11 @@
 
 			this.el.innerHTML = '';
 			this.el.classList.add('sticker-pipe');
-			this.el.style.width = Module.Configs.width;
+			this.el.style.width = Plugin.Configs.width;
 
 			this.scrollableEl = document.createElement('div');
 			this.scrollableEl.className = 'sp-scroll-content';
-			this.scrollableEl.style.height = parseInt(Module.Configs.height, 10) - 49 + 'px';
+			this.scrollableEl.style.height = parseInt(Plugin.Configs.height, 10) - 49 + 'px';
 			this.scrollableEl.appendChild(this.contentEl);
 
 			this.scrollableEl.addEventListener('ps-y-reach-end', (function () {
@@ -55,7 +55,7 @@
 			this.el.appendChild(this.tabsView.el);
 			this.el.appendChild(this.scrollableEl);
 
-			Module.Libs.PerfectScrollbar.initialize(this.scrollableEl);
+			Plugin.Libs.PerfectScrollbar.initialize(this.scrollableEl);
 
 			this.isRendered = true;
 
@@ -64,7 +64,7 @@
 		},
 		renderUsedStickers: function() {
 
-			var usedStickers = Module.Service.Storage.getUsedStickers();
+			var usedStickers = Plugin.Service.Storage.getUsedStickers();
 
 			this.contentEl.innerHTML = '';
 
@@ -72,13 +72,13 @@
 			this.contentEl.classList.remove('sp-emojis');
 
 			if (usedStickers.length == 0) {
-				this.contentEl.innerHTML += Module.Configs.htmlForEmptyRecent;
+				this.contentEl.innerHTML += Plugin.Configs.htmlForEmptyRecent;
 				this.updateScroll('top');
 				return false;
 			}
 
 			var stickers = [];
-			Module.Service.Helper.forEach(usedStickers, function(sticker) {
+			Plugin.Service.Helper.forEach(usedStickers, function(sticker) {
 				stickers.push(sticker.code);
 			});
 
@@ -101,7 +101,7 @@
 			this.contentEl.innerHTML = '';
 
 			var stickers = [];
-			Module.Service.Helper.forEach(pack.stickers, function(sticker) {
+			Plugin.Service.Helper.forEach(pack.stickers, function(sticker) {
 				stickers.push(pack.pack_name + '_' + sticker.name);
 			});
 
@@ -113,11 +113,11 @@
 			this.contentEl.classList.remove('sp-emojis');
 			this.contentEl.classList.add('sp-stickers');
 
-			Module.Service.Helper.forEach(stickers, function(stickerCode) {
+			Plugin.Service.Helper.forEach(stickers, function(stickerCode) {
 
 				var placeHolderClass = 'sp-sticker-placeholder';
 
-				var stickerImgSrc = Module.Service.Base.parseStickerFromText('[[' + stickerCode + ']]');
+				var stickerImgSrc = Plugin.Service.Base.parseStickerFromText('[[' + stickerCode + ']]');
 
 				var stickersSpanEl = document.createElement('span');
 				stickersSpanEl.classList.add(placeHolderClass);
@@ -125,7 +125,7 @@
 				var image = new Image();
 				image.onload = function() {
 					stickersSpanEl.classList.remove(placeHolderClass);
-					stickersSpanEl.classList.add(Module.Configs.stickerItemClass);
+					stickersSpanEl.classList.add(Plugin.Configs.stickerItemClass);
 					stickersSpanEl.setAttribute('data-sticker-string', stickerCode);
 					stickersSpanEl.appendChild(image);
 				};
@@ -140,21 +140,21 @@
 		},
 		renderEmojis: function(offset) {
 
-			if (offset > Module.Configs.emojiList.length - 1) {
+			if (offset > Plugin.Configs.emojiList.length - 1) {
 				return;
 			}
 
 			var limit = offset + this.emojisLimit;
-			if (limit > Module.Configs.emojiList.length - 1) {
-				limit = Module.Configs.emojiList.length;
+			if (limit > Plugin.Configs.emojiList.length - 1) {
+				limit = Plugin.Configs.emojiList.length;
 			}
 
 			for (var i = offset; i < limit; i++) {
-				var emoji = Module.Configs.emojiList[i],
+				var emoji = Plugin.Configs.emojiList[i],
 					emojiEl = document.createElement('span'),
 					emojiImgHtml = this.emojiService.parseEmojiFromText(emoji);
 
-				emojiEl.className = Module.Configs.emojiItemClass;
+				emojiEl.className = Plugin.Configs.emojiItemClass;
 				emojiEl.innerHTML = emojiImgHtml;
 
 				this.contentEl.appendChild(emojiEl);
@@ -166,12 +166,12 @@
 		},
 
 		handleClickOnSticker: function(callback) {
-			// todo: create static Module.Configs.stickerItemClass
-			Module.Service.Helper.setEvent('click', this.contentEl, Module.Configs.stickerItemClass, callback);
+			// todo: create static Plugin.Configs.stickerItemClass
+			Plugin.Service.Helper.setEvent('click', this.contentEl, Plugin.Configs.stickerItemClass, callback);
 		},
 		handleClickOnEmoji: function(callback) {
-			// todo: create static Module.Configs.emojiItemClass
-			Module.Service.Helper.setEvent('click', this.contentEl, Module.Configs.emojiItemClass, callback);
+			// todo: create static Plugin.Configs.emojiItemClass
+			Plugin.Service.Helper.setEvent('click', this.contentEl, Plugin.Configs.emojiItemClass, callback);
 		},
 
 		open: function(tabName) {
@@ -194,7 +194,7 @@
 				this.scrollableEl.scrollTop = 0;
 			}
 
-			Module.Libs.PerfectScrollbar.update(this.scrollableEl);
+			Plugin.Libs.PerfectScrollbar.update(this.scrollableEl);
 		},
 
 		onWindowResize: function() {}

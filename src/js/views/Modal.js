@@ -1,5 +1,5 @@
 
-(function(Module) {
+(function(Plugin) {
 
 	// todo: + bind & unbind methods for events (error on ESC two modals)
 
@@ -63,14 +63,14 @@
 
 		document.body.insertBefore(overlay, document.body.firstChild);
 
-		var bodyOuterWidth = Module.Service.El.outerWidth(document.body);
+		var bodyOuterWidth = Plugin.Service.El.outerWidth(document.body);
 		document.body.classList.add(classes.lock);
 		document.getElementsByTagName('html')[0].classList.add(classes.lock);
 
-		var scrollbarWidth = Module.Service.El.outerWidth(document.body) - bodyOuterWidth;
+		var scrollbarWidth = Plugin.Service.El.outerWidth(document.body) - bodyOuterWidth;
 
-		if (Module.Service.Helper.isIE()) {
-			ieBodyTopMargin = Module.Service.El.css(document.body, 'marginTop');
+		if (Plugin.Service.Helper.isIE()) {
+			ieBodyTopMargin = Plugin.Service.El.css(document.body, 'marginTop');
 			document.body.style.marginTop = 0;
 		}
 
@@ -80,7 +80,7 @@
 				var tag = tags[i],
 					tagEl = document.getElementsByTagName(tag)[0];
 
-				oMargin[tag.toLowerCase()] = parseInt(Module.Service.El.css(tagEl, 'marginRight'));
+				oMargin[tag.toLowerCase()] = parseInt(Plugin.Service.El.css(tagEl, 'marginRight'));
 			}
 
 			document.getElementsByTagName('html')[0].style.marginRight = oMargin['html'] + scrollbarWidth + 'px';
@@ -93,14 +93,14 @@
 		overlay.parentNode.removeChild(overlay);
 		overlay = null;
 
-		if (Module.Service.Helper.isIE()) {
+		if (Plugin.Service.Helper.isIE()) {
 			document.body.style.marginTop = ieBodyTopMargin + 'px';
 		}
 
-		var bodyOuterWidth = Module.Service.El.outerWidth(document.body);
+		var bodyOuterWidth = Plugin.Service.El.outerWidth(document.body);
 		document.body.classList.remove(classes.lock);
 		document.getElementsByTagName('html')[0].classList.remove(classes.lock);
-		var scrollbarWidth = Module.Service.El.outerWidth(document.body) - bodyOuterWidth;
+		var scrollbarWidth = Plugin.Service.El.outerWidth(document.body) - bodyOuterWidth;
 
 		if (scrollbarWidth != 0) {
 			var tags = ['html', 'body'];
@@ -118,7 +118,7 @@
 	}
 
 
-	Module.View.Modal = {
+	Plugin.View.Modal = {
 
 		init: function(contentEl, options) {
 
@@ -310,7 +310,7 @@
 
 					document.addEventListener('touchmove', function(e) {
 
-						//var q = Module.Service.El.getParents(e.target, '.' + classes.overlay);
+						//var q = Plugin.Service.El.getParents(e.target, '.' + classes.overlay);
 						//if (!q.length) {
 						//	e.preventDefault();
 						//}

@@ -1,7 +1,7 @@
 
-(function(Module) {
+(function(Plugin) {
 
-	Module.Service.Http = {
+	Plugin.Service.Http = {
 
 		// todo: refactor post(options) & get(options)
 
@@ -49,24 +49,24 @@
 			options.error = options.error || function() {};
 			options.complete = options.complete || function() {};
 
-			options.headers.Apikey = Module.Configs.apiKey;
+			options.headers.Apikey = Plugin.Configs.apiKey;
 			options.headers.Platform = 'JS';
-			options.headers.Localization = Module.Configs.lang;
+			options.headers.Localization = Plugin.Configs.lang;
 
-			if (Module.Configs.userId !== null) {
-				options.headers.UserId = Module.Configs.userId;
+			if (Plugin.Configs.userId !== null) {
+				options.headers.UserId = Plugin.Configs.userId;
 			}
 
 			if (options.type == 'POST' || options.type == 'PUT') {
 				options.headers['Content-Type'] = options.headers['Content-Type'] || 'application/x-www-form-urlencoded';
-				options.headers['DeviceId'] = Module.Service.Storage.getDeviceId();
+				options.headers['DeviceId'] = Plugin.Service.Storage.getDeviceId();
 			}
 
 
 			var xmlhttp = new XMLHttpRequest();
 			xmlhttp.open(options.type, options.url, true);
 
-			Module.Service.Helper.forEach(options.headers, function(value, name) {
+			Plugin.Service.Helper.forEach(options.headers, function(value, name) {
 				xmlhttp.setRequestHeader(name, value);
 			});
 

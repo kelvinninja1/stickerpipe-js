@@ -1,7 +1,7 @@
 
-(function(Module) {
+(function(Plugin) {
 
-	Module.Service.El = {
+	Plugin.Service.El = {
 
 		css: function(el, property) {
 			// todo: getComputedStyle add IE 8 supporting

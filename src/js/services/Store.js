@@ -1,16 +1,16 @@
 
-(function(Module) {
+(function(Plugin) {
 
 	function sendAPIMessage(action, attrs) {
-		var iframe = Module.Service.Store.stickerpipe.storeView.iframe;
+		var iframe = Plugin.Service.Store.stickerpipe.storeView.iframe;
 
 		iframe && iframe.contentWindow.postMessage(JSON.stringify({
 			action: action,
 			attrs: attrs
-		}), Module.Service.Helper.getDomain(Module.Configs.storeUrl));
+		}), Plugin.Service.Helper.getDomain(Plugin.Configs.storeUrl));
 	}
 
-	Module.Service.Store = {
+	Plugin.Service.Store = {
 
 		stickerpipe: null,
 
@@ -26,7 +26,7 @@
 		},
 
 		downloadPack: function(packName, pricePoint) {
-			Module.Service.Pack.activateUserPack(packName, pricePoint, function() {
+			Plugin.Service.Pack.activateUserPack(packName, pricePoint, function() {
 				sendAPIMessage('reload');
 				sendAPIMessage('onPackDownloaded', {
 					packName: packName
@@ -48,7 +48,7 @@
 
 		api: {
 			showCollections: function(data) {
-				Module.Service.Store.showCollections(data.attrs.packName);
+				Plugin.Service.Store.showCollections(data.attrs.packName);
 			},
 
 			purchasePack: function(data) {
@@ -56,21 +56,21 @@
 					packTitle = data.attrs.packTitle,
 					pricePoint = data.attrs.pricePoint;
 
-				if (pricePoint == 'A' || (pricePoint == 'B' && Module.Configs.userPremium)) {
-					Module.Service.Store.downloadPack(packName, pricePoint);
+				if (pricePoint == 'A' || (pricePoint == 'B' && Plugin.Configs.userPremium)) {
+					Plugin.Service.Store.downloadPack(packName, pricePoint);
 				} else {
-					var onPurchaseCallback = Module.Service.Store.onPurchaseCallback;
+					var onPurchaseCallback = Plugin.Service.Store.onPurchaseCallback;
 
 					onPurchaseCallback && onPurchaseCallback(packName, packTitle, pricePoint);
 				}
 			},
 
 			resizeStore: function(data) {
-				Module.Service.Store.stickerpipe.storeView.resize(data.attrs.height);
+				Plugin.Service.Store.stickerpipe.storeView.resize(data.attrs.height);
 			},
 
 			showBackButton: function(data) {
-				var modal = Module.Service.Store.stickerpipe.storeView.modal;
+				var modal = Plugin.Service.Store.stickerpipe.storeView.modal;
 
 				if (data.attrs.show) {
 					modal.backButton.style.display = 'block';

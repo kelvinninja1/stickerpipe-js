@@ -1,7 +1,7 @@
 
-(function(Module) {
+(function(Plugin) {
 
-	Module.Service.Event = {
+	Plugin.Service.Event = {
 
 		events: {
 			resize: 'resize',

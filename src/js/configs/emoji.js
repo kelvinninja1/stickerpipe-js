@@ -1,7 +1,7 @@
 
-(function(Module) {
+(function(Plugin) {
 
-	Module.Service.Helper.setConfig({
+	Plugin.Service.Helper.setConfig({
 		emojiList: [
 			// Emoticons		
 			"😊",

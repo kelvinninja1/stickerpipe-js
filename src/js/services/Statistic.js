@@ -1,7 +1,7 @@
 
-(function(Module) {
+(function(Plugin) {
 
-	Module.Service.Statistic = {
+	Plugin.Service.Statistic = {
 	};
 
 })(StickersModule);
