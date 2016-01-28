@@ -1,7 +1,5 @@
 (function(Plugin) {
 
-	Plugin.StickersModule = Plugin.StickersModule || {};
-
 	/**
 	 *
 	 * Copyright (C) 2011 by crac <![[dawid.kraczkowski[at]gmail[dot]com]]>
@@ -236,7 +234,7 @@
 	if (typeof module !== "undefined") {
 		module.exports = Class;
 	} else {
-		Plugin.StickersModule.Class = Class;   // for browser
+		Plugin.Libs.Class = Class;   // for browser
 	}
 
-})(window);
+})(window.StickersModule);

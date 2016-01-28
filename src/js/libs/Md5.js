@@ -1,6 +1,6 @@
 (function(Plugin) {
 
-	Plugin.StickersModule.MD5 = function (string) {
+	Plugin.Libs.MD5 = function (string) {
 
 		string = string.toString();
 
@@ -203,4 +203,4 @@
 		return temp.toLowerCase();
 	};
 
-})(window);
+})(window.StickersModule);

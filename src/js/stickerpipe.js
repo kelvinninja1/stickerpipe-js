@@ -6,9 +6,6 @@ window.StickersModule = {};
 window.StickersModule.Libs = {};
 //=include libs/**/*.js
 
-window.StickersModule.Utils = {};
-//=include utils/**/*.js
-
 window.StickersModule.Service = {};
 //=include services/**/*.js
 
@@ -24,7 +21,7 @@ window.StickersModule.View = {};
 (function(Plugin, Module) {
 
 	// todo: rename Stickers --> StickerPipe
-	Plugin.Stickers = Module.Class({
+	Plugin.Stickers = Module.Libs.Class({
 
 		emojiService: null,
 		stickersModel: {},
@@ -66,7 +63,7 @@ window.StickersModule.View = {};
 			Module.Service.Store.init(this);
 			Module.Service.Pack.init(this);
 
-			this.emojiService = new Module.Service.Emoji(Module.Twemoji);
+			this.emojiService = new Module.Service.Emoji(Module.Libs.Twemoji);
 
 			Module.Service.PendingRequest.run();
 		},

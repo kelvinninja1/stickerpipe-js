@@ -1,7 +1,7 @@
 
 (function(Plugin) {
 
-	Plugin.StickersModule.Lockr = {
+	Plugin.Libs.Lockr = {
 		prefix: '',
 
 		_getPrefixedKey: function(key, options) {
@@ -119,4 +119,4 @@
 		}
 	};
 
-})(window);
+})(window.StickersModule);

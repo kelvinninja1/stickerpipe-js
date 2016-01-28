@@ -4,7 +4,6 @@
 	Module.Service.Helper.setConfig({
 
 		elId: 'stickerPipe',
-		storeContainerId: 'stickerPipeStore',
 
 		// todo: more than 2 resolution
 		stickerResolutionType : (window.devicePixelRatio == 1) ? 'mdpi' : 'xhdpi',

@@ -1,7 +1,7 @@
 
 (function(Module) {
 
-	Module.Service.Emoji = Module.Class({
+	Module.Service.Emoji = Module.Libs.Class({
 
 		emojiProvider: null,
 

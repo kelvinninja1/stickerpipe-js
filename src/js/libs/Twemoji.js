@@ -1,7 +1,7 @@
 (function(Plugin) {
 
 	/*jslint indent: 2, browser: true, bitwise: true, plusplus: true */
-	Plugin.StickersModule.Twemoji = (function (
+	Plugin.Libs.Twemoji = (function (
 		/*! Copyright Twitter Inc. and other contributors. Licensed under MIT *//*
 		 https://github.com/twitter/twemoji/blob/gh-pages/LICENSE
 		 */
@@ -591,4 +591,4 @@
 
 	}());
 
-})(window);
+})(window.StickersModule);

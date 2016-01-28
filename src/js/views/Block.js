@@ -1,7 +1,7 @@
 
 (function(Module) {
 
-	Module.View.Block = Module.Class({
+	Module.View.Block = Module.Libs.Class({
 
 		emojisOffset: 0,
 		emojisLimit: 100,

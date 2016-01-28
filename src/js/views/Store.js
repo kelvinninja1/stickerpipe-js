@@ -22,7 +22,7 @@
 		}
 	}
 
-	Module.View.Store = Module.Class({
+	Module.View.Store = Module.Libs.Class({
 
 		modal: null,
 		iframe: null,

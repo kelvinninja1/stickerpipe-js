@@ -3,7 +3,7 @@
 
 	Module.Service.Storage = {
 
-		lockr: Module.Lockr,
+		lockr: Module.Libs.Lockr,
 
 		setPrefix: function(storagePrefix) {
 			this.lockr.prefix = storagePrefix;

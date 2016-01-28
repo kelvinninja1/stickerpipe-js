@@ -2,7 +2,7 @@
 (function(Module) {
 
 
-	Module.View.Tabs = Module.Class({
+	Module.View.Tabs = Module.Libs.Class({
 
 		el: null,
 		scrollableContainerEl: null,

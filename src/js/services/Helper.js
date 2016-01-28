@@ -173,7 +173,7 @@
 		},
 
 		md5: function(string) {
-			return Module.MD5(string);
+			return Module.Libs.MD5(string);
 		},
 
 		getLocation: function(url) {
