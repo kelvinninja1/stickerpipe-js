@@ -19,7 +19,7 @@
 <!-- AngularJS -->
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.2/angular.min.js"></script>
 
-<script src="js/stickerPipeStore.js?v=1453995362682"></script>
+<script src="js/stickerPipeStore.js?v=1454066994353"></script>
 
 <script>
 	(function() {
