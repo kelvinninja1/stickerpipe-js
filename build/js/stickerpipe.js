@@ -3946,14 +3946,237 @@ window.StickersModule.Service = {};
 	};
 })(window.StickersModule);
 
-window.StickersModule.Module = {
-	Store: function() {
-		var module = window.StickersModule.Module.Store.__Module__;
-		module.init && module.init.apply(module, arguments);
-		return module;
-	},
-	Modal: {}
-};
+////////////////////////////////////
+// Load modules
+////////////////////////////////////
+window.StickersModule.Module = {};
+
+(function(Plugin) {
+
+	Plugin.Module.Store = {
+
+		init: function(stickerpipe) {
+			Plugin.Module.Store.View.init();
+			Plugin.Module.Store.ApiListener.init();
+			Plugin.Module.Store.Controller.init(stickerpipe);
+		},
+
+		open: function(packName) {
+			Plugin.Module.Store.View.open(packName);
+		},
+
+		close: function() {
+			Plugin.Module.Store.View.close();
+		},
+
+		setOnPurchaseCallback: function(callback) {
+			Plugin.Module.Store.Controller.onPurchaseCallback = callback;
+		},
+
+		purchaseSuccess: function(packName, pricePoint) {
+			Plugin.Module.Store.Controller.onPurchaseSuccess(packName, pricePoint);
+		},
+
+		purchaseFail: function() {
+			Plugin.Module.Store.Controller.onPurchaseFail();
+		}
+	};
+
+})(StickersModule);
+
+
+(function(Plugin, Module) {
+
+	Module.Api= {
+
+		showCollections: function(data) {
+			Module.Controller.showCollections(data.attrs.packName);
+		},
+
+		purchasePack: function(data) {
+			var attrs = data.attrs;
+			Module.Controller.purchasePack(attrs.packName, attrs.packTitle, attrs.pricePoint);
+		},
+
+		showBackButton: function(data) {
+			Module.View.showBackButton(data.attrs.show);
+		},
+
+		// todo: remove (not used)
+		resizeStore: function(data) {
+			Module.View.resize(data.attrs.height);
+		}
+	};
+
+})(StickersModule, StickersModule.Module.Store);
+
+
+(function(Plugin, Module) {
+
+	var initialized = false;
+
+	Module.ApiListener = {
+
+		init: function() {
+			if (initialized) {
+				return;
+			}
+
+			window.addEventListener('message', (function(e) {
+				var data = JSON.parse(e.data);
+
+				if (!data.action) {
+					return;
+				}
+
+				var api = Module.Api;
+				api[data.action] && api[data.action](data);
+
+			}).bind(this));
+
+			initialized = true;
+		}
+	};
+
+})(window.StickersModule, StickersModule.Module.Store);
+
+(function(Plugin, Module) {
+
+	function callStoreMethod(action, attrs) {
+		var iframe = Module.View.iframe;
+
+		iframe && iframe.contentWindow.postMessage(JSON.stringify({
+			action: action,
+			attrs: attrs
+		}), Plugin.Service.Helper.getDomain(Plugin.Configs.storeUrl));
+	}
+
+	Module.Controller = {
+
+		stickerpipe: null,
+
+		onPurchaseCallback: null,
+
+		init: function(stickerpipe) {
+			this.stickerpipe = stickerpipe;
+		},
+
+		showCollections: function(packName) {
+			Module.View.close();
+			this.stickerpipe.open(packName);
+		},
+
+		downloadPack: function(packName, pricePoint) {
+			Plugin.Service.Pack.activateUserPack(packName, pricePoint, function() {
+				callStoreMethod('reload');
+				callStoreMethod('onPackDownloaded', {
+					packName: packName
+				});
+			});
+		},
+
+		purchasePack: function(packName, packTitle, pricePoint) {
+			if (pricePoint == 'A' || (pricePoint == 'B' && Plugin.Configs.userPremium)) {
+				this.downloadPack(packName, pricePoint);
+			} else {
+				this.onPurchaseCallback && this.onPurchaseCallback(packName, packTitle, pricePoint);
+			}
+		},
+
+		goBack: function() {
+			callStoreMethod('goBack');
+		},
+
+		///////////////////////////////////////////
+		// Callbacks
+		///////////////////////////////////////////
+
+		onPurchaseSuccess: function(packName, pricePoint) {
+			this.downloadPack(packName, pricePoint);
+		},
+
+		onPurchaseFail: function() {
+			callStoreMethod('hideActionProgress');
+		}
+	};
+
+})(StickersModule, StickersModule.Module.Store);
+
+
+(function(Plugin, Module) {
+
+	Module.View = {
+
+		modal: null,
+		iframe: null,
+
+		init: function() {
+			this.iframe = document.createElement('iframe');
+
+			this.iframe.style.width = '100%';
+			this.iframe.style.height = '100%';
+			this.iframe.style.border = '0';
+
+			this.modal = Plugin.Module.Modal.init(this.iframe, {
+				onOpen: (function(contentEl, modalEl, overlay) {
+					Plugin.Service.Event.resize();
+					Module.ApiListener.init();
+
+					if (Plugin.Service.Helper.getMobileOS() == 'ios') {
+						modalEl.getElementsByClassName('sp-modal-body')[0].style.overflowY = 'scroll';
+					}
+				}).bind(this)
+			});
+
+			this.modal.backButton.addEventListener('click', (function() {
+				Module.Controller.goBack();
+			}).bind(this));
+
+
+			window.addEventListener('resize', (function() {
+				this.resize();
+			}).bind(this));
+		},
+
+		open: function(packName) {
+			var url = Plugin.Service.Url.getStoreUrl();
+
+			if (packName) {
+				url = Plugin.Service.Url.getStorePackUrl(packName);
+			}
+
+			this.iframe.src = url;
+			this.modal.open();
+		},
+
+		close: function() {
+			if (this.modal && this.modal.hasGlobalOpened()) {
+				this.modal.close();
+			}
+		},
+
+		showBackButton: function(show) {
+			var modal = this.modal;
+			modal.backButton.style.display = (show) ? 'block' : 'none';
+		},
+
+		resize: function(height) {
+			var dialog = this.modal.modalEl.getElementsByClassName('sp-modal-dialog')[0];
+			dialog.style.height = '';
+
+			if (window.innerWidth > 700) {
+
+				var marginTop = parseInt(Plugin.Service.El.css(dialog, 'marginTop'), 10),
+					marginBottom = parseInt(Plugin.Service.El.css(dialog, 'marginBottom'), 10);
+
+				var minHeight = window.innerHeight - marginTop - marginBottom;
+
+				dialog.style.height = minHeight + 'px';
+			}
+		}
+	};
+
+})(window.StickersModule, StickersModule.Module.Store);
 
 (function(Plugin) {
 
@@ -4349,232 +4572,7 @@ window.StickersModule.Module = {
 
 })(window.StickersModule);
 
-(function(Plugin) {
-
-	Plugin.Module.Store.__Module__ = {
-
-		init: function(stickerpipe) {
-			Plugin.Module.Store.View.init();
-			Plugin.Module.Store.ApiListener.init();
-			Plugin.Module.Store.Controller.init(stickerpipe);
-		},
-
-		open: function(packName) {
-			Plugin.Module.Store.View.open(packName);
-		},
-		
-		close: function() {
-			Plugin.Module.Store.View.close();
-		},
-
-		setOnPurchaseCallback: function(callback) {
-			Plugin.Module.Store.Controller.onPurchaseCallback = callback;
-		},
-
-		purchaseSuccess: function(packName, pricePoint) {
-			Plugin.Module.Store.Controller.onPurchaseSuccess(packName, pricePoint);
-		},
-
-		purchaseFail: function() {
-			Plugin.Module.Store.Controller.onPurchaseFail();
-		}
-	};
-
-})(StickersModule);
-
-
-(function(Plugin, Module) {
-
-	Module.Api= {
-
-		showCollections: function(data) {
-			Module.Controller.showCollections(data.attrs.packName);
-		},
-
-		purchasePack: function(data) {
-			var attrs = data.attrs;
-			Module.Controller.purchasePack(attrs.packName, attrs.packTitle, attrs.pricePoint);
-		},
-
-		showBackButton: function(data) {
-			Module.View.showBackButton(data.attrs.show);
-		},
-
-		// todo: remove (not used)
-		resizeStore: function(data) {
-			Module.View.resize(data.attrs.height);
-		}
-	};
-
-})(StickersModule, StickersModule.Module.Store);
-
-
-(function(Plugin) {
-
-	var initialized = false;
-
-	Plugin.Module.Store.ApiListener = {
-
-		init: function() {
-			if (initialized) {
-				return;
-			}
-
-			window.addEventListener('message', (function(e) {
-				var data = JSON.parse(e.data);
-
-				if (!data.action) {
-					return;
-				}
-
-				var api = Plugin.Module.Store.Api;
-				api[data.action] && api[data.action](data);
-
-			}).bind(this));
-
-			initialized = true;
-		}
-	};
-
-})(window.StickersModule);
-
-(function(Plugin, Module) {
-
-	function callStoreMethod(action, attrs) {
-		var iframe = Module.View.iframe;
-
-		iframe && iframe.contentWindow.postMessage(JSON.stringify({
-			action: action,
-			attrs: attrs
-		}), Plugin.Service.Helper.getDomain(Plugin.Configs.storeUrl));
-	}
-
-	Plugin.Module.Store.Controller = {
-
-		stickerpipe: null,
-
-		onPurchaseCallback: null,
-
-		init: function(stickerpipe) {
-			this.stickerpipe = stickerpipe;
-		},
-
-		showCollections: function(packName) {
-			Module.View.close();
-			this.stickerpipe.open(packName);
-		},
-
-		downloadPack: function(packName, pricePoint) {
-			Plugin.Service.Pack.activateUserPack(packName, pricePoint, function() {
-				callStoreMethod('reload');
-				callStoreMethod('onPackDownloaded', {
-					packName: packName
-				});
-			});
-		},
-
-		purchasePack: function(packName, packTitle, pricePoint) {
-			if (pricePoint == 'A' || (pricePoint == 'B' && Plugin.Configs.userPremium)) {
-				this.downloadPack(packName, pricePoint);
-			} else {
-				this.onPurchaseCallback && this.onPurchaseCallback(packName, packTitle, pricePoint);
-			}
-		},
-
-		goBack: function() {
-			callStoreMethod('goBack');
-		},
-
-		///////////////////////////////////////////
-		// Callbacks
-		///////////////////////////////////////////
-
-		onPurchaseSuccess: function(packName, pricePoint) {
-			this.downloadPack(packName, pricePoint);
-		},
-
-		onPurchaseFail: function() {
-			callStoreMethod('hideActionProgress');
-		}
-	};
-
-})(StickersModule, StickersModule.Module.Store);
-
-
-(function(Plugin, Module) {
-
-	Module.View = {
-
-		modal: null,
-		iframe: null,
-
-		init: function() {
-			this.iframe = document.createElement('iframe');
-
-			this.iframe.style.width = '100%';
-			this.iframe.style.height = '100%';
-			this.iframe.style.border = '0';
-
-			this.modal = Plugin.Module.Modal.init(this.iframe, {
-				onOpen: (function(contentEl, modalEl, overlay) {
-					Plugin.Service.Event.resize();
-					Module.ApiListener.init();
-
-					if (Plugin.Service.Helper.getMobileOS() == 'ios') {
-						modalEl.getElementsByClassName('sp-modal-body')[0].style.overflowY = 'scroll';
-					}
-				}).bind(this)
-			});
-
-			this.modal.backButton.addEventListener('click', (function() {
-				Module.Controller.goBack();
-			}).bind(this));
-
-
-			window.addEventListener('resize', (function() {
-				this.resize();
-			}).bind(this));
-		},
-
-		open: function(packName) {
-			var url = Plugin.Service.Url.getStoreUrl();
-
-			if (packName) {
-				url = Plugin.Service.Url.getStorePackUrl(packName);
-			}
-
-			this.iframe.src = url;
-			this.modal.open();
-		},
-
-		close: function() {
-			if (this.modal && this.modal.hasGlobalOpened()) {
-				this.modal.close();
-			}
-		},
-
-		showBackButton: function(show) {
-			var modal = this.modal;
-			modal.backButton.style.display = (show) ? 'block' : 'none';
-		},
-
-		resize: function(height) {
-			var dialog = this.modal.modalEl.getElementsByClassName('sp-modal-dialog')[0];
-			dialog.style.height = '';
-
-			if (window.innerWidth > 700) {
-
-				var marginTop = parseInt(Plugin.Service.El.css(dialog, 'marginTop'), 10),
-					marginBottom = parseInt(Plugin.Service.El.css(dialog, 'marginBottom'), 10);
-
-				var minHeight = window.innerHeight - marginTop - marginBottom;
-
-				dialog.style.height = minHeight + 'px';
-			}
-		}
-	};
-
-})(window.StickersModule, StickersModule.Module.Store);
+////////////////////////////////////
 
 window.StickersModule.Configs = {};
 
@@ -6151,7 +6149,6 @@ window.StickersModule.View = {};
 
 		stickersModel: {},
 		view: null,
-		store: null,
 
 		_constructor: function(config) {
 
@@ -6184,7 +6181,7 @@ window.StickersModule.View = {};
 			}
 
 			// ***** Init store *****
-			this.store = new Plugin.Module.Store(this);
+			Plugin.Module.Store.init(this);
 
 			// ***** Init services ******
 			Plugin.Service.Pack.init(this);
@@ -6343,11 +6340,11 @@ window.StickersModule.View = {};
 		},
 
 		purchaseSuccess: function(packName, pricePoint) {
-			this.store.purchaseSuccess(packName, pricePoint);
+			Plugin.Module.Store.purchaseSuccess(packName, pricePoint);
 		},
 
 		purchaseFail: function() {
-			this.store.purchaseFail();
+			Plugin.Module.Store.purchaseFail();
 		},
 
 		open: function(tabName) {
@@ -6359,11 +6356,11 @@ window.StickersModule.View = {};
 		},
 
 		openStore: function(packName) {
-			this.store.open(packName);
+			Plugin.Module.Store.open(packName);
 		},
 
 		closeStore: function() {
-			this.store.close();
+			Plugin.Module.Store.close();
 		},
 
 		////////////////////
@@ -6385,7 +6382,7 @@ window.StickersModule.View = {};
 		},
 
 		onPurchase: function(callback) {
-			this.store.setOnPurchaseCallback(callback);
+			Plugin.Module.Store.setOnPurchaseCallback(callback);
 		}
 	});
 

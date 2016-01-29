@@ -9,15 +9,17 @@ window.StickersModule.Libs = {};
 window.StickersModule.Service = {};
 //=include services/**/*.js
 
-window.StickersModule.Module = {
-	Store: function() {
-		var module = window.StickersModule.Module.Store.__Module__;
-		module.init && module.init.apply(module, arguments);
-		return module;
-	},
-	Modal: {}
-};
-//=include modules/**/*.js
+////////////////////////////////////
+// Load modules
+////////////////////////////////////
+window.StickersModule.Module = {};
+
+//=include modules/store/Store.js
+//=include modules/store/src/**/*.js
+
+//=include modules/modal/Modal.js
+
+////////////////////////////////////
 
 window.StickersModule.Configs = {};
 //=include configs/**/*.js
@@ -32,7 +34,6 @@ window.StickersModule.View = {};
 
 		stickersModel: {},
 		view: null,
-		store: null,
 
 		_constructor: function(config) {
 
@@ -65,7 +66,7 @@ window.StickersModule.View = {};
 			}
 
 			// ***** Init store *****
-			this.store = new Plugin.Module.Store(this);
+			Plugin.Module.Store.init(this);
 
 			// ***** Init services ******
 			Plugin.Service.Pack.init(this);
@@ -224,11 +225,11 @@ window.StickersModule.View = {};
 		},
 
 		purchaseSuccess: function(packName, pricePoint) {
-			this.store.purchaseSuccess(packName, pricePoint);
+			Plugin.Module.Store.purchaseSuccess(packName, pricePoint);
 		},
 
 		purchaseFail: function() {
-			this.store.purchaseFail();
+			Plugin.Module.Store.purchaseFail();
 		},
 
 		open: function(tabName) {
@@ -240,11 +241,11 @@ window.StickersModule.View = {};
 		},
 
 		openStore: function(packName) {
-			this.store.open(packName);
+			Plugin.Module.Store.open(packName);
 		},
 
 		closeStore: function() {
-			this.store.close();
+			Plugin.Module.Store.close();
 		},
 
 		////////////////////
@@ -266,7 +267,7 @@ window.StickersModule.View = {};
 		},
 
 		onPurchase: function(callback) {
-			this.store.setOnPurchaseCallback(callback);
+			Plugin.Module.Store.setOnPurchaseCallback(callback);
 		}
 	});
 

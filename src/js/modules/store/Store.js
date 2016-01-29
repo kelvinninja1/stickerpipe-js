@@ -1,7 +1,7 @@
 
 (function(Plugin) {
 
-	Plugin.Module.Store.__Module__ = {
+	Plugin.Module.Store = {
 
 		init: function(stickerpipe) {
 			Plugin.Module.Store.View.init();
@@ -12,7 +12,7 @@
 		open: function(packName) {
 			Plugin.Module.Store.View.open(packName);
 		},
-		
+
 		close: function() {
 			Plugin.Module.Store.View.close();
 		},

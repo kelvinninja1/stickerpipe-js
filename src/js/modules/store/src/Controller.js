@@ -10,7 +10,7 @@
 		}), Plugin.Service.Helper.getDomain(Plugin.Configs.storeUrl));
 	}
 
-	Plugin.Module.Store.Controller = {
+	Module.Controller = {
 
 		stickerpipe: null,
 

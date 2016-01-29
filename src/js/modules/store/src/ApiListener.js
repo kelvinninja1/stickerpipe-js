@@ -1,9 +1,9 @@
 
-(function(Plugin) {
+(function(Plugin, Module) {
 
 	var initialized = false;
 
-	Plugin.Module.Store.ApiListener = {
+	Module.ApiListener = {
 
 		init: function() {
 			if (initialized) {
@@ -17,7 +17,7 @@
 					return;
 				}
 
-				var api = Plugin.Module.Store.Api;
+				var api = Module.Api;
 				api[data.action] && api[data.action](data);
 
 			}).bind(this));
@@ -26,4 +26,4 @@
 		}
 	};
 
-})(window.StickersModule);
+})(window.StickersModule, StickersModule.Module.Store);
