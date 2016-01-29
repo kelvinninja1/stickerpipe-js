@@ -14,11 +14,6 @@
 
 		showBackButton: function(data) {
 			Module.View.showBackButton(data.attrs.show);
-		},
-
-		// todo: remove (not used)
-		resizeStore: function(data) {
-			Module.View.resize(data.attrs.height);
 		}
 	};
 

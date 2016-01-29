@@ -9,9 +9,12 @@ window.StickersModule.Libs = {};
 window.StickersModule.Service = {};
 //=include services/**/*.js
 
-////////////////////////////////////
+window.StickersModule.Configs = {};
+//=include configs/**/*.js
+
+/////////////////////////////////////////////////////////////
 // Load modules
-////////////////////////////////////
+/////////////////////////////////////////////////////////////
 window.StickersModule.Module = {};
 
 //=include modules/store/Store.js
@@ -19,10 +22,7 @@ window.StickersModule.Module = {};
 
 //=include modules/modal/Modal.js
 
-////////////////////////////////////
-
-window.StickersModule.Configs = {};
-//=include configs/**/*.js
+/////////////////////////////////////////////////////////////
 
 window.StickersModule.View = {};
 //=include views/**/*.js

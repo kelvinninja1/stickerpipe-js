@@ -30,7 +30,7 @@
 
 
 			window.addEventListener('resize', (function() {
-				this.resize();
+				this.onWindowResize();
 			}).bind(this));
 		},
 
@@ -56,7 +56,7 @@
 			modal.backButton.style.display = (show) ? 'block' : 'none';
 		},
 
-		resize: function(height) {
+		onWindowResize: function() {
 			var dialog = this.modal.modalEl.getElementsByClassName('sp-modal-dialog')[0];
 			dialog.style.height = '';
 
