@@ -661,43 +661,6 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $rootScop
 
 });
 
-appStickerPipeStore.directive('basePage', function() {
-
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/view.tpl',
-		link: function($scope, $el, attrs) {}
-	};
-});
-
-appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI, $location) {
-
-	PlatformAPI.showInProgress(false);
-
-	angular.extend($scope, {
-		platformAPI: PlatformAPI,
-		packs: packs.packs,
-
-		getPackMainIcon: function(pack) {
-			return pack.main_icon[Config.resolutionType];
-		},
-
-		getPackTitle: function(pack) {
-			var title = pack.title;
-			if (title.length > 15) {
-				title = title.substr(0, 15);
-				title += '...';
-			}
-
-			return title;
-		},
-
-		openPack: function(packName) {
-			$location.path('/packs/' + packName);
-		}
-	});
-});
-
 appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack, $window) {
 
 	PlatformAPI.showBackButton('#/store');
@@ -759,6 +722,59 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 	angular.element($window).bind('resize', function () {
 		$scope.$apply();
 	});
+});
+
+appStickerPipeStore.directive('basePage', function() {
+
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/view.tpl',
+		link: function($scope, $el, attrs) {}
+	};
+});
+
+appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI, $location) {
+
+	PlatformAPI.showInProgress(false);
+
+	angular.extend($scope, {
+		platformAPI: PlatformAPI,
+		packs: packs.packs,
+
+		getPackMainIcon: function(pack) {
+			return pack.main_icon[Config.resolutionType];
+		},
+
+		getPackTitle: function(pack) {
+			var title = pack.title;
+			if (title.length > 15) {
+				title = title.substr(0, 15);
+				title += '...';
+			}
+
+			return title;
+		},
+
+		openPack: function(packName) {
+			$location.path('/packs/' + packName);
+		}
+	});
+});
+
+appStickerPipeStore.value('En', {
+	download: 'Download',
+	open: 'Open',
+	buyPack: 'Buy pack',
+	unavailableContent: 'This content is currently unavailable',
+	get: 'Get'
+});
+
+appStickerPipeStore.value('Ru', {
+	download: 'Скачать',
+	open: 'Открыть',
+	buyPack: 'Купить',
+	unavailableContent: 'В данный момент этот контент недоступен',
+	get: 'Скачать'
 });
 
 appStickerPipeStore.factory('AndroidPlatform', function() {
@@ -905,6 +921,7 @@ appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout
 		},
 
 		onScrollContent: function(attrs) {
+			alert(2);
 			var log = document.getElementById('log');
 			log.innerHTML += attrs.y + '<br/>';
 		}
@@ -912,20 +929,18 @@ appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout
 	});
 });
 
-appStickerPipeStore.value('En', {
-	download: 'Download',
-	open: 'Open',
-	buyPack: 'Buy pack',
-	unavailableContent: 'This content is currently unavailable',
-	get: 'Get'
-});
+appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
+	
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/error/view.tpl',
+		link: function($scope, $el, attrs) {
 
-appStickerPipeStore.value('Ru', {
-	download: 'Скачать',
-	open: 'Открыть',
-	buyPack: 'Купить',
-	unavailableContent: 'В данный момент этот контент недоступен',
-	get: 'Скачать'
+			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
+			$scope.i18n = i18n;
+		}
+
+	};
 });
 
 appStickerPipeStore.directive('preloader', function($rootScope) {
@@ -953,20 +968,6 @@ appStickerPipeStore.directive('preloader', function($rootScope) {
 				}
 			});
 
-		}
-
-	};
-});
-
-appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
-	
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/error/view.tpl',
-		link: function($scope, $el, attrs) {
-
-			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
-			$scope.i18n = i18n;
 		}
 
 	};

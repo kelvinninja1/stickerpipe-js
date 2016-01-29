@@ -5037,7 +5037,6 @@ window.StickersModule.Module = {};
 						var modalBody = modalEl.getElementsByClassName('sp-modal-body')[0];
 						modalBody.style.overflowY = 'scroll';
 						modalBody.addEventListener('scroll', function() {
-							alert(1);
 							Module.Controller.onScrollContent(modalBody.scrollTop);
 						});
 					}
