@@ -833,7 +833,7 @@ appStickerPipeStore.factory('IOSPlatform', function() {
 		},
 
 		showInProgress: function(show) {
-			return window.IosJsInterface.setInProgress(show);
+			return getInterface().setInProgress(show);
 		},
 
 		////////////////////////////////////////////////////////////
