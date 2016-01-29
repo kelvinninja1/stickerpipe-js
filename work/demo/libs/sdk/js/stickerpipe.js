@@ -4,6 +4,829 @@ window.StickersModule = {};
 
 
 window.StickersModule.Libs = {};
+(function(Plugin) {
+
+	/**
+	 *
+	 * Copyright (C) 2011 by crac <![[dawid.kraczkowski[at]gmail[dot]com]]>
+	 * Thanks for Hardy Keppler<![[Keppler.H[at]online.de]]> for shortened version
+	 *
+	 * Permission is hereby granted, free of charge, to any person obtaining a copy
+	 * of this software and associated documentation files (the "Software"), to deal
+	 * in the Software without restriction, including without limitation the rights
+	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	 * copies of the Software, and to permit persons to whom the Software is
+	 * furnished to do so, subject to the following conditions:
+	 *
+	 * The above copyright notice and this permission notice shall be included in
+	 * all copies or substantial portions of the Software.
+	 *
+	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	 * THE SOFTWARE.
+	 *
+	 **/
+	var Class = (function() {
+
+		function _rewriteStatics(fnc, statics) {
+			for (var prop in statics) {
+				if (prop === 'extend' || prop === 'static' || prop === 'typeOf' || prop === 'mixin' ) {
+					continue;
+				}
+
+				if (typeof statics[prop] === 'object' || typeof statics[prop] === 'function') {
+					fnc[prop] = statics[prop];
+					return;
+				}
+
+				//check if static is a constant
+				if (prop === prop.toUpperCase()) {
+					Object.defineProperty(fnc, prop, {
+						writable: false,
+						configurable: false,
+						enumerable: true,
+						value: statics[prop]
+					});
+					Object.defineProperty(fnc.prototype, prop, {
+						writable: false,
+						configurable: false,
+						enumerable: true,
+						value: statics[prop]
+					});
+				} else {
+					Object.defineProperty(fnc, prop, {
+						get: function() {
+							return statics[prop]
+						},
+						set: function(val) {
+							statics[prop] = val;
+						}
+					});
+					Object.defineProperty(fnc.prototype, prop, {
+						get: function() {
+							return statics[prop]
+						},
+						set: function(val) {
+							statics[prop] = val;
+						}
+					});
+				}
+			}
+		}
+
+		function _extend(base, source, overrideConstructor) {
+			overrideConstructor = overrideConstructor || false;
+
+			for (var p in source) {
+				if ((p === '_constructor' && !overrideConstructor) || p === 'typeOf' || p === 'mixin' || p === 'static' || p === 'extend') {
+					continue;
+				}
+				base[p] = source[p];
+			}
+		}
+
+		return function (classBody) {
+
+			var _preventCreateCall = false;
+
+			return (function createClass(self, classBody) {
+
+				var _mixins = [];
+				var instance;
+
+				var isSingleton = classBody.hasOwnProperty('singleton') && classBody.singleton;
+
+				var classConstructor = function () {
+					//apply constructor pattern
+					if (typeof this['_constructor'] === 'function' && _preventCreateCall === false) {
+						this._constructor.apply(this, arguments);
+					}
+
+					//apply getter pattern
+					if (classBody.hasOwnProperty('get')) {
+						for (var p in classBody.get) {
+
+							var setter = 'set' in classBody ? (p in classBody.set ? classBody.set[p] : null) : null;
+							if (setter === null) {
+								Object.defineProperty(this, p, {
+									get: classBody.get[p]
+								});
+							}
+						}
+					}
+
+					//apply setter pattern
+					if (classBody.hasOwnProperty('set')) {
+						for (var p in classBody.set) {
+
+							var getter = 'get' in classBody ? (p in classBody.get ? classBody.get[p] : null) : null;
+							if (getter !== null) {
+								Object.defineProperty(this, p, {
+									set: classBody.set[p],
+									get: classBody.get[p]
+								});
+							} else {
+								Object.defineProperty(this, p, {
+									set: classBody.set[p]
+								});
+							}
+						}
+					}
+
+					if (isSingleton && typeof this !== 'undefined') {
+						throw new Error('Singleton object cannot have more than one instance, call instance method instead');
+					}
+					this.constructor = classConstructor;
+				};
+
+				//make new class instance of extended object
+				if (self !== null) {
+					_preventCreateCall = true;
+					classConstructor.prototype = new self();
+					_preventCreateCall = false;
+				}
+
+				var classPrototype = classConstructor.prototype;
+
+				classPrototype.typeOf = function(cls) {
+					if (typeof cls === 'object') {
+						return _mixins.indexOf(cls) >= 0;
+					} else if (typeof cls === 'function') {
+						if (this instanceof cls) {
+							return true;
+						} else if (_mixins.indexOf(cls) >= 0) {
+							return true;
+						}
+					}
+
+					return false;
+				};
+				if (typeof classBody === 'function') {
+					classBody = classBody();
+				}
+
+				_extend(classPrototype, classBody, true);
+
+				/**
+				 * Defines statics and constans in class' body.
+				 *
+				 * @param {Object} statics
+				 * @returns {Function}
+				 */
+				classConstructor.static = function(statics) {
+					_rewriteStatics(classConstructor, statics);
+					return classConstructor;
+				};
+
+				/**
+				 * Extends class body by passed other class declaration
+				 * @param {Function} *mixins
+				 * @returns {Function}
+				 */
+				classConstructor.mixin = function() {
+					for (var i = 0, l = arguments.length; i < l; i++) {
+						//check if class implements interfaces
+						var mixin = arguments[i];
+
+						if (typeof mixin === 'function') {
+							var methods = mixin.prototype;
+						} else if (typeof mixin === 'object') {
+							var methods = mixin;
+						} else {
+							throw new Error('js.class mixin method accepts only types: object, function - `' + (typeof mixin) + '` type given');
+						}
+						_extend(classPrototype, methods, false);
+						_mixins.push(mixin);
+					}
+					return classConstructor;
+				};
+
+				/**
+				 * Creates and returns new constructor function which extends
+				 * its parent
+				 *
+				 * @param {Object} classBody
+				 * @returns {Function}
+				 */
+				if (isSingleton) {
+					classConstructor.extend = function() {
+						throw new Error('Singleton class cannot be extended');
+					};
+
+					classConstructor.instance = function() {
+						if (!instance) {
+							isSingleton = false;
+							instance = new classConstructor();
+							isSingleton = true;
+						}
+						return instance;
+					}
+
+				} else {
+					classConstructor.extend = function (classBody) {
+						return createClass(this, classBody);
+					};
+				}
+
+				return classConstructor;
+			})(null, classBody);
+		}
+	})();
+
+	if (typeof module !== "undefined") {
+		module.exports = Class;
+	} else {
+		Plugin.Libs.Class = Class;   // for browser
+	}
+
+})(window.StickersModule);
+
+// todo: remove
+
+/*
+ * classList.js: Cross-browser full element.classList implementation.
+ * 2014-12-13
+ *
+ * By Eli Grey, http://eligrey.com
+ * Public Domain.
+ * NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
+ */
+
+/*global self, document, DOMException */
+
+/*! @source http://purl.eligrey.com/github/classList.js/blob/master/classList.js */
+
+if ("document" in self) {
+
+// Full polyfill for browsers with no classList support
+	if (!("classList" in document.createElement("_"))) {
+
+		(function (view) {
+
+			"use strict";
+
+			if (!('Element' in view)) return;
+
+			var
+				classListProp = "classList"
+				, protoProp = "prototype"
+				, elemCtrProto = view.Element[protoProp]
+				, objCtr = Object
+				, strTrim = String[protoProp].trim || function () {
+						return this.replace(/^\s+|\s+$/g, "");
+					}
+				, arrIndexOf = Array[protoProp].indexOf || function (item) {
+						var
+							i = 0
+							, len = this.length
+							;
+						for (; i < len; i++) {
+							if (i in this && this[i] === item) {
+								return i;
+							}
+						}
+						return -1;
+					}
+			// Vendors: please allow content code to instantiate DOMExceptions
+				, DOMEx = function (type, message) {
+					this.name = type;
+					this.code = DOMException[type];
+					this.message = message;
+				}
+				, checkTokenAndGetIndex = function (classList, token) {
+					if (token === "") {
+						throw new DOMEx(
+							"SYNTAX_ERR"
+							, "An invalid or illegal string was specified"
+						);
+					}
+					if (/\s/.test(token)) {
+						throw new DOMEx(
+							"INVALID_CHARACTER_ERR"
+							, "String contains an invalid character"
+						);
+					}
+					return arrIndexOf.call(classList, token);
+				}
+				, ClassList = function (elem) {
+					var
+						trimmedClasses = strTrim.call(elem.getAttribute("class") || "")
+						, classes = trimmedClasses ? trimmedClasses.split(/\s+/) : []
+						, i = 0
+						, len = classes.length
+						;
+					for (; i < len; i++) {
+						this.push(classes[i]);
+					}
+					this._updateClassName = function () {
+						elem.setAttribute("class", this.toString());
+					};
+				}
+				, classListProto = ClassList[protoProp] = []
+				, classListGetter = function () {
+					return new ClassList(this);
+				}
+				;
+// Most DOMException implementations don't allow calling DOMException's toString()
+// on non-DOMExceptions. Error's toString() is sufficient here.
+			DOMEx[protoProp] = Error[protoProp];
+			classListProto.item = function (i) {
+				return this[i] || null;
+			};
+			classListProto.contains = function (token) {
+				token += "";
+				return checkTokenAndGetIndex(this, token) !== -1;
+			};
+			classListProto.add = function () {
+				var
+					tokens = arguments
+					, i = 0
+					, l = tokens.length
+					, token
+					, updated = false
+					;
+				do {
+					token = tokens[i] + "";
+					if (checkTokenAndGetIndex(this, token) === -1) {
+						this.push(token);
+						updated = true;
+					}
+				}
+				while (++i < l);
+
+				if (updated) {
+					this._updateClassName();
+				}
+			};
+			classListProto.remove = function () {
+				var
+					tokens = arguments
+					, i = 0
+					, l = tokens.length
+					, token
+					, updated = false
+					, index
+					;
+				do {
+					token = tokens[i] + "";
+					index = checkTokenAndGetIndex(this, token);
+					while (index !== -1) {
+						this.splice(index, 1);
+						updated = true;
+						index = checkTokenAndGetIndex(this, token);
+					}
+				}
+				while (++i < l);
+
+				if (updated) {
+					this._updateClassName();
+				}
+			};
+			classListProto.toggle = function (token, force) {
+				token += "";
+
+				var
+					result = this.contains(token)
+					, method = result ?
+					force !== true && "remove"
+						:
+					force !== false && "add"
+					;
+
+				if (method) {
+					this[method](token);
+				}
+
+				if (force === true || force === false) {
+					return force;
+				} else {
+					return !result;
+				}
+			};
+			classListProto.toString = function () {
+				return this.join(" ");
+			};
+
+			if (objCtr.defineProperty) {
+				var classListPropDesc = {
+					get: classListGetter
+					, enumerable: true
+					, configurable: true
+				};
+				try {
+					objCtr.defineProperty(elemCtrProto, classListProp, classListPropDesc);
+				} catch (ex) { // IE 8 doesn't support enumerable:true
+					if (ex.number === -0x7FF5EC54) {
+						classListPropDesc.enumerable = false;
+						objCtr.defineProperty(elemCtrProto, classListProp, classListPropDesc);
+					}
+				}
+			} else if (objCtr[protoProp].__defineGetter__) {
+				elemCtrProto.__defineGetter__(classListProp, classListGetter);
+			}
+
+		}(self));
+
+	} else {
+// There is full or partial native classList support, so just check if we need
+// to normalize the add/remove and toggle APIs.
+
+		(function () {
+			"use strict";
+
+			var testElement = document.createElement("_");
+
+			testElement.classList.add("c1", "c2");
+
+			// Polyfill for IE 10/11 and Firefox <26, where classList.add and
+			// classList.remove exist but support only one argument at a time.
+			if (!testElement.classList.contains("c2")) {
+				var createMethod = function(method) {
+					var original = DOMTokenList.prototype[method];
+
+					DOMTokenList.prototype[method] = function(token) {
+						var i, len = arguments.length;
+
+						for (i = 0; i < len; i++) {
+							token = arguments[i];
+							original.call(this, token);
+						}
+					};
+				};
+				createMethod('add');
+				createMethod('remove');
+			}
+
+			testElement.classList.toggle("c3", false);
+
+			// Polyfill for IE 10 and Firefox <24, where classList.toggle does not
+			// support the second argument.
+			if (testElement.classList.contains("c3")) {
+				var _toggle = DOMTokenList.prototype.toggle;
+
+				DOMTokenList.prototype.toggle = function(token, force) {
+					if (1 in arguments && !this.contains(token) === !force) {
+						return force;
+					} else {
+						return _toggle.call(this, token);
+					}
+				};
+
+			}
+
+			testElement = null;
+		}());
+
+	}
+
+}
+document.addEventListener("DOMContentLoaded", function(event) {
+
+	if(typeof window.ga === "undefined"){
+
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	}
+
+	ga('create', 'UA-1113296-81', 'auto', {'name': 'stickerTracker'});
+	ga('stickerTracker.send', 'pageview');
+
+});
+
+(function(Plugin) {
+
+	Plugin.Libs.Lockr = {
+		prefix: '',
+
+		_getPrefixedKey: function(key, options) {
+			options = options || {};
+
+			if (options.noPrefix) {
+				return key;
+			} else {
+				return this.prefix + key;
+			}
+		},
+
+		set: function (key, value, options) {
+			var query_key = this._getPrefixedKey(key, options);
+
+			try {
+				localStorage.setItem(query_key, JSON.stringify({
+					data: value
+				}));
+			} catch (e) {
+				console && console.warn('Lockr didn\'t successfully save the "{'+ key +': '+ value +'}" pair, because the localStorage is full.');
+			}
+		},
+
+		get: function (key, missing, options) {
+			var query_key = this._getPrefixedKey(key, options),
+				value;
+
+			try {
+				value = JSON.parse(localStorage.getItem(query_key));
+			} catch (e) {
+				value = null;
+			}
+
+			return (value === null) ? missing : (value.data || missing);
+		},
+
+		sadd: function(key, value, options) {
+			var query_key = this._getPrefixedKey(key, options),
+				json;
+
+			var values = this.smembers(key);
+
+			if (values.indexOf(value) > -1) {
+				return null;
+			}
+
+			try {
+				values.push(value);
+				json = JSON.stringify({"data": values});
+				localStorage.setItem(query_key, json);
+			} catch (e) {
+				if (console) {
+					console.log(e);
+					console.warn('Lockr didn\'t successfully add the '+ value +' to '+ key +' set, because the localStorage is full.');
+				}
+			}
+		},
+
+		smembers: function(key, options) {
+			var query_key = this._getPrefixedKey(key, options),
+				value;
+
+			try {
+				value = JSON.parse(localStorage.getItem(query_key));
+			} catch (e) {
+				value = null;
+			}
+
+			return (value === null) ? [] : (value.data || []);
+		},
+
+		sismember: function(key, value, options) {
+			var query_key = this._getPrefixedKey(key, options);
+			return this.smembers(key).indexOf(value) > -1;
+		},
+
+		getAll: function () {
+			var keys = Object.keys(localStorage);
+
+			return keys.map((function (key) {
+				return this.get(key);
+			}).bind(this));
+		},
+
+		srem: function(key, value, options) {
+			var query_key = this._getPrefixedKey(key, options),
+				json,
+				index;
+
+			var values = this.smembers(key, value);
+
+			index = values.indexOf(value);
+
+			if (index > -1)
+				values.splice(index, 1);
+
+			json = JSON.stringify({
+				data: values
+			});
+
+			try {
+				localStorage.setItem(query_key, json);
+			} catch (e) {
+				console && console.warn('Lockr couldn\'t remove the ' + value + ' from the set ' + key);
+			}
+		},
+
+		rm: function (key) {
+			localStorage.removeItem(key);
+		},
+
+		flush: function () {
+			localStorage.clear();
+		}
+	};
+
+})(window.StickersModule);
+(function(Plugin) {
+
+	Plugin.Libs.MD5 = function (string) {
+
+		string = string.toString();
+
+		function RotateLeft(lValue, iShiftBits) {
+			return (lValue<<iShiftBits) | (lValue>>>(32-iShiftBits));
+		}
+
+		function AddUnsigned(lX,lY) {
+			var lX4,lY4,lX8,lY8,lResult;
+			lX8 = (lX & 0x80000000);
+			lY8 = (lY & 0x80000000);
+			lX4 = (lX & 0x40000000);
+			lY4 = (lY & 0x40000000);
+			lResult = (lX & 0x3FFFFFFF)+(lY & 0x3FFFFFFF);
+			if (lX4 & lY4) {
+				return (lResult ^ 0x80000000 ^ lX8 ^ lY8);
+			}
+			if (lX4 | lY4) {
+				if (lResult & 0x40000000) {
+					return (lResult ^ 0xC0000000 ^ lX8 ^ lY8);
+				} else {
+					return (lResult ^ 0x40000000 ^ lX8 ^ lY8);
+				}
+			} else {
+				return (lResult ^ lX8 ^ lY8);
+			}
+		}
+
+		function F(x,y,z) { return (x & y) | ((~x) & z); }
+		function G(x,y,z) { return (x & z) | (y & (~z)); }
+		function H(x,y,z) { return (x ^ y ^ z); }
+		function I(x,y,z) { return (y ^ (x | (~z))); }
+
+		function FF(a,b,c,d,x,s,ac) {
+			a = AddUnsigned(a, AddUnsigned(AddUnsigned(F(b, c, d), x), ac));
+			return AddUnsigned(RotateLeft(a, s), b);
+		}
+
+		function GG(a,b,c,d,x,s,ac) {
+			a = AddUnsigned(a, AddUnsigned(AddUnsigned(G(b, c, d), x), ac));
+			return AddUnsigned(RotateLeft(a, s), b);
+		}
+
+		function HH(a,b,c,d,x,s,ac) {
+			a = AddUnsigned(a, AddUnsigned(AddUnsigned(H(b, c, d), x), ac));
+			return AddUnsigned(RotateLeft(a, s), b);
+		}
+
+		function II(a,b,c,d,x,s,ac) {
+			a = AddUnsigned(a, AddUnsigned(AddUnsigned(I(b, c, d), x), ac));
+			return AddUnsigned(RotateLeft(a, s), b);
+		}
+
+		function ConvertToWordArray(string) {
+			var lWordCount;
+			var lMessageLength = string.length;
+			var lNumberOfWords_temp1=lMessageLength + 8;
+			var lNumberOfWords_temp2=(lNumberOfWords_temp1-(lNumberOfWords_temp1 % 64))/64;
+			var lNumberOfWords = (lNumberOfWords_temp2+1)*16;
+			var lWordArray=Array(lNumberOfWords-1);
+			var lBytePosition = 0;
+			var lByteCount = 0;
+			while ( lByteCount < lMessageLength ) {
+				lWordCount = (lByteCount-(lByteCount % 4))/4;
+				lBytePosition = (lByteCount % 4)*8;
+				lWordArray[lWordCount] = (lWordArray[lWordCount] | (string.charCodeAt(lByteCount)<<lBytePosition));
+				lByteCount++;
+			}
+			lWordCount = (lByteCount-(lByteCount % 4))/4;
+			lBytePosition = (lByteCount % 4)*8;
+			lWordArray[lWordCount] = lWordArray[lWordCount] | (0x80<<lBytePosition);
+			lWordArray[lNumberOfWords-2] = lMessageLength<<3;
+			lWordArray[lNumberOfWords-1] = lMessageLength>>>29;
+			return lWordArray;
+		}
+
+		function WordToHex(lValue) {
+			var WordToHexValue="",WordToHexValue_temp="",lByte,lCount;
+			for (lCount = 0;lCount<=3;lCount++) {
+				lByte = (lValue>>>(lCount*8)) & 255;
+				WordToHexValue_temp = "0" + lByte.toString(16);
+				WordToHexValue = WordToHexValue + WordToHexValue_temp.substr(WordToHexValue_temp.length-2,2);
+			}
+			return WordToHexValue;
+		}
+
+		function Utf8Encode(string) {
+			string = string.replace(/\r\n/g,"\n");
+			var utftext = "";
+
+			for (var n = 0; n < string.length; n++) {
+
+				var c = string.charCodeAt(n);
+
+				if (c < 128) {
+					utftext += String.fromCharCode(c);
+				}
+				else if((c > 127) && (c < 2048)) {
+					utftext += String.fromCharCode((c >> 6) | 192);
+					utftext += String.fromCharCode((c & 63) | 128);
+				}
+				else {
+					utftext += String.fromCharCode((c >> 12) | 224);
+					utftext += String.fromCharCode(((c >> 6) & 63) | 128);
+					utftext += String.fromCharCode((c & 63) | 128);
+				}
+
+			}
+
+			return utftext;
+		}
+
+		var x=Array();
+		var k,AA,BB,CC,DD,a,b,c,d;
+		var S11=7, S12=12, S13=17, S14=22;
+		var S21=5, S22=9 , S23=14, S24=20;
+		var S31=4, S32=11, S33=16, S34=23;
+		var S41=6, S42=10, S43=15, S44=21;
+
+		string = Utf8Encode(string);
+
+		x = ConvertToWordArray(string);
+
+		a = 0x67452301; b = 0xEFCDAB89; c = 0x98BADCFE; d = 0x10325476;
+
+		for (k=0;k<x.length;k+=16) {
+			AA=a; BB=b; CC=c; DD=d;
+			a=FF(a,b,c,d,x[k+0], S11,0xD76AA478);
+			d=FF(d,a,b,c,x[k+1], S12,0xE8C7B756);
+			c=FF(c,d,a,b,x[k+2], S13,0x242070DB);
+			b=FF(b,c,d,a,x[k+3], S14,0xC1BDCEEE);
+			a=FF(a,b,c,d,x[k+4], S11,0xF57C0FAF);
+			d=FF(d,a,b,c,x[k+5], S12,0x4787C62A);
+			c=FF(c,d,a,b,x[k+6], S13,0xA8304613);
+			b=FF(b,c,d,a,x[k+7], S14,0xFD469501);
+			a=FF(a,b,c,d,x[k+8], S11,0x698098D8);
+			d=FF(d,a,b,c,x[k+9], S12,0x8B44F7AF);
+			c=FF(c,d,a,b,x[k+10],S13,0xFFFF5BB1);
+			b=FF(b,c,d,a,x[k+11],S14,0x895CD7BE);
+			a=FF(a,b,c,d,x[k+12],S11,0x6B901122);
+			d=FF(d,a,b,c,x[k+13],S12,0xFD987193);
+			c=FF(c,d,a,b,x[k+14],S13,0xA679438E);
+			b=FF(b,c,d,a,x[k+15],S14,0x49B40821);
+			a=GG(a,b,c,d,x[k+1], S21,0xF61E2562);
+			d=GG(d,a,b,c,x[k+6], S22,0xC040B340);
+			c=GG(c,d,a,b,x[k+11],S23,0x265E5A51);
+			b=GG(b,c,d,a,x[k+0], S24,0xE9B6C7AA);
+			a=GG(a,b,c,d,x[k+5], S21,0xD62F105D);
+			d=GG(d,a,b,c,x[k+10],S22,0x2441453);
+			c=GG(c,d,a,b,x[k+15],S23,0xD8A1E681);
+			b=GG(b,c,d,a,x[k+4], S24,0xE7D3FBC8);
+			a=GG(a,b,c,d,x[k+9], S21,0x21E1CDE6);
+			d=GG(d,a,b,c,x[k+14],S22,0xC33707D6);
+			c=GG(c,d,a,b,x[k+3], S23,0xF4D50D87);
+			b=GG(b,c,d,a,x[k+8], S24,0x455A14ED);
+			a=GG(a,b,c,d,x[k+13],S21,0xA9E3E905);
+			d=GG(d,a,b,c,x[k+2], S22,0xFCEFA3F8);
+			c=GG(c,d,a,b,x[k+7], S23,0x676F02D9);
+			b=GG(b,c,d,a,x[k+12],S24,0x8D2A4C8A);
+			a=HH(a,b,c,d,x[k+5], S31,0xFFFA3942);
+			d=HH(d,a,b,c,x[k+8], S32,0x8771F681);
+			c=HH(c,d,a,b,x[k+11],S33,0x6D9D6122);
+			b=HH(b,c,d,a,x[k+14],S34,0xFDE5380C);
+			a=HH(a,b,c,d,x[k+1], S31,0xA4BEEA44);
+			d=HH(d,a,b,c,x[k+4], S32,0x4BDECFA9);
+			c=HH(c,d,a,b,x[k+7], S33,0xF6BB4B60);
+			b=HH(b,c,d,a,x[k+10],S34,0xBEBFBC70);
+			a=HH(a,b,c,d,x[k+13],S31,0x289B7EC6);
+			d=HH(d,a,b,c,x[k+0], S32,0xEAA127FA);
+			c=HH(c,d,a,b,x[k+3], S33,0xD4EF3085);
+			b=HH(b,c,d,a,x[k+6], S34,0x4881D05);
+			a=HH(a,b,c,d,x[k+9], S31,0xD9D4D039);
+			d=HH(d,a,b,c,x[k+12],S32,0xE6DB99E5);
+			c=HH(c,d,a,b,x[k+15],S33,0x1FA27CF8);
+			b=HH(b,c,d,a,x[k+2], S34,0xC4AC5665);
+			a=II(a,b,c,d,x[k+0], S41,0xF4292244);
+			d=II(d,a,b,c,x[k+7], S42,0x432AFF97);
+			c=II(c,d,a,b,x[k+14],S43,0xAB9423A7);
+			b=II(b,c,d,a,x[k+5], S44,0xFC93A039);
+			a=II(a,b,c,d,x[k+12],S41,0x655B59C3);
+			d=II(d,a,b,c,x[k+3], S42,0x8F0CCC92);
+			c=II(c,d,a,b,x[k+10],S43,0xFFEFF47D);
+			b=II(b,c,d,a,x[k+1], S44,0x85845DD1);
+			a=II(a,b,c,d,x[k+8], S41,0x6FA87E4F);
+			d=II(d,a,b,c,x[k+15],S42,0xFE2CE6E0);
+			c=II(c,d,a,b,x[k+6], S43,0xA3014314);
+			b=II(b,c,d,a,x[k+13],S44,0x4E0811A1);
+			a=II(a,b,c,d,x[k+4], S41,0xF7537E82);
+			d=II(d,a,b,c,x[k+11],S42,0xBD3AF235);
+			c=II(c,d,a,b,x[k+2], S43,0x2AD7D2BB);
+			b=II(b,c,d,a,x[k+9], S44,0xEB86D391);
+			a=AddUnsigned(a,AA);
+			b=AddUnsigned(b,BB);
+			c=AddUnsigned(c,CC);
+			d=AddUnsigned(d,DD);
+		}
+
+		var temp = WordToHex(a)+WordToHex(b)+WordToHex(c)+WordToHex(d);
+
+		return temp.toLowerCase();
+	};
+
+})(window.StickersModule);
 /* perfect-scrollbar v0.6.10 */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
@@ -1542,835 +2365,10 @@ module.exports = function (element) {
 
 },{"../lib/dom":3,"../lib/helper":6,"./instances":18,"./update-geometry":19,"./update-scroll":20}]},{},[1]);
 
-
-window.StickersModule.Utils = {};
-document.addEventListener("DOMContentLoaded", function(event) {
-
-	if(typeof window.ga === "undefined"){
-
-		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-	}
-
-	ga('create', 'UA-1113296-81', 'auto', {'name': 'stickerTracker'});
-	ga('stickerTracker.send', 'pageview');
-
-});
-(function(Plugin) {
-
-	Plugin.StickersModule = Plugin.StickersModule || {};
-
-	/**
-	 *
-	 * Copyright (C) 2011 by crac <![[dawid.kraczkowski[at]gmail[dot]com]]>
-	 * Thanks for Hardy Keppler<![[Keppler.H[at]online.de]]> for shortened version
-	 *
-	 * Permission is hereby granted, free of charge, to any person obtaining a copy
-	 * of this software and associated documentation files (the "Software"), to deal
-	 * in the Software without restriction, including without limitation the rights
-	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-	 * copies of the Software, and to permit persons to whom the Software is
-	 * furnished to do so, subject to the following conditions:
-	 *
-	 * The above copyright notice and this permission notice shall be included in
-	 * all copies or substantial portions of the Software.
-	 *
-	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-	 * THE SOFTWARE.
-	 *
-	 **/
-	var Class = (function() {
-
-		function _rewriteStatics(fnc, statics) {
-			for (var prop in statics) {
-				if (prop === 'extend' || prop === 'static' || prop === 'typeOf' || prop === 'mixin' ) {
-					continue;
-				}
-
-				if (typeof statics[prop] === 'object' || typeof statics[prop] === 'function') {
-					fnc[prop] = statics[prop];
-					return;
-				}
-
-				//check if static is a constant
-				if (prop === prop.toUpperCase()) {
-					Object.defineProperty(fnc, prop, {
-						writable: false,
-						configurable: false,
-						enumerable: true,
-						value: statics[prop]
-					});
-					Object.defineProperty(fnc.prototype, prop, {
-						writable: false,
-						configurable: false,
-						enumerable: true,
-						value: statics[prop]
-					});
-				} else {
-					Object.defineProperty(fnc, prop, {
-						get: function() {
-							return statics[prop]
-						},
-						set: function(val) {
-							statics[prop] = val;
-						}
-					});
-					Object.defineProperty(fnc.prototype, prop, {
-						get: function() {
-							return statics[prop]
-						},
-						set: function(val) {
-							statics[prop] = val;
-						}
-					});
-				}
-			}
-		}
-
-		function _extend(base, source, overrideConstructor) {
-			overrideConstructor = overrideConstructor || false;
-
-			for (var p in source) {
-				if ((p === '_constructor' && !overrideConstructor) || p === 'typeOf' || p === 'mixin' || p === 'static' || p === 'extend') {
-					continue;
-				}
-				base[p] = source[p];
-			}
-		}
-
-		return function (classBody) {
-
-			var _preventCreateCall = false;
-
-			return (function createClass(self, classBody) {
-
-				var _mixins = [];
-				var instance;
-
-				var isSingleton = classBody.hasOwnProperty('singleton') && classBody.singleton;
-
-				var classConstructor = function () {
-					//apply constructor pattern
-					if (typeof this['_constructor'] === 'function' && _preventCreateCall === false) {
-						this._constructor.apply(this, arguments);
-					}
-
-					//apply getter pattern
-					if (classBody.hasOwnProperty('get')) {
-						for (var p in classBody.get) {
-
-							var setter = 'set' in classBody ? (p in classBody.set ? classBody.set[p] : null) : null;
-							if (setter === null) {
-								Object.defineProperty(this, p, {
-									get: classBody.get[p]
-								});
-							}
-						}
-					}
-
-					//apply setter pattern
-					if (classBody.hasOwnProperty('set')) {
-						for (var p in classBody.set) {
-
-							var getter = 'get' in classBody ? (p in classBody.get ? classBody.get[p] : null) : null;
-							if (getter !== null) {
-								Object.defineProperty(this, p, {
-									set: classBody.set[p],
-									get: classBody.get[p]
-								});
-							} else {
-								Object.defineProperty(this, p, {
-									set: classBody.set[p]
-								});
-							}
-						}
-					}
-
-					if (isSingleton && typeof this !== 'undefined') {
-						throw new Error('Singleton object cannot have more than one instance, call instance method instead');
-					}
-					this.constructor = classConstructor;
-				};
-
-				//make new class instance of extended object
-				if (self !== null) {
-					_preventCreateCall = true;
-					classConstructor.prototype = new self();
-					_preventCreateCall = false;
-				}
-
-				var classPrototype = classConstructor.prototype;
-
-				classPrototype.typeOf = function(cls) {
-					if (typeof cls === 'object') {
-						return _mixins.indexOf(cls) >= 0;
-					} else if (typeof cls === 'function') {
-						if (this instanceof cls) {
-							return true;
-						} else if (_mixins.indexOf(cls) >= 0) {
-							return true;
-						}
-					}
-
-					return false;
-				};
-				if (typeof classBody === 'function') {
-					classBody = classBody();
-				}
-
-				_extend(classPrototype, classBody, true);
-
-				/**
-				 * Defines statics and constans in class' body.
-				 *
-				 * @param {Object} statics
-				 * @returns {Function}
-				 */
-				classConstructor.static = function(statics) {
-					_rewriteStatics(classConstructor, statics);
-					return classConstructor;
-				};
-
-				/**
-				 * Extends class body by passed other class declaration
-				 * @param {Function} *mixins
-				 * @returns {Function}
-				 */
-				classConstructor.mixin = function() {
-					for (var i = 0, l = arguments.length; i < l; i++) {
-						//check if class implements interfaces
-						var mixin = arguments[i];
-
-						if (typeof mixin === 'function') {
-							var methods = mixin.prototype;
-						} else if (typeof mixin === 'object') {
-							var methods = mixin;
-						} else {
-							throw new Error('js.class mixin method accepts only types: object, function - `' + (typeof mixin) + '` type given');
-						}
-						_extend(classPrototype, methods, false);
-						_mixins.push(mixin);
-					}
-					return classConstructor;
-				};
-
-				/**
-				 * Creates and returns new constructor function which extends
-				 * its parent
-				 *
-				 * @param {Object} classBody
-				 * @returns {Function}
-				 */
-				if (isSingleton) {
-					classConstructor.extend = function() {
-						throw new Error('Singleton class cannot be extended');
-					};
-
-					classConstructor.instance = function() {
-						if (!instance) {
-							isSingleton = false;
-							instance = new classConstructor();
-							isSingleton = true;
-						}
-						return instance;
-					}
-
-				} else {
-					classConstructor.extend = function (classBody) {
-						return createClass(this, classBody);
-					};
-				}
-
-				return classConstructor;
-			})(null, classBody);
-		}
-	})();
-
-	if (typeof module !== "undefined") {
-		module.exports = Class;
-	} else {
-		Plugin.StickersModule.Class = Class;   // for browser
-	}
-
-})(window);
-
-/*
- * classList.js: Cross-browser full element.classList implementation.
- * 2014-12-13
- *
- * By Eli Grey, http://eligrey.com
- * Public Domain.
- * NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
- */
-
-/*global self, document, DOMException */
-
-/*! @source http://purl.eligrey.com/github/classList.js/blob/master/classList.js */
-
-if ("document" in self) {
-
-// Full polyfill for browsers with no classList support
-	if (!("classList" in document.createElement("_"))) {
-
-		(function (view) {
-
-			"use strict";
-
-			if (!('Element' in view)) return;
-
-			var
-				classListProp = "classList"
-				, protoProp = "prototype"
-				, elemCtrProto = view.Element[protoProp]
-				, objCtr = Object
-				, strTrim = String[protoProp].trim || function () {
-						return this.replace(/^\s+|\s+$/g, "");
-					}
-				, arrIndexOf = Array[protoProp].indexOf || function (item) {
-						var
-							i = 0
-							, len = this.length
-							;
-						for (; i < len; i++) {
-							if (i in this && this[i] === item) {
-								return i;
-							}
-						}
-						return -1;
-					}
-			// Vendors: please allow content code to instantiate DOMExceptions
-				, DOMEx = function (type, message) {
-					this.name = type;
-					this.code = DOMException[type];
-					this.message = message;
-				}
-				, checkTokenAndGetIndex = function (classList, token) {
-					if (token === "") {
-						throw new DOMEx(
-							"SYNTAX_ERR"
-							, "An invalid or illegal string was specified"
-						);
-					}
-					if (/\s/.test(token)) {
-						throw new DOMEx(
-							"INVALID_CHARACTER_ERR"
-							, "String contains an invalid character"
-						);
-					}
-					return arrIndexOf.call(classList, token);
-				}
-				, ClassList = function (elem) {
-					var
-						trimmedClasses = strTrim.call(elem.getAttribute("class") || "")
-						, classes = trimmedClasses ? trimmedClasses.split(/\s+/) : []
-						, i = 0
-						, len = classes.length
-						;
-					for (; i < len; i++) {
-						this.push(classes[i]);
-					}
-					this._updateClassName = function () {
-						elem.setAttribute("class", this.toString());
-					};
-				}
-				, classListProto = ClassList[protoProp] = []
-				, classListGetter = function () {
-					return new ClassList(this);
-				}
-				;
-// Most DOMException implementations don't allow calling DOMException's toString()
-// on non-DOMExceptions. Error's toString() is sufficient here.
-			DOMEx[protoProp] = Error[protoProp];
-			classListProto.item = function (i) {
-				return this[i] || null;
-			};
-			classListProto.contains = function (token) {
-				token += "";
-				return checkTokenAndGetIndex(this, token) !== -1;
-			};
-			classListProto.add = function () {
-				var
-					tokens = arguments
-					, i = 0
-					, l = tokens.length
-					, token
-					, updated = false
-					;
-				do {
-					token = tokens[i] + "";
-					if (checkTokenAndGetIndex(this, token) === -1) {
-						this.push(token);
-						updated = true;
-					}
-				}
-				while (++i < l);
-
-				if (updated) {
-					this._updateClassName();
-				}
-			};
-			classListProto.remove = function () {
-				var
-					tokens = arguments
-					, i = 0
-					, l = tokens.length
-					, token
-					, updated = false
-					, index
-					;
-				do {
-					token = tokens[i] + "";
-					index = checkTokenAndGetIndex(this, token);
-					while (index !== -1) {
-						this.splice(index, 1);
-						updated = true;
-						index = checkTokenAndGetIndex(this, token);
-					}
-				}
-				while (++i < l);
-
-				if (updated) {
-					this._updateClassName();
-				}
-			};
-			classListProto.toggle = function (token, force) {
-				token += "";
-
-				var
-					result = this.contains(token)
-					, method = result ?
-					force !== true && "remove"
-						:
-					force !== false && "add"
-					;
-
-				if (method) {
-					this[method](token);
-				}
-
-				if (force === true || force === false) {
-					return force;
-				} else {
-					return !result;
-				}
-			};
-			classListProto.toString = function () {
-				return this.join(" ");
-			};
-
-			if (objCtr.defineProperty) {
-				var classListPropDesc = {
-					get: classListGetter
-					, enumerable: true
-					, configurable: true
-				};
-				try {
-					objCtr.defineProperty(elemCtrProto, classListProp, classListPropDesc);
-				} catch (ex) { // IE 8 doesn't support enumerable:true
-					if (ex.number === -0x7FF5EC54) {
-						classListPropDesc.enumerable = false;
-						objCtr.defineProperty(elemCtrProto, classListProp, classListPropDesc);
-					}
-				}
-			} else if (objCtr[protoProp].__defineGetter__) {
-				elemCtrProto.__defineGetter__(classListProp, classListGetter);
-			}
-
-		}(self));
-
-	} else {
-// There is full or partial native classList support, so just check if we need
-// to normalize the add/remove and toggle APIs.
-
-		(function () {
-			"use strict";
-
-			var testElement = document.createElement("_");
-
-			testElement.classList.add("c1", "c2");
-
-			// Polyfill for IE 10/11 and Firefox <26, where classList.add and
-			// classList.remove exist but support only one argument at a time.
-			if (!testElement.classList.contains("c2")) {
-				var createMethod = function(method) {
-					var original = DOMTokenList.prototype[method];
-
-					DOMTokenList.prototype[method] = function(token) {
-						var i, len = arguments.length;
-
-						for (i = 0; i < len; i++) {
-							token = arguments[i];
-							original.call(this, token);
-						}
-					};
-				};
-				createMethod('add');
-				createMethod('remove');
-			}
-
-			testElement.classList.toggle("c3", false);
-
-			// Polyfill for IE 10 and Firefox <24, where classList.toggle does not
-			// support the second argument.
-			if (testElement.classList.contains("c3")) {
-				var _toggle = DOMTokenList.prototype.toggle;
-
-				DOMTokenList.prototype.toggle = function(token, force) {
-					if (1 in arguments && !this.contains(token) === !force) {
-						return force;
-					} else {
-						return _toggle.call(this, token);
-					}
-				};
-
-			}
-
-			testElement = null;
-		}());
-
-	}
-
-}
-
-(function(Plugin) {
-
-	Plugin.StickersModule.Lockr = {
-		prefix: '',
-
-		_getPrefixedKey: function(key, options) {
-			options = options || {};
-
-			if (options.noPrefix) {
-				return key;
-			} else {
-				return this.prefix + key;
-			}
-		},
-
-		set: function (key, value, options) {
-			var query_key = this._getPrefixedKey(key, options);
-
-			try {
-				localStorage.setItem(query_key, JSON.stringify({
-					data: value
-				}));
-			} catch (e) {
-				console && console.warn('Lockr didn\'t successfully save the "{'+ key +': '+ value +'}" pair, because the localStorage is full.');
-			}
-		},
-
-		get: function (key, missing, options) {
-			var query_key = this._getPrefixedKey(key, options),
-				value;
-
-			try {
-				value = JSON.parse(localStorage.getItem(query_key));
-			} catch (e) {
-				value = null;
-			}
-
-			return (value === null) ? missing : (value.data || missing);
-		},
-
-		sadd: function(key, value, options) {
-			var query_key = this._getPrefixedKey(key, options),
-				json;
-
-			var values = this.smembers(key);
-
-			if (values.indexOf(value) > -1) {
-				return null;
-			}
-
-			try {
-				values.push(value);
-				json = JSON.stringify({"data": values});
-				localStorage.setItem(query_key, json);
-			} catch (e) {
-				if (console) {
-					console.log(e);
-					console.warn('Lockr didn\'t successfully add the '+ value +' to '+ key +' set, because the localStorage is full.');
-				}
-			}
-		},
-
-		smembers: function(key, options) {
-			var query_key = this._getPrefixedKey(key, options),
-				value;
-
-			try {
-				value = JSON.parse(localStorage.getItem(query_key));
-			} catch (e) {
-				value = null;
-			}
-
-			return (value === null) ? [] : (value.data || []);
-		},
-
-		sismember: function(key, value, options) {
-			var query_key = this._getPrefixedKey(key, options);
-			return this.smembers(key).indexOf(value) > -1;
-		},
-
-		getAll: function () {
-			var keys = Object.keys(localStorage);
-
-			return keys.map((function (key) {
-				return this.get(key);
-			}).bind(this));
-		},
-
-		srem: function(key, value, options) {
-			var query_key = this._getPrefixedKey(key, options),
-				json,
-				index;
-
-			var values = this.smembers(key, value);
-
-			index = values.indexOf(value);
-
-			if (index > -1)
-				values.splice(index, 1);
-
-			json = JSON.stringify({
-				data: values
-			});
-
-			try {
-				localStorage.setItem(query_key, json);
-			} catch (e) {
-				console && console.warn('Lockr couldn\'t remove the ' + value + ' from the set ' + key);
-			}
-		},
-
-		rm: function (key) {
-			localStorage.removeItem(key);
-		},
-
-		flush: function () {
-			localStorage.clear();
-		}
-	};
-
-})(window);
-(function(Plugin) {
-
-	Plugin.StickersModule.MD5 = function (string) {
-
-		string = string.toString();
-
-		function RotateLeft(lValue, iShiftBits) {
-			return (lValue<<iShiftBits) | (lValue>>>(32-iShiftBits));
-		}
-
-		function AddUnsigned(lX,lY) {
-			var lX4,lY4,lX8,lY8,lResult;
-			lX8 = (lX & 0x80000000);
-			lY8 = (lY & 0x80000000);
-			lX4 = (lX & 0x40000000);
-			lY4 = (lY & 0x40000000);
-			lResult = (lX & 0x3FFFFFFF)+(lY & 0x3FFFFFFF);
-			if (lX4 & lY4) {
-				return (lResult ^ 0x80000000 ^ lX8 ^ lY8);
-			}
-			if (lX4 | lY4) {
-				if (lResult & 0x40000000) {
-					return (lResult ^ 0xC0000000 ^ lX8 ^ lY8);
-				} else {
-					return (lResult ^ 0x40000000 ^ lX8 ^ lY8);
-				}
-			} else {
-				return (lResult ^ lX8 ^ lY8);
-			}
-		}
-
-		function F(x,y,z) { return (x & y) | ((~x) & z); }
-		function G(x,y,z) { return (x & z) | (y & (~z)); }
-		function H(x,y,z) { return (x ^ y ^ z); }
-		function I(x,y,z) { return (y ^ (x | (~z))); }
-
-		function FF(a,b,c,d,x,s,ac) {
-			a = AddUnsigned(a, AddUnsigned(AddUnsigned(F(b, c, d), x), ac));
-			return AddUnsigned(RotateLeft(a, s), b);
-		}
-
-		function GG(a,b,c,d,x,s,ac) {
-			a = AddUnsigned(a, AddUnsigned(AddUnsigned(G(b, c, d), x), ac));
-			return AddUnsigned(RotateLeft(a, s), b);
-		}
-
-		function HH(a,b,c,d,x,s,ac) {
-			a = AddUnsigned(a, AddUnsigned(AddUnsigned(H(b, c, d), x), ac));
-			return AddUnsigned(RotateLeft(a, s), b);
-		}
-
-		function II(a,b,c,d,x,s,ac) {
-			a = AddUnsigned(a, AddUnsigned(AddUnsigned(I(b, c, d), x), ac));
-			return AddUnsigned(RotateLeft(a, s), b);
-		}
-
-		function ConvertToWordArray(string) {
-			var lWordCount;
-			var lMessageLength = string.length;
-			var lNumberOfWords_temp1=lMessageLength + 8;
-			var lNumberOfWords_temp2=(lNumberOfWords_temp1-(lNumberOfWords_temp1 % 64))/64;
-			var lNumberOfWords = (lNumberOfWords_temp2+1)*16;
-			var lWordArray=Array(lNumberOfWords-1);
-			var lBytePosition = 0;
-			var lByteCount = 0;
-			while ( lByteCount < lMessageLength ) {
-				lWordCount = (lByteCount-(lByteCount % 4))/4;
-				lBytePosition = (lByteCount % 4)*8;
-				lWordArray[lWordCount] = (lWordArray[lWordCount] | (string.charCodeAt(lByteCount)<<lBytePosition));
-				lByteCount++;
-			}
-			lWordCount = (lByteCount-(lByteCount % 4))/4;
-			lBytePosition = (lByteCount % 4)*8;
-			lWordArray[lWordCount] = lWordArray[lWordCount] | (0x80<<lBytePosition);
-			lWordArray[lNumberOfWords-2] = lMessageLength<<3;
-			lWordArray[lNumberOfWords-1] = lMessageLength>>>29;
-			return lWordArray;
-		}
-
-		function WordToHex(lValue) {
-			var WordToHexValue="",WordToHexValue_temp="",lByte,lCount;
-			for (lCount = 0;lCount<=3;lCount++) {
-				lByte = (lValue>>>(lCount*8)) & 255;
-				WordToHexValue_temp = "0" + lByte.toString(16);
-				WordToHexValue = WordToHexValue + WordToHexValue_temp.substr(WordToHexValue_temp.length-2,2);
-			}
-			return WordToHexValue;
-		}
-
-		function Utf8Encode(string) {
-			string = string.replace(/\r\n/g,"\n");
-			var utftext = "";
-
-			for (var n = 0; n < string.length; n++) {
-
-				var c = string.charCodeAt(n);
-
-				if (c < 128) {
-					utftext += String.fromCharCode(c);
-				}
-				else if((c > 127) && (c < 2048)) {
-					utftext += String.fromCharCode((c >> 6) | 192);
-					utftext += String.fromCharCode((c & 63) | 128);
-				}
-				else {
-					utftext += String.fromCharCode((c >> 12) | 224);
-					utftext += String.fromCharCode(((c >> 6) & 63) | 128);
-					utftext += String.fromCharCode((c & 63) | 128);
-				}
-
-			}
-
-			return utftext;
-		}
-
-		var x=Array();
-		var k,AA,BB,CC,DD,a,b,c,d;
-		var S11=7, S12=12, S13=17, S14=22;
-		var S21=5, S22=9 , S23=14, S24=20;
-		var S31=4, S32=11, S33=16, S34=23;
-		var S41=6, S42=10, S43=15, S44=21;
-
-		string = Utf8Encode(string);
-
-		x = ConvertToWordArray(string);
-
-		a = 0x67452301; b = 0xEFCDAB89; c = 0x98BADCFE; d = 0x10325476;
-
-		for (k=0;k<x.length;k+=16) {
-			AA=a; BB=b; CC=c; DD=d;
-			a=FF(a,b,c,d,x[k+0], S11,0xD76AA478);
-			d=FF(d,a,b,c,x[k+1], S12,0xE8C7B756);
-			c=FF(c,d,a,b,x[k+2], S13,0x242070DB);
-			b=FF(b,c,d,a,x[k+3], S14,0xC1BDCEEE);
-			a=FF(a,b,c,d,x[k+4], S11,0xF57C0FAF);
-			d=FF(d,a,b,c,x[k+5], S12,0x4787C62A);
-			c=FF(c,d,a,b,x[k+6], S13,0xA8304613);
-			b=FF(b,c,d,a,x[k+7], S14,0xFD469501);
-			a=FF(a,b,c,d,x[k+8], S11,0x698098D8);
-			d=FF(d,a,b,c,x[k+9], S12,0x8B44F7AF);
-			c=FF(c,d,a,b,x[k+10],S13,0xFFFF5BB1);
-			b=FF(b,c,d,a,x[k+11],S14,0x895CD7BE);
-			a=FF(a,b,c,d,x[k+12],S11,0x6B901122);
-			d=FF(d,a,b,c,x[k+13],S12,0xFD987193);
-			c=FF(c,d,a,b,x[k+14],S13,0xA679438E);
-			b=FF(b,c,d,a,x[k+15],S14,0x49B40821);
-			a=GG(a,b,c,d,x[k+1], S21,0xF61E2562);
-			d=GG(d,a,b,c,x[k+6], S22,0xC040B340);
-			c=GG(c,d,a,b,x[k+11],S23,0x265E5A51);
-			b=GG(b,c,d,a,x[k+0], S24,0xE9B6C7AA);
-			a=GG(a,b,c,d,x[k+5], S21,0xD62F105D);
-			d=GG(d,a,b,c,x[k+10],S22,0x2441453);
-			c=GG(c,d,a,b,x[k+15],S23,0xD8A1E681);
-			b=GG(b,c,d,a,x[k+4], S24,0xE7D3FBC8);
-			a=GG(a,b,c,d,x[k+9], S21,0x21E1CDE6);
-			d=GG(d,a,b,c,x[k+14],S22,0xC33707D6);
-			c=GG(c,d,a,b,x[k+3], S23,0xF4D50D87);
-			b=GG(b,c,d,a,x[k+8], S24,0x455A14ED);
-			a=GG(a,b,c,d,x[k+13],S21,0xA9E3E905);
-			d=GG(d,a,b,c,x[k+2], S22,0xFCEFA3F8);
-			c=GG(c,d,a,b,x[k+7], S23,0x676F02D9);
-			b=GG(b,c,d,a,x[k+12],S24,0x8D2A4C8A);
-			a=HH(a,b,c,d,x[k+5], S31,0xFFFA3942);
-			d=HH(d,a,b,c,x[k+8], S32,0x8771F681);
-			c=HH(c,d,a,b,x[k+11],S33,0x6D9D6122);
-			b=HH(b,c,d,a,x[k+14],S34,0xFDE5380C);
-			a=HH(a,b,c,d,x[k+1], S31,0xA4BEEA44);
-			d=HH(d,a,b,c,x[k+4], S32,0x4BDECFA9);
-			c=HH(c,d,a,b,x[k+7], S33,0xF6BB4B60);
-			b=HH(b,c,d,a,x[k+10],S34,0xBEBFBC70);
-			a=HH(a,b,c,d,x[k+13],S31,0x289B7EC6);
-			d=HH(d,a,b,c,x[k+0], S32,0xEAA127FA);
-			c=HH(c,d,a,b,x[k+3], S33,0xD4EF3085);
-			b=HH(b,c,d,a,x[k+6], S34,0x4881D05);
-			a=HH(a,b,c,d,x[k+9], S31,0xD9D4D039);
-			d=HH(d,a,b,c,x[k+12],S32,0xE6DB99E5);
-			c=HH(c,d,a,b,x[k+15],S33,0x1FA27CF8);
-			b=HH(b,c,d,a,x[k+2], S34,0xC4AC5665);
-			a=II(a,b,c,d,x[k+0], S41,0xF4292244);
-			d=II(d,a,b,c,x[k+7], S42,0x432AFF97);
-			c=II(c,d,a,b,x[k+14],S43,0xAB9423A7);
-			b=II(b,c,d,a,x[k+5], S44,0xFC93A039);
-			a=II(a,b,c,d,x[k+12],S41,0x655B59C3);
-			d=II(d,a,b,c,x[k+3], S42,0x8F0CCC92);
-			c=II(c,d,a,b,x[k+10],S43,0xFFEFF47D);
-			b=II(b,c,d,a,x[k+1], S44,0x85845DD1);
-			a=II(a,b,c,d,x[k+8], S41,0x6FA87E4F);
-			d=II(d,a,b,c,x[k+15],S42,0xFE2CE6E0);
-			c=II(c,d,a,b,x[k+6], S43,0xA3014314);
-			b=II(b,c,d,a,x[k+13],S44,0x4E0811A1);
-			a=II(a,b,c,d,x[k+4], S41,0xF7537E82);
-			d=II(d,a,b,c,x[k+11],S42,0xBD3AF235);
-			c=II(c,d,a,b,x[k+2], S43,0x2AD7D2BB);
-			b=II(b,c,d,a,x[k+9], S44,0xEB86D391);
-			a=AddUnsigned(a,AA);
-			b=AddUnsigned(b,BB);
-			c=AddUnsigned(c,CC);
-			d=AddUnsigned(d,DD);
-		}
-
-		var temp = WordToHex(a)+WordToHex(b)+WordToHex(c)+WordToHex(d);
-
-		return temp.toLowerCase();
-	};
-
-})(window);
 (function(Plugin) {
 
 	/*jslint indent: 2, browser: true, bitwise: true, plusplus: true */
-	Plugin.StickersModule.Twemoji = (function (
+	Plugin.Libs.Twemoji = (function (
 		/*! Copyright Twitter Inc. and other contributors. Licensed under MIT *//*
 		 https://github.com/twitter/twemoji/blob/gh-pages/LICENSE
 		 */
@@ -2960,36 +2958,36 @@ if ("document" in self) {
 
 	}());
 
-})(window);
+})(window.StickersModule);
 
 window.StickersModule.Service = {};
 
-(function(Module) {
+(function(Plugin) {
 
 	var API_VERSION = 1;
 
-	Module.Api = {
+	Plugin.Service.Api = {
 
 		getApiVersion: function() {
 			return API_VERSION;
 		},
 
 		getPacks: function(doneCallback) {
-			var url = Module.Url.getPacksUrl();
+			var url = Plugin.Service.Url.getPacksUrl();
 
-			Module.Http.get(url, {
+			Plugin.Service.Http.get(url, {
 				success: doneCallback
 			});
 		},
 
 		sendStatistic: function(statistic) {
-			Module.Http.post(Module.Url.getStatisticUrl(), statistic);
+			Plugin.Service.Http.post(Plugin.Service.Url.getStatisticUrl(), statistic);
 		},
 
 		updateUserData: function(userData) {
-			return Module.Http.ajax({
+			return Plugin.Service.Http.ajax({
 				type: 'PUT',
-				url: Module.Url.getUserDataUrl(),
+				url: Plugin.Service.Url.getUserDataUrl(),
 				data: userData,
 				headers: {
 					'Content-Type': 'application/json'
@@ -2999,9 +2997,9 @@ window.StickersModule.Service = {};
 
 		changeUserPackStatus: function(packName, status, pricePoint, doneCallback) {
 
-			var url = Module.Url.getUserPackUrl(packName, pricePoint);
+			var url = Plugin.Service.Url.getUserPackUrl(packName, pricePoint);
 
-			Module.Http.post(url, {
+			Plugin.Service.Http.post(url, {
 				status: status
 			}, {
 				success: function() {
@@ -3009,7 +3007,7 @@ window.StickersModule.Service = {};
 				},
 				error: function() {
 					if (status) {
-						var pr = Module.Service.PendingRequest;
+						var pr = Plugin.Service.PendingRequest;
 						pr.add(pr.tasks.activateUserPack, {
 							packName: packName,
 							pricePoint: pricePoint
@@ -3024,20 +3022,20 @@ window.StickersModule.Service = {};
 	};
 })(window.StickersModule);
 
-(function(Module) {
+(function(Plugin) {
 
-	Module.BaseService = {
+	Plugin.Service.Base = {
 
 		markNewPacks: function(newPacks) {
 			var globalNew = false,
-				oldPacks = Module.Storage.getPacks();
+				oldPacks = Plugin.Service.Storage.getPacks();
 
 			if (oldPacks.length != 0){
 
-				Module.Service.Helper.forEach(newPacks, function(newPack, key) {
+				Plugin.Service.Helper.forEach(newPacks, function(newPack, key) {
 					var isNewPack = true;
 
-					Module.Service.Helper.forEach(oldPacks, function(oldPack) {
+					Plugin.Service.Helper.forEach(oldPacks, function(oldPack) {
 
 
 						if(newPack.pack_name == oldPack.pack_name) {
@@ -3055,10 +3053,10 @@ window.StickersModule.Service = {};
 				// todo: check & fix
 				//if (globalNew) {
 
-				if (globalNew == false && Module.Storage.getUsedStickers().length == 0) {
+				if (globalNew == false && Plugin.Service.Storage.getUsedStickers().length == 0) {
 					globalNew = true;
 				}
-				Module.DOMEventService.changeContentHighlight(globalNew);
+				Plugin.Service.Event.changeContentHighlight(globalNew);
 				//}
 
 
@@ -3066,7 +3064,7 @@ window.StickersModule.Service = {};
 				// todo: do in other function
 				// update used stickers
 
-				var used = Module.Storage.getUsedStickers();
+				var used = Plugin.Service.Storage.getUsedStickers();
 
 				for (var i = 0; i < used.length; i++) {
 					var sticker = this.parseStickerFromText('[[' + used[i].code + ']]');
@@ -3098,11 +3096,11 @@ window.StickersModule.Service = {};
 					}
 				}
 
-				Module.Storage.setUsedStickers(used);
+				Plugin.Service.Storage.setUsedStickers(used);
 
 				// *****************************************************************************************************
 			} else {
-				Module.DOMEventService.changeContentHighlight(true);
+				Plugin.Service.Event.changeContentHighlight(true);
 			}
 
 			return newPacks;
@@ -3117,7 +3115,7 @@ window.StickersModule.Service = {};
 
 			if (matchData) {
 				outData.isSticker = true;
-				outData.url = Module.Url.getStickerUrl(matchData[1], matchData[2]);
+				outData.url = Plugin.Service.Url.getStickerUrl(matchData[1], matchData[2]);
 
 
 				outData.pack = matchData[1];
@@ -3134,7 +3132,7 @@ window.StickersModule.Service = {};
 				label = (isSticker) ? 'sticker' : 'text';
 
 
-			Module.Api.sendStatistic([{
+			Plugin.Service.Api.sendStatistic([{
 				action: action,
 				category: category,
 				label: label,
@@ -3146,7 +3144,7 @@ window.StickersModule.Service = {};
 
 		updatePacks: function(successCallback) {
 
-			Module.Api.getPacks(
+			Plugin.Service.Api.getPacks(
 				(function(response) {
 					if(response.status != 'success') {
 						return;
@@ -3163,7 +3161,7 @@ window.StickersModule.Service = {};
 
 					packs = this.markNewPacks(packs);
 
-					Module.Storage.setPacks(packs);
+					Plugin.Service.Storage.setPacks(packs);
 
 					successCallback && successCallback(packs);
 				}).bind(this)
@@ -3171,84 +3169,24 @@ window.StickersModule.Service = {};
 		},
 
 		trackUserData: function() {
-			if (!Module.Configs.userId || !Module.Configs.userData) {
+			if (!Plugin.Configs.userId || !Plugin.Configs.userData) {
 				return;
 			}
 
-			var storedUserData = Module.Storage.getUserData() || {};
+			var storedUserData = Plugin.Service.Storage.getUserData() || {};
 
-			if (!Module.Service.Helper.deepCompare(Module.Configs.userData, storedUserData)) {
-				Module.Api.updateUserData(Module.Configs.userData);
-				Module.Storage.setUserData(Module.Configs.userData);
+			if (!Plugin.Service.Helper.deepCompare(Plugin.Configs.userData, storedUserData)) {
+				Plugin.Service.Api.updateUserData(Plugin.Configs.userData);
+				Plugin.Service.Storage.setUserData(Plugin.Configs.userData);
 			}
 		}
 	};
 
 })(window.StickersModule);
 
-(function(Module) {
+(function(Plugin) {
 
-	Module.DOMEventService = {
-
-		events: {
-			resize: 'resize',
-			popoverShown: 'sp:popover:shown',
-			popoverHidden: 'sp:popover:hidden',
-			showContentHighlight: 'sp:content:highlight:show',
-			hideContentHighlight: 'sp:content:highlight:hide'
-		},
-
-		dispatch: function(eventName, el) {
-			if (!eventName) {
-				return;
-			}
-
-			el = el || window;
-
-			var event;
-			if (document.createEvent) {
-				event = document.createEvent('HTMLEvents');
-				event.initEvent(eventName, true, true);
-			} else if (document.createEventObject) { // IE < 9
-				event = document.createEventObject();
-				event.eventType = eventName;
-			}
-
-			event.eventName = eventName;
-
-			if (el.dispatchEvent) {
-				el.dispatchEvent(event);
-			} else if (el.fireEvent) { // IE < 9
-				el.fireEvent('on' + event.eventType, event);// can trigger only real event (e.g. 'click')
-			} else if (el[eventName]) {
-				el[eventName]();
-			} else if (el['on' + eventName]) {
-				el['on' + eventName]();
-			}
-		},
-
-		popoverShown: function() {
-			this.dispatch(this.events.popoverShown);
-		},
-
-		popoverHidden: function() {
-			this.dispatch(this.events.popoverHidden);
-		},
-
-		changeContentHighlight: function(value) {
-			this.dispatch((value) ? this.events.showContentHighlight : this.events.hideContentHighlight);
-		},
-
-		resize: function(el) {
-			this.dispatch(this.events.resize, el);
-		}
-	};
-
-})(window.StickersModule);
-
-(function(Module) {
-
-	Module.El = {
+	Plugin.Service.El = {
 
 		css: function(el, property) {
 			// todo: getComputedStyle add IE 8 supporting
@@ -3319,13 +3257,13 @@ window.StickersModule.Service = {};
 	};
 })(window.StickersModule);
 
-(function(Module) {
+(function(Plugin) {
 
-	Module.EmojiService = Module.Class({
+	Plugin.Service.Emoji = {
 
 		emojiProvider: null,
 
-		_constructor: function(emojiProvider) {
+		init: function(emojiProvider) {
 			this.emojiProvider = emojiProvider;
 		},
 
@@ -3348,13 +3286,73 @@ window.StickersModule.Service = {};
 
 			return content.innerHTML;
 		}
-	});
+	};
 
 })(window.StickersModule);
 
-(function(Module) {
+(function(Plugin) {
 
-	Module.Service.Helper = {
+	Plugin.Service.Event = {
+
+		events: {
+			resize: 'resize',
+			popoverShown: 'sp:popover:shown',
+			popoverHidden: 'sp:popover:hidden',
+			showContentHighlight: 'sp:content:highlight:show',
+			hideContentHighlight: 'sp:content:highlight:hide'
+		},
+
+		dispatch: function(eventName, el) {
+			if (!eventName) {
+				return;
+			}
+
+			el = el || window;
+
+			var event;
+			if (document.createEvent) {
+				event = document.createEvent('HTMLEvents');
+				event.initEvent(eventName, true, true);
+			} else if (document.createEventObject) { // IE < 9
+				event = document.createEventObject();
+				event.eventType = eventName;
+			}
+
+			event.eventName = eventName;
+
+			if (el.dispatchEvent) {
+				el.dispatchEvent(event);
+			} else if (el.fireEvent) { // IE < 9
+				el.fireEvent('on' + event.eventType, event);// can trigger only real event (e.g. 'click')
+			} else if (el[eventName]) {
+				el[eventName]();
+			} else if (el['on' + eventName]) {
+				el['on' + eventName]();
+			}
+		},
+
+		popoverShown: function() {
+			this.dispatch(this.events.popoverShown);
+		},
+
+		popoverHidden: function() {
+			this.dispatch(this.events.popoverHidden);
+		},
+
+		changeContentHighlight: function(value) {
+			this.dispatch((value) ? this.events.showContentHighlight : this.events.hideContentHighlight);
+		},
+
+		resize: function(el) {
+			this.dispatch(this.events.resize, el);
+		}
+	};
+
+})(window.StickersModule);
+
+(function(Plugin) {
+
+	Plugin.Service.Helper = {
 		forEach: function(data, callback) {
 			for (var x in data) {
 				callback(data[x], x);
@@ -3376,7 +3374,7 @@ window.StickersModule.Service = {};
 		},
 
 		setConfig: function(config) {
-			Module.Configs = this.merge(Module.Configs || {}, config);
+			Plugin.Configs = this.merge(Plugin.Configs || {}, config);
 		},
 
 		setEvent: function(eventType, el, className, callback) {
@@ -3526,7 +3524,7 @@ window.StickersModule.Service = {};
 		},
 
 		md5: function(string) {
-			return Module.MD5(string);
+			return Plugin.Libs.MD5(string);
 		},
 
 		getLocation: function(url) {
@@ -3555,9 +3553,9 @@ window.StickersModule.Service = {};
 
 })(window.StickersModule);
 
-(function(Module) {
+(function(Plugin) {
 
-	Module.Http = {
+	Plugin.Service.Http = {
 
 		// todo: refactor post(options) & get(options)
 
@@ -3605,24 +3603,24 @@ window.StickersModule.Service = {};
 			options.error = options.error || function() {};
 			options.complete = options.complete || function() {};
 
-			options.headers.Apikey = Module.Configs.apiKey;
+			options.headers.Apikey = Plugin.Configs.apiKey;
 			options.headers.Platform = 'JS';
-			options.headers.Localization = Module.Configs.lang;
+			options.headers.Localization = Plugin.Configs.lang;
 
-			if (Module.Configs.userId !== null) {
-				options.headers.UserId = Module.Configs.userId;
+			if (Plugin.Configs.userId !== null) {
+				options.headers.UserId = Plugin.Configs.userId;
 			}
 
 			if (options.type == 'POST' || options.type == 'PUT') {
 				options.headers['Content-Type'] = options.headers['Content-Type'] || 'application/x-www-form-urlencoded';
-				options.headers['DeviceId'] = Module.Storage.getDeviceId();
+				options.headers['DeviceId'] = Plugin.Service.Storage.getDeviceId();
 			}
 
 
 			var xmlhttp = new XMLHttpRequest();
 			xmlhttp.open(options.type, options.url, true);
 
-			Module.Service.Helper.forEach(options.headers, function(value, name) {
+			Plugin.Service.Helper.forEach(options.headers, function(value, name) {
 				xmlhttp.setRequestHeader(name, value);
 			});
 
@@ -3649,18 +3647,18 @@ window.StickersModule.Service = {};
 	};
 })(window.StickersModule);
 
-(function(Module) {
+(function(Plugin) {
 
 	var stickerpipe;
 
-	Module.Service.Pack = {
+	Plugin.Service.Pack = {
 
 		init: function(_stickerpipe) {
 			stickerpipe = _stickerpipe;
 		},
 
 		activateUserPack: function(packName, pricePoint, doneCallback) {
-			Module.Api.changeUserPackStatus(packName, true, pricePoint, function() {
+			Plugin.Service.Api.changeUserPackStatus(packName, true, pricePoint, function() {
 
 				// todo: add event ~ "packs fetched" & remove "stickerpipe" variable
 				stickerpipe.fetchPacks(function() {
@@ -3672,27 +3670,31 @@ window.StickersModule.Service = {};
 	};
 })(window.StickersModule);
 
-(function(Module) {
+(function(Plugin) {
 
 	function activateUserPack(taskData) {
-		Module.Service.Pack.activateUserPack(taskData.packName, taskData.pricePoint);
+		Plugin.Service.Pack.activateUserPack(taskData.packName, taskData.pricePoint);
 	}
 
-	Module.Service.PendingRequest = {
+	Plugin.Service.PendingRequest = {
 
 		tasks: {
 			activateUserPack: 'activateUserPack'
 		},
 
+		init: function() {
+			this.run();
+		},
+
 		add: function(taskName, taskData) {
-			Module.Storage.addPendingRequestTask({
+			Plugin.Service.Storage.addPendingRequestTask({
 				name: taskName,
 				data: taskData
 			});
 		},
 
 		run: function() {
-			var task = Module.Storage.popPendingRequestTask();
+			var task = Plugin.Service.Storage.popPendingRequestTask();
 
 			while(task) {
 				switch (task.name) {
@@ -3703,20 +3705,26 @@ window.StickersModule.Service = {};
 						break;
 				}
 
-				task = Module.Storage.popPendingRequestTask();
+				task = Plugin.Service.Storage.popPendingRequestTask();
 			}
 		}
 
 	};
 })(window.StickersModule);
 
-// todo: StatisticService
+(function(Plugin) {
 
-(function(Module) {
+	Plugin.Service.Statistic = {
+	};
 
-	Module.Storage = {
+})(StickersModule);
 
-		lockr: Module.Lockr,
+
+(function(Plugin) {
+
+	Plugin.Service.Storage = {
+
+		lockr: Plugin.Libs.Lockr,
 
 		setPrefix: function(storagePrefix) {
 			this.lockr.prefix = storagePrefix;
@@ -3737,7 +3745,7 @@ window.StickersModule.Service = {};
 				newStorageDate = [];
 
 			// todo: rewrite function as for & slice
-			Module.Service.Helper.forEach(usedStickers, function(usedSticker) {
+			Plugin.Service.Helper.forEach(usedStickers, function(usedSticker) {
 
 				if (usedSticker.code != stickerCode) {
 					newStorageDate.push(usedSticker);
@@ -3835,146 +3843,61 @@ window.StickersModule.Service = {};
 
 })(window.StickersModule);
 
-(function(Module) {
+(function(Plugin) {
 
-	function sendAPIMessage(action, attrs) {
-		var iframe = Module.Service.Store.stickerpipe.storeView.iframe;
-
-		iframe && iframe.contentWindow.postMessage(JSON.stringify({
-			action: action,
-			attrs: attrs
-		}), Module.Service.Helper.getDomain(Module.Configs.storeUrl));
-	}
-
-	Module.Service.Store = {
-
-		stickerpipe: null,
-
-		onPurchaseCallback: null,
-
-		init: function(stickerpipe) {
-			this.stickerpipe = stickerpipe;
-		},
-
-		showCollections: function(packName) {
-			this.stickerpipe.storeView.close();
-			this.stickerpipe.open(packName);
-		},
-
-		downloadPack: function(packName, pricePoint) {
-			Module.Service.Pack.activateUserPack(packName, pricePoint, function() {
-				sendAPIMessage('reload');
-				sendAPIMessage('onPackDownloaded', {
-					packName: packName
-				});
-			});
-		},
-
-		purchaseSuccess: function(packName, pricePoint) {
-			this.downloadPack(packName, pricePoint);
-		},
-
-		purchaseFail: function() {
-			sendAPIMessage('hideActionProgress');
-		},
-
-		goBack: function() {
-			sendAPIMessage('goBack');
-		},
-
-		api: {
-			showCollections: function(data) {
-				Module.Service.Store.showCollections(data.attrs.packName);
-			},
-
-			purchasePack: function(data) {
-				var packName = data.attrs.packName,
-					packTitle = data.attrs.packTitle,
-					pricePoint = data.attrs.pricePoint;
-
-				if (pricePoint == 'A' || (pricePoint == 'B' && Module.Configs.userPremium)) {
-					Module.Service.Store.downloadPack(packName, pricePoint);
-				} else {
-					var onPurchaseCallback = Module.Service.Store.onPurchaseCallback;
-
-					onPurchaseCallback && onPurchaseCallback(packName, packTitle, pricePoint);
-				}
-			},
-
-			resizeStore: function(data) {
-				Module.Service.Store.stickerpipe.storeView.resize(data.attrs.height);
-			},
-
-			showBackButton: function(data) {
-				var modal = Module.Service.Store.stickerpipe.storeView.modal;
-
-				if (data.attrs.show) {
-					modal.backButton.style.display = 'block';
-				} else {
-					modal.backButton.style.display = 'none';
-				}
-			}
-		}
-	};
-
-})(StickersModule);
-
-
-(function(Module) {
-
-	Module.Url = {
+	Plugin.Service.Url = {
 
 		buildStoreUrl: function(uri) {
 			uri = uri || '';
 
 			var params = {
-				apiKey: Module.Configs.apiKey,
+				apiKey: Plugin.Configs.apiKey,
 				platform: 'JS',
-				userId: Module.Configs.userId,
-				density: Module.Configs.stickerResolutionType,
-				priceB: Module.Configs.priceB,
-				priceC: Module.Configs.priceC,
-				is_subscriber: (Module.Configs.userPremium ? 1 : 0),
-				localization: Module.Configs.lang
+				userId: Plugin.Configs.userId,
+				density: Plugin.Configs.stickerResolutionType,
+				priceB: Plugin.Configs.priceB,
+				priceC: Plugin.Configs.priceC,
+				is_subscriber: (Plugin.Configs.userPremium ? 1 : 0),
+				localization: Plugin.Configs.lang
 			};
 
-			return Module.Configs.storeUrl + ((Module.Configs.storeUrl.indexOf('?') == -1) ? '?' : '&')
-				+ Module.Service.Helper.urlParamsSerialize(params) + '#/' + uri;
+			return Plugin.Configs.storeUrl + ((Plugin.Configs.storeUrl.indexOf('?') == -1) ? '?' : '&')
+				+ Plugin.Service.Helper.urlParamsSerialize(params) + '#/' + uri;
 		},
 
 		buildCdnUrl: function(uri) {
 			uri = uri || '';
 
-			return Module.Configs.cdnUrl + '/stk/' + uri;
+			return Plugin.Configs.cdnUrl + '/stk/' + uri;
 		},
 
 		buildApiUrl: function(uri) {
 			uri = uri || '';
 
-			return Module.Configs.apiUrl + '/api/v' + Module.Api.getApiVersion() + '/' + uri;
+			return Plugin.Configs.apiUrl + '/api/v' + Plugin.Service.Api.getApiVersion() + '/' + uri;
 		},
 
 		getStickerUrl: function(packName, stickerName) {
 			return this.buildCdnUrl(
 				packName + '/' + stickerName +
-				'_' + Module.Configs.stickerResolutionType + '.png'
+				'_' + Plugin.Configs.stickerResolutionType + '.png'
 			);
 		},
 
 		getPackTabIconUrl: function(packName) {
 			return this.buildCdnUrl(
 				packName + '/' +
-				'tab_icon_' + Module.Configs.tabResolutionType + '.png'
+				'tab_icon_' + Plugin.Configs.tabResolutionType + '.png'
 			);
 		},
 
 		getPacksUrl: function() {
 			var url = this.buildApiUrl('client-packs');
 
-			if (Module.Configs.userId !== null) {
+			if (Plugin.Configs.userId !== null) {
 				url = this.buildApiUrl('packs');
 
-				if (Module.Configs.userPremium) {
+				if (Plugin.Configs.userPremium) {
 					url += '?is_subscriber=1';
 				}
 			}
@@ -3996,7 +3919,7 @@ window.StickersModule.Service = {};
 			var purchaseType = 'free';
 			if (pricePoint == 'B') {
 				purchaseType = 'oneoff';
-				if (Module.Configs.userPremium) {
+				if (Plugin.Configs.userPremium) {
 					purchaseType = 'subscription';
 				}
 			} else if (pricePoint == 'C') {
@@ -4005,7 +3928,7 @@ window.StickersModule.Service = {};
 
 			// build url
 			var url = this.buildApiUrl('user/pack/' + packName);
-			url += '?' + Module.Service.Helper.urlParamsSerialize({
+			url += '?' + Plugin.Service.Helper.urlParamsSerialize({
 					purchase_type: purchaseType
 				});
 
@@ -4023,14 +3946,641 @@ window.StickersModule.Service = {};
 	};
 })(window.StickersModule);
 
+////////////////////////////////////
+// Load modules
+////////////////////////////////////
+window.StickersModule.Module = {};
+
+(function(Plugin) {
+
+	Plugin.Module.Store = {
+
+		init: function(stickerpipe) {
+			Plugin.Module.Store.View.init();
+			Plugin.Module.Store.ApiListener.init();
+			Plugin.Module.Store.Controller.init(stickerpipe);
+		},
+
+		open: function(packName) {
+			Plugin.Module.Store.View.open(packName);
+		},
+
+		close: function() {
+			Plugin.Module.Store.View.close();
+		},
+
+		setOnPurchaseCallback: function(callback) {
+			Plugin.Module.Store.Controller.onPurchaseCallback = callback;
+		},
+
+		purchaseSuccess: function(packName, pricePoint) {
+			Plugin.Module.Store.Controller.onPurchaseSuccess(packName, pricePoint);
+		},
+
+		purchaseFail: function() {
+			Plugin.Module.Store.Controller.onPurchaseFail();
+		}
+	};
+
+})(StickersModule);
+
+
+(function(Plugin, Module) {
+
+	Module.Api= {
+
+		showCollections: function(data) {
+			Module.Controller.showCollections(data.attrs.packName);
+		},
+
+		purchasePack: function(data) {
+			var attrs = data.attrs;
+			Module.Controller.purchasePack(attrs.packName, attrs.packTitle, attrs.pricePoint);
+		},
+
+		showBackButton: function(data) {
+			Module.View.showBackButton(data.attrs.show);
+		},
+
+		// todo: remove (not used)
+		resizeStore: function(data) {
+			Module.View.resize(data.attrs.height);
+		}
+	};
+
+})(StickersModule, StickersModule.Module.Store);
+
+
+(function(Plugin, Module) {
+
+	var initialized = false;
+
+	Module.ApiListener = {
+
+		init: function() {
+			if (initialized) {
+				return;
+			}
+
+			window.addEventListener('message', (function(e) {
+				var data = JSON.parse(e.data);
+
+				if (!data.action) {
+					return;
+				}
+
+				var api = Module.Api;
+				api[data.action] && api[data.action](data);
+
+			}).bind(this));
+
+			initialized = true;
+		}
+	};
+
+})(window.StickersModule, StickersModule.Module.Store);
+
+(function(Plugin, Module) {
+
+	function callStoreMethod(action, attrs) {
+		var iframe = Module.View.iframe;
+
+		iframe && iframe.contentWindow.postMessage(JSON.stringify({
+			action: action,
+			attrs: attrs
+		}), Plugin.Service.Helper.getDomain(Plugin.Configs.storeUrl));
+	}
+
+	Module.Controller = {
+
+		stickerpipe: null,
+
+		onPurchaseCallback: null,
+
+		init: function(stickerpipe) {
+			this.stickerpipe = stickerpipe;
+		},
+
+		showCollections: function(packName) {
+			Module.View.close();
+			this.stickerpipe.open(packName);
+		},
+
+		downloadPack: function(packName, pricePoint) {
+			Plugin.Service.Pack.activateUserPack(packName, pricePoint, function() {
+				callStoreMethod('reload');
+				callStoreMethod('onPackDownloaded', {
+					packName: packName
+				});
+			});
+		},
+
+		purchasePack: function(packName, packTitle, pricePoint) {
+			if (pricePoint == 'A' || (pricePoint == 'B' && Plugin.Configs.userPremium)) {
+				this.downloadPack(packName, pricePoint);
+			} else {
+				this.onPurchaseCallback && this.onPurchaseCallback(packName, packTitle, pricePoint);
+			}
+		},
+
+		goBack: function() {
+			callStoreMethod('goBack');
+		},
+
+		///////////////////////////////////////////
+		// Callbacks
+		///////////////////////////////////////////
+
+		onPurchaseSuccess: function(packName, pricePoint) {
+			this.downloadPack(packName, pricePoint);
+		},
+
+		onPurchaseFail: function() {
+			callStoreMethod('hideActionProgress');
+		}
+	};
+
+})(StickersModule, StickersModule.Module.Store);
+
+
+(function(Plugin, Module) {
+
+	Module.View = {
+
+		modal: null,
+		iframe: null,
+
+		init: function() {
+			this.iframe = document.createElement('iframe');
+
+			this.iframe.style.width = '100%';
+			this.iframe.style.height = '100%';
+			this.iframe.style.border = '0';
+
+			this.modal = Plugin.Module.Modal.init(this.iframe, {
+				onOpen: (function(contentEl, modalEl, overlay) {
+					Plugin.Service.Event.resize();
+					Module.ApiListener.init();
+
+					if (Plugin.Service.Helper.getMobileOS() == 'ios') {
+						modalEl.getElementsByClassName('sp-modal-body')[0].style.overflowY = 'scroll';
+					}
+				}).bind(this)
+			});
+
+			this.modal.backButton.addEventListener('click', (function() {
+				Module.Controller.goBack();
+			}).bind(this));
+
+
+			window.addEventListener('resize', (function() {
+				this.resize();
+			}).bind(this));
+		},
+
+		open: function(packName) {
+			var url = Plugin.Service.Url.getStoreUrl();
+
+			if (packName) {
+				url = Plugin.Service.Url.getStorePackUrl(packName);
+			}
+
+			this.iframe.src = url;
+			this.modal.open();
+		},
+
+		close: function() {
+			if (this.modal && this.modal.hasGlobalOpened()) {
+				this.modal.close();
+			}
+		},
+
+		showBackButton: function(show) {
+			var modal = this.modal;
+			modal.backButton.style.display = (show) ? 'block' : 'none';
+		},
+
+		resize: function(height) {
+			var dialog = this.modal.modalEl.getElementsByClassName('sp-modal-dialog')[0];
+			dialog.style.height = '';
+
+			if (window.innerWidth > 700) {
+
+				var marginTop = parseInt(Plugin.Service.El.css(dialog, 'marginTop'), 10),
+					marginBottom = parseInt(Plugin.Service.El.css(dialog, 'marginBottom'), 10);
+
+				var minHeight = window.innerHeight - marginTop - marginBottom;
+
+				dialog.style.height = minHeight + 'px';
+			}
+		}
+	};
+
+})(window.StickersModule, StickersModule.Module.Store);
+
+(function(Plugin) {
+
+	// todo: + bind & unbind methods for events (error on ESC two modals)
+
+	var modalsStack = [],
+		KEY_CODE_A = 65,
+		KEY_CODE_TAB = 9,
+		KEY_CODE_ESC = 27,
+
+		oMargin = {},
+		ieBodyTopMargin = 0,
+
+		classes = {
+			lock: 'sp-modal-lock',
+			overlay: 'sp-modal-overlay',
+			modal: 'sp-modal',
+			modalDialog: 'sp-modal-dialog',
+			dialogHeader: 'sp-modal-header',
+			dialogBody: 'sp-modal-body',
+			back: 'sp-modal-back',
+			close: 'sp-modal-close'
+		},
+
+		defaultOptions = {
+			closeOnEsc: true,
+			closeOnOverlayClick: true,
+
+			onBeforeClose: null,
+			onClose: null,
+			onOpen: null
+		},
+
+		isOpen = false,
+
+		overlay = null;
+
+	// todo: extend --> HelperModule
+	function extend(out) {
+		out = out || {};
+
+		for (var i = 1; i < arguments.length; i++) {
+			if (!arguments[i])
+				continue;
+
+			for (var key in arguments[i]) {
+				if (arguments[i].hasOwnProperty(key))
+					out[key] = arguments[i][key];
+			}
+		}
+
+		return out;
+	}
+
+	function lockContainer() {
+		if (overlay) {
+			return;
+		}
+
+		overlay = document.createElement('div');
+		overlay.className = classes.overlay;
+
+		document.body.insertBefore(overlay, document.body.firstChild);
+
+		var bodyOuterWidth = Plugin.Service.El.outerWidth(document.body);
+		document.body.classList.add(classes.lock);
+		document.getElementsByTagName('html')[0].classList.add(classes.lock);
+
+		var scrollbarWidth = Plugin.Service.El.outerWidth(document.body) - bodyOuterWidth;
+
+		if (Plugin.Service.Helper.isIE()) {
+			ieBodyTopMargin = Plugin.Service.El.css(document.body, 'marginTop');
+			document.body.style.marginTop = 0;
+		}
+
+		if (scrollbarWidth != 0) {
+			var tags = ['html', 'body'];
+			for (var i = 0 ; i < tags.length; i++) {
+				var tag = tags[i],
+					tagEl = document.getElementsByTagName(tag)[0];
+
+				oMargin[tag.toLowerCase()] = parseInt(Plugin.Service.El.css(tagEl, 'marginRight'));
+			}
+
+			document.getElementsByTagName('html')[0].style.marginRight = oMargin['html'] + scrollbarWidth + 'px';
+
+			overlay.style.left = 0 - scrollbarWidth + 'px';
+		}
+	}
+
+	function unlockContainer() {
+		overlay.parentNode.removeChild(overlay);
+		overlay = null;
+
+		if (Plugin.Service.Helper.isIE()) {
+			document.body.style.marginTop = ieBodyTopMargin + 'px';
+		}
+
+		var bodyOuterWidth = Plugin.Service.El.outerWidth(document.body);
+		document.body.classList.remove(classes.lock);
+		document.getElementsByTagName('html')[0].classList.remove(classes.lock);
+		var scrollbarWidth = Plugin.Service.El.outerWidth(document.body) - bodyOuterWidth;
+
+		if (scrollbarWidth != 0) {
+			var tags = ['html', 'body'];
+			for (var i = 0 ; i < tags.length; i++) {
+				var tag = tags[i],
+					tagEl = document.getElementsByTagName(tag)[0];
+
+				tagEl.style.marginRight = oMargin[tag.toLowerCase()] + 'px';
+			}
+		}
+	}
+
+	function insertAfter(newNode, referenceNode) {
+		referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+	}
+
+
+	Plugin.Module.Modal = {
+
+		init: function(contentEl, options) {
+
+			options = extend({}, defaultOptions, (options || {}));
+
+			var modalInstance = {};
+
+			// ****************************************************************************
+
+			// MODAL
+			var modalEl = document.createElement('div');
+			modalEl.style.display = 'none';
+			modalEl.className = classes.modal;
+
+
+			// DIALOG
+			var dialogEl = document.createElement('div');
+			dialogEl.className = classes.modalDialog;
+
+
+			// HEADER
+			var dialogHeader = document.createElement('div');
+			dialogHeader.className = classes.dialogHeader;
+
+
+			// BODY
+			var dialogBody = document.createElement('div');
+			dialogBody.className = classes.dialogBody;
+
+
+			modalEl.appendChild(dialogEl);
+
+			dialogEl.appendChild(dialogBody);
+			dialogEl.appendChild(dialogHeader);
+
+			var backButton = document.createElement('div');
+			backButton.className = classes.back;
+			backButton.innerHTML = '<div class="sp-icon-back"></div>';
+			modalInstance.backButton = backButton;
+
+			var closeButton = document.createElement('div');
+			closeButton.className = classes.close;
+			closeButton.innerHTML = '<div class="sp-icon-close"></div>';
+			closeButton.addEventListener('click', (function() {
+				this.close();
+			}).bind(modalInstance));
+
+			dialogHeader.appendChild(backButton);
+			dialogHeader.appendChild(closeButton);
+
+			modalInstance.modalEl = modalEl;
+
+			// ****************************************************************************
+
+			if (!contentEl || !contentEl.nodeType) {
+
+				try {
+					contentEl = document.querySelector(contentEl);
+				} catch (e) {}
+
+				if (!contentEl) {
+					contentEl = document.createElement('div');
+				}
+			}
+
+			dialogBody.appendChild(contentEl);
+
+			document.body.appendChild(modalInstance.modalEl);
+
+			// on Ctrl+A click fire `onSelectAll` event
+			window.addEventListener('keydown', function(e) {
+				// todo
+				//if (!(e.ctrlKey && e.keyCode == KEY_CODE_A)) {
+				//	return true;
+				//}
+				//
+				//if ( $('input:focus, textarea:focus').length > 0 ) {
+				//    return true;
+				//}
+				//
+				//var selectAllEvent = new $.Event('onSelectAll');
+				//selectAllEvent.parentEvent = e;
+				//$(window).trigger(selectAllEvent);
+				//return true;
+			});
+
+			// todo line 6
+			//els.bind('keydown',function(e) {
+			//	var modalFocusableElements = $(':focusable',$(this));
+			//	if(modalFocusableElements.filter(':last').is(':focus') && (e.which || e.keyCode) == KEY_CODE_TAB){
+			//		e.preventDefault();
+			//		modalFocusableElements.filter(':first').focus();
+			//	}
+			//});
+
+			return extend(modalInstance, {
+
+				options: options,
+				contentEl: contentEl,
+
+				open: function() {
+
+					if (modalsStack.length) {
+						modalsStack[modalsStack.length - 1].modalEl.style.display = 'none';
+					}
+
+					modalsStack.push(this);
+
+					// todo: close modal if opened
+					//if (document.getElementsByClassName(classes.overlay).length) {
+					//	this.close();
+					//}
+
+					lockContainer();
+
+
+					//overlay.appendChild(this.modalEl); // openedModalElement
+					insertAfter(this.modalEl, overlay);
+
+					this.modalEl.style.display = 'block';
+
+					if (this.options.closeOnEsc) {
+						window.addEventListener('keyup', (function(e) {
+							if(e.keyCode === KEY_CODE_ESC && isOpen) {
+								this.close(this.options);
+							}
+						}).bind(this));
+
+						// todo
+						// if iframe
+						//if (this.contentEl && this.contentEl.contentWindow) {
+						//	this.contentEl.contentWindow.addEventListener('keyup', (function(e) {
+						//		if(e.keyCode === KEY_CODE_ESC && isOpen) {
+						//			this.close(this.options);
+						//		}
+						//	}).bind(this));
+						//}
+					}
+
+					if (this.options.closeOnOverlayClick) {
+						for (var i = overlay.children.length; i--;) {
+							if (overlay.children[i].nodeType != 8) {
+								overlay.children[i].addEventListener('click', function(e) {
+									e.stopPropagation();
+								});
+							}
+						}
+
+						document.getElementsByClassName(classes.overlay)[0]
+							.addEventListener('click', (function() {
+								this.close(this.options);
+							}).bind(this));
+					}
+
+					//document.addEventListener('touchmove', (function(e) {
+					//	//helper function (see below)
+					//	function collectionHas(a, b) {
+					//		for(var i = 0, len = a.length; i < len; i ++) {
+					//			if(a[i] == b) return true;
+					//		}
+					//		return false;
+					//	}
+					//
+					//	function findParentBySelector(elm, selector) {
+					//		var all = document.querySelectorAll(selector),
+					//			cur = elm.parentNode;
+					//
+					//		//keep going up until you find a match
+					//		while (cur && !collectionHas(all, cur)) {
+					//			cur = cur.parentNode; //go up
+					//		}
+					//
+					//		//will return null if not found
+					//		return cur;
+					//	}
+					//
+					//	var selector = '.' + classes.overlay;
+					//	var parent = findParentBySelector(e.target, selector);
+					//
+					//	if(!parent) {
+					//		e.preventDefault();
+					//	}
+					//}).bind(this));
+
+					//document.addEventListener('touchmove', (function(e) {
+					//	e.preventDefault();
+					//}).bind(this));
+
+					document.addEventListener('touchmove', function(e) {
+
+						//var q = Plugin.Service.El.getParents(e.target, '.' + classes.overlay);
+						//if (!q.length) {
+						//	e.preventDefault();
+						//}
+
+						//if(!$(e).parents('.' + localOptions.overlayClass)) {
+						//	e.preventDefault();
+						//}
+					});
+
+					window.addEventListener('onSelectAll',function(e) {
+						//e.parentEvent.preventDefault();
+
+						// todo
+						//var range = null,
+						//	selection = null,
+						//	selectionElement = openedModalElement.get(0);
+						//
+						//if (document.body.createTextRange) { //ms
+						//	range = document.body.createTextRange();
+						//	range.moveToElementText(selectionElement);
+						//	range.select();
+						//} else if (window.getSelection) { //all others
+						//	selection = window.getSelection();
+						//	range = document.createRange();
+						//	range.selectNodeContents(selectionElement);
+						//	selection.removeAllRanges();
+						//	selection.addRange(range);
+						//}
+					});
+
+					if (this.options.onOpen) {
+						this.options.onOpen(this.contentEl, this.modalEl, overlay, this.options);
+					}
+
+					isOpen = true;
+				},
+
+				close: function() {
+
+					// todo
+					//if ($.isFunction(this.options.onBeforeClose)) {
+					//	if (this.options.onBeforeClose(overlay, this.options) === false) {
+					//		return;
+					//	}
+					//}
+
+					// todo
+					//if (!this.options.cloning) {
+					//	if (!modalEl) {
+					//		modalEl = overlay.data(pluginNamespace+'.modalEl');
+					//	}
+					//	$(modalEl).hide().appendTo($(modalEl).data(pluginNamespace+'.parent'));
+					//}
+
+					if (this.options.onClose) {
+						this.options.onClose(this.contentEl, this.modalEl, overlay, this.options);
+					}
+
+					document.body.removeChild(this.modalEl);
+					modalsStack.pop();
+
+					if (!modalsStack.length) {
+						unlockContainer();
+					} else {
+						modalsStack[modalsStack.length - 1].modalEl.style.display = 'block';
+					}
+
+					isOpen = false;
+				},
+
+				// todo
+				hasGlobalOpened: function() {
+					return isOpen;
+				}
+			});
+		},
+
+		setDefaultOptions: function(options) {
+			defaultOptions = extend({}, defaultOptions, options);
+		}
+	};
+
+})(window.StickersModule);
+
+////////////////////////////////////
+
 window.StickersModule.Configs = {};
 
-(function(Module) {
+(function(Plugin) {
 
-	Module.Service.Helper.setConfig({
+	Plugin.Service.Helper.setConfig({
 
 		elId: 'stickerPipe',
-		storeContainerId: 'stickerPipeStore',
 
 		// todo: more than 2 resolution
 		stickerResolutionType : (window.devicePixelRatio == 1) ? 'mdpi' : 'xhdpi',
@@ -4072,9 +4622,9 @@ window.StickersModule.Configs = {};
 
 })(window.StickersModule);
 
-(function(Module) {
+(function(Plugin) {
 
-	Module.Service.Helper.setConfig({
+	Plugin.Service.Helper.setConfig({
 		emojiList: [
 			// Emoticons		
 			"😊",
@@ -4934,17 +5484,15 @@ window.StickersModule.Configs = {};
 
 window.StickersModule.View = {};
 
-(function(Module) {
+(function(Plugin) {
 
-	Module.BlockView = Module.Class({
+	Plugin.View.Block = Plugin.Libs.Class({
 
 		emojisOffset: 0,
 		emojisLimit: 100,
 
 		// todo
 		isRendered: false,
-
-		emojiService: null,
 
 		el: null,
 		contentEl: null,
@@ -4953,13 +5501,12 @@ window.StickersModule.View = {};
 
 		scrollableEl: null,
 
-		_constructor: function(emojiService) {
-			this.emojiService = emojiService;
+		_constructor: function() {
 
-			this.el = document.getElementById(Module.Configs.elId);
+			this.el = document.getElementById(Plugin.Configs.elId);
 			this.contentEl = document.createElement('div');
 
-			this.tabsView = new Module.TabsView();
+			this.tabsView = new Plugin.View.Tabs();
 
 			window.addEventListener('resize', (function() {
 				this.onWindowResize();
@@ -4972,11 +5519,11 @@ window.StickersModule.View = {};
 
 			this.el.innerHTML = '';
 			this.el.classList.add('sticker-pipe');
-			this.el.style.width = Module.Configs.width;
+			this.el.style.width = Plugin.Configs.width;
 
 			this.scrollableEl = document.createElement('div');
 			this.scrollableEl.className = 'sp-scroll-content';
-			this.scrollableEl.style.height = parseInt(Module.Configs.height, 10) - 49 + 'px';
+			this.scrollableEl.style.height = parseInt(Plugin.Configs.height, 10) - 49 + 'px';
 			this.scrollableEl.appendChild(this.contentEl);
 
 			this.scrollableEl.addEventListener('ps-y-reach-end', (function () {
@@ -4990,7 +5537,7 @@ window.StickersModule.View = {};
 			this.el.appendChild(this.tabsView.el);
 			this.el.appendChild(this.scrollableEl);
 
-			Module.Libs.PerfectScrollbar.initialize(this.scrollableEl);
+			Plugin.Libs.PerfectScrollbar.initialize(this.scrollableEl);
 
 			this.isRendered = true;
 
@@ -4999,7 +5546,7 @@ window.StickersModule.View = {};
 		},
 		renderUsedStickers: function() {
 
-			var usedStickers = Module.Storage.getUsedStickers();
+			var usedStickers = Plugin.Service.Storage.getUsedStickers();
 
 			this.contentEl.innerHTML = '';
 
@@ -5007,13 +5554,13 @@ window.StickersModule.View = {};
 			this.contentEl.classList.remove('sp-emojis');
 
 			if (usedStickers.length == 0) {
-				this.contentEl.innerHTML += Module.Configs.htmlForEmptyRecent;
+				this.contentEl.innerHTML += Plugin.Configs.htmlForEmptyRecent;
 				this.updateScroll('top');
 				return false;
 			}
 
 			var stickers = [];
-			Module.Service.Helper.forEach(usedStickers, function(sticker) {
+			Plugin.Service.Helper.forEach(usedStickers, function(sticker) {
 				stickers.push(sticker.code);
 			});
 
@@ -5036,7 +5583,7 @@ window.StickersModule.View = {};
 			this.contentEl.innerHTML = '';
 
 			var stickers = [];
-			Module.Service.Helper.forEach(pack.stickers, function(sticker) {
+			Plugin.Service.Helper.forEach(pack.stickers, function(sticker) {
 				stickers.push(pack.pack_name + '_' + sticker.name);
 			});
 
@@ -5048,11 +5595,11 @@ window.StickersModule.View = {};
 			this.contentEl.classList.remove('sp-emojis');
 			this.contentEl.classList.add('sp-stickers');
 
-			Module.Service.Helper.forEach(stickers, function(stickerCode) {
+			Plugin.Service.Helper.forEach(stickers, function(stickerCode) {
 
 				var placeHolderClass = 'sp-sticker-placeholder';
 
-				var stickerImgSrc = Module.BaseService.parseStickerFromText('[[' + stickerCode + ']]');
+				var stickerImgSrc = Plugin.Service.Base.parseStickerFromText('[[' + stickerCode + ']]');
 
 				var stickersSpanEl = document.createElement('span');
 				stickersSpanEl.classList.add(placeHolderClass);
@@ -5060,7 +5607,7 @@ window.StickersModule.View = {};
 				var image = new Image();
 				image.onload = function() {
 					stickersSpanEl.classList.remove(placeHolderClass);
-					stickersSpanEl.classList.add(Module.Configs.stickerItemClass);
+					stickersSpanEl.classList.add(Plugin.Configs.stickerItemClass);
 					stickersSpanEl.setAttribute('data-sticker-string', stickerCode);
 					stickersSpanEl.appendChild(image);
 				};
@@ -5075,21 +5622,21 @@ window.StickersModule.View = {};
 		},
 		renderEmojis: function(offset) {
 
-			if (offset > Module.Configs.emojiList.length - 1) {
+			if (offset > Plugin.Configs.emojiList.length - 1) {
 				return;
 			}
 
 			var limit = offset + this.emojisLimit;
-			if (limit > Module.Configs.emojiList.length - 1) {
-				limit = Module.Configs.emojiList.length;
+			if (limit > Plugin.Configs.emojiList.length - 1) {
+				limit = Plugin.Configs.emojiList.length;
 			}
 
 			for (var i = offset; i < limit; i++) {
-				var emoji = Module.Configs.emojiList[i],
+				var emoji = Plugin.Configs.emojiList[i],
 					emojiEl = document.createElement('span'),
-					emojiImgHtml = this.emojiService.parseEmojiFromText(emoji);
+					emojiImgHtml = Plugin.Service.Emoji.parseEmojiFromText(emoji);
 
-				emojiEl.className = Module.Configs.emojiItemClass;
+				emojiEl.className = Plugin.Configs.emojiItemClass;
 				emojiEl.innerHTML = emojiImgHtml;
 
 				this.contentEl.appendChild(emojiEl);
@@ -5101,12 +5648,12 @@ window.StickersModule.View = {};
 		},
 
 		handleClickOnSticker: function(callback) {
-			// todo: create static Module.Configs.stickerItemClass
-			Module.Service.Helper.setEvent('click', this.contentEl, Module.Configs.stickerItemClass, callback);
+			// todo: create static Plugin.Configs.stickerItemClass
+			Plugin.Service.Helper.setEvent('click', this.contentEl, Plugin.Configs.stickerItemClass, callback);
 		},
 		handleClickOnEmoji: function(callback) {
-			// todo: create static Module.Configs.emojiItemClass
-			Module.Service.Helper.setEvent('click', this.contentEl, Module.Configs.emojiItemClass, callback);
+			// todo: create static Plugin.Configs.emojiItemClass
+			Plugin.Service.Helper.setEvent('click', this.contentEl, Plugin.Configs.emojiItemClass, callback);
 		},
 
 		open: function(tabName) {
@@ -5129,7 +5676,7 @@ window.StickersModule.View = {};
 				this.scrollableEl.scrollTop = 0;
 			}
 
-			Module.Libs.PerfectScrollbar.update(this.scrollableEl);
+			Plugin.Libs.PerfectScrollbar.update(this.scrollableEl);
 		},
 
 		onWindowResize: function() {}
@@ -5137,407 +5684,11 @@ window.StickersModule.View = {};
 
 })(window.StickersModule);
 
-(function(Module) {
+(function(Plugin) {
 
-	// todo: + bind & unbind methods for events (error on ESC two modals)
+	var parent = Plugin.View.Block;
 
-	var modalsStack = [],
-		KEY_CODE_A = 65,
-		KEY_CODE_TAB = 9,
-		KEY_CODE_ESC = 27,
-
-		oMargin = {},
-		ieBodyTopMargin = 0,
-		pluginNamespace = 'sp-modal',
-
-		classes = {
-			lock: 'sp-modal-lock',
-			overlay: 'sp-modal-overlay',
-			modal: 'sp-modal',
-			modalDialog: 'sp-modal-dialog',
-			dialogHeader: 'sp-modal-header',
-			dialogBody: 'sp-modal-body',
-			back: 'sp-modal-back',
-			close: 'sp-modal-close'
-		},
-
-		defaultOptions = {
-			closeOnEsc: true,
-			closeOnOverlayClick: true,
-
-			onBeforeClose: null,
-			onClose: null,
-			onOpen: null
-		},
-
-		isOpen = false,
-
-		overlay = null;
-
-	// todo: extend --> HelperModule
-	function extend(out) {
-		out = out || {};
-
-		for (var i = 1; i < arguments.length; i++) {
-			if (!arguments[i])
-				continue;
-
-			for (var key in arguments[i]) {
-				if (arguments[i].hasOwnProperty(key))
-					out[key] = arguments[i][key];
-			}
-		}
-
-		return out;
-	}
-
-	function lockContainer() {
-		if (overlay) {
-			return;
-		}
-
-		overlay = document.createElement('div');
-		overlay.className = classes.overlay;
-
-		document.body.insertBefore(overlay, document.body.firstChild);
-
-		var bodyOuterWidth = Module.El.outerWidth(document.body);
-		document.body.classList.add(classes.lock);
-		document.getElementsByTagName('html')[0].classList.add(classes.lock);
-
-		var scrollbarWidth = Module.El.outerWidth(document.body) - bodyOuterWidth;
-
-		if (Module.Service.Helper.isIE()) {
-			ieBodyTopMargin = Module.El.css(document.body, 'marginTop');
-			document.body.style.marginTop = 0;
-		}
-
-		if (scrollbarWidth != 0) {
-			var tags = ['html', 'body'];
-			for (var i = 0 ; i < tags.length; i++) {
-				var tag = tags[i],
-					tagEl = document.getElementsByTagName(tag)[0];
-
-				oMargin[tag.toLowerCase()] = parseInt(Module.El.css(tagEl, 'marginRight'));
-			}
-
-			document.getElementsByTagName('html')[0].style.marginRight = oMargin['html'] + scrollbarWidth + 'px';
-
-			overlay.style.left = 0 - scrollbarWidth + 'px';
-		}
-	}
-
-	function unlockContainer() {
-		overlay.parentNode.removeChild(overlay);
-		overlay = null;
-
-		if (Module.Service.Helper.isIE()) {
-			document.body.style.marginTop = ieBodyTopMargin + 'px';
-		}
-
-		var bodyOuterWidth = Module.El.outerWidth(document.body);
-		document.body.classList.remove(classes.lock);
-		document.getElementsByTagName('html')[0].classList.remove(classes.lock);
-		var scrollbarWidth = Module.El.outerWidth(document.body) - bodyOuterWidth;
-
-		if (scrollbarWidth != 0) {
-			var tags = ['html', 'body'];
-			for (var i = 0 ; i < tags.length; i++) {
-				var tag = tags[i],
-					tagEl = document.getElementsByTagName(tag)[0];
-
-				tagEl.style.marginRight = oMargin[tag.toLowerCase()] + 'px';
-			}
-		}
-	}
-
-	function insertAfter(newNode, referenceNode) {
-		referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
-	}
-
-
-	Module.View = Module.View || {};
-
-	Module.View.Modal = {
-
-		init: function(contentEl, options) {
-
-			options = extend({}, defaultOptions, (options || {}));
-
-			var modalInstance = {};
-
-
-			// ****************************************************************************
-
-			// MODAL
-			var modalEl = document.createElement('div');
-			modalEl.style.display = 'none';
-			modalEl.className = classes.modal;
-
-
-			// DIALOG
-			var dialogEl = document.createElement('div');
-			dialogEl.className = classes.modalDialog;
-
-
-			// HEADER
-			var dialogHeader = document.createElement('div');
-			dialogHeader.className = classes.dialogHeader;
-
-
-			// BODY
-			var dialogBody = document.createElement('div');
-			dialogBody.className = classes.dialogBody;
-
-
-			modalEl.appendChild(dialogEl);
-
-			dialogEl.appendChild(dialogBody);
-			dialogEl.appendChild(dialogHeader);
-
-			var backButton = document.createElement('div');
-			backButton.className = classes.back;
-			backButton.innerHTML = '<div class="sp-icon-back"></div>';
-			modalInstance.backButton = backButton;
-
-			var closeButton = document.createElement('div');
-			closeButton.className = classes.close;
-			closeButton.innerHTML = '<div class="sp-icon-close"></div>';
-			closeButton.addEventListener('click', (function() {
-				this.close();
-			}).bind(modalInstance));
-
-			dialogHeader.appendChild(backButton);
-			dialogHeader.appendChild(closeButton);
-
-			modalInstance.modalEl = modalEl;
-
-			// ****************************************************************************
-
-			if (!contentEl || !contentEl.nodeType) {
-
-				try {
-					contentEl = document.querySelector(contentEl);
-				} catch (e) {}
-
-				if (!contentEl) {
-					contentEl = document.createElement('div');
-				}
-			}
-
-			dialogBody.appendChild(contentEl);
-
-			document.body.appendChild(modalInstance.modalEl);
-
-			// on Ctrl+A click fire `onSelectAll` event
-			window.addEventListener('keydown', function(e) {
-				// todo
-				//if (!(e.ctrlKey && e.keyCode == KEY_CODE_A)) {
-				//	return true;
-				//}
-				//
-				//if ( $('input:focus, textarea:focus').length > 0 ) {
-				//    return true;
-				//}
-				//
-				//var selectAllEvent = new $.Event('onSelectAll');
-				//selectAllEvent.parentEvent = e;
-				//$(window).trigger(selectAllEvent);
-				//return true;
-			});
-
-			// todo line 6
-			//els.bind('keydown',function(e) {
-			//	var modalFocusableElements = $(':focusable',$(this));
-			//	if(modalFocusableElements.filter(':last').is(':focus') && (e.which || e.keyCode) == KEY_CODE_TAB){
-			//		e.preventDefault();
-			//		modalFocusableElements.filter(':first').focus();
-			//	}
-			//});
-
-			return extend(modalInstance, {
-
-				options: options,
-				contentEl: contentEl,
-
-				open: function() {
-
-					if (modalsStack.length) {
-						modalsStack[modalsStack.length - 1].modalEl.style.display = 'none';
-					}
-
-					modalsStack.push(this);
-
-					// todo: close modal if opened
-					//if (document.getElementsByClassName(classes.overlay).length) {
-					//	this.close();
-					//}
-
-					lockContainer();
-
-
-					//overlay.appendChild(this.modalEl); // openedModalElement
-					insertAfter(this.modalEl, overlay);
-
-					this.modalEl.style.display = 'block';
-
-					if (this.options.closeOnEsc) {
-						window.addEventListener('keyup', (function(e) {
-							if(e.keyCode === KEY_CODE_ESC && isOpen) {
-								this.close(this.options);
-							}
-						}).bind(this));
-
-						// if iframe
-						//if (this.contentEl && this.contentEl.contentWindow) {
-						//	this.contentEl.contentWindow.addEventListener('keyup', (function(e) {
-						//		if(e.keyCode === KEY_CODE_ESC && isOpen) {
-						//			this.close(this.options);
-						//		}
-						//	}).bind(this));
-						//}
-					}
-
-					if (this.options.closeOnOverlayClick) {
-						for (var i = overlay.children.length; i--;) {
-							if (overlay.children[i].nodeType != 8) {
-								overlay.children[i].addEventListener('click', function(e) {
-									e.stopPropagation();
-								});
-							}
-						}
-
-						document.getElementsByClassName(classes.overlay)[0]
-							.addEventListener('click', (function() {
-								this.close(this.options);
-							}).bind(this));
-					}
-
-					//document.addEventListener('touchmove', (function(e) {
-					//	//helper function (see below)
-					//	function collectionHas(a, b) {
-					//		for(var i = 0, len = a.length; i < len; i ++) {
-					//			if(a[i] == b) return true;
-					//		}
-					//		return false;
-					//	}
-					//
-					//	function findParentBySelector(elm, selector) {
-					//		var all = document.querySelectorAll(selector),
-					//			cur = elm.parentNode;
-					//
-					//		//keep going up until you find a match
-					//		while (cur && !collectionHas(all, cur)) {
-					//			cur = cur.parentNode; //go up
-					//		}
-					//
-					//		//will return null if not found
-					//		return cur;
-					//	}
-					//
-					//	var selector = '.' + classes.overlay;
-					//	var parent = findParentBySelector(e.target, selector);
-					//
-					//	if(!parent) {
-					//		e.preventDefault();
-					//	}
-					//}).bind(this));
-
-					//document.addEventListener('touchmove', (function(e) {
-					//	e.preventDefault();
-					//}).bind(this));
-
-					document.addEventListener('touchmove', function(e) {
-
-						//var q = Module.El.getParents(e.target, '.' + classes.overlay);
-						//if (!q.length) {
-						//	e.preventDefault();
-						//}
-
-						//if(!$(e).parents('.' + localOptions.overlayClass)) {
-						//	e.preventDefault();
-						//}
-					});
-
-					window.addEventListener('onSelectAll',function(e) {
-						//e.parentEvent.preventDefault();
-
-						// todo
-						//var range = null,
-						//	selection = null,
-						//	selectionElement = openedModalElement.get(0);
-						//
-						//if (document.body.createTextRange) { //ms
-						//	range = document.body.createTextRange();
-						//	range.moveToElementText(selectionElement);
-						//	range.select();
-						//} else if (window.getSelection) { //all others
-						//	selection = window.getSelection();
-						//	range = document.createRange();
-						//	range.selectNodeContents(selectionElement);
-						//	selection.removeAllRanges();
-						//	selection.addRange(range);
-						//}
-					});
-
-					if (this.options.onOpen) {
-						this.options.onOpen(this.contentEl, this.modalEl, overlay, this.options);
-					}
-
-					isOpen = true;
-				},
-
-				close: function() {
-
-					// todo
-					//if ($.isFunction(this.options.onBeforeClose)) {
-					//	if (this.options.onBeforeClose(overlay, this.options) === false) {
-					//		return;
-					//	}
-					//}
-
-					// todo
-					//if (!this.options.cloning) {
-					//	if (!modalEl) {
-					//		modalEl = overlay.data(pluginNamespace+'.modalEl');
-					//	}
-					//	$(modalEl).hide().appendTo($(modalEl).data(pluginNamespace+'.parent'));
-					//}
-
-					if (this.options.onClose) {
-						this.options.onClose(this.contentEl, this.modalEl, overlay, this.options);
-					}
-
-					document.body.removeChild(this.modalEl);
-					modalsStack.pop();
-
-					if (!modalsStack.length) {
-						unlockContainer();
-					} else {
-						modalsStack[modalsStack.length - 1].modalEl.style.display = 'block';
-					}
-
-					isOpen = false;
-				}
-			});
-		},
-
-		hasOpened: function() {
-			return isOpen;
-		},
-
-		setDefaultOptions: function(options) {
-			defaultOptions = extend({}, defaultOptions, options);
-		}
-	};
-
-})(window.StickersModule);
-
-(function(Module) {
-
-	var parent = Module.BlockView;
-
-	Module.PopoverView = parent.extend({
+	Plugin.View.Popover = parent.extend({
 
 		popoverEl: null,
 		triangleEl: null,
@@ -5548,7 +5699,7 @@ window.StickersModule.View = {};
 		_constructor: function() {
 			parent.prototype._constructor.apply(this, arguments);
 
-			this.toggleEl = document.getElementById(Module.Configs.elId);
+			this.toggleEl = document.getElementById(Plugin.Configs.elId);
 			this.toggleEl.addEventListener('click', (function() {
 				this.toggle();
 			}).bind(this));
@@ -5591,12 +5742,12 @@ window.StickersModule.View = {};
 
 			// todo: addEventListener --> DOMEventService
 			if (window.addEventListener) {
-				window.addEventListener(Module.DOMEventService.events.popoverShown, function() {
-					Module.DOMEventService.resize();
+				window.addEventListener(Plugin.Service.Event.events.popoverShown, function() {
+					Plugin.Service.Event.resize();
 				});
 			} else {
-				window.attachEvent('on' + Module.DOMEventService.events.popoverShown, function() {
-					Module.DOMEventService.resize();
+				window.attachEvent('on' + Plugin.Service.Event.events.popoverShown, function() {
+					Plugin.Service.Event.resize();
 				});
 			}
 		},
@@ -5616,7 +5767,7 @@ window.StickersModule.View = {};
 
 				this.toggleEl.parentElement.appendChild(this.popoverEl);
 				this.positioned();
-				Module.DOMEventService.popoverShown();
+				Plugin.Service.Event.popoverShown();
 			}
 
 			parent.prototype.open.apply(this, arguments);
@@ -5625,7 +5776,7 @@ window.StickersModule.View = {};
 		close: function() {
 			this.active = false;
 			this.toggleEl.parentElement.removeChild(this.popoverEl);
-			Module.DOMEventService.popoverHidden();
+			Plugin.Service.Event.popoverHidden();
 			// todo
 			this.popoverEl.style.marginTop = 0;
 		},
@@ -5667,104 +5818,10 @@ window.StickersModule.View = {};
 
 })(window.StickersModule);
 
-(function(Module) {
+(function(Plugin) {
 
 
-	var hasMessageListener = false;
-
-	function setWindowMessageListener() {
-		if (!hasMessageListener) {
-			window.addEventListener('message', (function(e) {
-				var data = JSON.parse(e.data);
-
-				if (!data.action) {
-					return;
-				}
-
-				var StoreService = Module.Service.Store;
-				StoreService.api[data.action] && StoreService.api[data.action](data);
-
-			}).bind(this));
-
-			hasMessageListener = true;
-		}
-	}
-
-	Module.StoreView = Module.Class({
-
-		modal: null,
-		iframe: null,
-		overlay: null,
-
-		_constructor: function() {
-
-			this.iframe = document.createElement('iframe');
-
-			this.iframe.style.width = '100%';
-			this.iframe.style.height = '100%';
-			this.iframe.style.border = '0';
-
-			this.modal = Module.View.Modal.init(this.iframe, {
-				onOpen: (function(contentEl, modalEl, overlay) {
-					this.overlay = overlay;
-					Module.DOMEventService.resize();
-					setWindowMessageListener.bind(this)();
-
-					if (Module.Service.Helper.getMobileOS() == 'ios') {
-						modalEl.getElementsByClassName('sp-modal-body')[0].style.overflowY = 'scroll';
-					}
-				}).bind(this)
-			});
-
-			this.modal.backButton.addEventListener('click', (function() {
-				Module.Service.Store.goBack();
-			}).bind(this));
-
-
-			window.addEventListener('resize', (function() {
-				this.resize();
-			}).bind(this));
-		},
-
-		renderStore: function() {
-			this.iframe.src = Module.Url.getStoreUrl();
-			this.modal.open();
-		},
-
-		renderPack: function(packName) {
-			this.iframe.src = Module.Url.getStorePackUrl(packName);
-			this.modal.open();
-		},
-
-		close: function() {
-			// todo: сделать hasOpened функцией конкретного окна
-			if (Module.View.Modal.hasOpened()) {
-				this.modal.close();
-			}
-		},
-
-		resize: function(height) {
-			var dialog = this.modal.modalEl.getElementsByClassName('sp-modal-dialog')[0];
-			dialog.style.height = '';
-
-			if (window.innerWidth > 700) {
-
-				var marginTop = parseInt(Module.El.css(dialog, 'marginTop'), 10),
-					marginBottom = parseInt(Module.El.css(dialog, 'marginBottom'), 10);
-
-				var minHeight = window.innerHeight - marginTop - marginBottom;
-
-				dialog.style.height = minHeight + 'px';
-			}
-		}
-	});
-
-})(window.StickersModule);
-
-(function(Module) {
-
-
-	Module.TabsView = Module.Class({
+	Plugin.View.Tabs = Plugin.Libs.Class({
 
 		el: null,
 		scrollableContainerEl: null,
@@ -5886,7 +5943,7 @@ window.StickersModule.View = {};
 				classes.push(this.classes.newPack);
 			}
 
-			var iconSrc = Module.Url.getPackTabIconUrl(pack.pack_name);
+			var iconSrc = Plugin.Service.Url.getPackTabIconUrl(pack.pack_name);
 
 			var content = '<img src=' + iconSrc + '>';
 
@@ -5912,11 +5969,11 @@ window.StickersModule.View = {};
 				tabEl.id = id;
 			}
 
-			classes.push(Module.Configs.tabItemClass);
+			classes.push(Plugin.Configs.tabItemClass);
 
 			tabEl.classList.add.apply(tabEl.classList, classes);
 
-			Module.Service.Helper.forEach(attrs, function(value, name) {
+			Plugin.Service.Helper.forEach(attrs, function(value, name) {
 				tabEl.setAttribute(name, value);
 			});
 
@@ -5928,11 +5985,11 @@ window.StickersModule.View = {};
 					return;
 				}
 
-				Module.Service.Helper.forEach(this.packTabs, (function(tabEl) {
+				Plugin.Service.Helper.forEach(this.packTabs, (function(tabEl) {
 					tabEl.classList.remove(this.classes.tabActive);
 				}).bind(this));
 
-				Module.Service.Helper.forEach(this.controls, (function(controlTab) {
+				Plugin.Service.Helper.forEach(this.controls, (function(controlTab) {
 					if (controlTab && controlTab.el) {
 						controlTab.el.classList.remove(this.classes.tabActive);
 					}
@@ -5960,32 +6017,32 @@ window.StickersModule.View = {};
 			this.renderSettingsTab();
 		},
 		renderEmojiTab: function() {
-			if (Module.Configs.enableEmojiTab) {
+			if (Plugin.Configs.enableEmojiTab) {
 				this.scrollableContentEl.appendChild(this.renderControlButton(this.controls.emoji));
 			}
 		},
 		renderHistoryTab: function() {
-			if (Module.Configs.enableHistoryTab) {
+			if (Plugin.Configs.enableHistoryTab) {
 				this.scrollableContentEl.appendChild(this.renderControlButton(this.controls.history));
 			}
 		},
 		renderSettingsTab: function() {
-			if (Module.Configs.enableSettingsTab) {
+			if (Plugin.Configs.enableSettingsTab) {
 				this.scrollableContentEl.appendChild(this.renderControlButton(this.controls.settings));
 			}
 		},
 		renderStoreTab: function() {
-			if (Module.Configs.enableStoreTab) {
+			if (Plugin.Configs.enableStoreTab) {
 				this.el.appendChild(this.renderControlButton(this.controls.store));
 			}
 		},
 		renderPrevPacksTab: function() {
 			this.el.appendChild(this.renderControlButton(this.controls.prevPacks));
-			Module.Service.Helper.setEvent('click', this.el, this.controls.prevPacks.class, this.onClickPrevPacksButton.bind(this));
+			Plugin.Service.Helper.setEvent('click', this.el, this.controls.prevPacks.class, this.onClickPrevPacksButton.bind(this));
 		},
 		renderNextPacksTab: function() {
 			this.el.appendChild(this.renderControlButton(this.controls.nextPacks));
-			Module.Service.Helper.setEvent('click', this.el, this.controls.nextPacks.class, this.onClickNextPacksButton.bind(this));
+			Plugin.Service.Helper.setEvent('click', this.el, this.controls.nextPacks.class, this.onClickNextPacksButton.bind(this));
 		},
 
 
@@ -6015,10 +6072,10 @@ window.StickersModule.View = {};
 		activeTab: function(tabName) {
 			var i = this.packTabsIndexes[tabName];
 
-			if (Module.Configs.enableEmojiTab) {
+			if (Plugin.Configs.enableEmojiTab) {
 				i++;
 			}
-			if (Module.Configs.enableHistoryTab) {
+			if (Plugin.Configs.enableHistoryTab) {
 				i++;
 			}
 
@@ -6042,16 +6099,16 @@ window.StickersModule.View = {};
 
 
 		handleClickOnEmojiTab: function(callback) {
-			Module.Service.Helper.setEvent('click', this.el, this.controls.emoji.class, callback);
+			Plugin.Service.Helper.setEvent('click', this.el, this.controls.emoji.class, callback);
 		},
 		handleClickOnLastUsedPacksTab: function(callback) {
-			Module.Service.Helper.setEvent('click', this.el, this.controls.history.class, callback);
+			Plugin.Service.Helper.setEvent('click', this.el, this.controls.history.class, callback);
 		},
 		handleClickOnPackTab: function(callback) {
-			Module.Service.Helper.setEvent('click', this.el, this.classes.packTab, callback);
+			Plugin.Service.Helper.setEvent('click', this.el, this.classes.packTab, callback);
 		},
 		handleClickOnStoreTab: function(callback) {
-			Module.Service.Helper.setEvent('click', this.el, this.controls.store.class, callback);
+			Plugin.Service.Helper.setEvent('click', this.el, this.controls.store.class, callback);
 		},
 
 
@@ -6085,54 +6142,51 @@ window.StickersModule.View = {};
 
 })(window.StickersModule);
 
-(function(Plugin, Module) {
+(function(window, Plugin) {
 
 	// todo: rename Stickers --> StickerPipe
-	Plugin.Stickers = Module.Class({
+	window.Stickers = Plugin.Libs.Class({
 
-		emojiService: null,
 		stickersModel: {},
 		view: null,
-		storeView: null,
 
 		_constructor: function(config) {
 
-			Module.Service.Helper.setConfig(config);
+			Plugin.Service.Helper.setConfig(config);
 
 			// ***** Init Storage ******
-			Module.Storage.setPrefix(Module.Configs.storagePrefix);
+			Plugin.Service.Storage.setPrefix(Plugin.Configs.storagePrefix);
 
 			// ***** Init Emoji tab *****
-			var mobileOS = Module.Service.Helper.getMobileOS();
+			var mobileOS = Plugin.Service.Helper.getMobileOS();
 			if (mobileOS == 'ios' || mobileOS == 'android') {
 				config.enableEmojiTab = false;
 			}
 
 			// ***** Check ApiKey *****
-			if (!Module.Configs.apiKey) {
+			if (!Plugin.Configs.apiKey) {
 				throw new Error('Empty apiKey');
 			}
 
-
 			// ***** Init UserId *****
-			var savedUserId = Module.Storage.getUserId();
+			var savedUserId = Plugin.Service.Storage.getUserId();
 
-			if (Module.Configs.userId) {
-				Module.Configs.userId = Module.Service.Helper.md5(Module.Configs.userId + Module.Configs.apiKey);
-				Module.Storage.setUserId(Module.Configs.userId);
+			if (Plugin.Configs.userId) {
+				Plugin.Configs.userId = Plugin.Service.Helper.md5(Plugin.Configs.userId + Plugin.Configs.apiKey);
+				Plugin.Service.Storage.setUserId(Plugin.Configs.userId);
 			}
 
-			if (Module.Configs.userId != savedUserId) {
-				Module.Storage.setUsedStickers([]);
+			if (Plugin.Configs.userId != savedUserId) {
+				Plugin.Service.Storage.setUsedStickers([]);
 			}
+
+			// ***** Init store *****
+			Plugin.Module.Store.init(this);
 
 			// ***** Init services ******
-			Module.Service.Store.init(this);
-			Module.Service.Pack.init(this);
-
-			this.emojiService = new Module.EmojiService(Module.Twemoji);
-
-			Module.Service.PendingRequest.run();
+			Plugin.Service.Pack.init(this);
+			Plugin.Service.Emoji.init(Plugin.Libs.Twemoji);
+			Plugin.Service.PendingRequest.init();
 		},
 
 		////////////////////
@@ -6140,10 +6194,9 @@ window.StickersModule.View = {};
 		////////////////////
 
 		render: function(onload, elId) {
-			Module.Configs.elId = elId || Module.Configs.elId;
+			Plugin.Configs.elId = elId || Plugin.Configs.elId;
 
-			this.view = new Module.PopoverView(this.emojiService);
-			this.storeView = new Module.StoreView();
+			this.view = new Plugin.View.Popover();
 
 			this.delegateEvents();
 
@@ -6154,7 +6207,7 @@ window.StickersModule.View = {};
 
 			this.fetchPacks((function() {
 				// todo: move to initialize (with API v2)
-				Module.BaseService.trackUserData();
+				Plugin.Service.Base.trackUserData();
 
 				this.view.render(this.stickersModel);
 
@@ -6194,7 +6247,7 @@ window.StickersModule.View = {};
 						// set newPack - false
 						changed = true;
 						this.stickersModel[i].newPack = false;
-						Module.Storage.setPacks(this.stickersModel);
+						Plugin.Service.Storage.setPacks(this.stickersModel);
 
 						pack = this.stickersModel[i];
 					}
@@ -6204,8 +6257,8 @@ window.StickersModule.View = {};
 					}
 				}
 
-				if (changed == true && Module.Storage.getUsedStickers().length != 0 && hasNewContent == false) {
-					Module.DOMEventService.changeContentHighlight(false);
+				if (changed == true && Plugin.Service.Storage.getUsedStickers().length != 0 && hasNewContent == false) {
+					Plugin.Service.Event.changeContentHighlight(false);
 				}
 
 				pack && this.view.renderPack(pack);
@@ -6216,7 +6269,7 @@ window.StickersModule.View = {};
 				var stickerAttribute = el.getAttribute('data-sticker-string'),
 					nowDate = new Date().getTime() / 1000|0;
 
-				Module.Api.sendStatistic([{
+				Plugin.Service.Api.sendStatistic([{
 					action: 'use',
 					category: 'sticker',
 					label: '[[' + stickerAttribute + ']]',
@@ -6225,7 +6278,7 @@ window.StickersModule.View = {};
 
 				ga('stickerTracker.send', 'event', 'sticker', stickerAttribute.split('_')[0], stickerAttribute.split('_')[1], 1);
 
-				Module.Storage.addUsedSticker(stickerAttribute);
+				Plugin.Service.Storage.addUsedSticker(stickerAttribute);
 
 				// todo: rewrite
 				// new content mark
@@ -6238,16 +6291,16 @@ window.StickersModule.View = {};
 					}
 				}
 
-				if (Module.Storage.getUsedStickers().length != 0 && hasNewContent == false) {
-					Module.DOMEventService.changeContentHighlight(false);
+				if (Plugin.Service.Storage.getUsedStickers().length != 0 && hasNewContent == false) {
+					Plugin.Service.Event.changeContentHighlight(false);
 				}
 			}).bind(this));
 
 			this.view.handleClickOnEmoji((function(el) {
 				var nowDate = new Date().getTime() / 1000| 0,
-					emoji = this.emojiService.parseEmojiFromHtml(el.innerHTML);
+					emoji = this.parseEmojiFromHtml(el.innerHTML);
 
-				Module.Api.sendStatistic([{
+				Plugin.Service.Api.sendStatistic([{
 					action: 'use',
 					category: 'emoji',
 					label: emoji,
@@ -6259,7 +6312,7 @@ window.StickersModule.View = {};
 		},
 
 		fetchPacks: function(callback) {
-			Module.BaseService.updatePacks((function(stickerPacks) {
+			Plugin.Service.Base.updatePacks((function(stickerPacks) {
 				this.stickersModel = stickerPacks;
 
 				if (this.view.isRendered) {
@@ -6271,27 +6324,27 @@ window.StickersModule.View = {};
 		},
 
 		parseStickerFromText: function(text) {
-			return Module.BaseService.parseStickerFromText(text);
+			return Plugin.Service.Base.parseStickerFromText(text);
 		},
 
 		parseEmojiFromText: function(text) {
-			return this.emojiService.parseEmojiFromText(text);
+			return Plugin.Service.Emoji.parseEmojiFromText(text);
 		},
 
 		parseEmojiFromHtml: function(html) {
-			return this.emojiService.parseEmojiFromHtml(html);
+			return Plugin.Service.Emoji.parseEmojiFromHtml(html);
 		},
 
 		onUserMessageSent: function(isSticker) {
-			return Module.BaseService.onUserMessageSent(isSticker);
+			return Plugin.Service.Base.onUserMessageSent(isSticker);
 		},
 
 		purchaseSuccess: function(packName, pricePoint) {
-			Module.Service.Store.purchaseSuccess(packName, pricePoint);
+			Plugin.Module.Store.purchaseSuccess(packName, pricePoint);
 		},
 
 		purchaseFail: function() {
-			Module.Service.Store.purchaseFail();
+			Plugin.Module.Store.purchaseFail();
 		},
 
 		open: function(tabName) {
@@ -6302,12 +6355,12 @@ window.StickersModule.View = {};
 			this.view.close();
 		},
 
-		openStore: function() {
-			this.storeView.renderStore();
+		openStore: function(packName) {
+			Plugin.Module.Store.open(packName);
 		},
 
 		closeStore: function() {
-			this.storeView.close();
+			Plugin.Module.Store.close();
 		},
 
 		////////////////////
@@ -6322,14 +6375,14 @@ window.StickersModule.View = {};
 
 		onClickEmoji: function(callback, context) {
 			this.view.handleClickOnEmoji((function(el) {
-				var emoji = this.emojiService.parseEmojiFromHtml(el.innerHTML);
+				var emoji = this.parseEmojiFromHtml(el.innerHTML);
 
 				callback.call(context, emoji);
 			}).bind(this));
 		},
 
 		onPurchase: function(callback) {
-			Module.Service.Store.onPurchaseCallback = callback;
+			Plugin.Module.Store.setOnPurchaseCallback(callback);
 		}
 	});
 

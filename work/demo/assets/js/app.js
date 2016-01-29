@@ -58,7 +58,7 @@ var App = _makeClass(function(options) {
 		this.$messages.on('click', 'img[data-sticker]', (function(e) {
 			var $target = $(e.target);
 
-			this.stickerpipe.storeView.renderPack($target.attr('data-sticker-pack'));
+			this.stickerpipe.openStore($target.attr('data-sticker-pack'));
 		}).bind(this));
 	},
 
