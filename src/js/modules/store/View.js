@@ -1,46 +1,22 @@
 
-(function(Plugin) {
+(function(Plugin, Module) {
 
-
-	var hasMessageListener = false;
-
-	function setWindowMessageListener() {
-		if (!hasMessageListener) {
-			window.addEventListener('message', (function(e) {
-				var data = JSON.parse(e.data);
-
-				if (!data.action) {
-					return;
-				}
-
-				var StoreService = Plugin.Service.Store;
-				StoreService.api[data.action] && StoreService.api[data.action](data);
-
-			}).bind(this));
-
-			hasMessageListener = true;
-		}
-	}
-
-	Plugin.Module.Store.View = Plugin.Libs.Class({
+	Module.View = {
 
 		modal: null,
 		iframe: null,
-		overlay: null,
 
-		_constructor: function() {
-
+		init: function() {
 			this.iframe = document.createElement('iframe');
 
 			this.iframe.style.width = '100%';
 			this.iframe.style.height = '100%';
 			this.iframe.style.border = '0';
 
-			this.modal = Plugin.View.Modal.init(this.iframe, {
+			this.modal = Plugin.Module.Modal.init(this.iframe, {
 				onOpen: (function(contentEl, modalEl, overlay) {
-					this.overlay = overlay;
 					Plugin.Service.Event.resize();
-					setWindowMessageListener.bind(this)();
+					Module.ApiListener.init();
 
 					if (Plugin.Service.Helper.getMobileOS() == 'ios') {
 						modalEl.getElementsByClassName('sp-modal-body')[0].style.overflowY = 'scroll';
@@ -49,7 +25,7 @@
 			});
 
 			this.modal.backButton.addEventListener('click', (function() {
-				Plugin.Service.Store.goBack();
+				Module.Controller.goBack();
 			}).bind(this));
 
 
@@ -58,21 +34,26 @@
 			}).bind(this));
 		},
 
-		renderStore: function() {
-			this.iframe.src = Plugin.Service.Url.getStoreUrl();
-			this.modal.open();
-		},
+		open: function(packName) {
+			var url = Plugin.Service.Url.getStoreUrl();
 
-		renderPack: function(packName) {
-			this.iframe.src = Plugin.Service.Url.getStorePackUrl(packName);
+			if (packName) {
+				url = Plugin.Service.Url.getStorePackUrl(packName);
+			}
+
+			this.iframe.src = url;
 			this.modal.open();
 		},
 
 		close: function() {
-			// todo: сделать hasOpened функцией конкретного окна
-			if (Plugin.View.Modal.hasOpened()) {
+			if (this.modal && this.modal.hasGlobalOpened()) {
 				this.modal.close();
 			}
+		},
+
+		showBackButton: function(show) {
+			var modal = this.modal;
+			modal.backButton.style.display = (show) ? 'block' : 'none';
 		},
 
 		resize: function(height) {
@@ -89,6 +70,6 @@
 				dialog.style.height = minHeight + 'px';
 			}
 		}
-	});
+	};
 
-})(window.StickersModule);
+})(window.StickersModule, StickersModule.Module.Store);

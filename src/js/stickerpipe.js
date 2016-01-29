@@ -10,7 +10,12 @@ window.StickersModule.Service = {};
 //=include services/**/*.js
 
 window.StickersModule.Module = {
-	Store: {}
+	Store: function() {
+		var module = window.StickersModule.Module.Store.__Module__;
+		module.init && module.init.apply(module, arguments);
+		return module;
+	},
+	Modal: {}
 };
 //=include modules/**/*.js
 
@@ -27,7 +32,7 @@ window.StickersModule.View = {};
 
 		stickersModel: {},
 		view: null,
-		storeView: null,
+		store: null,
 
 		_constructor: function(config) {
 
@@ -59,8 +64,10 @@ window.StickersModule.View = {};
 				Plugin.Service.Storage.setUsedStickers([]);
 			}
 
+			// ***** Init store *****
+			this.store = new Plugin.Module.Store(this);
+
 			// ***** Init services ******
-			Plugin.Service.Store.init(this);
 			Plugin.Service.Pack.init(this);
 			Plugin.Service.Emoji.init(Plugin.Libs.Twemoji);
 			Plugin.Service.PendingRequest.init();
@@ -74,7 +81,6 @@ window.StickersModule.View = {};
 			Plugin.Configs.elId = elId || Plugin.Configs.elId;
 
 			this.view = new Plugin.View.Popover();
-			this.storeView = new Plugin.Module.Store.View();
 
 			this.delegateEvents();
 
@@ -218,11 +224,11 @@ window.StickersModule.View = {};
 		},
 
 		purchaseSuccess: function(packName, pricePoint) {
-			Plugin.Service.Store.purchaseSuccess(packName, pricePoint);
+			this.store.purchaseSuccess(packName, pricePoint);
 		},
 
 		purchaseFail: function() {
-			Plugin.Service.Store.purchaseFail();
+			this.store.purchaseFail();
 		},
 
 		open: function(tabName) {
@@ -233,12 +239,12 @@ window.StickersModule.View = {};
 			this.view.close();
 		},
 
-		openStore: function() {
-			this.storeView.renderStore();
+		openStore: function(packName) {
+			this.store.open(packName);
 		},
 
 		closeStore: function() {
-			this.storeView.close();
+			this.store.close();
 		},
 
 		////////////////////
@@ -260,7 +266,7 @@ window.StickersModule.View = {};
 		},
 
 		onPurchase: function(callback) {
-			Plugin.Service.Store.onPurchaseCallback = callback;
+			this.store.setOnPurchaseCallback(callback);
 		}
 	});
 

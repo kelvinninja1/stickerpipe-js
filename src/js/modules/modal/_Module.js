@@ -10,7 +10,6 @@
 
 		oMargin = {},
 		ieBodyTopMargin = 0,
-		pluginNamespace = 'sp-modal',
 
 		classes = {
 			lock: 'sp-modal-lock',
@@ -118,14 +117,13 @@
 	}
 
 
-	Plugin.View.Modal = {
+	Plugin.Module.Modal = {
 
 		init: function(contentEl, options) {
 
 			options = extend({}, defaultOptions, (options || {}));
 
 			var modalInstance = {};
-
 
 			// ****************************************************************************
 
@@ -379,12 +377,13 @@
 					}
 
 					isOpen = false;
+				},
+
+				// todo
+				hasGlobalOpened: function() {
+					return isOpen;
 				}
 			});
-		},
-
-		hasOpened: function() {
-			return isOpen;
 		},
 
 		setDefaultOptions: function(options) {
