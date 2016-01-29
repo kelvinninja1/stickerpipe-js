@@ -814,7 +814,7 @@ appStickerPipeStore.factory('IOSPlatform', function() {
 		return window.IosJsInterface || {
 				showCollections: function() {},
 				purchasePack: function() {},
-				showInProgress: function() {}
+				setInProgress: function() {}
 			};
 	}
 
