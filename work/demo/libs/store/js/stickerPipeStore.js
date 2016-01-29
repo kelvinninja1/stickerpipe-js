@@ -660,166 +660,6 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $rootScop
 
 });
 
-appStickerPipeStore.value('En', {
-	download: 'Download',
-	open: 'Open',
-	buyPack: 'Buy pack',
-	unavailableContent: 'This content is currently unavailable',
-	get: 'Get'
-});
-
-appStickerPipeStore.value('Ru', {
-	download: 'Скачать',
-	open: 'Открыть',
-	buyPack: 'Купить',
-	unavailableContent: 'В данный момент этот контент недоступен',
-	get: 'Скачать'
-});
-
-appStickerPipeStore.factory('AndroidPlatform', function() {
-
-	var platformJSProvider = window.AndroidJsInterface || {};
-
-	return angular.extend({}, {
-
-		////////////////////////////////////////////////////////////
-		// Functions
-		////////////////////////////////////////////////////////////
-
-		showCollections: function() {
-			return platformJSProvider.showCollections();
-		},
-
-		purchasePack: function(packTitle, packName, packPrice) {
-			return platformJSProvider.purchasePack(packTitle, packName, packPrice);
-		},
-
-		showInProgress: function(show) {
-			return platformJSProvider.setInProgress(show);
-		},
-
-		////////////////////////////////////////////////////////////
-		// Callbacks
-		////////////////////////////////////////////////////////////
-
-		onPackDownloaded: function() {
-			this.showCollections()
-		}
-	});
-});
-
-appStickerPipeStore.factory('IosPlatform', function() {
-
-	var platformJSProvider = window.IosJsInterface || {};
-
-	return angular.extend({}, {
-
-		////////////////////////////////////////////////////////////
-		// Functions
-		////////////////////////////////////////////////////////////
-
-		showCollections: function() {
-			return window.IosJsInterface.showCollections();
-		},
-
-		purchasePack: function(packTitle, packName, packPrice) {
-			return window.IosJsInterface.purchasePack(packTitle, packName, packPrice);
-		},
-
-		showInProgress: function(show) {
-			return window.IosJsInterface.setInProgress(show);
-		},
-
-		////////////////////////////////////////////////////////////
-		// Callbacks
-		////////////////////////////////////////////////////////////
-
-		onPackDownloaded: function() {
-			this.showCollections()
-		}
-	});
-});
-
-appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout, Config) {
-
-	function callSDKMethod(action, attrs) {
-		window.parent.postMessage(JSON.stringify({
-			action: action,
-			attrs: attrs
-		}), 'http://' + Config.clientDomain);
-	}
-
-	function runApiListener() {
-		$window.addEventListener('message', (function(e) {
-
-			var data = JSON.parse(e.data);
-
-			data.attrs = data.attrs || {};
-
-			if (!data.action) {
-				return;
-			}
-
-			var JsInterface = window.JsInterface;
-			if (JsInterface) {
-				JsInterface[data.action] && JsInterface[data.action](data.attrs);
-			}
-		}).bind(this));
-	}
-
-	return angular.extend({}, {
-
-		init: function() {
-			runApiListener();
-		},
-
-		////////////////////////////////////////////////////////////
-		// Functions
-		////////////////////////////////////////////////////////////
-
-		showCollections: function(packName) {
-			callSDKMethod('showCollections', {
-				packName: packName
-			});
-		},
-
-		purchasePack: function(packTitle, packName, packPrice) {
-			callSDKMethod('purchasePack', {
-				packTitle: packTitle,
-				packName: packName,
-				pricePoint: packPrice
-			});
-		},
-
-		showInProgress: function(show) {
-			if (show) {
-				$rootScope.$emit('preloaderShow');
-			} else {
-				$rootScope.$emit('preloaderHide');
-			}
-		},
-
-		showBackButton: function(show) {
-			callSDKMethod('showBackButton', {
-				show: show
-			});
-		},
-
-		contentScrolling: function() {
-			callSDKMethod('contentScrolling');
-		},
-
-		////////////////////////////////////////////////////////////
-		// Callbacks
-		////////////////////////////////////////////////////////////
-
-		onPackDownloaded: function(attrs) {
-			this.showCollections(attrs.packName)
-		}
-
-	});
-});
-
 appStickerPipeStore.directive('basePage', function() {
 
 	return {
@@ -920,6 +760,186 @@ appStickerPipeStore.controller('StoreController', function($scope, packs, Config
 	});
 });
 
+appStickerPipeStore.value('En', {
+	download: 'Download',
+	open: 'Open',
+	buyPack: 'Buy pack',
+	unavailableContent: 'This content is currently unavailable',
+	get: 'Get'
+});
+
+appStickerPipeStore.value('Ru', {
+	download: 'Скачать',
+	open: 'Открыть',
+	buyPack: 'Купить',
+	unavailableContent: 'В данный момент этот контент недоступен',
+	get: 'Скачать'
+});
+
+appStickerPipeStore.factory('AndroidPlatform', function() {
+
+	var platformJSProvider = window.AndroidJsInterface || {};
+
+	return angular.extend({}, {
+
+		////////////////////////////////////////////////////////////
+		// Functions
+		////////////////////////////////////////////////////////////
+
+		showCollections: function() {
+			return platformJSProvider.showCollections();
+		},
+
+		purchasePack: function(packTitle, packName, packPrice) {
+			return platformJSProvider.purchasePack(packTitle, packName, packPrice);
+		},
+
+		showInProgress: function(show) {
+			return platformJSProvider.setInProgress(show);
+		},
+
+		////////////////////////////////////////////////////////////
+		// Callbacks
+		////////////////////////////////////////////////////////////
+
+		onPackDownloaded: function() {
+			this.showCollections()
+		}
+	});
+});
+
+appStickerPipeStore.factory('IOSPlatform', function() {
+
+	function getInterface() {
+		return window.IosJsInterface || {
+				showCollections: function() {},
+				purchasePack: function() {},
+				showInProgress: function() {}
+			};
+	}
+
+	return angular.extend({}, {
+
+		////////////////////////////////////////////////////////////
+		// Functions
+		////////////////////////////////////////////////////////////
+
+		showCollections: function() {
+			return getInterface().showCollections();
+		},
+
+		purchasePack: function(packTitle, packName, packPrice) {
+			return getInterface().purchasePack(packTitle, packName, packPrice);
+		},
+
+		showInProgress: function(show) {
+			return window.IosJsInterface.setInProgress(show);
+		},
+
+		////////////////////////////////////////////////////////////
+		// Callbacks
+		////////////////////////////////////////////////////////////
+
+		onPackDownloaded: function() {
+			this.showCollections()
+		}
+	});
+});
+
+appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout, Config) {
+
+	function callSDKMethod(action, attrs) {
+		window.parent.postMessage(JSON.stringify({
+			action: action,
+			attrs: attrs
+		}), 'http://' + Config.clientDomain);
+	}
+
+	function runApiListener() {
+		$window.addEventListener('message', (function(e) {
+
+			var data = JSON.parse(e.data);
+
+			data.attrs = data.attrs || {};
+
+			if (!data.action) {
+				return;
+			}
+
+			var JsInterface = window.JsInterface;
+			if (JsInterface) {
+				JsInterface[data.action] && JsInterface[data.action](data.attrs);
+			}
+		}).bind(this));
+	}
+
+	return angular.extend({}, {
+
+		init: function() {
+			runApiListener();
+		},
+
+		////////////////////////////////////////////////////////////
+		// Functions
+		////////////////////////////////////////////////////////////
+
+		showCollections: function(packName) {
+			callSDKMethod('showCollections', {
+				packName: packName
+			});
+		},
+
+		purchasePack: function(packTitle, packName, packPrice) {
+			callSDKMethod('purchasePack', {
+				packTitle: packTitle,
+				packName: packName,
+				pricePoint: packPrice
+			});
+		},
+
+		showInProgress: function(show) {
+			if (show) {
+				$rootScope.$emit('preloaderShow');
+			} else {
+				$rootScope.$emit('preloaderHide');
+			}
+		},
+
+		showBackButton: function(show) {
+			callSDKMethod('showBackButton', {
+				show: show
+			});
+		},
+
+		contentScrolling: function() {
+			callSDKMethod('contentScrolling');
+		},
+
+		////////////////////////////////////////////////////////////
+		// Callbacks
+		////////////////////////////////////////////////////////////
+
+		onPackDownloaded: function(attrs) {
+			this.showCollections(attrs.packName)
+		}
+
+	});
+});
+
+appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
+	
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/error/view.tpl',
+		link: function($scope, $el, attrs) {
+
+			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
+			$scope.i18n = i18n;
+		}
+
+	};
+});
+
 appStickerPipeStore.directive('preloader', function($rootScope) {
 
 	return {
@@ -945,20 +965,6 @@ appStickerPipeStore.directive('preloader', function($rootScope) {
 				}
 			});
 
-		}
-
-	};
-});
-
-appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
-	
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/error/view.tpl',
-		link: function($scope, $el, attrs) {
-
-			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
-			$scope.i18n = i18n;
 		}
 
 	};
