@@ -5000,6 +5000,12 @@ window.StickersModule.Module = {};
 
 		onPurchaseFail: function() {
 			callStoreMethod('hideActionProgress');
+		},
+
+		onScrollContent: function(y) {
+			callStoreMethod('onScrollContent', {
+				y: y
+			});
 		}
 	};
 
@@ -5012,6 +5018,8 @@ window.StickersModule.Module = {};
 
 		modal: null,
 		iframe: null,
+
+		modalBody: null,
 
 		init: function() {
 			this.iframe = document.createElement('iframe');
@@ -5026,7 +5034,11 @@ window.StickersModule.Module = {};
 					Module.ApiListener.init();
 
 					if (Plugin.Service.Helper.getMobileOS() == 'ios') {
-						modalEl.getElementsByClassName('sp-modal-body')[0].style.overflowY = 'scroll';
+						var modalBody = modalEl.getElementsByClassName('sp-modal-body')[0];
+						modalBody.style.overflowY = 'scroll';
+						modalBody.addEventListener('scroll', function() {
+							Module.Controller.onScrollContent(modalBody.scrollTop);
+						});
 					}
 				}).bind(this)
 			});
