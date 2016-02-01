@@ -5003,9 +5003,9 @@ window.StickersModule.Module = {};
 		},
 
 		onScrollContent: function(y) {
-			//callStoreMethod('onScrollContent', {
-			//	y: y
-			//});
+			callStoreMethod('onScrollContent', {
+				y: y
+			});
 		}
 	};
 
