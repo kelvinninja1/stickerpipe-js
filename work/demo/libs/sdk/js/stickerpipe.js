@@ -5092,7 +5092,9 @@ window.StickersModule.Module = {};
 		},
 
 		setYScroll: function(yPosition) {
+			alert('ok');
 			if (this.modalBody) {
+				alert(yPosition);
 				this.modalBody.scrollTop = yPosition;
 			}
 		},
