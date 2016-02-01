@@ -14,6 +14,10 @@
 
 		showBackButton: function(data) {
 			Module.View.showBackButton(data.attrs.show);
+		},
+
+		setYScroll: function(data) {
+			Module.View.setYScroll(data.attrs.yPosition);
 		}
 	};
 

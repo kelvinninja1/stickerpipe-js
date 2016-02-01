@@ -56,6 +56,12 @@
 
 		onPurchaseFail: function() {
 			callStoreMethod('hideActionProgress');
+		},
+
+		onScrollContent: function(y) {
+			callStoreMethod('onScrollContent', {
+				y: y
+			});
 		}
 	};
 

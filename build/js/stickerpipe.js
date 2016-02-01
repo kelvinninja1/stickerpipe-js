@@ -4908,6 +4908,10 @@ window.StickersModule.Module = {};
 
 		showBackButton: function(data) {
 			Module.View.showBackButton(data.attrs.show);
+		},
+
+		setYScroll: function(data) {
+			Module.View.setYScroll(data.attrs.yPosition);
 		}
 	};
 
@@ -5000,6 +5004,12 @@ window.StickersModule.Module = {};
 
 		onPurchaseFail: function() {
 			callStoreMethod('hideActionProgress');
+		},
+
+		onScrollContent: function(y) {
+			callStoreMethod('onScrollContent', {
+				y: y
+			});
 		}
 	};
 
@@ -5012,6 +5022,10 @@ window.StickersModule.Module = {};
 
 		modal: null,
 		iframe: null,
+
+		modalBody: null,
+
+		iosFixScrollTimeoutId: null,
 
 		init: function() {
 			this.iframe = document.createElement('iframe');
@@ -5026,7 +5040,21 @@ window.StickersModule.Module = {};
 					Module.ApiListener.init();
 
 					if (Plugin.Service.Helper.getMobileOS() == 'ios') {
-						modalEl.getElementsByClassName('sp-modal-body')[0].style.overflowY = 'scroll';
+						var modalBody = modalEl.getElementsByClassName('sp-modal-body')[0];
+						modalBody.style.overflowY = 'scroll';
+
+						modalBody.addEventListener('scroll', (function() {
+							if (this.iosFixScrollTimeoutId) {
+								clearTimeout(this.iosFixScrollTimeoutId);
+							}
+
+							this.iosFixScrollTimeoutId = setTimeout((function() {
+								Module.Controller.onScrollContent(modalBody.scrollTop);
+								this.iosFixScrollTimeoutId = null;
+							}).bind(this), 500);
+						}).bind(this));
+
+						this.modalBody = modalBody;
 					}
 				}).bind(this)
 			});
@@ -5061,6 +5089,12 @@ window.StickersModule.Module = {};
 		showBackButton: function(show) {
 			var modal = this.modal;
 			modal.backButton.style.display = (show) ? 'block' : 'none';
+		},
+
+		setYScroll: function(yPosition) {
+			if (this.modalBody) {
+				this.modalBody.scrollTop = yPosition;
+			}
 		},
 
 		onWindowResize: function() {
