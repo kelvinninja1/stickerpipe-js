@@ -4911,6 +4911,7 @@ window.StickersModule.Module = {};
 		},
 
 		setYScroll: function(data) {
+			alert(1);
 			Module.View.setYScroll(data.attrs.yPosition);
 		}
 	};

@@ -121,7 +121,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/view.tpl',
-    '<div class="version">0.0.53</div>\n' +
+    '<div class="version">0.0.54</div>\n' +
     '<div class="store" data-sp-auto-scroll>\n' +
     '	<div data-ng-show="!error && showContent" data-ui-view=""></div>\n' +
     '	<div data-ng-show="error" data-error></div>\n' +
@@ -686,7 +686,9 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $rootScop
 		},
 
 		setYScroll: function(yPosition) {
+			alert(-2);
 			if (PlatformAPI.isJS() && PlatformAPI.getMobileOS() == 'ios') {
+				alert(-1)
 				PlatformAPI.setYScroll(yPosition);
 			} else {
 				$window.scrollTo(0, yPosition);
@@ -710,6 +712,15 @@ appStickerPipeStore.value('Ru', {
 	buyPack: 'Купить',
 	unavailableContent: 'В данный момент этот контент недоступен',
 	get: 'Скачать'
+});
+
+appStickerPipeStore.directive('basePage', function() {
+
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/view.tpl',
+		link: function($scope, $el, attrs) {}
+	};
 });
 
 appStickerPipeStore.factory('AndroidPlatform', function() {
@@ -848,6 +859,7 @@ appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout
 		},
 
 		setYScroll: function(yPosition) {
+			alert(0);
 			callSDKMethod('setYScroll', {
 				yPosition: yPosition
 			});
@@ -862,15 +874,6 @@ appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout
 		}
 
 	});
-});
-
-appStickerPipeStore.directive('basePage', function() {
-
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/view.tpl',
-		link: function($scope, $el, attrs) {}
-	};
 });
 
 appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack, $window) {
