@@ -121,35 +121,11 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/view.tpl',
-    '<div class="version">0.0.45</div>\n' +
+    '<div class="version">0.0.46</div>\n' +
     '<div class="store" data-sp-auto-scroll>\n' +
     '	<div data-ng-show="!error && showContent" data-ui-view=""></div>\n' +
     '	<div data-ng-show="error" data-error></div>\n' +
     '	<div data-ng-show="preloader" data-preloader></div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/store/StoreView.tpl',
-    '<div data-ng-class="{\'screen-header\': platformAPI.isJS()}" data-ng-show="platformAPI.isJS()"></div>\n' +
-    '<div class="packs">\n' +
-    '	<div class="col" data-ng-repeat="pack in packs">\n' +
-    '		<div class="pack-preview center-block">\n' +
-    '			<a href="#/packs/{{ pack.pack_name }}">\n' +
-    '				<div class="pack-main-sticker">\n' +
-    '					<img data-ng-src="{{ getPackMainIcon(pack) }}" alt="" />\n' +
-    '				</div>\n' +
-    '				<h5 class="pack-preview-name">{{ getPackTitle(pack) }}</h5>\n' +
-    '			</a>\n' +
-    '		</div>\n' +
-    '	</div>\n' +
     '</div>');
 }]);
 })();
@@ -239,12 +215,17 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/base-page/preloader/view.tpl',
-    '<div class="preloader">\n' +
-    '	<div class="preloader-content">\n' +
-    '		<div class="preloader-chasing-dots">\n' +
-    '			<div class="preloader-child preloader-dot1"></div>\n' +
-    '			<div class="preloader-child preloader-dot2"></div>\n' +
+  $templateCache.put('/modules/store/StoreView.tpl',
+    '<div data-ng-class="{\'screen-header\': platformAPI.isJS()}" data-ng-show="platformAPI.isJS()"></div>\n' +
+    '<div class="packs">\n' +
+    '	<div class="col" data-ng-repeat="pack in packs">\n' +
+    '		<div class="pack-preview center-block">\n' +
+    '			<a href="#/packs/{{ pack.pack_name }}">\n' +
+    '				<div class="pack-main-sticker">\n' +
+    '					<img data-ng-src="{{ getPackMainIcon(pack) }}" alt="" />\n' +
+    '				</div>\n' +
+    '				<h5 class="pack-preview-name">{{ getPackTitle(pack) }}</h5>\n' +
+    '			</a>\n' +
     '		</div>\n' +
     '	</div>\n' +
     '</div>');
@@ -265,6 +246,25 @@ module.run(['$templateCache', function($templateCache) {
     '			<img ng-src="{{ imgUrl }}" alt="">\n' +
     '		</div>\n' +
     '		<h5>{{ i18n.unavailableContent }}</h5>\n' +
+    '	</div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/base-page/preloader/view.tpl',
+    '<div class="preloader">\n' +
+    '	<div class="preloader-content">\n' +
+    '		<div class="preloader-chasing-dots">\n' +
+    '			<div class="preloader-child preloader-dot1"></div>\n' +
+    '			<div class="preloader-child preloader-dot2"></div>\n' +
+    '		</div>\n' +
     '	</div>\n' +
     '</div>');
 }]);
@@ -298,7 +298,7 @@ appStickerPipeStore.config(function($stateProvider, $urlRouterProvider) {
 		});
 });
 
-appStickerPipeStore.directive('spAutoScroll', function ($document, $timeout, $location, $window, $rootScope) {
+appStickerPipeStore.directive('spAutoScroll', function ($document, $timeout, $location, $window, $rootScope, PlatformAPI) {
 	return {
 		restrict: 'A',
 		link: function (scope, element, attrs) {
@@ -338,7 +338,11 @@ appStickerPipeStore.directive('spAutoScroll', function ($document, $timeout, $lo
 
 					var y = scope.history[scope.history.length - 1].y;
 
-					$window.scrollTo(0, y);
+					if (PlatformAPI.isJS() && PlatformAPI.getMobileOS() == 'ios') {
+
+					} else {
+						$window.scrollTo(0, y);
+					}
 				}, 100);
 			}
 
@@ -617,6 +621,19 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $rootScop
 
 			isIOS: function() {
 				return Config.platform.toLowerCase() == 'ios';
+			},
+
+			// todo: to helper class or service
+			getMobileOS: function() {
+				var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+				if(userAgent.match( /iPad/i ) || userAgent.match( /iPhone/i ) || userAgent.match( /iPod/i )) {
+					return 'ios';
+				} else if(userAgent.match( /Android/i )) {
+					return 'android';
+				} else {
+					return 'other';
+				}
 			}
 		};
 
