@@ -75,12 +75,6 @@ var App = _makeClass(function(options) {
 		}, 500);
 
 		this.fetchRandomUsersMock();
-		//this.fetchRandomUsers().done((function() {
-		//	this.sendMessage(false, '', true);
-		//	this.sendMessage(true, '', true);
-		//	this.sendMessage(false, '', true);
-		//	this.sendMessage(true, '[[stevie40_1576]]');
-		//}).bind(this));
 		this.initMessageBox();
 	},
 	initStickers: function() {

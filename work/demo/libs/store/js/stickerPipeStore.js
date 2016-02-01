@@ -18,7 +18,6 @@ appStickerPipeStore.run(function($rootScope, PlatformAPI, JsInterface) {
 	});
 
 	$rootScope.$on('$stateChangeSuccess', function() {
-		//PlatformAPI.showInProgress(false);
 		$rootScope.error = false;
 	});
 
@@ -29,22 +28,20 @@ appStickerPipeStore.run(function($rootScope, PlatformAPI, JsInterface) {
 
 });
 
-appStickerPipeStore.controller('AppController', function(Config, envService, $timeout) {
+appStickerPipeStore.controller('AppController', function(Config, envService, Helper) {
 
 	document.body.addEventListener('touchstart',function() {},false);
 
-	var userAgent = navigator.userAgent || navigator.vendor || window.opera;
-
-	if (envService.is('local') || envService.is('development')) {
-		document.getElementById('css').setAttribute('href', envService.read('cssUrl') + Config.platform.toLocaleLowerCase() + '.css?v='+(+(new Date())));
+	function includeCss(filename) {
+		document.getElementById('css').setAttribute('href', envService.read('cssUrl') + filename + '.css?v='+(+(new Date())));
 	}
 
-	if (userAgent.match( /iPad/i ) ||
-		userAgent.match( /iPhone/i ) ||
-		userAgent.match( /iPod/i ) ||
-		navigator.appVersion.indexOf('Mac') != -1) {
+	if (envService.is('local') || envService.is('development')) {
+		includeCss(Config.platform.toLocaleLowerCase());
+	}
 
-		document.getElementById('css').setAttribute('href', envService.read('cssUrl') + 'ios' + '.css?v='+(+(new Date())));
+	if (Helper.getMobileOS() == 'ios' || navigator.appVersion.indexOf('Mac') != -1) {
+		includeCss('ios');
 	}
 });
 angular.module('environment',[]).provider('envService',function(){this.environment='development';this.data={};this.config=function(config){this.data=config;};this.set=function(environment){this.environment=environment;};this.get=function(){return this.environment;};this.read=function(variable){if(variable!=='all'){return this.data.vars[this.get()][variable];}
@@ -138,9 +135,33 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/store/StoreView.tpl',
+    '<div data-ng-class="{\'screen-header\': helper.isJS()}" data-ng-show="helper.isJS()"></div>\n' +
+    '<div class="packs">\n' +
+    '	<div class="col" data-ng-repeat="pack in packs">\n' +
+    '		<div class="pack-preview center-block">\n' +
+    '			<a href="#/packs/{{ pack.pack_name }}">\n' +
+    '				<div class="pack-main-sticker">\n' +
+    '					<img data-ng-src="{{ getPackMainIcon(pack) }}" alt="" />\n' +
+    '				</div>\n' +
+    '				<h5 class="pack-preview-name">{{ getPackTitle(pack) }}</h5>\n' +
+    '			</a>\n' +
+    '		</div>\n' +
+    '	</div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/pack/PackView.tpl',
     '<div data-ng-show="showPage">\n' +
-    '	<div ng-class="{\'screen-header\': platformAPI.isJS()}" data-ng-show="platformAPI.isJS()"></div>\n' +
+    '	<div ng-class="{\'screen-header\': helper.isJS()}" data-ng-show="helper.isJS()"></div>\n' +
     '	<div class="pack-header">\n' +
     '		<div class="pack-main-sticker">\n' +
     '			<img data-ng-src="{{ getMainStickerUrl() }}" alt="Main sticker">\n' +
@@ -206,30 +227,6 @@ module.run(['$templateCache', function($templateCache) {
     '		<!--</div>-->\n' +
     '	<!--</div>-->\n' +
     '<!--</div>-->');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/store/StoreView.tpl',
-    '<div data-ng-class="{\'screen-header\': platformAPI.isJS()}" data-ng-show="platformAPI.isJS()"></div>\n' +
-    '<div class="packs">\n' +
-    '	<div class="col" data-ng-repeat="pack in packs">\n' +
-    '		<div class="pack-preview center-block">\n' +
-    '			<a href="#/packs/{{ pack.pack_name }}">\n' +
-    '				<div class="pack-main-sticker">\n' +
-    '					<img data-ng-src="{{ getPackMainIcon(pack) }}" alt="" />\n' +
-    '				</div>\n' +
-    '				<h5 class="pack-preview-name">{{ getPackTitle(pack) }}</h5>\n' +
-    '			</a>\n' +
-    '		</div>\n' +
-    '	</div>\n' +
-    '</div>');
 }]);
 })();
 
@@ -452,6 +449,36 @@ appStickerPipeStore.factory('$exceptionHandler', function ($injector) {
     };
 });
 
+
+appStickerPipeStore.factory('Helper', function(Config) {
+
+	return {
+		isAndroid: function() {
+			return Config.platform.toLowerCase() == 'android';
+		},
+
+		isJS: function() {
+			return Config.platform.toLowerCase() == 'js';
+		},
+
+		isIOS: function() {
+			return Config.platform.toLowerCase() == 'ios';
+		},
+
+		getMobileOS: function() {
+			var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+			if(userAgent.match( /iPad/i ) || userAgent.match( /iPhone/i ) || userAgent.match( /iPod/i )) {
+				return 'ios';
+			} else if(userAgent.match( /Android/i )) {
+				return 'android';
+			} else {
+				return 'other';
+			}
+		}
+	};
+
+});
 appStickerPipeStore.factory('Http', ['$http', '$q', 'Config', function($http, $q, Config) {
 
     var Http = {};
@@ -593,9 +620,11 @@ appStickerPipeStore.factory('i18n', ['Config', '$injector',
 appStickerPipeStore.factory('JsInterface', function($rootScope, $state, PlatformAPI) {
 
 	var JsInterface = {
-		onPackDownloaded: function() {
+		onPackDownloaded: function(arrts) {
+			var packName = (arrts && arrts.packName) || null;
+
 			this.hideActionProgress();
-			PlatformAPI.onPackDownloaded.apply(PlatformAPI, arguments);
+			PlatformAPI.showCollections(packName);
 		},
 
 		reload: function() {
@@ -618,7 +647,7 @@ appStickerPipeStore.factory('JsInterface', function($rootScope, $state, Platform
 		},
 
 		onScrollContent: function(attrs) {
-			$rootScope.$emit('sp-auto-scroll:scrollContent', attrs.y);
+			$rootScope.$emit('sp-auto-scroll:scrollContent', attrs.yPosition);
 		}
 	};
 
@@ -628,6 +657,75 @@ appStickerPipeStore.factory('JsInterface', function($rootScope, $state, Platform
 		}
 	};
 
+});
+
+appStickerPipeStore.factory('JsProvider', function($rootScope, $window, $timeout, Config) {
+
+	function callSDKMethod(action, attrs) {
+		window.parent.postMessage(JSON.stringify({
+			action: action,
+			attrs: attrs
+		}), 'http://' + Config.clientDomain);
+	}
+
+	function runApiListener() {
+		$window.addEventListener('message', (function(e) {
+
+			var data = JSON.parse(e.data);
+
+			data.attrs = data.attrs || {};
+
+			if (!data.action) {
+				return;
+			}
+
+			var JsInterface = window.JsInterface;
+			if (JsInterface) {
+				JsInterface[data.action] && JsInterface[data.action](data.attrs);
+			}
+		}).bind(this));
+	}
+
+	return angular.extend({}, {
+
+		init: function() {
+			runApiListener();
+		},
+
+		showCollections: function(packName) {
+			callSDKMethod('showCollections', {
+				packName: packName
+			});
+		},
+
+		purchasePack: function(packTitle, packName, packPrice) {
+			callSDKMethod('purchasePack', {
+				packTitle: packTitle,
+				packName: packName,
+				pricePoint: packPrice
+			});
+		},
+
+		setInProgress: function(show) {
+			if (show) {
+				$rootScope.$emit('preloaderShow');
+			} else {
+				$rootScope.$emit('preloaderHide');
+			}
+		},
+
+		showBackButton: function(show) {
+			callSDKMethod('showBackButton', {
+				show: show
+			});
+		},
+
+		setYScroll: function(yPosition) {
+			callSDKMethod('setYScroll', {
+				yPosition: yPosition
+			});
+		}
+	});
 });
 
 appStickerPipeStore.factory('PackService', function() {
@@ -644,66 +742,56 @@ appStickerPipeStore.factory('PackService', function() {
 
 });
 
-appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $rootScope, $state, $window) {
+appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $rootScope, $state, $window, Helper) {
 
-	var PlatformInstance = {},
-		PlatformAPI = {
-			isAndroid: function() {
-				return Config.platform.toLowerCase() == 'android';
-			},
+	var provider = {};
 
-			isJS: function() {
-				return Config.platform.toLowerCase() == 'js';
-			},
-
-			isIOS: function() {
-				return Config.platform.toLowerCase() == 'ios';
-			},
-
-			// todo: to helper class or service
-			getMobileOS: function() {
-				var userAgent = navigator.userAgent || navigator.vendor || window.opera;
-
-				if(userAgent.match( /iPad/i ) || userAgent.match( /iPhone/i ) || userAgent.match( /iPod/i )) {
-					return 'ios';
-				} else if(userAgent.match( /Android/i )) {
-					return 'android';
-				} else {
-					return 'other';
-				}
-			}
-		};
-
-	switch(true) {
-		case PlatformAPI.isAndroid():
-			PlatformInstance = $injector.get('AndroidPlatform');
-			break;
-		case PlatformAPI.isJS():
-			PlatformInstance = $injector.get('JSPlatform');
-			break;
-		case PlatformAPI.isIOS():
-			PlatformInstance = $injector.get('IOSPlatform');
-			break;
-	}
-
-	return angular.extend(PlatformAPI, PlatformInstance, {
+	return {
 		init: function() {
-			PlatformInstance.init && PlatformInstance.init();
+			switch(true) {
+				case Helper.isAndroid():
+					provider = window.AndroidJsInterface || {};
+					break;
+				case Helper.isIOS():
+					provider = window.IosJsInterface || {};
+					break;
+				case Helper.isJS():
+					provider = $injector.get('JsProvider');
+					break;
+			}
+
+			provider.init && provider.init();
+		},
+
+		////////////////////////////////////////////////////////////
+		// Functions
+		////////////////////////////////////////////////////////////
+
+		showCollections: function(packName) {
+			return provider.showCollections(packName);
+		},
+
+		purchasePack: function(packTitle, packName, packPrice) {
+			return provider.purchasePack(packTitle, packName, packPrice);
+		},
+
+		showInProgress: function(show) {
+			return provider.setInProgress(show);
 		},
 
 		showBackButton: function(url) {
 			$rootScope.goBackUrl = url;
-			PlatformInstance.showBackButton && PlatformInstance.showBackButton(!!(url));
+			provider.showBackButton && provider.showBackButton(!!(url));
 		},
 
 		setYScroll: function(yPosition) {
-			if (PlatformAPI.isJS() && PlatformAPI.getMobileOS() == 'ios') {
-				PlatformInstance.setYScroll(yPosition);
+			if (Helper.isJS() && Helper.getMobileOS() == 'ios') {
+				provider.setYScroll && provider.setYScroll(yPosition);
 			} else {
 				$window.scrollTo(0, yPosition);
 			}
 		}
-	});
+	};
 
 });
 
@@ -716,13 +804,13 @@ appStickerPipeStore.directive('basePage', function() {
 	};
 });
 
-appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack, $window) {
+appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack, $window, Helper) {
 
 	PlatformAPI.showBackButton('#/store');
 
 	angular.extend($scope, {
 		config: Config,
-		platformAPI: PlatformAPI,
+		helper: Helper,
 		pack: pack,
 		i18n: i18n,
 		packService: PackService,
@@ -785,12 +873,12 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 	});
 });
 
-appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI, $location) {
+appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI, $location, Helper) {
 
 	PlatformAPI.showInProgress(false);
 
 	angular.extend($scope, {
-		platformAPI: PlatformAPI,
+		helper: Helper,
 		packs: packs.packs,
 
 		getPackMainIcon: function(pack) {

@@ -5006,9 +5006,9 @@ window.StickersModule.Module = {};
 			callStoreMethod('hideActionProgress');
 		},
 
-		onScrollContent: function(y) {
+		onScrollContent: function(yPosition) {
 			callStoreMethod('onScrollContent', {
-				y: y
+				yPosition: yPosition
 			});
 		}
 	};
