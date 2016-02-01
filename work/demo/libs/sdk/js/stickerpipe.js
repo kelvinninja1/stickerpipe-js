@@ -4908,6 +4908,10 @@ window.StickersModule.Module = {};
 
 		showBackButton: function(data) {
 			Module.View.showBackButton(data.attrs.show);
+		},
+
+		setYScroll: function(data) {
+			Module.View.setYScroll(data.attrs.yPosition);
 		}
 	};
 
@@ -5039,10 +5043,6 @@ window.StickersModule.Module = {};
 						var modalBody = modalEl.getElementsByClassName('sp-modal-body')[0];
 						modalBody.style.overflowY = 'scroll';
 
-						//modalBody.addEventListener('scroll', function() {
-						//	Module.Controller.onScrollContent(modalBody.scrollTop);
-						//});
-
 						modalBody.addEventListener('scroll', (function() {
 							if (this.iosFixScrollTimeoutId) {
 								clearTimeout(this.iosFixScrollTimeoutId);
@@ -5053,6 +5053,8 @@ window.StickersModule.Module = {};
 								this.iosFixScrollTimeoutId = null;
 							}).bind(this), 500);
 						}).bind(this));
+
+						this.modalBody = modalBody;
 					}
 				}).bind(this)
 			});
@@ -5087,6 +5089,12 @@ window.StickersModule.Module = {};
 		showBackButton: function(show) {
 			var modal = this.modal;
 			modal.backButton.style.display = (show) ? 'block' : 'none';
+		},
+
+		setYScroll: function(yPosition) {
+			if (this.modalBody) {
+				this.modalBody.scrollTop = yPosition + 'px';
+			}
 		},
 
 		onWindowResize: function() {
