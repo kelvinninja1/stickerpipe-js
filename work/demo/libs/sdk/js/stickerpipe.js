@@ -5036,6 +5036,7 @@ window.StickersModule.Module = {};
 					if (Plugin.Service.Helper.getMobileOS() == 'ios') {
 						var modalBody = modalEl.getElementsByClassName('sp-modal-body')[0];
 						modalBody.style.overflowY = 'scroll';
+
 						modalBody.addEventListener('scroll', function() {
 							Module.Controller.onScrollContent(modalBody.scrollTop);
 						});

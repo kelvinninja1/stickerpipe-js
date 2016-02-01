@@ -121,12 +121,11 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/view.tpl',
-    '<!--<div class="version">0.0.43</div>-->\n' +
+    '<div class="version">0.0.44</div>\n' +
     '<div class="store" data-sp-auto-scroll>\n' +
     '	<div data-ng-show="!error && showContent" data-ui-view=""></div>\n' +
     '	<div data-ng-show="error" data-error></div>\n' +
     '	<div data-ng-show="preloader" data-preloader></div>\n' +
-    '	<div id="log" style="height: 300px; overflow: scroll;"></div>\n' +
     '</div>');
 }]);
 })();
@@ -308,24 +307,28 @@ appStickerPipeStore.directive('spAutoScroll', function ($document, $timeout, $lo
 			scope.okSaveScroll = true;
 			scope.history = [];
 
+			// --------------------------------------------------------------
+
 			$document.bind('scroll', function () {
 				if (scope.okSaveScroll && scope.history.length > 0) {
 					scope.history[scope.history.length - 1].y = $window.scrollY;
 				}
 			});
 
-			$rootScope.$on('sp-auto-scroll:scrollContent', function(e, data) {
-				var log = document.getElementById('log');
-				log.innerHTML += '-' + data + '<br/>';
+			$rootScope.$on('sp-auto-scroll:scrollContent', function(e, yPosition) {
+				if (scope.okSaveScroll && scope.history.length > 0) {
+					scope.history[scope.history.length - 1].y = yPosition;
+				}
 			});
+
+			// --------------------------------------------------------------
 
 			scope.$on('$locationChangeStart', function () {
 				scope.okSaveScroll = false;
 				$rootScope.showContent = false;
 			});
 
-			// ************************
-
+			// --------------------------------------------------------------
 
 			function onContentLoad() {
 				$rootScope.showContent = true;
@@ -346,6 +349,8 @@ appStickerPipeStore.directive('spAutoScroll', function ($document, $timeout, $lo
 			$rootScope.$on('$stateChangeError', function() {
 				onContentLoad();
 			});
+
+			// --------------------------------------------------------------
 
 			$rootScope.$watch(function () { return $location.path() }, function (newLocation, oldLocation) {
 
@@ -658,8 +663,6 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $rootScop
 
 				onScrollContent: function(attrs) {
 					$rootScope.$emit('sp-auto-scroll:scrollContent', attrs.y);
-					//var log = document.getElementById('log');
-					//log.innerHTML += attrs.y + '<br/>';
 				}
 			};
 		},
