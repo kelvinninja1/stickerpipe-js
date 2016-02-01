@@ -5093,7 +5093,7 @@ window.StickersModule.Module = {};
 
 		setYScroll: function(yPosition) {
 			if (this.modalBody) {
-				this.modalBody.scrollTop = yPosition + 'px';
+				this.modalBody.scrollTop = yPosition;
 			}
 		},
 
