@@ -5021,6 +5021,8 @@ window.StickersModule.Module = {};
 
 		modalBody: null,
 
+		iosFixScrollTimeoutId: null,
+
 		init: function() {
 			this.iframe = document.createElement('iframe');
 
@@ -5037,9 +5039,20 @@ window.StickersModule.Module = {};
 						var modalBody = modalEl.getElementsByClassName('sp-modal-body')[0];
 						modalBody.style.overflowY = 'scroll';
 
-						modalBody.addEventListener('scroll', function() {
-							Module.Controller.onScrollContent(modalBody.scrollTop);
-						});
+						//modalBody.addEventListener('scroll', function() {
+						//	Module.Controller.onScrollContent(modalBody.scrollTop);
+						//});
+
+						modalBody.addEventListener('scroll', (function() {
+							if (this.iosFixScrollTimeoutId) {
+								clearTimeout(this.iosFixScrollTimeoutId);
+							}
+
+							this.iosFixScrollTimeoutId = setTimeout((function() {
+								Module.Controller.onScrollContent(modalBody.scrollTop);
+								this.iosFixScrollTimeoutId = null;
+							}).bind(this), 500);
+						}).bind(this));
 					}
 				}).bind(this)
 			});
