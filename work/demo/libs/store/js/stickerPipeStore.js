@@ -314,6 +314,11 @@ appStickerPipeStore.directive('spAutoScroll', function ($document, $timeout, $lo
 				}
 			});
 
+			$rootScope.$on('sp-auto-scroll:scrollContent', function(e, data) {
+				var log = document.getElementById('log');
+				log.innerHTML += '-' + data + '<br/>';
+			});
+
 			scope.$on('$locationChangeStart', function () {
 				scope.okSaveScroll = false;
 				$rootScope.showContent = false;
@@ -652,8 +657,9 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $rootScop
 				},
 
 				onScrollContent: function(attrs) {
-					var log = document.getElementById('log');
-					log.innerHTML += attrs.y + '<br/>';
+					$rootScope.$emit('sp-auto-scroll:scrollContent', attrs.y);
+					//var log = document.getElementById('log');
+					//log.innerHTML += attrs.y + '<br/>';
 				}
 			};
 		},
