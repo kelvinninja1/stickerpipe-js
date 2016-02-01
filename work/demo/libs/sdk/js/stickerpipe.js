@@ -5044,14 +5044,14 @@ window.StickersModule.Module = {};
 						//});
 
 						modalBody.addEventListener('scroll', (function() {
-							//if (this.iosFixScrollTimeoutId) {
-							//	clearTimeout(this.iosFixScrollTimeoutId);
-							//}
-							//
-							//this.iosFixScrollTimeoutId = setTimeout((function() {
-							//	Module.Controller.onScrollContent(modalBody.scrollTop);
-							//	this.iosFixScrollTimeoutId = null;
-							//}).bind(this), 500);
+							if (this.iosFixScrollTimeoutId) {
+								clearTimeout(this.iosFixScrollTimeoutId);
+							}
+
+							this.iosFixScrollTimeoutId = setTimeout((function() {
+								Module.Controller.onScrollContent(modalBody.scrollTop);
+								this.iosFixScrollTimeoutId = null;
+							}).bind(this), 500);
 						}).bind(this));
 					}
 				}).bind(this)
