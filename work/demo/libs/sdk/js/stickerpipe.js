@@ -4911,7 +4911,6 @@ window.StickersModule.Module = {};
 		},
 
 		setYScroll: function(data) {
-			alert(1);
 			Module.View.setYScroll(data.attrs.yPosition);
 		}
 	};
@@ -5093,7 +5092,6 @@ window.StickersModule.Module = {};
 		},
 
 		setYScroll: function(yPosition) {
-			alert('ok');
 			if (this.modalBody) {
 				alert(yPosition);
 				this.modalBody.scrollTop = yPosition;
