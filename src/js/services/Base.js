@@ -102,23 +102,6 @@
 			return outData;
 		},
 
-		onUserMessageSent: function(isSticker) {
-			var nowDate = new Date().getTime() / 1000 | 0,
-				action = 'send',
-				category = 'message',
-				label = (isSticker) ? 'sticker' : 'text';
-
-
-			Plugin.Service.Api.sendStatistic([{
-				action: action,
-				category: category,
-				label: label,
-				time: nowDate
-			}]);
-
-			ga('stickerTracker.send', 'event', category, action, label);
-		},
-
 		updatePacks: function(successCallback) {
 
 			Plugin.Service.Api.getPacks(

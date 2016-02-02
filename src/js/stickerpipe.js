@@ -151,19 +151,13 @@ window.StickersModule.View = {};
 
 			this.view.handleClickOnSticker((function(el) {
 
-				var stickerAttribute = el.getAttribute('data-sticker-string'),
-					nowDate = new Date().getTime() / 1000|0;
+				// todo: data-sticker-string --> data-sp-pack & data-sp-sticker
+				// todo: add Plugin.Service.Sticker.generateStickerCode(packName, stickerName)
 
-				Plugin.Service.Api.sendStatistic([{
-					action: 'use',
-					category: 'sticker',
-					label: '[[' + stickerAttribute + ']]',
-					time: nowDate
-				}]);
+				var stickerAttrs = el.getAttribute('data-sticker-string').split('_');
 
-				ga('stickerTracker.send', 'event', 'sticker', stickerAttribute.split('_')[0], stickerAttribute.split('_')[1], 1);
-
-				Plugin.Service.Storage.addUsedSticker(stickerAttribute);
+				Plugin.Service.Statistic.useSticker(stickerAttrs[0], stickerAttrs[1]);
+				Plugin.Service.Storage.addUsedSticker(stickerAttrs[0] + '_' + stickerAttrs[1]);
 
 				// todo: rewrite
 				// new content mark
@@ -181,19 +175,11 @@ window.StickersModule.View = {};
 				}
 			}).bind(this));
 
-			this.view.handleClickOnEmoji((function(el) {
-				var nowDate = new Date().getTime() / 1000| 0,
-					emoji = this.parseEmojiFromHtml(el.innerHTML);
-
-				Plugin.Service.Api.sendStatistic([{
-					action: 'use',
-					category: 'emoji',
-					label: emoji,
-					time: nowDate
-				}]);
-
-				ga('stickerTracker.send', 'event', 'emoji', 'use', emoji);
-			}).bind(this));
+			this.view.handleClickOnEmoji(function(el) {
+				Plugin.Service.Statistic.useEmoji(
+					Plugin.Service.Emoji.parseEmojiFromHtml(el.innerHTML)
+				);
+			});
 		},
 
 		fetchPacks: function(callback) {
@@ -221,7 +207,7 @@ window.StickersModule.View = {};
 		},
 
 		onUserMessageSent: function(isSticker) {
-			return Plugin.Service.Base.onUserMessageSent(isSticker);
+			Plugin.Service.Statistic.messageSend(isSticker);
 		},
 
 		purchaseSuccess: function(packName, pricePoint) {

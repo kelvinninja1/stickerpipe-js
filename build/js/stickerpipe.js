@@ -3125,23 +3125,6 @@ window.StickersModule.Service = {};
 			return outData;
 		},
 
-		onUserMessageSent: function(isSticker) {
-			var nowDate = new Date().getTime() / 1000 | 0,
-				action = 'send',
-				category = 'message',
-				label = (isSticker) ? 'sticker' : 'text';
-
-
-			Plugin.Service.Api.sendStatistic([{
-				action: action,
-				category: category,
-				label: label,
-				time: nowDate
-			}]);
-
-			ga('stickerTracker.send', 'event', category, action, label);
-		},
-
 		updatePacks: function(successCallback) {
 
 			Plugin.Service.Api.getPacks(
@@ -3714,7 +3697,54 @@ window.StickersModule.Service = {};
 
 (function(Plugin) {
 
+	function getTime() {
+		return new Date().getTime() / 1000 | 0;
+	}
+
 	Plugin.Service.Statistic = {
+
+		messageSend: function(isSticker) {
+			var category = 'message',
+				action = 'send',
+				label = (isSticker) ? 'sticker' : 'text';
+
+			Plugin.Service.Api.sendStatistic([{
+				category: category,
+				action: action,
+				label: label,
+				time: getTime()
+			}]);
+
+			ga('stickerTracker.send', 'event', category, action, label);
+		},
+
+		useSticker: function(packName, stickerName) {
+			var category = 'sticker';
+
+			Plugin.Service.Api.sendStatistic([{
+				category: category,
+				action: 'use',
+				label: '[[' + packName + '_' + stickerName + ']]',
+				time: getTime()
+			}]);
+
+			ga('stickerTracker.send', 'event', category, packName, stickerName, 1);
+		},
+
+		useEmoji: function(emoji) {
+			var action = 'use',
+				category = 'emoji';
+
+			Plugin.Service.Api.sendStatistic([{
+				category: category,
+				action: action,
+				label: emoji,
+				time: getTime()
+			}]);
+
+			ga('stickerTracker.send', 'event', category, action, emoji);
+		}
+
 	};
 
 })(StickersModule);
@@ -6286,19 +6316,13 @@ window.StickersModule.View = {};
 
 			this.view.handleClickOnSticker((function(el) {
 
-				var stickerAttribute = el.getAttribute('data-sticker-string'),
-					nowDate = new Date().getTime() / 1000|0;
+				// todo: data-sticker-string --> data-sp-pack & data-sp-sticker
+				// todo: add Plugin.Service.Sticker.generateStickerCode(packName, stickerName)
 
-				Plugin.Service.Api.sendStatistic([{
-					action: 'use',
-					category: 'sticker',
-					label: '[[' + stickerAttribute + ']]',
-					time: nowDate
-				}]);
+				var stickerAttrs = el.getAttribute('data-sticker-string').split('_');
 
-				ga('stickerTracker.send', 'event', 'sticker', stickerAttribute.split('_')[0], stickerAttribute.split('_')[1], 1);
-
-				Plugin.Service.Storage.addUsedSticker(stickerAttribute);
+				Plugin.Service.Statistic.useSticker(stickerAttrs[0], stickerAttrs[1]);
+				Plugin.Service.Storage.addUsedSticker(stickerAttrs[0] + '_' + stickerAttrs[1]);
 
 				// todo: rewrite
 				// new content mark
@@ -6316,19 +6340,11 @@ window.StickersModule.View = {};
 				}
 			}).bind(this));
 
-			this.view.handleClickOnEmoji((function(el) {
-				var nowDate = new Date().getTime() / 1000| 0,
-					emoji = this.parseEmojiFromHtml(el.innerHTML);
-
-				Plugin.Service.Api.sendStatistic([{
-					action: 'use',
-					category: 'emoji',
-					label: emoji,
-					time: nowDate
-				}]);
-
-				ga('stickerTracker.send', 'event', 'emoji', 'use', emoji);
-			}).bind(this));
+			this.view.handleClickOnEmoji(function(el) {
+				Plugin.Service.Statistic.useEmoji(
+					Plugin.Service.Emoji.parseEmojiFromHtml(el.innerHTML)
+				);
+			});
 		},
 
 		fetchPacks: function(callback) {
@@ -6356,7 +6372,7 @@ window.StickersModule.View = {};
 		},
 
 		onUserMessageSent: function(isSticker) {
-			return Plugin.Service.Base.onUserMessageSent(isSticker);
+			Plugin.Service.Statistic.messageSend(isSticker);
 		},
 
 		purchaseSuccess: function(packName, pricePoint) {
