@@ -8,8 +8,6 @@
 
 		modalBody: null,
 
-		iosFixScrollTimeoutId: null,
-
 		init: function() {
 			this.iframe = document.createElement('iframe');
 
@@ -27,14 +25,7 @@
 						modalBody.style.overflowY = 'scroll';
 
 						modalBody.addEventListener('scroll', (function() {
-							if (this.iosFixScrollTimeoutId) {
-								clearTimeout(this.iosFixScrollTimeoutId);
-							}
-
-							this.iosFixScrollTimeoutId = setTimeout((function() {
-								Module.Controller.onScrollContent(modalBody.scrollTop);
-								this.iosFixScrollTimeoutId = null;
-							}).bind(this), 500);
+							Module.Controller.onScrollContent(modalBody.scrollTop);
 						}).bind(this));
 
 						this.modalBody = modalBody;
