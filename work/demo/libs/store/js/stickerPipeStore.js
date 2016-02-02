@@ -119,7 +119,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/view.tpl',
-    '<div class="version">0.0.59</div>\n' +
+    '<div class="version">0.0.60</div>\n' +
     '<div class="store" data-sp-auto-scroll>\n' +
     '	<div data-ng-show="!error && showContent" data-ui-view=""></div>\n' +
     '	<div data-ng-show="error" data-error></div>\n' +
@@ -237,13 +237,13 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/base-page/preloader/view.tpl',
-    '<div class="preloader">\n' +
-    '	<div class="preloader-content">\n' +
-    '		<div class="preloader-chasing-dots">\n' +
-    '			<div class="preloader-child preloader-dot1"></div>\n' +
-    '			<div class="preloader-child preloader-dot2"></div>\n' +
+  $templateCache.put('/modules/base-page/error/view.tpl',
+    '<div class="error">\n' +
+    '	<div class="error-content">\n' +
+    '		<div class="error-image">\n' +
+    '			<img ng-src="{{ imgUrl }}" alt="">\n' +
     '		</div>\n' +
+    '		<h5>{{ i18n.unavailableContent }}</h5>\n' +
     '	</div>\n' +
     '</div>');
 }]);
@@ -256,13 +256,13 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/base-page/error/view.tpl',
-    '<div class="error">\n' +
-    '	<div class="error-content">\n' +
-    '		<div class="error-image">\n' +
-    '			<img ng-src="{{ imgUrl }}" alt="">\n' +
+  $templateCache.put('/modules/base-page/preloader/view.tpl',
+    '<div class="preloader">\n' +
+    '	<div class="preloader-content">\n' +
+    '		<div class="preloader-chasing-dots">\n' +
+    '			<div class="preloader-child preloader-dot1"></div>\n' +
+    '			<div class="preloader-child preloader-dot2"></div>\n' +
     '		</div>\n' +
-    '		<h5>{{ i18n.unavailableContent }}</h5>\n' +
     '	</div>\n' +
     '</div>');
 }]);
@@ -768,7 +768,18 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $rootScop
 		////////////////////////////////////////////////////////////
 
 		showCollections: function(packName) {
-			return provider.showCollections(packName);
+			var result = null;
+			switch(true) {
+				case Helper.isAndroid():
+				case Helper.isIOS():
+					result = provider.showCollections();
+					break;
+				case Helper.isJS():
+					result = provider.showCollections(packName);
+					break;
+			}
+
+			return result;
 		},
 
 		purchasePack: function(packTitle, packName, packPrice) {
@@ -870,34 +881,6 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 
 	angular.element($window).bind('resize', function () {
 		$scope.$apply();
-	});
-});
-
-appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI, $location, Helper) {
-
-	PlatformAPI.showInProgress(false);
-
-	angular.extend($scope, {
-		helper: Helper,
-		packs: packs.packs,
-
-		getPackMainIcon: function(pack) {
-			return pack.main_icon[Config.resolutionType];
-		},
-
-		getPackTitle: function(pack) {
-			var title = pack.title;
-			if (title.length > 15) {
-				title = title.substr(0, 15);
-				title += '...';
-			}
-
-			return title;
-		},
-
-		openPack: function(packName) {
-			$location.path('/packs/' + packName);
-		}
 	});
 });
 
@@ -1066,6 +1049,34 @@ appStickerPipeStore.factory('JSPlatform', function($rootScope, $window, $timeout
 			this.showCollections(attrs.packName)
 		}
 
+	});
+});
+
+appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI, $location, Helper) {
+
+	PlatformAPI.showInProgress(false);
+
+	angular.extend($scope, {
+		helper: Helper,
+		packs: packs.packs,
+
+		getPackMainIcon: function(pack) {
+			return pack.main_icon[Config.resolutionType];
+		},
+
+		getPackTitle: function(pack) {
+			var title = pack.title;
+			if (title.length > 15) {
+				title = title.substr(0, 15);
+				title += '...';
+			}
+
+			return title;
+		},
+
+		openPack: function(packName) {
+			$location.path('/packs/' + packName);
+		}
 	});
 });
 
