@@ -1,10 +1,6 @@
 
 (function(Plugin) {
 
-	function getTime() {
-		return new Date().getTime() / 1000 | 0;
-	}
-
 	Plugin.Service.Statistic = {
 
 		messageSend: function(isSticker) {
@@ -15,8 +11,7 @@
 			Plugin.Service.Api.sendStatistic([{
 				category: category,
 				action: action,
-				label: label,
-				time: getTime()
+				label: label
 			}]);
 
 			ga('stickerTracker.send', 'event', category, action, label);
@@ -28,8 +23,7 @@
 			Plugin.Service.Api.sendStatistic([{
 				category: category,
 				action: 'use',
-				label: '[[' + packName + '_' + stickerName + ']]',
-				time: getTime()
+				label: '[[' + packName + '_' + stickerName + ']]'
 			}]);
 
 			ga('stickerTracker.send', 'event', category, packName, stickerName, 1);
@@ -42,8 +36,7 @@
 			Plugin.Service.Api.sendStatistic([{
 				category: category,
 				action: action,
-				label: emoji,
-				time: getTime()
+				label: emoji
 			}]);
 
 			ga('stickerTracker.send', 'event', category, action, emoji);

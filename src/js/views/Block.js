@@ -114,7 +114,7 @@
 
 				var placeHolderClass = 'sp-sticker-placeholder';
 
-				var stickerImgSrc = Plugin.Service.Base.parseStickerFromText('[[' + stickerCode + ']]');
+				var stickerImgSrc = Plugin.Service.Sticker.parse('[[' + stickerCode + ']]');
 
 				var stickersSpanEl = document.createElement('span');
 				stickersSpanEl.classList.add(placeHolderClass);

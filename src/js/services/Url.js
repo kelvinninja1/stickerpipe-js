@@ -30,7 +30,7 @@
 		buildApiUrl: function(uri) {
 			uri = uri || '';
 
-			return Plugin.Configs.apiUrl + '/api/v' + Plugin.Service.Api.getApiVersion() + '/' + uri;
+			return Plugin.Configs.apiUrl + '/api/v' + Plugin.Service.Api.getApiVersion() + uri;
 		},
 
 		getStickerUrl: function(packName, stickerName) {
@@ -48,25 +48,21 @@
 		},
 
 		getPacksUrl: function() {
-			var url = this.buildApiUrl('client-packs');
+			var url = this.buildApiUrl('/shop/my');
 
-			if (Plugin.Configs.userId !== null) {
-				url = this.buildApiUrl('packs');
-
-				if (Plugin.Configs.userPremium) {
-					url += '?is_subscriber=1';
-				}
+			if (Plugin.Configs.userPremium) {
+				url += '?is_subscriber=1';
 			}
 
 			return url;
 		},
 
 		getStatisticUrl: function() {
-			return this.buildApiUrl('track-statistic');
+			return this.buildApiUrl('/statistics');
 		},
 
 		getUserDataUrl: function() {
-			return this.buildApiUrl('user');
+			return this.buildApiUrl('/user');
 		},
 
 		getUserPackUrl: function(packName, pricePoint) {
@@ -83,7 +79,7 @@
 			}
 
 			// build url
-			var url = this.buildApiUrl('user/pack/' + packName);
+			var url = this.buildApiUrl('/user/pack/' + packName);
 			url += '?' + Plugin.Service.Helper.urlParamsSerialize({
 					purchase_type: purchaseType
 				});

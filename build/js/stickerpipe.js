@@ -2964,7 +2964,7 @@ window.StickersModule.Service = {};
 
 (function(Plugin) {
 
-	var API_VERSION = 1;
+	var API_VERSION = 2;
 
 	Plugin.Service.Api = {
 
@@ -3014,8 +3014,6 @@ window.StickersModule.Service = {};
 						});
 					}
 				}
-			}, {
-				'Content-Type': 'application/json'
 			});
 		}
 
@@ -3067,7 +3065,7 @@ window.StickersModule.Service = {};
 				var used = Plugin.Service.Storage.getUsedStickers();
 
 				for (var i = 0; i < used.length; i++) {
-					var sticker = this.parseStickerFromText('[[' + used[i].code + ']]');
+					var sticker = Plugin.Service.Sticker.parse('[[' + used[i].code + ']]');
 
 					var pack = null;
 					for (var j = 0; j < newPacks.length; j++) {
@@ -3106,25 +3104,6 @@ window.StickersModule.Service = {};
 			return newPacks;
 		},
 
-		parseStickerFromText: function(text) {
-			var outData = {
-					isSticker: false,
-					url: ''
-				},
-				matchData = text.match(/\[\[(\S+)_(\S+)\]\]/);
-
-			if (matchData) {
-				outData.isSticker = true;
-				outData.url = Plugin.Service.Url.getStickerUrl(matchData[1], matchData[2]);
-
-
-				outData.pack = matchData[1];
-				outData.name = matchData[2];
-			}
-
-			return outData;
-		},
-
 		updatePacks: function(successCallback) {
 
 			Plugin.Service.Api.getPacks(
@@ -3149,19 +3128,6 @@ window.StickersModule.Service = {};
 					successCallback && successCallback(packs);
 				}).bind(this)
 			);
-		},
-
-		trackUserData: function() {
-			if (!Plugin.Configs.userId || !Plugin.Configs.userData) {
-				return;
-			}
-
-			var storedUserData = Plugin.Service.Storage.getUserData() || {};
-
-			if (!Plugin.Service.Helper.deepCompare(Plugin.Configs.userData, storedUserData)) {
-				Plugin.Service.Api.updateUserData(Plugin.Configs.userData);
-				Plugin.Service.Storage.setUserData(Plugin.Configs.userData);
-			}
 		}
 	};
 
@@ -3589,13 +3555,10 @@ window.StickersModule.Service = {};
 			options.headers.Apikey = Plugin.Configs.apiKey;
 			options.headers.Platform = 'JS';
 			options.headers.Localization = Plugin.Configs.lang;
-
-			if (Plugin.Configs.userId !== null) {
-				options.headers.UserId = Plugin.Configs.userId;
-			}
+			options.headers.UserId = Plugin.Configs.userId;
 
 			if (options.type == 'POST' || options.type == 'PUT') {
-				options.headers['Content-Type'] = options.headers['Content-Type'] || 'application/x-www-form-urlencoded';
+				options.headers['Content-Type'] = options.headers['Content-Type'] || 'application/json';
 				options.headers['DeviceId'] = Plugin.Service.Storage.getDeviceId();
 			}
 
@@ -3697,10 +3660,6 @@ window.StickersModule.Service = {};
 
 (function(Plugin) {
 
-	function getTime() {
-		return new Date().getTime() / 1000 | 0;
-	}
-
 	Plugin.Service.Statistic = {
 
 		messageSend: function(isSticker) {
@@ -3711,8 +3670,7 @@ window.StickersModule.Service = {};
 			Plugin.Service.Api.sendStatistic([{
 				category: category,
 				action: action,
-				label: label,
-				time: getTime()
+				label: label
 			}]);
 
 			ga('stickerTracker.send', 'event', category, action, label);
@@ -3724,8 +3682,7 @@ window.StickersModule.Service = {};
 			Plugin.Service.Api.sendStatistic([{
 				category: category,
 				action: 'use',
-				label: '[[' + packName + '_' + stickerName + ']]',
-				time: getTime()
+				label: '[[' + packName + '_' + stickerName + ']]'
 			}]);
 
 			ga('stickerTracker.send', 'event', category, packName, stickerName, 1);
@@ -3738,8 +3695,7 @@ window.StickersModule.Service = {};
 			Plugin.Service.Api.sendStatistic([{
 				category: category,
 				action: action,
-				label: emoji,
-				time: getTime()
+				label: emoji
 			}]);
 
 			ga('stickerTracker.send', 'event', category, action, emoji);
@@ -3749,6 +3705,32 @@ window.StickersModule.Service = {};
 
 })(StickersModule);
 
+
+(function(Plugin) {
+
+
+	Plugin.Service.Sticker = {
+		parse: function(text) {
+			// todo: add method isSticker
+			var result = {
+					isSticker: false,
+					url: ''
+				},
+				matchData = text.match(/\[\[(\S+)_(\S+)\]\]/);
+
+			if (matchData) {
+				result.isSticker = true;
+				result.url = Plugin.Service.Url.getStickerUrl(matchData[1], matchData[2]);
+
+
+				result.pack = matchData[1];
+				result.name = matchData[2];
+			}
+
+			return result;
+		}
+	};
+})(window.StickersModule);
 
 (function(Plugin) {
 
@@ -3904,7 +3886,7 @@ window.StickersModule.Service = {};
 		buildApiUrl: function(uri) {
 			uri = uri || '';
 
-			return Plugin.Configs.apiUrl + '/api/v' + Plugin.Service.Api.getApiVersion() + '/' + uri;
+			return Plugin.Configs.apiUrl + '/api/v' + Plugin.Service.Api.getApiVersion() + uri;
 		},
 
 		getStickerUrl: function(packName, stickerName) {
@@ -3922,25 +3904,21 @@ window.StickersModule.Service = {};
 		},
 
 		getPacksUrl: function() {
-			var url = this.buildApiUrl('client-packs');
+			var url = this.buildApiUrl('/shop/my');
 
-			if (Plugin.Configs.userId !== null) {
-				url = this.buildApiUrl('packs');
-
-				if (Plugin.Configs.userPremium) {
-					url += '?is_subscriber=1';
-				}
+			if (Plugin.Configs.userPremium) {
+				url += '?is_subscriber=1';
 			}
 
 			return url;
 		},
 
 		getStatisticUrl: function() {
-			return this.buildApiUrl('track-statistic');
+			return this.buildApiUrl('/statistics');
 		},
 
 		getUserDataUrl: function() {
-			return this.buildApiUrl('user');
+			return this.buildApiUrl('/user');
 		},
 
 		getUserPackUrl: function(packName, pricePoint) {
@@ -3957,7 +3935,7 @@ window.StickersModule.Service = {};
 			}
 
 			// build url
-			var url = this.buildApiUrl('user/pack/' + packName);
+			var url = this.buildApiUrl('/user/pack/' + packName);
 			url += '?' + Plugin.Service.Helper.urlParamsSerialize({
 					purchase_type: purchaseType
 				});
@@ -3974,6 +3952,30 @@ window.StickersModule.Service = {};
 		}
 
 	};
+})(window.StickersModule);
+
+(function(Plugin) {
+
+	Plugin.Service.User = {
+
+		init: function() {
+			this.updateUserData();
+		},
+
+		updateUserData: function() {
+			if (!Plugin.Configs.userData) {
+				return;
+			}
+
+			var storedUserData = Plugin.Service.Storage.getUserData() || {};
+
+			if (!Plugin.Service.Helper.deepCompare(Plugin.Configs.userData, storedUserData)) {
+				Plugin.Service.Api.updateUserData(Plugin.Configs.userData);
+				Plugin.Service.Storage.setUserData(Plugin.Configs.userData);
+			}
+		}
+	};
+
 })(window.StickersModule);
 
 window.StickersModule.Configs = {};
@@ -5649,7 +5651,7 @@ window.StickersModule.View = {};
 
 				var placeHolderClass = 'sp-sticker-placeholder';
 
-				var stickerImgSrc = Plugin.Service.Base.parseStickerFromText('[[' + stickerCode + ']]');
+				var stickerImgSrc = Plugin.Service.Sticker.parse('[[' + stickerCode + ']]');
 
 				var stickersSpanEl = document.createElement('span');
 				stickersSpanEl.classList.add(placeHolderClass);
@@ -6213,27 +6215,25 @@ window.StickersModule.View = {};
 				config.enableEmojiTab = false;
 			}
 
-			// ***** Check ApiKey *****
-			if (!Plugin.Configs.apiKey) {
-				throw new Error('Empty apiKey');
+			// ***** Check required params *****
+			if (!Plugin.Configs.apiKey || !Plugin.Configs.userId) {
+				throw new Error('Empty one of required data [apiKey, userId]');
 			}
 
 			// ***** Init UserId *****
-			var savedUserId = Plugin.Service.Storage.getUserId();
+			Plugin.Configs.userId = Plugin.Service.Helper.md5(Plugin.Configs.userId + Plugin.Configs.apiKey);
 
-			if (Plugin.Configs.userId) {
-				Plugin.Configs.userId = Plugin.Service.Helper.md5(Plugin.Configs.userId + Plugin.Configs.apiKey);
-				Plugin.Service.Storage.setUserId(Plugin.Configs.userId);
-			}
-
-			if (Plugin.Configs.userId != savedUserId) {
+			if (Plugin.Configs.userId != Plugin.Service.Storage.getUserId()) {
 				Plugin.Service.Storage.setUsedStickers([]);
 			}
+
+			Plugin.Service.Storage.setUserId(Plugin.Configs.userId);
 
 			// ***** Init store *****
 			Plugin.Module.Store.init(this);
 
 			// ***** Init services ******
+			Plugin.Service.User.init();
 			Plugin.Service.Pack.init(this);
 			Plugin.Service.Emoji.init(Plugin.Libs.Twemoji);
 			Plugin.Service.PendingRequest.init();
@@ -6256,9 +6256,6 @@ window.StickersModule.View = {};
 			var callback = onload || null;
 
 			this.fetchPacks((function() {
-				// todo: move to initialize (with API v2)
-				Plugin.Service.Base.trackUserData();
-
 				this.view.render(this.stickersModel);
 
 				callback && callback();
@@ -6360,7 +6357,7 @@ window.StickersModule.View = {};
 		},
 
 		parseStickerFromText: function(text) {
-			return Plugin.Service.Base.parseStickerFromText(text);
+			return Plugin.Service.Sticker.parse(text);
 		},
 
 		parseEmojiFromText: function(text) {

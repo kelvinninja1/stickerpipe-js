@@ -1,7 +1,7 @@
 
 (function(Plugin) {
 
-	var API_VERSION = 1;
+	var API_VERSION = 2;
 
 	Plugin.Service.Api = {
 
@@ -51,8 +51,6 @@
 						});
 					}
 				}
-			}, {
-				'Content-Type': 'application/json'
 			});
 		}
 

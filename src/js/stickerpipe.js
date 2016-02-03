@@ -48,27 +48,25 @@ window.StickersModule.View = {};
 				config.enableEmojiTab = false;
 			}
 
-			// ***** Check ApiKey *****
-			if (!Plugin.Configs.apiKey) {
-				throw new Error('Empty apiKey');
+			// ***** Check required params *****
+			if (!Plugin.Configs.apiKey || !Plugin.Configs.userId) {
+				throw new Error('Empty one of required data [apiKey, userId]');
 			}
 
 			// ***** Init UserId *****
-			var savedUserId = Plugin.Service.Storage.getUserId();
+			Plugin.Configs.userId = Plugin.Service.Helper.md5(Plugin.Configs.userId + Plugin.Configs.apiKey);
 
-			if (Plugin.Configs.userId) {
-				Plugin.Configs.userId = Plugin.Service.Helper.md5(Plugin.Configs.userId + Plugin.Configs.apiKey);
-				Plugin.Service.Storage.setUserId(Plugin.Configs.userId);
-			}
-
-			if (Plugin.Configs.userId != savedUserId) {
+			if (Plugin.Configs.userId != Plugin.Service.Storage.getUserId()) {
 				Plugin.Service.Storage.setUsedStickers([]);
 			}
+
+			Plugin.Service.Storage.setUserId(Plugin.Configs.userId);
 
 			// ***** Init store *****
 			Plugin.Module.Store.init(this);
 
 			// ***** Init services ******
+			Plugin.Service.User.init();
 			Plugin.Service.Pack.init(this);
 			Plugin.Service.Emoji.init(Plugin.Libs.Twemoji);
 			Plugin.Service.PendingRequest.init();
@@ -91,9 +89,6 @@ window.StickersModule.View = {};
 			var callback = onload || null;
 
 			this.fetchPacks((function() {
-				// todo: move to initialize (with API v2)
-				Plugin.Service.Base.trackUserData();
-
 				this.view.render(this.stickersModel);
 
 				callback && callback();
@@ -195,7 +190,7 @@ window.StickersModule.View = {};
 		},
 
 		parseStickerFromText: function(text) {
-			return Plugin.Service.Base.parseStickerFromText(text);
+			return Plugin.Service.Sticker.parse(text);
 		},
 
 		parseEmojiFromText: function(text) {

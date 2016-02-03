@@ -44,7 +44,7 @@
 				var used = Plugin.Service.Storage.getUsedStickers();
 
 				for (var i = 0; i < used.length; i++) {
-					var sticker = this.parseStickerFromText('[[' + used[i].code + ']]');
+					var sticker = Plugin.Service.Sticker.parse('[[' + used[i].code + ']]');
 
 					var pack = null;
 					for (var j = 0; j < newPacks.length; j++) {
@@ -83,25 +83,6 @@
 			return newPacks;
 		},
 
-		parseStickerFromText: function(text) {
-			var outData = {
-					isSticker: false,
-					url: ''
-				},
-				matchData = text.match(/\[\[(\S+)_(\S+)\]\]/);
-
-			if (matchData) {
-				outData.isSticker = true;
-				outData.url = Plugin.Service.Url.getStickerUrl(matchData[1], matchData[2]);
-
-
-				outData.pack = matchData[1];
-				outData.name = matchData[2];
-			}
-
-			return outData;
-		},
-
 		updatePacks: function(successCallback) {
 
 			Plugin.Service.Api.getPacks(
@@ -126,19 +107,6 @@
 					successCallback && successCallback(packs);
 				}).bind(this)
 			);
-		},
-
-		trackUserData: function() {
-			if (!Plugin.Configs.userId || !Plugin.Configs.userData) {
-				return;
-			}
-
-			var storedUserData = Plugin.Service.Storage.getUserData() || {};
-
-			if (!Plugin.Service.Helper.deepCompare(Plugin.Configs.userData, storedUserData)) {
-				Plugin.Service.Api.updateUserData(Plugin.Configs.userData);
-				Plugin.Service.Storage.setUserData(Plugin.Configs.userData);
-			}
 		}
 	};
 

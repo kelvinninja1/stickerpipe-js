@@ -52,13 +52,10 @@
 			options.headers.Apikey = Plugin.Configs.apiKey;
 			options.headers.Platform = 'JS';
 			options.headers.Localization = Plugin.Configs.lang;
-
-			if (Plugin.Configs.userId !== null) {
-				options.headers.UserId = Plugin.Configs.userId;
-			}
+			options.headers.UserId = Plugin.Configs.userId;
 
 			if (options.type == 'POST' || options.type == 'PUT') {
-				options.headers['Content-Type'] = options.headers['Content-Type'] || 'application/x-www-form-urlencoded';
+				options.headers['Content-Type'] = options.headers['Content-Type'] || 'application/json';
 				options.headers['DeviceId'] = Plugin.Service.Storage.getDeviceId();
 			}
 
