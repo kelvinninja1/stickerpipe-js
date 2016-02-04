@@ -119,7 +119,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/view.tpl',
-    '<div class="version">0.0.65</div>\n' +
+    '<!--<div class="version">0.0.65</div>-->\n' +
     '<div class="store" data-sp-auto-scroll>\n' +
     '	<div data-ng-show="!error && showContent" data-ui-view=""></div>\n' +
     '	<div data-ng-show="error" data-error></div>\n' +
@@ -785,6 +785,15 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $rootScop
 
 });
 
+appStickerPipeStore.directive('basePage', function() {
+
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/view.tpl',
+		link: function($scope, $el, attrs) {}
+	};
+});
+
 appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack, $window, Helper) {
 
 	PlatformAPI.showBackButton('#/store');
@@ -848,15 +857,6 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 	angular.element($window).bind('resize', function () {
 		$scope.$apply();
 	});
-});
-
-appStickerPipeStore.directive('basePage', function() {
-
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/view.tpl',
-		link: function($scope, $el, attrs) {}
-	};
 });
 
 appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI, $location, Helper, PackService) {
