@@ -119,35 +119,11 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/view.tpl',
-    '<div class="version">0.0.63</div>\n' +
+    '<div class="version">0.0.64</div>\n' +
     '<div class="store" data-sp-auto-scroll>\n' +
     '	<div data-ng-show="!error && showContent" data-ui-view=""></div>\n' +
     '	<div data-ng-show="error" data-error></div>\n' +
     '	<div data-ng-show="preloader" data-preloader></div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/store/StoreView.tpl',
-    '<div data-ng-class="{\'screen-header\': isJSPlatform }" data-ng-show="isJSPlatform"></div>\n' +
-    '<div class="packs">\n' +
-    '	<div class="col" data-ng-repeat="pack in packs">\n' +
-    '		<div class="pack-preview center-block">\n' +
-    '			<a href="#/packs/{{ pack.pack_name }}">\n' +
-    '				<div class="pack-main-sticker">\n' +
-    '					<img data-ng-src="{{ packService.getMainSticker(pack) }}" alt="" />\n' +
-    '				</div>\n' +
-    '				<h5 class="pack-preview-name">{{ getPackTitle(pack) }}</h5>\n' +
-    '			</a>\n' +
-    '		</div>\n' +
-    '	</div>\n' +
     '</div>');
 }]);
 })();
@@ -224,13 +200,18 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/base-page/error/view.tpl',
-    '<div class="error">\n' +
-    '	<div class="error-content">\n' +
-    '		<div class="error-image">\n' +
-    '			<img ng-src="{{ imgUrl }}" alt="">\n' +
+  $templateCache.put('/modules/store/StoreView.tpl',
+    '<div data-ng-class="{\'screen-header\': isJSPlatform }" data-ng-show="isJSPlatform"></div>\n' +
+    '<div class="packs">\n' +
+    '	<div class="col" data-ng-repeat="pack in packs">\n' +
+    '		<div class="pack-preview center-block">\n' +
+    '			<a href="#/packs/{{ pack.pack_name }}">\n' +
+    '				<div class="pack-main-sticker">\n' +
+    '					<img data-ng-src="{{ packService.getMainSticker(pack) }}" alt="" />\n' +
+    '				</div>\n' +
+    '				<h5 class="pack-preview-name">{{ getPackTitle(pack) }}</h5>\n' +
+    '			</a>\n' +
     '		</div>\n' +
-    '		<h5>{{ i18n.unavailableContent }}</h5>\n' +
     '	</div>\n' +
     '</div>');
 }]);
@@ -250,6 +231,25 @@ module.run(['$templateCache', function($templateCache) {
     '			<div class="preloader-child preloader-dot1"></div>\n' +
     '			<div class="preloader-child preloader-dot2"></div>\n' +
     '		</div>\n' +
+    '	</div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/base-page/error/view.tpl',
+    '<div class="error">\n' +
+    '	<div class="error-content">\n' +
+    '		<div class="error-image">\n' +
+    '			<img ng-src="{{ imgUrl }}" alt="">\n' +
+    '		</div>\n' +
+    '		<h5>{{ i18n.unavailableContent }}</h5>\n' +
     '	</div>\n' +
     '</div>');
 }]);
@@ -281,6 +281,134 @@ appStickerPipeStore.config(function($stateProvider, $urlRouterProvider) {
 				}
 			}
 		});
+});
+
+appStickerPipeStore.directive('spAutoScroll', function ($document, $timeout, $location, $window, $rootScope, PlatformAPI) {
+	return {
+		restrict: 'A',
+		link: function (scope, element, attrs) {
+
+			$rootScope.showContent = true;
+			scope.okSaveScroll = true;
+			scope.history = [];
+
+			// --------------------------------------------------------------
+
+			$document.bind('scroll', function () {
+				if (scope.okSaveScroll && scope.history.length > 0) {
+					scope.history[scope.history.length - 1].y = $window.scrollY;
+				}
+			});
+
+			$rootScope.$on('sp-auto-scroll:scrollContent', function(e, yPosition) {
+				if (scope.okSaveScroll && scope.history.length > 0) {
+					scope.history[scope.history.length - 1].y = yPosition;
+				}
+			});
+
+			// --------------------------------------------------------------
+
+			scope.$on('$locationChangeStart', function () {
+				scope.okSaveScroll = false;
+				$rootScope.showContent = false;
+			});
+
+			// --------------------------------------------------------------
+
+			function onContentLoad() {
+				$rootScope.showContent = true;
+
+				$timeout(function() {
+					scope.okSaveScroll = true;
+
+					var y = scope.history[scope.history.length - 1].y;
+
+					PlatformAPI.setYScroll(y);
+				}, 100);
+			}
+
+			$rootScope.$on('$stateChangeSuccess', function() {
+				onContentLoad();
+			});
+
+			$rootScope.$on('$stateChangeError', function() {
+				onContentLoad();
+			});
+
+			// --------------------------------------------------------------
+
+			$rootScope.$watch(function () { return $location.path() }, function (newLocation, oldLocation) {
+
+				function forward() {
+					scope.history[scope.history.length] = {
+						url: newLocation,
+						y: 0
+					};
+				}
+
+				function back() {
+					scope.history.splice(scope.history.length - 1, 1);
+				}
+
+				if (scope.history.length > 1) {
+					if (newLocation == scope.history[scope.history.length - 2].url ||
+						newLocation + '/' == scope.history[scope.history.length - 2].url) {
+						back();
+					} else {
+						forward();
+					}
+				} else {
+					forward();
+				}
+			});
+		}
+	};
+});
+appStickerPipeStore.directive('spLoad', ['$parse', function ($parse) {
+	return {
+		restrict: 'A',
+		link: function (scope, elem, attrs) {
+			var fn = $parse(attrs.spLoad);
+			elem.on('load', function (event) {
+				scope.$apply(function() {
+					fn(scope, { $event: event });
+				});
+			});
+		}
+	};
+}]);
+appStickerPipeStore.directive('spOnLongPress', function($timeout) {
+	return {
+		restrict: 'A',
+		link: function($scope, $elm, $attrs) {
+			$elm.bind('touchstart', function(evt) {
+				// Locally scoped variable that will keep track of the long press
+				$scope.longPress = true;
+
+				// We'll set a timeout for 600 ms for a long press
+				$timeout(function() {
+					if ($scope.longPress) {
+						// If the touchend event hasn't fired,
+						// apply the function given in on the element's on-long-press attribute
+						$scope.$apply(function() {
+							$scope.$eval($attrs.onLongPress)
+						});
+					}
+				}, 600);
+			});
+
+			$elm.bind('touchend', function(evt) {
+				// Prevent the onLongPress event from firing
+				$scope.longPress = false;
+				// If there is an on-touch-end function attached to this element, apply it
+				if ($attrs.spOnTouchEnd) {
+					$scope.$apply(function() {
+						$scope.$eval($attrs.spOnTouchEnd)
+					});
+				}
+			});
+		}
+	};
 });
 appStickerPipeStore.factory('EnvConfig', ['envService', function(envService) {
 	return envService.read('all');
@@ -657,134 +785,6 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $rootScop
 
 });
 
-appStickerPipeStore.directive('spAutoScroll', function ($document, $timeout, $location, $window, $rootScope, PlatformAPI) {
-	return {
-		restrict: 'A',
-		link: function (scope, element, attrs) {
-
-			$rootScope.showContent = true;
-			scope.okSaveScroll = true;
-			scope.history = [];
-
-			// --------------------------------------------------------------
-
-			$document.bind('scroll', function () {
-				if (scope.okSaveScroll && scope.history.length > 0) {
-					scope.history[scope.history.length - 1].y = $window.scrollY;
-				}
-			});
-
-			$rootScope.$on('sp-auto-scroll:scrollContent', function(e, yPosition) {
-				if (scope.okSaveScroll && scope.history.length > 0) {
-					scope.history[scope.history.length - 1].y = yPosition;
-				}
-			});
-
-			// --------------------------------------------------------------
-
-			scope.$on('$locationChangeStart', function () {
-				scope.okSaveScroll = false;
-				$rootScope.showContent = false;
-			});
-
-			// --------------------------------------------------------------
-
-			function onContentLoad() {
-				$rootScope.showContent = true;
-
-				$timeout(function() {
-					scope.okSaveScroll = true;
-
-					var y = scope.history[scope.history.length - 1].y;
-
-					PlatformAPI.setYScroll(y);
-				}, 100);
-			}
-
-			$rootScope.$on('$stateChangeSuccess', function() {
-				onContentLoad();
-			});
-
-			$rootScope.$on('$stateChangeError', function() {
-				onContentLoad();
-			});
-
-			// --------------------------------------------------------------
-
-			$rootScope.$watch(function () { return $location.path() }, function (newLocation, oldLocation) {
-
-				function forward() {
-					scope.history[scope.history.length] = {
-						url: newLocation,
-						y: 0
-					};
-				}
-
-				function back() {
-					scope.history.splice(scope.history.length - 1, 1);
-				}
-
-				if (scope.history.length > 1) {
-					if (newLocation == scope.history[scope.history.length - 2].url ||
-						newLocation + '/' == scope.history[scope.history.length - 2].url) {
-						back();
-					} else {
-						forward();
-					}
-				} else {
-					forward();
-				}
-			});
-		}
-	};
-});
-appStickerPipeStore.directive('spLoad', ['$parse', function ($parse) {
-	return {
-		restrict: 'A',
-		link: function (scope, elem, attrs) {
-			var fn = $parse(attrs.spLoad);
-			elem.on('load', function (event) {
-				scope.$apply(function() {
-					fn(scope, { $event: event });
-				});
-			});
-		}
-	};
-}]);
-appStickerPipeStore.directive('spOnLongPress', function($timeout) {
-	return {
-		restrict: 'A',
-		link: function($scope, $elm, $attrs) {
-			$elm.bind('touchstart', function(evt) {
-				// Locally scoped variable that will keep track of the long press
-				$scope.longPress = true;
-
-				// We'll set a timeout for 600 ms for a long press
-				$timeout(function() {
-					if ($scope.longPress) {
-						// If the touchend event hasn't fired,
-						// apply the function given in on the element's on-long-press attribute
-						$scope.$apply(function() {
-							$scope.$eval($attrs.onLongPress)
-						});
-					}
-				}, 600);
-			});
-
-			$elm.bind('touchend', function(evt) {
-				// Prevent the onLongPress event from firing
-				$scope.longPress = false;
-				// If there is an on-touch-end function attached to this element, apply it
-				if ($attrs.spOnTouchEnd) {
-					$scope.$apply(function() {
-						$scope.$eval($attrs.spOnTouchEnd)
-					});
-				}
-			});
-		}
-	};
-});
-
 appStickerPipeStore.directive('basePage', function() {
 
 	return {
@@ -798,7 +798,7 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 
 	PlatformAPI.showBackButton('#/store');
 
-	console.log('isSubscriber', Config.isSubscriber);
+	console.log(PackService.isHidden(pack), (pack.pricepoint == 'A'), (pack.pricepoint == 'B' && isSubscriber));
 
 	angular.extend($scope, {
 		i18n: i18n,
