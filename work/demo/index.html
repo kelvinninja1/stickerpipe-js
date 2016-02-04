@@ -91,7 +91,7 @@
 </div>
 
 <script id="messageTemplate" type="text/template">
-	<div class="message {{ sticker.isSticker && 'is-sticker' }}">
+	<div class="message {{ (sticker.isSticker && 'is-sticker') || '' }}">
 		{[ if (!isCurrentUser) { ]}
 		<div class="message-user-photo">
 			<img src="{{ user.picture }}" class="img-circle">

@@ -54,7 +54,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 body {
   background: #d9d9d9;
   padding-top: 50px;
-  padding-bottom: 40px; }
+  padding-bottom: 100px; }
 
 @media (min-width: 992px) {
   .container {
