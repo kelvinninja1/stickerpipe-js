@@ -395,6 +395,11 @@ h6 {
   margin: 5px 0;
   text-align: center; }
 
+.pack-preview-price {
+  color: #333;
+  margin: 5px 0;
+  text-align: center; }
+
 .pack-main-sticker {
   display: table;
   margin-right: 8px; }
