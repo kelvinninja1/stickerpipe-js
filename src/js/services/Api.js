@@ -9,11 +9,13 @@
 			return API_VERSION;
 		},
 
-		getPacks: function(doneCallback) {
+		getPacks: function(successCallback) {
 			var url = Plugin.Service.Url.getPacksUrl();
 
 			Plugin.Service.Http.get(url, {
-				success: doneCallback
+				success: function(response) {
+					successCallback && successCallback(response.data);
+				}
 			});
 		},
 
@@ -32,27 +34,27 @@
 			});
 		},
 
-		changeUserPackStatus: function(packName, status, pricePoint, doneCallback) {
-
-			var url = Plugin.Service.Url.getUserPackUrl(packName, pricePoint);
-
-			Plugin.Service.Http.post(url, {
-				status: status
-			}, {
-				success: function() {
-					doneCallback && doneCallback();
+		purchasePack: function(packName, pricePoint, successCallback) {
+			Plugin.Service.Http.post(Plugin.Service.Url.getPurchaseUrl(packName, pricePoint), {}, {
+				success: function(response) {
+					successCallback && successCallback(response.data);
 				},
 				error: function() {
-					if (status) {
-						var pr = Plugin.Service.PendingRequest;
-						pr.add(pr.tasks.activateUserPack, {
-							packName: packName,
-							pricePoint: pricePoint
-						});
-					}
+					var pr = Plugin.Service.PendingRequest;
+					pr.add(pr.tasks.purchasePack, {
+						packName: packName,
+						pricePoint: pricePoint
+					});
+				}
+			});
+		},
+
+		getContentById: function(contentId, successCallback) {
+			Plugin.Service.Http.get(Plugin.Service.Url.getContentByIdUrl(contentId), {
+				success: function(response) {
+					successCallback && successCallback(response.data);
 				}
 			});
 		}
-
 	};
 })(window.StickersModule);

@@ -54,6 +54,7 @@
 	}
 }
 
+// todo: rename sticker-pipe --> stickerpipe
 .sticker-pipe {
 	background: $contentBackground;
 	width: 100%;
@@ -155,7 +156,7 @@
 			}
 
 			&.sp-pack-tab {
-				&.sp-new-pack::after {
+				&.sp-unwatched-pack::after {
 					content: "";
 					width: 10px;
 					height: 10px;
@@ -235,6 +236,13 @@
 			}
 		}
 	}
+}
+
+.stickerpipe-sticker {
+	$stickerSize: 160px;
+
+	height: $stickerSize;
+	width: $stickerSize;
 }
 
 

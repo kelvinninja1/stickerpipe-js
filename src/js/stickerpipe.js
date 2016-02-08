@@ -32,7 +32,6 @@ window.StickersModule.View = {};
 	// todo: rename Stickers --> StickerPipe
 	window.Stickers = Plugin.Libs.Class({
 
-		stickersModel: {},
 		view: null,
 
 		_constructor: function(config) {
@@ -57,7 +56,7 @@ window.StickersModule.View = {};
 			Plugin.Configs.userId = Plugin.Service.Helper.md5(Plugin.Configs.userId + Plugin.Configs.apiKey);
 
 			if (Plugin.Configs.userId != Plugin.Service.Storage.getUserId()) {
-				Plugin.Service.Storage.setUsedStickers([]);
+				Plugin.Service.Storage.setRecentStickers([]);
 			}
 
 			Plugin.Service.Storage.setUserId(Plugin.Configs.userId);
@@ -76,121 +75,75 @@ window.StickersModule.View = {};
 		//   Functions
 		////////////////////
 
-		render: function(onload, elId) {
-			Plugin.Configs.elId = elId || Plugin.Configs.elId;
+		render: function(callback) {
+			var self = this;
 
 			this.view = new Plugin.View.Popover();
 
 			this.delegateEvents();
 
 			// todo
-			//// ***** START *******************************************************************************************
-
-			var callback = onload || null;
-
-			this.fetchPacks((function() {
-				this.view.render(this.stickersModel);
+			Plugin.Service.Pack.fetchPacks(function() {
+				self.view.render();
 
 				callback && callback();
-			}).bind(this));
+			});
 
-			setInterval((function() {
-				this.fetchPacks();
-			}).bind(this), 1000 * 60 * 60); // hour
+			setInterval(function() {
+				Plugin.Service.Pack.fetchPacks();
+			}, 1000 * 60 * 60);
 		},
 
 		delegateEvents: function() {
+			var self = this;
 
-			this.view.tabsView.handleClickOnEmojiTab((function() {
-				this.view.renderEmojiBlock();
-			}).bind(this));
+			this.view.tabsView.handleClickOnEmojiTab(function() {
+				self.view.renderEmojiBlock();
+			});
 
-			this.view.tabsView.handleClickOnLastUsedPacksTab((function() {
-				this.view.renderUsedStickers();
-			}).bind(this));
+			this.view.tabsView.handleClickOnRecentTab(function() {
+				self.view.renderRecentStickers();
+			});
 
-			this.view.tabsView.handleClickOnStoreTab((function() {
-				this.openStore();
-			}).bind(this));
+			this.view.tabsView.handleClickOnStoreTab(function() {
+				Plugin.Module.Store.open();
+			});
 
-			this.view.tabsView.handleClickOnPackTab((function(el) {
-				var pack = null,
-					packName = el.getAttribute('data-pack-name');
+			this.view.tabsView.handleClickOnPackTab(function(el) {
+				var packName = el.getAttribute('data-pack-name'),
+					pack = Plugin.Service.Storage.getPack(packName);
 
-				// todo rename
-				var changed = false,
-					hasNewContent = false;
-
-				for (var i = 0; i < this.stickersModel.length; i++) {
-					if (this.stickersModel[i].pack_name == packName) {
-
-						// set newPack - false
-						changed = true;
-						this.stickersModel[i].newPack = false;
-						Plugin.Service.Storage.setPacks(this.stickersModel);
-
-						pack = this.stickersModel[i];
-					}
-
-					if (this.stickersModel[i].newPack == true) {
-						hasNewContent = true;
-					}
+				if (pack) {
+					pack.isUnwatched = false;
+					Plugin.Service.Storage.setPack(packName, pack);
+					self.view.renderPack(pack);
 				}
 
-				if (changed == true && Plugin.Service.Storage.getUsedStickers().length != 0 && hasNewContent == false) {
-					Plugin.Service.Event.changeContentHighlight(false);
-				}
+				Plugin.Service.Pack.checkHighlight();
+			});
 
-				pack && this.view.renderPack(pack);
-			}).bind(this));
+			this.view.handleClickOnSticker(function(el) {
 
-			this.view.handleClickOnSticker((function(el) {
+				var stickerId = el.getAttribute('data-sticker-id');
 
-				// todo: data-sticker-string --> data-sp-pack & data-sp-sticker
-				// todo: add Plugin.Service.Sticker.generateStickerCode(packName, stickerName)
+				Plugin.Service.Statistic.useSticker(stickerId);
+				Plugin.Service.Storage.addRecentSticker(stickerId);
 
-				var stickerAttrs = el.getAttribute('data-sticker-string').split('_');
-
-				Plugin.Service.Statistic.useSticker(stickerAttrs[0], stickerAttrs[1]);
-				Plugin.Service.Storage.addUsedSticker(stickerAttrs[0] + '_' + stickerAttrs[1]);
-
-				// todo: rewrite
-				// new content mark
-
-				var hasNewContent = false;
-				for (var i = 0; i < this.stickersModel.length; i++) {
-					if (this.stickersModel[i].newPack == true) {
-						hasNewContent = true;
-						break;
-					}
-				}
-
-				if (Plugin.Service.Storage.getUsedStickers().length != 0 && hasNewContent == false) {
-					Plugin.Service.Event.changeContentHighlight(false);
-				}
-			}).bind(this));
+				Plugin.Service.Pack.checkHighlight();
+			});
 
 			this.view.handleClickOnEmoji(function(el) {
-				Plugin.Service.Statistic.useEmoji(
-					Plugin.Service.Emoji.parseEmojiFromHtml(el.innerHTML)
-				);
+				var emoji = Plugin.Service.Emoji.parseEmojiFromHtml(el.innerHTML);
+				Plugin.Service.Statistic.useEmoji(emoji);
 			});
 		},
 
 		fetchPacks: function(callback) {
-			Plugin.Service.Base.updatePacks((function(stickerPacks) {
-				this.stickersModel = stickerPacks;
-
-				if (this.view.isRendered) {
-					this.view.tabsView.renderPacks(this.stickersModel);
-				}
-
-				callback && callback.apply();
-			}).bind(this));
+			Plugin.Service.Pack.fetchPacks(callback);
 		},
 
-		parseStickerFromText: function(text) {
-			return Plugin.Service.Sticker.parse(text);
+		parseStickerFromText: function(text, callback) {
+			return Plugin.Service.Sticker.parse(text, callback);
 		},
 
 		parseEmojiFromText: function(text) {
@@ -221,8 +174,8 @@ window.StickersModule.View = {};
 			this.view.close();
 		},
 
-		openStore: function(packName) {
-			Plugin.Module.Store.open(packName);
+		openStore: function(contentId) {
+			Plugin.Module.Store.open(contentId);
 		},
 
 		closeStore: function() {
@@ -235,7 +188,7 @@ window.StickersModule.View = {};
 
 		onClickSticker: function(callback, context) {
 			this.view.handleClickOnSticker(function(el) {
-				callback.call(context, '[[' + el.getAttribute('data-sticker-string') + ']]');
+				callback.call(context, '[[' + el.getAttribute('data-sticker-id') + ']]');
 			});
 		},
 

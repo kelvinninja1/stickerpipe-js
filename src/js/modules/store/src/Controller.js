@@ -26,12 +26,12 @@
 		},
 
 		downloadPack: function(packName, pricePoint) {
-			Plugin.Service.Pack.activateUserPack(packName, pricePoint, function() {
+			Plugin.Service.Pack.purchase(packName, pricePoint, function() {
 				callStoreMethod('reload');
 				callStoreMethod('onPackDownloaded', {
 					packName: packName
 				});
-			});
+			}, true);
 		},
 
 		purchasePack: function(packName, packTitle, pricePoint) {

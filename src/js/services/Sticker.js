@@ -3,24 +3,47 @@
 
 
 	Plugin.Service.Sticker = {
-		parse: function(text) {
-			// todo: add method isSticker
-			var result = {
-					isSticker: false,
-					url: ''
-				},
-				matchData = text.match(/\[\[(\S+)_(\S+)\]\]/);
 
-			if (matchData) {
-				result.isSticker = true;
-				result.url = Plugin.Service.Url.getStickerUrl(matchData[1], matchData[2]);
+		parse: function(text, callback) {
 
+			var stickerId = null,
+				formatV1 = text.match(/\[\[(\S+)_(\S+)\]\]/),
+				formatV2 = text.match(/\[\[(\d+)\]\]/);
 
-				result.pack = matchData[1];
-				result.name = matchData[2];
+			if (formatV1) {
+				stickerId = formatV1[1] + '_' + formatV1[2];
+			} else if (formatV2) {
+				stickerId = formatV2[1];
 			}
 
-			return result;
+			if (!stickerId) {
+				callback && callback(null);
+				return;
+			}
+
+			Plugin.Service.Sticker.getById(stickerId, function(sticker) {
+				var url = sticker.image && sticker.image[Plugin.Configs.stickerResolutionType];
+
+				callback && callback({
+					id: stickerId,
+					url: url,
+					html: '<img src="' + url + '" class="stickerpipe-sticker" data-sticker-id="' + stickerId + '">'
+				});
+			});
+		},
+
+		getById: function(contentId, successCallback) {
+			var sticker = Plugin.Service.Storage.getContentById(contentId);
+
+			if (sticker) {
+				successCallback && successCallback(sticker);
+				return;
+			}
+
+			Plugin.Service.Api.getContentById(contentId, function(sticker) {
+				Plugin.Service.Storage.setContentById(contentId, sticker);
+				successCallback && successCallback(sticker);
+			});
 		}
 	};
 })(window.StickersModule);

@@ -1,14 +1,15 @@
 
 (function(Plugin) {
 
-	function activateUserPack(taskData) {
-		Plugin.Service.Pack.activateUserPack(taskData.packName, taskData.pricePoint);
+	function purchasePack(taskData) {
+		Plugin.Service.Pack.purchase(taskData.packName, taskData.pricePoint);
 	}
 
 	Plugin.Service.PendingRequest = {
 
 		tasks: {
-			activateUserPack: 'activateUserPack'
+			activateUserPack: 'activateUserPack',
+			purchasePack: 'purchasePack'
 		},
 
 		init: function() {
@@ -28,7 +29,8 @@
 			while(task) {
 				switch (task.name) {
 					case this.tasks.activateUserPack:
-						activateUserPack(task.data);
+					case this.tasks.purchasePack:
+						purchasePack(task.data);
 						break;
 					default :
 						break;

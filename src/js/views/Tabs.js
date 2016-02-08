@@ -19,7 +19,7 @@
 			scrollableContent: 'sp-tabs-scrollable-content',
 			controlTab: 'sp-control-tab',
 			controlButton: 'sp-control-button',
-			newPack: 'sp-new-pack',
+			unwatched: 'sp-unwatched-pack',
 			packTab: 'sp-pack-tab',
 			tabActive: 'sp-tab-active',
 			tabs: 'sp-tabs'
@@ -80,7 +80,7 @@
 		},
 
 
-		render: function(stickerPacks) {
+		render: function() {
 
 			this.el.classList.add(this.classes.tabs);
 			this.el.innerHTML = '';
@@ -89,7 +89,7 @@
 
 			this.renderScrollableContainer();
 
-			this.renderPacks(stickerPacks);
+			this.renderPacks();
 
 			this.renderNextPacksTab();
 
@@ -120,20 +120,18 @@
 		renderPackTab: function(pack) {
 			var classes = [this.classes.packTab];
 
-			if(pack.newPack) {
-				classes.push(this.classes.newPack);
+			if (pack.isUnwatched) {
+				classes.push(this.classes.unwatched);
 			}
 
-			var iconSrc = Plugin.Service.Url.getPackTabIconUrl(pack.pack_name);
-
-			var content = '<img src=' + iconSrc + '>';
+			var content = '<img src=' + pack.tab_icon[Plugin.Configs.tabResolutionType] + '>';
 
 			var tabEl = this.renderTab(null, classes, content, {
 				'data-pack-name': pack.pack_name
 			});
 
 			tabEl.addEventListener('click', (function() {
-				tabEl.classList.remove(this.classes.newPack);
+				tabEl.classList.remove(this.classes.unwatched);
 			}).bind(this));
 
 			this.packTabs[pack.pack_name] = tabEl;
@@ -183,14 +181,16 @@
 		},
 
 
-		renderPacks: function(stickerPacks) {
+		renderPacks: function() {
 			this.scrollableContentEl.innerHTML = '';
 
 			this.renderEmojiTab();
 			this.renderHistoryTab();
 
-			for (var i = 0; i < stickerPacks.length; i++) {
-				var pack = stickerPacks[i];
+			var packs = Plugin.Service.Storage.getPacks();
+
+			for (var i = 0; i < packs.length; i++) {
+				var pack = packs[i];
 				this.scrollableContentEl.appendChild(this.renderPackTab(pack));
 				this.packTabsIndexes[pack.pack_name] = i;
 			}
@@ -282,7 +282,7 @@
 		handleClickOnEmojiTab: function(callback) {
 			Plugin.Service.Helper.setEvent('click', this.el, this.controls.emoji.class, callback);
 		},
-		handleClickOnLastUsedPacksTab: function(callback) {
+		handleClickOnRecentTab: function(callback) {
 			Plugin.Service.Helper.setEvent('click', this.el, this.controls.history.class, callback);
 		},
 		handleClickOnPackTab: function(callback) {

@@ -450,7 +450,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   padding-right: 0;
 }
 
-.sticker-pipe .sp-tabs .sp-tab-item.sp-pack-tab.sp-new-pack::after {
+.sticker-pipe .sp-tabs .sp-tab-item.sp-pack-tab.sp-unwatched-pack::after {
   content: "";
   width: 10px;
   height: 10px;
@@ -523,6 +523,11 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 .sticker-pipe .sp-content.sp-stickers .sp-sticker-item img {
   height: 80px;
   width: 80px;
+}
+
+.stickerpipe-sticker {
+  height: 160px;
+  width: 160px;
 }
 
 .sp-icon-arrow-back {

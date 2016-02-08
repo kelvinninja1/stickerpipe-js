@@ -9,8 +9,8 @@
 			Plugin.Module.Store.Controller.init(stickerpipe);
 		},
 
-		open: function(packName) {
-			Plugin.Module.Store.View.open(packName);
+		open: function(contentId) {
+			Plugin.Module.Store.View.open(contentId);
 		},
 
 		close: function() {

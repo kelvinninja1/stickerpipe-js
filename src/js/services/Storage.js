@@ -12,53 +12,86 @@
 		///////////////////////////////////////
 		// Used stickers
 		///////////////////////////////////////
-		getUsedStickers: function() {
-			return this.lockr.get('sticker_latest_use') || [];
+		getRecentStickers: function() {
+			return this.lockr.get('recent_stickers') || [];
 		},
-		setUsedStickers: function(usedStickers) {
-			return this.lockr.set('sticker_latest_use', usedStickers);
+		setRecentStickers: function(recentStickers) {
+			return this.lockr.set('recent_stickers', recentStickers);
 		},
-		addUsedSticker: function(stickerCode) {
+		addRecentSticker: function(stickerId) {
 
-			var usedStickers = this.getUsedStickers(),
-				newStorageDate = [];
+			var recentStickers = this.getRecentStickers();
 
-			// todo: rewrite function as for & slice
-			Plugin.Service.Helper.forEach(usedStickers, function(usedSticker) {
-
-				if (usedSticker.code != stickerCode) {
-					newStorageDate.push(usedSticker);
+			for (var i = 0; i < recentStickers.length; i++) {
+				if (recentStickers[i] == stickerId) {
+					recentStickers.splice(i, 1);
 				}
+			}
 
-			});
+			recentStickers.unshift(stickerId);
 
-			usedStickers = newStorageDate;
-
-			usedStickers.unshift({
-				code : stickerCode
-			});
-
-			this.setUsedStickers(usedStickers);
+			this.setRecentStickers(recentStickers);
 		},
 
 		///////////////////////////////////////
 		// Packs
 		///////////////////////////////////////
 		getPacks: function() {
-			var packs = this.lockr.get('sticker_packs');
-
-			if (typeof packs == 'object' && packs.packs) {
-				packs = packs.packs;
-			} else if (Object.prototype.toString.call(packs) !== '[object Array]') {
-				packs = [];
-			}
-
-			return packs;
+			return this.lockr.get('packs') || [];
 		},
 		setPacks: function(packs) {
-			return this.lockr.set('sticker_packs', packs)
+			return this.lockr.set('packs', packs)
 		},
 
+		getPack: function(packName) {
+			var packs = this.getPacks();
+
+			for (var i = 0; i < packs.length; i++) {
+				if (packName == packs[i].pack_name) {
+					return packs[i];
+				}
+			}
+
+			return null;
+		},
+		setPack: function(packName, pack) {
+
+			var packExist = false,
+				packs = this.getPacks();
+
+			for (var i = 0; i < packs.length; i++) {
+				if (packName == packs[i].pack_name) {
+					packs[i] = pack;
+					packExist = true;
+					break;
+				}
+			}
+
+			if (!packExist) {
+				packs.unshift(pack);
+			}
+
+			this.setPacks(packs);
+		},
+
+		///////////////////////////////////////
+		// Content
+		///////////////////////////////////////
+		getContent: function() {
+			return this.lockr.get('content') || {};
+		},
+		setContent: function(content) {
+			return this.lockr.set('content', content || {})
+		},
+
+		getContentById: function(id) {
+			return this.getContent()['id' + id] || null;
+		},
+		setContentById: function(id, data) {
+			var content = this.getContent();
+			content['id' + id] = data || null;
+			this.setContent(content);
+		},
 		///////////////////////////////////////
 		// Device ID
 		///////////////////////////////////////

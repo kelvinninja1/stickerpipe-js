@@ -1,45 +1,28 @@
 
 (function(Plugin) {
 
+	function trackStatistic(category, action, label) {
+		Plugin.Service.Api.sendStatistic([{
+			category: category,
+			action: action,
+			label: label
+		}]);
+
+		ga('stickerTracker.send', 'event', category, action, label);
+	}
+
 	Plugin.Service.Statistic = {
 
 		messageSend: function(isSticker) {
-			var category = 'message',
-				action = 'send',
-				label = (isSticker) ? 'sticker' : 'text';
-
-			Plugin.Service.Api.sendStatistic([{
-				category: category,
-				action: action,
-				label: label
-			}]);
-
-			ga('stickerTracker.send', 'event', category, action, label);
+			trackStatistic('message', 'send', ((isSticker) ? 'sticker' : 'text'));
 		},
 
-		useSticker: function(packName, stickerName) {
-			var category = 'sticker';
-
-			Plugin.Service.Api.sendStatistic([{
-				category: category,
-				action: 'use',
-				label: '[[' + packName + '_' + stickerName + ']]'
-			}]);
-
-			ga('stickerTracker.send', 'event', category, packName, stickerName, 1);
+		useSticker: function(stickerId) {
+			trackStatistic('sticker', 'use', stickerId);
 		},
 
 		useEmoji: function(emoji) {
-			var action = 'use',
-				category = 'emoji';
-
-			Plugin.Service.Api.sendStatistic([{
-				category: category,
-				action: action,
-				label: emoji
-			}]);
-
-			ga('stickerTracker.send', 'event', category, action, emoji);
+			trackStatistic('emoji', 'use', emoji);
 		}
 
 	};

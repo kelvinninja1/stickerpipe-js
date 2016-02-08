@@ -21,30 +21,10 @@
 				+ Plugin.Service.Helper.urlParamsSerialize(params) + '#/' + uri;
 		},
 
-		buildCdnUrl: function(uri) {
-			uri = uri || '';
-
-			return Plugin.Configs.cdnUrl + '/stk/' + uri;
-		},
-
 		buildApiUrl: function(uri) {
 			uri = uri || '';
 
 			return Plugin.Configs.apiUrl + '/api/v' + Plugin.Service.Api.getApiVersion() + uri;
-		},
-
-		getStickerUrl: function(packName, stickerName) {
-			return this.buildCdnUrl(
-				packName + '/' + stickerName +
-				'_' + Plugin.Configs.stickerResolutionType + '.png'
-			);
-		},
-
-		getPackTabIconUrl: function(packName) {
-			return this.buildCdnUrl(
-				packName + '/' +
-				'tab_icon_' + Plugin.Configs.tabResolutionType + '.png'
-			);
 		},
 
 		getPacksUrl: function() {
@@ -65,7 +45,7 @@
 			return this.buildApiUrl('/user');
 		},
 
-		getUserPackUrl: function(packName, pricePoint) {
+		getPurchaseUrl: function(packName, pricePoint) {
 
 			// detect purchase type
 			var purchaseType = 'free';
@@ -79,12 +59,16 @@
 			}
 
 			// build url
-			var url = this.buildApiUrl('/user/pack/' + packName);
+			var url = this.buildApiUrl('/packs/' + packName);
 			url += '?' + Plugin.Service.Helper.urlParamsSerialize({
 					purchase_type: purchaseType
 				});
 
 			return url;
+		},
+
+		getContentByIdUrl: function(contentId) {
+			return this.buildApiUrl('/content/' + contentId);
 		},
 
 		getStoreUrl: function() {

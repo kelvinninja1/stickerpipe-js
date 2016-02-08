@@ -43,14 +43,18 @@
 			}).bind(this));
 		},
 
-		open: function(packName) {
-			var url = Plugin.Service.Url.getStoreUrl();
+		open: function(contentId) {
 
-			if (packName) {
-				url = Plugin.Service.Url.getStorePackUrl(packName);
+			var self = this;
+
+			self.iframe.src = Plugin.Service.Url.getStoreUrl();
+
+			if (contentId) {
+				Plugin.Service.Sticker.getById(contentId, function (sticker) {
+					self.iframe.src = Plugin.Service.Url.getStorePackUrl(sticker.pack);
+				});
 			}
 
-			this.iframe.src = url;
 			this.modal.open();
 		},
 

@@ -17,9 +17,8 @@
 
 		apiKey: null, // example: 72921666b5ff8651f374747bfefaf7b2
 
-		cdnUrl: 'http://cdn.stickerpipe.com',
 		apiUrl: 'http://api.stickerpipe.com',
-		storeUrl: 'http://api.stickerpipe.com/api/v1/web',
+		storeUrl: 'http://api.stickerpipe.com/api/v2/web',
 
 		storagePrefix: 'stickerpipe_',
 

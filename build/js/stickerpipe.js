@@ -2972,11 +2972,13 @@ window.StickersModule.Service = {};
 			return API_VERSION;
 		},
 
-		getPacks: function(doneCallback) {
+		getPacks: function(successCallback) {
 			var url = Plugin.Service.Url.getPacksUrl();
 
 			Plugin.Service.Http.get(url, {
-				success: doneCallback
+				success: function(response) {
+					successCallback && successCallback(response.data);
+				}
 			});
 		},
 
@@ -2995,142 +2997,29 @@ window.StickersModule.Service = {};
 			});
 		},
 
-		changeUserPackStatus: function(packName, status, pricePoint, doneCallback) {
-
-			var url = Plugin.Service.Url.getUserPackUrl(packName, pricePoint);
-
-			Plugin.Service.Http.post(url, {
-				status: status
-			}, {
-				success: function() {
-					doneCallback && doneCallback();
+		purchasePack: function(packName, pricePoint, successCallback) {
+			Plugin.Service.Http.post(Plugin.Service.Url.getPurchaseUrl(packName, pricePoint), {}, {
+				success: function(response) {
+					successCallback && successCallback(response.data);
 				},
 				error: function() {
-					if (status) {
-						var pr = Plugin.Service.PendingRequest;
-						pr.add(pr.tasks.activateUserPack, {
-							packName: packName,
-							pricePoint: pricePoint
-						});
-					}
+					var pr = Plugin.Service.PendingRequest;
+					pr.add(pr.tasks.purchasePack, {
+						packName: packName,
+						pricePoint: pricePoint
+					});
+				}
+			});
+		},
+
+		getContentById: function(contentId, successCallback) {
+			Plugin.Service.Http.get(Plugin.Service.Url.getContentByIdUrl(contentId), {
+				success: function(response) {
+					successCallback && successCallback(response.data);
 				}
 			});
 		}
-
 	};
-})(window.StickersModule);
-
-(function(Plugin) {
-
-	Plugin.Service.Base = {
-
-		markNewPacks: function(newPacks) {
-			var globalNew = false,
-				oldPacks = Plugin.Service.Storage.getPacks();
-
-			if (oldPacks.length != 0){
-
-				Plugin.Service.Helper.forEach(newPacks, function(newPack, key) {
-					var isNewPack = true;
-
-					Plugin.Service.Helper.forEach(oldPacks, function(oldPack) {
-
-
-						if(newPack.pack_name == oldPack.pack_name) {
-							isNewPack = oldPack.newPack;
-						}
-
-					});
-
-					if(isNewPack)  globalNew = true;
-					newPacks[key]['newPack'] = isNewPack;
-				});
-
-
-				// todo: to other function
-				// todo: check & fix
-				//if (globalNew) {
-
-				if (globalNew == false && Plugin.Service.Storage.getUsedStickers().length == 0) {
-					globalNew = true;
-				}
-				Plugin.Service.Event.changeContentHighlight(globalNew);
-				//}
-
-
-				// *****************************************************************************************************
-				// todo: do in other function
-				// update used stickers
-
-				var used = Plugin.Service.Storage.getUsedStickers();
-
-				for (var i = 0; i < used.length; i++) {
-					var sticker = Plugin.Service.Sticker.parse('[[' + used[i].code + ']]');
-
-					var pack = null;
-					for (var j = 0; j < newPacks.length; j++) {
-						if (newPacks[j].pack_name == sticker.pack) {
-							pack = newPacks[j];
-							break;
-						}
-					}
-
-					if (pack == null) {
-						used.splice(i, 1);
-						continue;
-					}
-
-					var isset = false;
-					for (var j = 0; j < pack.stickers.length; j++) {
-						if (pack.stickers[j].name == sticker.name) {
-							isset = true;
-							break;
-						}
-					}
-
-					if (!isset) {
-						used.splice(i, 1);
-						continue;
-					}
-				}
-
-				Plugin.Service.Storage.setUsedStickers(used);
-
-				// *****************************************************************************************************
-			} else {
-				Plugin.Service.Event.changeContentHighlight(true);
-			}
-
-			return newPacks;
-		},
-
-		updatePacks: function(successCallback) {
-
-			Plugin.Service.Api.getPacks(
-				(function(response) {
-					if(response.status != 'success') {
-						return;
-					}
-
-					var packs = response.data;
-
-					// show only active packs
-					for (var i = 0; i < packs.length; i++) {
-						if (packs[i].user_status != 'active') {
-							packs.splice(i, 1);
-						}
-					}
-
-					packs = this.markNewPacks(packs);
-
-					Plugin.Service.Storage.setPacks(packs);
-
-					successCallback && successCallback(packs);
-				}).bind(this)
-			);
-		}
-	};
-
 })(window.StickersModule);
 
 (function(Plugin) {
@@ -3597,35 +3486,179 @@ window.StickersModule.Service = {};
 
 	var stickerpipe;
 
+	function filterActivePacks(packs) {
+		for (var i = 0; i < packs.length; i++) {
+			if (packs[i].user_status != 'active') {
+				packs.splice(i, 1);
+			}
+		}
+
+		return packs;
+	}
+
+	function filterRecentStickers() {
+
+		var packs = Plugin.Service.Storage.getPacks(),
+			recentStickersIds = Plugin.Service.Storage.getRecentStickers();
+
+		for (var i = 0; i < recentStickersIds.length; i++) {
+
+			Plugin.Service.Sticker.getById(recentStickersIds[i], function(sticker) {
+
+				// check existing sticker pack
+				var pack = null;
+
+				for (var j = 0; j < packs.length; j++) {
+					if (packs[j].pack_name == sticker.pack) {
+						pack = packs[j];
+						break;
+					}
+				}
+
+				if (pack == null) {
+					recentStickersIds.splice(i, 1);
+					Plugin.Service.Storage.setRecentStickers(recentStickersIds);
+					return;
+				}
+
+				// check existing sticker in pack
+				var exist = false;
+				for (var j = 0; j < pack.stickers.length; j++) {
+					if (pack.stickers[j] == sticker.content_id) {
+						exist = true;
+						break;
+					}
+				}
+
+				if (!exist) {
+					recentStickersIds.splice(i, 1);
+					Plugin.Service.Storage.setRecentStickers(recentStickersIds);
+					return;
+				}
+			});
+
+		}
+	}
+
 	Plugin.Service.Pack = {
 
 		init: function(_stickerpipe) {
 			stickerpipe = _stickerpipe;
 		},
 
-		activateUserPack: function(packName, pricePoint, doneCallback) {
-			Plugin.Service.Api.changeUserPackStatus(packName, true, pricePoint, function() {
+		purchase: function(packName, pricePoint, doneCallback, isUnwatched) {
+			isUnwatched = (typeof isUnwatched == 'undefined') ? true : isUnwatched;
 
-				// todo: add event ~ "packs fetched" & remove "stickerpipe" variable
-				stickerpipe.fetchPacks(function() {
-					doneCallback && doneCallback();
-				});
+			Plugin.Service.Api.purchasePack(packName, pricePoint, function(pack) {
+				pack.isUnwatched = isUnwatched;
 
+				var packContentIds = [];
+				for (var i = 0; i < pack.stickers.length; i++) {
+					var sticker = pack.stickers[i];
+					sticker.pack = packName;
+
+					Plugin.Service.Storage.setContentById(sticker.content_id, sticker);
+
+					packContentIds.push(sticker.content_id);
+				}
+
+				pack.stickers = packContentIds;
+
+				Plugin.Service.Storage.setPack(pack.pack_name, pack);
+
+				if (stickerpipe && stickerpipe.view.isRendered) {
+					stickerpipe.view.tabsView.renderPacks();
+				}
+
+				doneCallback && doneCallback(pack);
 			});
+		},
+
+		fetchPacks: function(callback) {
+
+			var self = this;
+
+			Plugin.Service.Api.getPacks(function(packs) {
+
+				packs = filterActivePacks(packs);
+
+				var packsInStorage = Plugin.Service.Storage.getPacks(),
+					undefinedPacksInStorage = [];
+
+				if (!packsInStorage.length) {
+					undefinedPacksInStorage = packs;
+				} else {
+					for (var i = 0; i < packs.length; i++) {
+						var packInStorage = null;
+
+						for (var j = 0; j < packsInStorage.length; j++) {
+							if (packs[i].pack_name == packsInStorage[j].pack_name) {
+								packInStorage = packsInStorage[j];
+								break;
+							}
+						}
+
+						if (packInStorage && packs[i].updated_at == packInStorage.updated_at) {
+							packs[i] = packInStorage;
+						} else {
+							undefinedPacksInStorage.push(packs[i]);
+						}
+					}
+				}
+
+				Plugin.Service.Storage.setPacks(packs);
+
+				for (var i = 0; i < undefinedPacksInStorage.length; i++) {
+					Plugin.Service.Pack.purchase(
+						undefinedPacksInStorage[i].pack_name,
+						undefinedPacksInStorage[i].pricepoint,
+						null,
+						(packsInStorage.length) ? true : false
+					);
+				}
+
+				filterRecentStickers();
+
+				self.checkHighlight();
+
+				callback && callback();
+			});
+		},
+
+		isExistUnwatchedPacks: function() {
+			var packs = Plugin.Service.Storage.getPacks();
+
+			for(var i = 0; i < packs.length; i++) {
+				if (!!packs[i].isUnwatched) {
+					return true;
+				}
+			}
+
+			return false;
+		},
+
+		checkHighlight: function() {
+			var showContentHighlight = this.isExistUnwatchedPacks();
+			if (!showContentHighlight && Plugin.Service.Storage.getRecentStickers().length == 0) {
+				showContentHighlight = true;
+			}
+			Plugin.Service.Event.changeContentHighlight(showContentHighlight);
 		}
 	};
+
 })(window.StickersModule);
 
 (function(Plugin) {
 
-	function activateUserPack(taskData) {
-		Plugin.Service.Pack.activateUserPack(taskData.packName, taskData.pricePoint);
+	function purchasePack(taskData) {
+		Plugin.Service.Pack.purchase(taskData.packName, taskData.pricePoint);
 	}
 
 	Plugin.Service.PendingRequest = {
 
 		tasks: {
-			activateUserPack: 'activateUserPack'
+			activateUserPack: 'activateUserPack',
+			purchasePack: 'purchasePack'
 		},
 
 		init: function() {
@@ -3645,7 +3678,8 @@ window.StickersModule.Service = {};
 			while(task) {
 				switch (task.name) {
 					case this.tasks.activateUserPack:
-						activateUserPack(task.data);
+					case this.tasks.purchasePack:
+						purchasePack(task.data);
 						break;
 					default :
 						break;
@@ -3660,45 +3694,28 @@ window.StickersModule.Service = {};
 
 (function(Plugin) {
 
+	function trackStatistic(category, action, label) {
+		Plugin.Service.Api.sendStatistic([{
+			category: category,
+			action: action,
+			label: label
+		}]);
+
+		ga('stickerTracker.send', 'event', category, action, label);
+	}
+
 	Plugin.Service.Statistic = {
 
 		messageSend: function(isSticker) {
-			var category = 'message',
-				action = 'send',
-				label = (isSticker) ? 'sticker' : 'text';
-
-			Plugin.Service.Api.sendStatistic([{
-				category: category,
-				action: action,
-				label: label
-			}]);
-
-			ga('stickerTracker.send', 'event', category, action, label);
+			trackStatistic('message', 'send', ((isSticker) ? 'sticker' : 'text'));
 		},
 
-		useSticker: function(packName, stickerName) {
-			var category = 'sticker';
-
-			Plugin.Service.Api.sendStatistic([{
-				category: category,
-				action: 'use',
-				label: '[[' + packName + '_' + stickerName + ']]'
-			}]);
-
-			ga('stickerTracker.send', 'event', category, packName, stickerName, 1);
+		useSticker: function(stickerId) {
+			trackStatistic('sticker', 'use', stickerId);
 		},
 
 		useEmoji: function(emoji) {
-			var action = 'use',
-				category = 'emoji';
-
-			Plugin.Service.Api.sendStatistic([{
-				category: category,
-				action: action,
-				label: emoji
-			}]);
-
-			ga('stickerTracker.send', 'event', category, action, emoji);
+			trackStatistic('emoji', 'use', emoji);
 		}
 
 	};
@@ -3710,24 +3727,47 @@ window.StickersModule.Service = {};
 
 
 	Plugin.Service.Sticker = {
-		parse: function(text) {
-			// todo: add method isSticker
-			var result = {
-					isSticker: false,
-					url: ''
-				},
-				matchData = text.match(/\[\[(\S+)_(\S+)\]\]/);
 
-			if (matchData) {
-				result.isSticker = true;
-				result.url = Plugin.Service.Url.getStickerUrl(matchData[1], matchData[2]);
+		parse: function(text, callback) {
 
+			var stickerId = null,
+				formatV1 = text.match(/\[\[(\S+)_(\S+)\]\]/),
+				formatV2 = text.match(/\[\[(\d+)\]\]/);
 
-				result.pack = matchData[1];
-				result.name = matchData[2];
+			if (formatV1) {
+				stickerId = formatV1[1] + '_' + formatV1[2];
+			} else if (formatV2) {
+				stickerId = formatV2[1];
 			}
 
-			return result;
+			if (!stickerId) {
+				callback && callback(null);
+				return;
+			}
+
+			Plugin.Service.Sticker.getById(stickerId, function(sticker) {
+				var url = sticker.image && sticker.image[Plugin.Configs.stickerResolutionType];
+
+				callback && callback({
+					id: stickerId,
+					url: url,
+					html: '<img src="' + url + '" class="stickerpipe-sticker" data-sticker-id="' + stickerId + '">'
+				});
+			});
+		},
+
+		getById: function(contentId, successCallback) {
+			var sticker = Plugin.Service.Storage.getContentById(contentId);
+
+			if (sticker) {
+				successCallback && successCallback(sticker);
+				return;
+			}
+
+			Plugin.Service.Api.getContentById(contentId, function(sticker) {
+				Plugin.Service.Storage.setContentById(contentId, sticker);
+				successCallback && successCallback(sticker);
+			});
 		}
 	};
 })(window.StickersModule);
@@ -3745,53 +3785,86 @@ window.StickersModule.Service = {};
 		///////////////////////////////////////
 		// Used stickers
 		///////////////////////////////////////
-		getUsedStickers: function() {
-			return this.lockr.get('sticker_latest_use') || [];
+		getRecentStickers: function() {
+			return this.lockr.get('recent_stickers') || [];
 		},
-		setUsedStickers: function(usedStickers) {
-			return this.lockr.set('sticker_latest_use', usedStickers);
+		setRecentStickers: function(recentStickers) {
+			return this.lockr.set('recent_stickers', recentStickers);
 		},
-		addUsedSticker: function(stickerCode) {
+		addRecentSticker: function(stickerId) {
 
-			var usedStickers = this.getUsedStickers(),
-				newStorageDate = [];
+			var recentStickers = this.getRecentStickers();
 
-			// todo: rewrite function as for & slice
-			Plugin.Service.Helper.forEach(usedStickers, function(usedSticker) {
-
-				if (usedSticker.code != stickerCode) {
-					newStorageDate.push(usedSticker);
+			for (var i = 0; i < recentStickers.length; i++) {
+				if (recentStickers[i] == stickerId) {
+					recentStickers.splice(i, 1);
 				}
+			}
 
-			});
+			recentStickers.unshift(stickerId);
 
-			usedStickers = newStorageDate;
-
-			usedStickers.unshift({
-				code : stickerCode
-			});
-
-			this.setUsedStickers(usedStickers);
+			this.setRecentStickers(recentStickers);
 		},
 
 		///////////////////////////////////////
 		// Packs
 		///////////////////////////////////////
 		getPacks: function() {
-			var packs = this.lockr.get('sticker_packs');
-
-			if (typeof packs == 'object' && packs.packs) {
-				packs = packs.packs;
-			} else if (Object.prototype.toString.call(packs) !== '[object Array]') {
-				packs = [];
-			}
-
-			return packs;
+			return this.lockr.get('packs') || [];
 		},
 		setPacks: function(packs) {
-			return this.lockr.set('sticker_packs', packs)
+			return this.lockr.set('packs', packs)
 		},
 
+		getPack: function(packName) {
+			var packs = this.getPacks();
+
+			for (var i = 0; i < packs.length; i++) {
+				if (packName == packs[i].pack_name) {
+					return packs[i];
+				}
+			}
+
+			return null;
+		},
+		setPack: function(packName, pack) {
+
+			var packExist = false,
+				packs = this.getPacks();
+
+			for (var i = 0; i < packs.length; i++) {
+				if (packName == packs[i].pack_name) {
+					packs[i] = pack;
+					packExist = true;
+					break;
+				}
+			}
+
+			if (!packExist) {
+				packs.unshift(pack);
+			}
+
+			this.setPacks(packs);
+		},
+
+		///////////////////////////////////////
+		// Content
+		///////////////////////////////////////
+		getContent: function() {
+			return this.lockr.get('content') || {};
+		},
+		setContent: function(content) {
+			return this.lockr.set('content', content || {})
+		},
+
+		getContentById: function(id) {
+			return this.getContent()['id' + id] || null;
+		},
+		setContentById: function(id, data) {
+			var content = this.getContent();
+			content['id' + id] = data || null;
+			this.setContent(content);
+		},
 		///////////////////////////////////////
 		// Device ID
 		///////////////////////////////////////
@@ -3877,30 +3950,10 @@ window.StickersModule.Service = {};
 				+ Plugin.Service.Helper.urlParamsSerialize(params) + '#/' + uri;
 		},
 
-		buildCdnUrl: function(uri) {
-			uri = uri || '';
-
-			return Plugin.Configs.cdnUrl + '/stk/' + uri;
-		},
-
 		buildApiUrl: function(uri) {
 			uri = uri || '';
 
 			return Plugin.Configs.apiUrl + '/api/v' + Plugin.Service.Api.getApiVersion() + uri;
-		},
-
-		getStickerUrl: function(packName, stickerName) {
-			return this.buildCdnUrl(
-				packName + '/' + stickerName +
-				'_' + Plugin.Configs.stickerResolutionType + '.png'
-			);
-		},
-
-		getPackTabIconUrl: function(packName) {
-			return this.buildCdnUrl(
-				packName + '/' +
-				'tab_icon_' + Plugin.Configs.tabResolutionType + '.png'
-			);
 		},
 
 		getPacksUrl: function() {
@@ -3921,7 +3974,7 @@ window.StickersModule.Service = {};
 			return this.buildApiUrl('/user');
 		},
 
-		getUserPackUrl: function(packName, pricePoint) {
+		getPurchaseUrl: function(packName, pricePoint) {
 
 			// detect purchase type
 			var purchaseType = 'free';
@@ -3935,12 +3988,16 @@ window.StickersModule.Service = {};
 			}
 
 			// build url
-			var url = this.buildApiUrl('/user/pack/' + packName);
+			var url = this.buildApiUrl('/packs/' + packName);
 			url += '?' + Plugin.Service.Helper.urlParamsSerialize({
 					purchase_type: purchaseType
 				});
 
 			return url;
+		},
+
+		getContentByIdUrl: function(contentId) {
+			return this.buildApiUrl('/content/' + contentId);
 		},
 
 		getStoreUrl: function() {
@@ -3998,9 +4055,8 @@ window.StickersModule.Configs = {};
 
 		apiKey: null, // example: 72921666b5ff8651f374747bfefaf7b2
 
-		cdnUrl: 'http://cdn.stickerpipe.com',
 		apiUrl: 'http://api.stickerpipe.com',
-		storeUrl: 'http://api.stickerpipe.com/api/v1/web',
+		storeUrl: 'http://api.stickerpipe.com/api/v2/web',
 
 		storagePrefix: 'stickerpipe_',
 
@@ -4901,8 +4957,8 @@ window.StickersModule.Module = {};
 			Plugin.Module.Store.Controller.init(stickerpipe);
 		},
 
-		open: function(packName) {
-			Plugin.Module.Store.View.open(packName);
+		open: function(contentId) {
+			Plugin.Module.Store.View.open(contentId);
 		},
 
 		close: function() {
@@ -5006,12 +5062,12 @@ window.StickersModule.Module = {};
 		},
 
 		downloadPack: function(packName, pricePoint) {
-			Plugin.Service.Pack.activateUserPack(packName, pricePoint, function() {
+			Plugin.Service.Pack.purchase(packName, pricePoint, function() {
 				callStoreMethod('reload');
 				callStoreMethod('onPackDownloaded', {
 					packName: packName
 				});
-			});
+			}, true);
 		},
 
 		purchasePack: function(packName, packTitle, pricePoint) {
@@ -5092,14 +5148,18 @@ window.StickersModule.Module = {};
 			}).bind(this));
 		},
 
-		open: function(packName) {
-			var url = Plugin.Service.Url.getStoreUrl();
+		open: function(contentId) {
 
-			if (packName) {
-				url = Plugin.Service.Url.getStorePackUrl(packName);
+			var self = this;
+
+			self.iframe.src = Plugin.Service.Url.getStoreUrl();
+
+			if (contentId) {
+				Plugin.Service.Sticker.getById(contentId, function (sticker) {
+					self.iframe.src = Plugin.Service.Url.getStorePackUrl(sticker.pack);
+				});
 			}
 
-			this.iframe.src = url;
 			this.modal.open();
 		},
 
@@ -5565,9 +5625,9 @@ window.StickersModule.View = {};
 			}).bind(this));
 		},
 
-		render: function(stickerPacks) {
+		render: function() {
 
-			this.tabsView.render(stickerPacks);
+			this.tabsView.render();
 
 			this.el.innerHTML = '';
 			this.el.classList.add('sticker-pipe');
@@ -5596,27 +5656,17 @@ window.StickersModule.View = {};
 			this.tabsView.onWindowResize();
 			this.onWindowResize();
 		},
-		renderUsedStickers: function() {
+		renderRecentStickers: function() {
 
-			var usedStickers = Plugin.Service.Storage.getUsedStickers();
+			var recentStickers = Plugin.Service.Storage.getRecentStickers();
 
-			this.contentEl.innerHTML = '';
-
-			this.contentEl.classList.remove('sp-stickers');
-			this.contentEl.classList.remove('sp-emojis');
-
-			if (usedStickers.length == 0) {
-				this.contentEl.innerHTML += Plugin.Configs.htmlForEmptyRecent;
+			if (!recentStickers.length) {
+				this.contentEl.innerHTML = Plugin.Configs.htmlForEmptyRecent;
 				this.updateScroll('top');
 				return false;
 			}
 
-			var stickers = [];
-			Plugin.Service.Helper.forEach(usedStickers, function(sticker) {
-				stickers.push(sticker.code);
-			});
-
-			this.renderStickers(stickers);
+			this.renderStickers(recentStickers);
 		},
 		renderEmojiBlock: function() {
 
@@ -5631,41 +5681,31 @@ window.StickersModule.View = {};
 			this.updateScroll('top');
 		},
 		renderPack: function(pack) {
-
-			this.contentEl.innerHTML = '';
-
-			var stickers = [];
-			Plugin.Service.Helper.forEach(pack.stickers, function(sticker) {
-				stickers.push(pack.pack_name + '_' + sticker.name);
-			});
-
-			this.renderStickers(stickers);
+			this.renderStickers(pack.stickers);
 		},
-		renderStickers: function(stickers) {
+		renderStickers: function(stickersIds) {
 			var self = this;
 
+			this.contentEl.innerHTML = '';
 			this.contentEl.classList.remove('sp-emojis');
 			this.contentEl.classList.add('sp-stickers');
 
-			Plugin.Service.Helper.forEach(stickers, function(stickerCode) {
-
-				var placeHolderClass = 'sp-sticker-placeholder';
-
-				var stickerImgSrc = Plugin.Service.Sticker.parse('[[' + stickerCode + ']]');
+			Plugin.Service.Helper.forEach(stickersIds, function(stickerId) {
 
 				var stickersSpanEl = document.createElement('span');
-				stickersSpanEl.classList.add(placeHolderClass);
+				stickersSpanEl.className = 'sp-sticker-placeholder';
+				stickersSpanEl.setAttribute('data-sticker-id', stickerId);
 
 				var image = new Image();
 				image.onload = function() {
-					stickersSpanEl.classList.remove(placeHolderClass);
-					stickersSpanEl.classList.add(Plugin.Configs.stickerItemClass);
-					stickersSpanEl.setAttribute('data-sticker-string', stickerCode);
+					stickersSpanEl.className = Plugin.Configs.stickerItemClass;
 					stickersSpanEl.appendChild(image);
 				};
 				image.onerror = function() {};
 
-				image.src = stickerImgSrc.url;
+				Plugin.Service.Sticker.getById(stickerId, function(sticker) {
+					image.src = sticker.image[Plugin.Configs.stickerResolutionType];
+				});
 
 				self.contentEl.appendChild(stickersSpanEl);
 			});
@@ -5890,7 +5930,7 @@ window.StickersModule.View = {};
 			scrollableContent: 'sp-tabs-scrollable-content',
 			controlTab: 'sp-control-tab',
 			controlButton: 'sp-control-button',
-			newPack: 'sp-new-pack',
+			unwatched: 'sp-unwatched-pack',
 			packTab: 'sp-pack-tab',
 			tabActive: 'sp-tab-active',
 			tabs: 'sp-tabs'
@@ -5951,7 +5991,7 @@ window.StickersModule.View = {};
 		},
 
 
-		render: function(stickerPacks) {
+		render: function() {
 
 			this.el.classList.add(this.classes.tabs);
 			this.el.innerHTML = '';
@@ -5960,7 +6000,7 @@ window.StickersModule.View = {};
 
 			this.renderScrollableContainer();
 
-			this.renderPacks(stickerPacks);
+			this.renderPacks();
 
 			this.renderNextPacksTab();
 
@@ -5991,20 +6031,18 @@ window.StickersModule.View = {};
 		renderPackTab: function(pack) {
 			var classes = [this.classes.packTab];
 
-			if(pack.newPack) {
-				classes.push(this.classes.newPack);
+			if (pack.isUnwatched) {
+				classes.push(this.classes.unwatched);
 			}
 
-			var iconSrc = Plugin.Service.Url.getPackTabIconUrl(pack.pack_name);
-
-			var content = '<img src=' + iconSrc + '>';
+			var content = '<img src=' + pack.tab_icon[Plugin.Configs.tabResolutionType] + '>';
 
 			var tabEl = this.renderTab(null, classes, content, {
 				'data-pack-name': pack.pack_name
 			});
 
 			tabEl.addEventListener('click', (function() {
-				tabEl.classList.remove(this.classes.newPack);
+				tabEl.classList.remove(this.classes.unwatched);
 			}).bind(this));
 
 			this.packTabs[pack.pack_name] = tabEl;
@@ -6054,14 +6092,16 @@ window.StickersModule.View = {};
 		},
 
 
-		renderPacks: function(stickerPacks) {
+		renderPacks: function() {
 			this.scrollableContentEl.innerHTML = '';
 
 			this.renderEmojiTab();
 			this.renderHistoryTab();
 
-			for (var i = 0; i < stickerPacks.length; i++) {
-				var pack = stickerPacks[i];
+			var packs = Plugin.Service.Storage.getPacks();
+
+			for (var i = 0; i < packs.length; i++) {
+				var pack = packs[i];
 				this.scrollableContentEl.appendChild(this.renderPackTab(pack));
 				this.packTabsIndexes[pack.pack_name] = i;
 			}
@@ -6153,7 +6193,7 @@ window.StickersModule.View = {};
 		handleClickOnEmojiTab: function(callback) {
 			Plugin.Service.Helper.setEvent('click', this.el, this.controls.emoji.class, callback);
 		},
-		handleClickOnLastUsedPacksTab: function(callback) {
+		handleClickOnRecentTab: function(callback) {
 			Plugin.Service.Helper.setEvent('click', this.el, this.controls.history.class, callback);
 		},
 		handleClickOnPackTab: function(callback) {
@@ -6199,7 +6239,6 @@ window.StickersModule.View = {};
 	// todo: rename Stickers --> StickerPipe
 	window.Stickers = Plugin.Libs.Class({
 
-		stickersModel: {},
 		view: null,
 
 		_constructor: function(config) {
@@ -6224,7 +6263,7 @@ window.StickersModule.View = {};
 			Plugin.Configs.userId = Plugin.Service.Helper.md5(Plugin.Configs.userId + Plugin.Configs.apiKey);
 
 			if (Plugin.Configs.userId != Plugin.Service.Storage.getUserId()) {
-				Plugin.Service.Storage.setUsedStickers([]);
+				Plugin.Service.Storage.setRecentStickers([]);
 			}
 
 			Plugin.Service.Storage.setUserId(Plugin.Configs.userId);
@@ -6243,121 +6282,75 @@ window.StickersModule.View = {};
 		//   Functions
 		////////////////////
 
-		render: function(onload, elId) {
-			Plugin.Configs.elId = elId || Plugin.Configs.elId;
+		render: function(callback) {
+			var self = this;
 
 			this.view = new Plugin.View.Popover();
 
 			this.delegateEvents();
 
 			// todo
-			//// ***** START *******************************************************************************************
-
-			var callback = onload || null;
-
-			this.fetchPacks((function() {
-				this.view.render(this.stickersModel);
+			Plugin.Service.Pack.fetchPacks(function() {
+				self.view.render();
 
 				callback && callback();
-			}).bind(this));
+			});
 
-			setInterval((function() {
-				this.fetchPacks();
-			}).bind(this), 1000 * 60 * 60); // hour
+			setInterval(function() {
+				Plugin.Service.Pack.fetchPacks();
+			}, 1000 * 60 * 60);
 		},
 
 		delegateEvents: function() {
+			var self = this;
 
-			this.view.tabsView.handleClickOnEmojiTab((function() {
-				this.view.renderEmojiBlock();
-			}).bind(this));
+			this.view.tabsView.handleClickOnEmojiTab(function() {
+				self.view.renderEmojiBlock();
+			});
 
-			this.view.tabsView.handleClickOnLastUsedPacksTab((function() {
-				this.view.renderUsedStickers();
-			}).bind(this));
+			this.view.tabsView.handleClickOnRecentTab(function() {
+				self.view.renderRecentStickers();
+			});
 
-			this.view.tabsView.handleClickOnStoreTab((function() {
-				this.openStore();
-			}).bind(this));
+			this.view.tabsView.handleClickOnStoreTab(function() {
+				Plugin.Module.Store.open();
+			});
 
-			this.view.tabsView.handleClickOnPackTab((function(el) {
-				var pack = null,
-					packName = el.getAttribute('data-pack-name');
+			this.view.tabsView.handleClickOnPackTab(function(el) {
+				var packName = el.getAttribute('data-pack-name'),
+					pack = Plugin.Service.Storage.getPack(packName);
 
-				// todo rename
-				var changed = false,
-					hasNewContent = false;
-
-				for (var i = 0; i < this.stickersModel.length; i++) {
-					if (this.stickersModel[i].pack_name == packName) {
-
-						// set newPack - false
-						changed = true;
-						this.stickersModel[i].newPack = false;
-						Plugin.Service.Storage.setPacks(this.stickersModel);
-
-						pack = this.stickersModel[i];
-					}
-
-					if (this.stickersModel[i].newPack == true) {
-						hasNewContent = true;
-					}
+				if (pack) {
+					pack.isUnwatched = false;
+					Plugin.Service.Storage.setPack(packName, pack);
+					self.view.renderPack(pack);
 				}
 
-				if (changed == true && Plugin.Service.Storage.getUsedStickers().length != 0 && hasNewContent == false) {
-					Plugin.Service.Event.changeContentHighlight(false);
-				}
+				Plugin.Service.Pack.checkHighlight();
+			});
 
-				pack && this.view.renderPack(pack);
-			}).bind(this));
+			this.view.handleClickOnSticker(function(el) {
 
-			this.view.handleClickOnSticker((function(el) {
+				var stickerId = el.getAttribute('data-sticker-id');
 
-				// todo: data-sticker-string --> data-sp-pack & data-sp-sticker
-				// todo: add Plugin.Service.Sticker.generateStickerCode(packName, stickerName)
+				Plugin.Service.Statistic.useSticker(stickerId);
+				Plugin.Service.Storage.addRecentSticker(stickerId);
 
-				var stickerAttrs = el.getAttribute('data-sticker-string').split('_');
-
-				Plugin.Service.Statistic.useSticker(stickerAttrs[0], stickerAttrs[1]);
-				Plugin.Service.Storage.addUsedSticker(stickerAttrs[0] + '_' + stickerAttrs[1]);
-
-				// todo: rewrite
-				// new content mark
-
-				var hasNewContent = false;
-				for (var i = 0; i < this.stickersModel.length; i++) {
-					if (this.stickersModel[i].newPack == true) {
-						hasNewContent = true;
-						break;
-					}
-				}
-
-				if (Plugin.Service.Storage.getUsedStickers().length != 0 && hasNewContent == false) {
-					Plugin.Service.Event.changeContentHighlight(false);
-				}
-			}).bind(this));
+				Plugin.Service.Pack.checkHighlight();
+			});
 
 			this.view.handleClickOnEmoji(function(el) {
-				Plugin.Service.Statistic.useEmoji(
-					Plugin.Service.Emoji.parseEmojiFromHtml(el.innerHTML)
-				);
+				var emoji = Plugin.Service.Emoji.parseEmojiFromHtml(el.innerHTML);
+				Plugin.Service.Statistic.useEmoji(emoji);
 			});
 		},
 
 		fetchPacks: function(callback) {
-			Plugin.Service.Base.updatePacks((function(stickerPacks) {
-				this.stickersModel = stickerPacks;
-
-				if (this.view.isRendered) {
-					this.view.tabsView.renderPacks(this.stickersModel);
-				}
-
-				callback && callback.apply();
-			}).bind(this));
+			Plugin.Service.Pack.fetchPacks(callback);
 		},
 
-		parseStickerFromText: function(text) {
-			return Plugin.Service.Sticker.parse(text);
+		parseStickerFromText: function(text, callback) {
+			return Plugin.Service.Sticker.parse(text, callback);
 		},
 
 		parseEmojiFromText: function(text) {
@@ -6388,8 +6381,8 @@ window.StickersModule.View = {};
 			this.view.close();
 		},
 
-		openStore: function(packName) {
-			Plugin.Module.Store.open(packName);
+		openStore: function(contentId) {
+			Plugin.Module.Store.open(contentId);
 		},
 
 		closeStore: function() {
@@ -6402,7 +6395,7 @@ window.StickersModule.View = {};
 
 		onClickSticker: function(callback, context) {
 			this.view.handleClickOnSticker(function(el) {
-				callback.call(context, '[[' + el.getAttribute('data-sticker-string') + ']]');
+				callback.call(context, '[[' + el.getAttribute('data-sticker-id') + ']]');
 			});
 		},
 

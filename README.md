@@ -84,7 +84,7 @@ js
 -  **render** - rendering sticker pipe keyboard
 
 ```js
-    sticker.render([onRender, elId]);
+    sticker.render([onRender]);
 ```
 
 -  **parseStickerFromText** - parse text and return img url if text is sticker
