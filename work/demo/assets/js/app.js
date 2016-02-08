@@ -31,8 +31,8 @@ var App = _makeClass(function(options) {
 	$textarea: $('.textarea'),
 	$wipeData: $('#wipeData'),
 
-	priceB: 4.99,
-	priceC: 9.99,
+	priceB: '4.99 UAH',
+	priceC: '9.99 UAH',
 
 	_constructor: function(configs) {
 		this.configs = configs;
@@ -98,8 +98,8 @@ var App = _makeClass(function(options) {
 				gender: 'female'
 			},
 
-			priceB: this.priceB + ' UAH',
-			priceC: this.priceC + ' UAH'
+			priceB: this.priceB,
+			priceC: this.priceC
 		});
 
 		this.stickerpipe.render((function() {
@@ -144,7 +144,7 @@ var App = _makeClass(function(options) {
 
 		this.stickerpipe.onPurchase((function(packName, packTitle, pricePoint) {
 
-			var result = confirm('Вы действительно хотите купить пак "' + packTitle + '" за ' + this['price' + pricePoint] + '$ ?');
+			var result = confirm('Вы действительно хотите купить пак "' + packTitle + '" за ' + this['price' + pricePoint] + '?');
 
 			if (result) {
 				this.stickerpipe.purchaseSuccess(packName, pricePoint);
