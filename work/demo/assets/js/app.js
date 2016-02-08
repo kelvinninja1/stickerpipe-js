@@ -31,8 +31,8 @@ var App = _makeClass(function(options) {
 	$textarea: $('.textarea'),
 	$wipeData: $('#wipeData'),
 
-	priceB: 0.99,
-	priceC: 1.99,
+	priceB: 4.99,
+	priceC: 9.99,
 
 	_constructor: function(configs) {
 		this.configs = configs;
@@ -55,10 +55,10 @@ var App = _makeClass(function(options) {
 			this.$window.resize();
 		}).bind(this), 100);
 
-		this.$messages.on('click', 'img[data-sticker]', (function(e) {
+		this.$messages.on('click', 'img.stickerpipe-sticker', (function(e) {
 			var $target = $(e.target);
 
-			this.stickerpipe.openStore($target.attr('data-sticker-pack'));
+			this.stickerpipe.openStore($target.attr('data-sticker-id'));
 		}).bind(this));
 	},
 
@@ -68,10 +68,10 @@ var App = _makeClass(function(options) {
 		var self = this;
 
 		setTimeout(function() {
-			self.sendMessage(false, '', true);
-			self.sendMessage(true, '', true);
-			self.sendMessage(false, '', true);
-			self.sendMessage(true, '[[stevie40_1576]]');
+			self.sendMessage(false, '', true, false);
+			self.sendMessage(true, '', true, false);
+			self.sendMessage(false, '', true, false);
+			self.sendMessage(true, '[[stevie40_1576]]', false, false);
 		}, 500);
 
 		this.fetchRandomUsersMock();
@@ -88,7 +88,6 @@ var App = _makeClass(function(options) {
 			enableHistoryTab: true,
 			enableStoreTab: true,
 
-			cdnUrl: 'http://work.stk.908.vc',
 			apiUrl: 'http://work.stk.908.vc',
 			storeUrl: this.configs.storeUrl,
 
@@ -99,8 +98,8 @@ var App = _makeClass(function(options) {
 				gender: 'female'
 			},
 
-			priceB: this.priceB + ' $',
-			priceC: this.priceC + ' $'
+			priceB: this.priceB + ' UAH',
+			priceC: this.priceC + ' UAH'
 		});
 
 		this.stickerpipe.render((function() {
@@ -229,7 +228,9 @@ var App = _makeClass(function(options) {
 		}
 	},
 
-	sendMessage: function(isCurrentUser, text, random) {
+	sendMessage: function(isCurrentUser, text, random, trackToStatistic) {
+
+		trackToStatistic = (typeof trackToStatistic == 'undefined') ? true : trackToStatistic;
 
 		text = text && text.trim();
 		random = random || false;
@@ -250,21 +251,21 @@ var App = _makeClass(function(options) {
 			user = this.getRandomUser();
 		}
 
-		var parseSticker = this.stickerpipe.parseStickerFromText(text);
+		this.stickerpipe.parseStickerFromText(text, (function(sticker) {
+			trackToStatistic && this.stickerpipe.onUserMessageSent(!!sticker);
 
-		this.stickerpipe.onUserMessageSent(parseSticker.isSticker);
+			var messageTemplate = _.template($('#messageTemplate').html());
 
-		var messageTemplate = _.template($('#messageTemplate').html());
+			this.$messages.append(messageTemplate({
+				isCurrentUser: isCurrentUser,
+				user: user,
+				text: text,
+				date: this.getDateString(0),
+				sticker: sticker
+			}));
 
-		this.$messages.append(messageTemplate({
-			isCurrentUser: isCurrentUser,
-			user: user,
-			text: text,
-			date: this.getDateString(0),
-			sticker: parseSticker
-		}));
-
-		this.$body.animate({ scrollTop: this.$body[0].scrollHeight }, 0);
+			this.$body.animate({ scrollTop: this.$body[0].scrollHeight }, 0);
+		}).bind(this));
 	},
 
 	getUrlParameter: function(name) {

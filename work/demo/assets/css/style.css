@@ -200,9 +200,6 @@ body {
 #messages {
   overflow: hidden;
   margin-top: 20px; }
-  #messages img[data-sticker] {
-    height: 160px;
-    width: 160px; }
 
 #store {
   height: 400px; }

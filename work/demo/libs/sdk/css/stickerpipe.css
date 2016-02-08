@@ -525,6 +525,11 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   width: 80px;
 }
 
+.stickerpipe-sticker {
+  height: 160px;
+  width: 160px;
+}
+
 .sp-icon-arrow-back {
   background-image: url("../img/icons/icons_sprite.1453724705945.png");
   background-position: 0px 0px;

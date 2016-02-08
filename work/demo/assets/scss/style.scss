@@ -114,13 +114,6 @@ body {
 #messages {
 	overflow: hidden;
 	margin-top: 20px;
-
-	img[data-sticker] {
-		$stickerSize: 160px;
-
-		height: $stickerSize;
-		width: $stickerSize;
-	}
 }
 
 #store {

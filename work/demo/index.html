@@ -8,9 +8,6 @@
 	<!-- Bootstrap -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
 
-	<!-- FontAwesome -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
-
 	<link rel="stylesheet" type="text/css" href="libs/sdk/css/stickerpipe.css" />
 	<link rel="stylesheet" type="text/css" href="assets/css/style.css" />
 	<title>Stickers</title>
@@ -91,14 +88,14 @@
 </div>
 
 <script id="messageTemplate" type="text/template">
-	<div class="message {{ (sticker.isSticker && 'is-sticker') || '' }}">
+	<div class="message {{ (!!sticker && 'is-sticker') || '' }}">
 		{[ if (!isCurrentUser) { ]}
 		<div class="message-user-photo">
 			<img src="{{ user.picture }}" class="img-circle">
 		</div>
 		{[ } ]}
 		<div class="message-body">
-			{[ if (!sticker.isSticker) { ]}
+			{[ if (!sticker) { ]}
 			<div class="{{ isCurrentUser ? 'message-bubble-from-me' : 'message-bubble-from-them' }}">
 				<p>{{ text }}</p>
 			</div>
@@ -106,12 +103,7 @@
 			{[ } else { ]}
 			<div class="text-center {{ !isCurrentUser ? 'pull-left' : 'pull-right' }}"
 			     style="margin-bottom: 30px;">
-				<img src="{{ sticker.url }}"
-				        alt=""
-				        data-sticker="{{ sticker.pack }}_{{ sticker.name }}"
-				        data-sticker-code="{{ text }}"
-				        data-sticker-pack="{{ sticker.pack }}"
-				        data-sticker-name="{{ sticker.name }}" />
+				{{ sticker.html }}
 			</div>
 			{[ } ]}
 		</div>
@@ -137,9 +129,9 @@
 		if (window.location.href.indexOf('localhost') != -1) {
 			configs.storeUrl = 'http://localhost/stickerpipe/store/build';
 		} else if (window.location.href.indexOf('work') != -1) {
-			configs.storeUrl = 'http://work.stk.908.vc/api/v1/web?uri=' + encodeURIComponent('http://demo.stickerpipe.com/work/demo/libs/store/js/stickerPipeStore.js');
+			configs.storeUrl = 'http://work.stk.908.vc/api/v2/web?uri=' + encodeURIComponent('http://demo.stickerpipe.com/work/demo/libs/store/js/stickerPipeStore.js');
 		} else {
-			configs.storeUrl = 'http://api.stickerpipe.com/api/v1/web';
+			configs.storeUrl = 'http://api.stickerpipe.com/api/v2/web';
 		}
 
 		window.app = new App(configs);
