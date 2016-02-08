@@ -323,7 +323,7 @@ h6 {
 .pack-info {
   display: table-cell;
   padding-top: 15px;
-  padding-left: 8px;
+  padding-left: 16px;
   vertical-align: top; }
 
 .pack-description {
@@ -381,7 +381,7 @@ h6 {
 .pack-preview {
   display: table;
   margin: 8px auto;
-  padding: 5px 10px; }
+  padding: 8px; }
   .pack-preview:hover {
     background: rgba(0, 0, 0, 0.1);
     border-radius: 5px; }
@@ -390,19 +390,15 @@ h6 {
   display: block;
   text-decoration: none; }
 
-.pack-preview-name {
-  color: #333;
-  margin: 5px 0;
-  text-align: center; }
-
+.pack-preview-name,
 .pack-preview-price {
   color: #333;
-  margin: 5px 0;
+  line-height: 16px;
+  margin: 0;
   text-align: center; }
 
 .pack-main-sticker {
-  display: table;
-  margin-right: 8px; }
+  display: table; }
   .pack-main-sticker img {
     height: 120px;
     width: 120px; }
