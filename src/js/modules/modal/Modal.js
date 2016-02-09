@@ -35,23 +35,6 @@
 
 		overlay = null;
 
-	// todo: extend --> HelperModule
-	function extend(out) {
-		out = out || {};
-
-		for (var i = 1; i < arguments.length; i++) {
-			if (!arguments[i])
-				continue;
-
-			for (var key in arguments[i]) {
-				if (arguments[i].hasOwnProperty(key))
-					out[key] = arguments[i][key];
-			}
-		}
-
-		return out;
-	}
-
 	function lockContainer() {
 		if (overlay) {
 			return;
@@ -116,7 +99,7 @@
 
 		init: function(contentEl, options) {
 
-			options = extend({}, defaultOptions, (options || {}));
+			options = Plugin.Service.Helper.extend({}, defaultOptions, (options || {}));
 
 			var modalInstance = {};
 
@@ -208,7 +191,7 @@
 			//	}
 			//});
 
-			return extend(modalInstance, {
+			return Plugin.Service.Helper.extend(modalInstance, {
 
 				options: options,
 				contentEl: contentEl,
@@ -382,7 +365,7 @@
 		},
 
 		setDefaultOptions: function(options) {
-			defaultOptions = extend({}, defaultOptions, options);
+			defaultOptions = Plugin.Service.Helper.extend({}, defaultOptions, options);
 		}
 	};
 

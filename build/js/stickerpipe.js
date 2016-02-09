@@ -3196,22 +3196,24 @@ window.StickersModule.Service = {};
 
 	Plugin.Service.Helper = {
 
-		merge: function(obj1, obj2) {
-			var obj3 = {};
+		extend: function(out) {
+			out = out || {};
 
-			for(var attrname in obj1) {
-				obj3[attrname] = obj1[attrname];
+			for (var i = 1; i < arguments.length; i++) {
+				if (!arguments[i])
+					continue;
+
+				for (var key in arguments[i]) {
+					if (arguments[i].hasOwnProperty(key))
+						out[key] = arguments[i][key];
+				}
 			}
 
-			for(var attrname in obj2) {
-				obj3[attrname] = obj2[attrname];
-			}
-
-			return obj3;
+			return out;
 		},
 
 		setConfig: function(config) {
-			Plugin.Configs = this.merge(Plugin.Configs || {}, config);
+			Plugin.Configs = this.extend({}, Plugin.Configs || {}, config);
 		},
 
 		setEvent: function(eventType, el, className, callback) {
@@ -5130,23 +5132,6 @@ window.StickersModule.Module = {};
 
 		overlay = null;
 
-	// todo: extend --> HelperModule
-	function extend(out) {
-		out = out || {};
-
-		for (var i = 1; i < arguments.length; i++) {
-			if (!arguments[i])
-				continue;
-
-			for (var key in arguments[i]) {
-				if (arguments[i].hasOwnProperty(key))
-					out[key] = arguments[i][key];
-			}
-		}
-
-		return out;
-	}
-
 	function lockContainer() {
 		if (overlay) {
 			return;
@@ -5211,7 +5196,7 @@ window.StickersModule.Module = {};
 
 		init: function(contentEl, options) {
 
-			options = extend({}, defaultOptions, (options || {}));
+			options = Plugin.Service.Helper.extend({}, defaultOptions, (options || {}));
 
 			var modalInstance = {};
 
@@ -5303,7 +5288,7 @@ window.StickersModule.Module = {};
 			//	}
 			//});
 
-			return extend(modalInstance, {
+			return Plugin.Service.Helper.extend(modalInstance, {
 
 				options: options,
 				contentEl: contentEl,
@@ -5477,7 +5462,7 @@ window.StickersModule.Module = {};
 		},
 
 		setDefaultOptions: function(options) {
-			defaultOptions = extend({}, defaultOptions, options);
+			defaultOptions = Plugin.Service.Helper.extend({}, defaultOptions, options);
 		}
 	};
 
