@@ -20,7 +20,7 @@
 			}).bind(this));
 
 			this.popoverEl = document.createElement('div');
-			this.popoverEl.classList.add('sp-popover');
+			this.popoverEl.className = 'sp-popover';
 
 			this.el = document.createElement('div');
 

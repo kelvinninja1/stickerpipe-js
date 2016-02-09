@@ -33,7 +33,7 @@
 			this.tabsView.render();
 
 			this.el.innerHTML = '';
-			this.el.classList.add('sticker-pipe');
+			this.el.className ='sticker-pipe';
 			this.el.style.width = Plugin.Configs.width;
 
 			this.scrollableEl = document.createElement('div');
@@ -42,12 +42,10 @@
 			this.scrollableEl.appendChild(this.contentEl);
 
 			this.scrollableEl.addEventListener('ps-y-reach-end', (function () {
-				if (this.contentEl.classList.contains('sp-emojis')) {
+				if (this.contentEl.className == 'sp-emojis') {
 					this.renderEmojis(this.emojisOffset);
 				}
 			}).bind(this));
-
-			this.contentEl.classList.add('sp-content');
 
 			this.el.appendChild(this.tabsView.el);
 			this.el.appendChild(this.scrollableEl);
@@ -74,9 +72,7 @@
 		renderEmojiBlock: function() {
 
 			this.contentEl.innerHTML = '';
-
-			this.contentEl.classList.remove('sp-stickers');
-			this.contentEl.classList.add('sp-emojis');
+			this.contentEl.className = 'sp-emojis';
 
 			this.emojisOffset = 0;
 			this.renderEmojis(this.emojisOffset);
@@ -90,8 +86,7 @@
 			var self = this;
 
 			this.contentEl.innerHTML = '';
-			this.contentEl.classList.remove('sp-emojis');
-			this.contentEl.classList.add('sp-stickers');
+			this.contentEl.className = 'sp-stickers';
 
 			function appendSticker(stickerId) {
 				var stickersSpanEl = document.createElement('span');
