@@ -139,6 +139,12 @@ js
     sticker.onUserMessageSent(isSticker);
 ```
 
+- **md5** - return md5 hash of string
+
+```js
+    sticker.md5(string);
+```
+
 ## Events
 
 | Name                      |  description                                                        |
