@@ -10,6 +10,8 @@
 		}), Plugin.Service.Helper.getDomain(Plugin.Configs.storeUrl));
 	}
 
+	var ESC_CODE = 27;
+
 	Module.Controller = {
 
 		stickerpipe: null,
@@ -44,6 +46,12 @@
 
 		goBack: function() {
 			callStoreMethod('goBack');
+		},
+
+		keyUp: function(keyCode) {
+			if (keyCode == ESC_CODE) {
+				Module.View.close();
+			}
 		},
 
 		///////////////////////////////////////////

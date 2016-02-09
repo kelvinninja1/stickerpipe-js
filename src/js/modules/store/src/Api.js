@@ -22,6 +22,10 @@
 
 		setYScroll: function(data) {
 			Module.View.setYScroll(data.attrs.yPosition);
+		},
+
+		keyUp: function(data) {
+			Module.Controller.keyUp(data.attrs.keyCode);
 		}
 	};
 

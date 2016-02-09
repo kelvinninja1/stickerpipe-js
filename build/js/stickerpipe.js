@@ -4890,6 +4890,10 @@ window.StickersModule.Module = {};
 
 		setYScroll: function(data) {
 			Module.View.setYScroll(data.attrs.yPosition);
+		},
+
+		keyUp: function(data) {
+			Module.Controller.keyUp(data.attrs.keyCode);
 		}
 	};
 
@@ -4935,6 +4939,8 @@ window.StickersModule.Module = {};
 		}), Plugin.Service.Helper.getDomain(Plugin.Configs.storeUrl));
 	}
 
+	var ESC_CODE = 27;
+
 	Module.Controller = {
 
 		stickerpipe: null,
@@ -4969,6 +4975,12 @@ window.StickersModule.Module = {};
 
 		goBack: function() {
 			callStoreMethod('goBack');
+		},
+
+		keyUp: function(keyCode) {
+			if (keyCode == ESC_CODE) {
+				Module.View.close();
+			}
 		},
 
 		///////////////////////////////////////////
@@ -5028,8 +5040,10 @@ window.StickersModule.Module = {};
 					}
 
 
-					var modalDialog = modalEl.getElementsByClassName('sp-modal-dialog')[0];
-					this.preloader = new Plugin.View.Preloader(modalDialog);
+					if (!this.preloader) {
+						var modalDialog = modalEl.getElementsByClassName('sp-modal-dialog')[0];
+						this.preloader = new Plugin.View.Preloader(modalDialog);
+					}
 				}).bind(this)
 			});
 
@@ -5207,6 +5221,12 @@ window.StickersModule.Module = {};
 			modalEl.style.display = 'none';
 			modalEl.className = classes.modal;
 
+			if (options.closeOnOverlayClick) {
+				modalEl.addEventListener('click', (function() {
+					modalInstance.close(options);
+				}).bind(this));
+			}
+
 
 			// DIALOG
 			var dialogEl = document.createElement('div');
@@ -5320,31 +5340,16 @@ window.StickersModule.Module = {};
 								this.close(this.options);
 							}
 						}).bind(this));
-
-						// todo
-						// if iframe
-						//if (this.contentEl && this.contentEl.contentWindow) {
-						//	this.contentEl.contentWindow.addEventListener('keyup', (function(e) {
-						//		if(e.keyCode === KEY_CODE_ESC && isOpen) {
-						//			this.close(this.options);
-						//		}
-						//	}).bind(this));
-						//}
 					}
 
 					if (this.options.closeOnOverlayClick) {
-						for (var i = overlay.children.length; i--;) {
-							if (overlay.children[i].nodeType != 8) {
-								overlay.children[i].addEventListener('click', function(e) {
+						for (var i = this.modalEl.children.length; i--;) {
+							if (this.modalEl.children[i].nodeType != 8) {
+								this.modalEl.children[i].addEventListener('click', function(e) {
 									e.stopPropagation();
 								});
 							}
 						}
-
-						document.getElementsByClassName(classes.overlay)[0]
-							.addEventListener('click', (function() {
-								this.close(this.options);
-							}).bind(this));
 					}
 
 					//document.addEventListener('touchmove', (function(e) {
