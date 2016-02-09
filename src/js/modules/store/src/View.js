@@ -8,6 +8,8 @@
 
 		modalBody: null,
 
+		preloader: null,
+
 		init: function() {
 			this.iframe = document.createElement('iframe');
 
@@ -30,13 +32,16 @@
 
 						this.modalBody = modalBody;
 					}
+
+
+					var modalDialog = modalEl.getElementsByClassName('sp-modal-dialog')[0];
+					this.preloader = new Plugin.View.Preloader(modalDialog);
 				}).bind(this)
 			});
 
 			this.modal.backButton.addEventListener('click', (function() {
 				Module.Controller.goBack();
 			}).bind(this));
-
 
 			window.addEventListener('resize', (function() {
 				this.onWindowResize();
@@ -62,6 +67,10 @@
 			if (this.modal && this.modal.hasGlobalOpened()) {
 				this.modal.close();
 			}
+		},
+
+		showPagePreloader: function(show) {
+			this.preloader[(show ? 'show' : 'hide')]();
 		},
 
 		showBackButton: function(show) {

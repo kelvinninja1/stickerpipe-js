@@ -12,6 +12,10 @@
 			Module.Controller.purchasePack(attrs.packName, attrs.packTitle, attrs.pricePoint);
 		},
 
+		showPagePreloader: function(data) {
+			Module.View.showPagePreloader(data.attrs.show);
+		},
+
 		showBackButton: function(data) {
 			Module.View.showBackButton(data.attrs.show);
 		},

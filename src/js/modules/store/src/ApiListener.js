@@ -10,7 +10,7 @@
 				return;
 			}
 
-			window.addEventListener('message', (function(e) {
+			window.addEventListener('message', function(e) {
 				var data = JSON.parse(e.data);
 
 				if (!data.action) {
@@ -19,8 +19,7 @@
 
 				var api = Module.Api;
 				api[data.action] && api[data.action](data);
-
-			}).bind(this));
+			});
 
 			initialized = true;
 		}
