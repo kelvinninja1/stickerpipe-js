@@ -43,20 +43,29 @@ html
 js
 ```js
     var sticker = new Stickers({
-        
-        elId: 'stickerPipe',
-        
-        enableEmojiTab: true,
-        enableHistoryTab: true,
-        enableStoreTab: true,
-
-        htmlForEmptyRecent: '<div class="emptyRecent">empty recent text</div>',
-        storagePrefix: 'stickerPipe_',
-        
-        apiKey: '72921666b5ff8651f374747bfefaf7b2',
-
-        userId: MD5('<YOUR_USER_ID>')
-
+    	
+    	elId: 'stickerPipe',
+    	
+    	apiKey: '72921666b5ff8651f374747bfefaf7b2',
+    		
+    	enableEmojiTab: true,
+    	enableHistoryTab: true,
+    	enableStoreTab: true,
+    	
+    	htmlForEmptyRecent: 'You have not submitted any sticker',
+    	storagePrefix: 'prefix_',
+    	lang: 'en',
+    	
+    	userId: '<YOUR_USER_ID>',
+    	userPremium: false,
+    	userData: {
+    		age: 20,
+    		gender: 'male'
+    	},
+    	
+    	priceB: '0.99 $',
+    	priceC: '1.99 $'
+    	
     });
     
     sticker.render(function() {
@@ -67,17 +76,22 @@ js
 ## Options
 
 
-| Name                  | value                             |  description                                  |
-| --------------------- | --------------------------------- | --------------------------------------------- |
-| elId                  | id name string                    | name of container id where will render plugin |
-| htmlForEmptyRecent    | html code                         | insert in empty recent block                  |
-| apiKey                | api key your account              | your api key                                  |
-| storagePrefix         | string                            | prefix for LocalStorage                       |
-| enableEmojiTab        | boolean                           | if your wont use emoji tab                    |
-| enableHistoryTab      | boolean                           | if your wont use history tab                  |
-| userId                | md5 of user id - string           | client user id hash                           |
-| userData              | object type                       | data of user for statistic                    |
-| lang                  | "en", "ru" ...                    | language ISO 2                                |
+| Name                  | Type        | Description                                   |
+| --------------------- | ----------- | --------------------------------------------- |
+| elId                  | string      | Container id where will be render plugin      |
+| apiKey                | string      | Your api key                                  |
+| enableEmojiTab        | boolean     | If you want use emoji tab                     |
+| enableHistoryTab      | boolean     | If you want use history tab                   |
+| enableStoreTab        | boolean     | If you want use store                         |
+| htmlForEmptyRecent    | string      | Insert in empty recent block                  |
+| storagePrefix         | string      | Prefix for local storage                      |
+| lang                  | string      | Language ISO 2 ("en", "ru")                   |
+| userId                | string      | User id (hash)                                |
+| userData              | object      | Data of user for statistic                    |
+| userPremium           | boolean     | Flag is user - premium                        |
+| priceB                | string      | Price for packs with pricePoint = B           |
+| priceC                | string      | Price for packs with pricePoint = C           |
+
 
 
 ## Methods
