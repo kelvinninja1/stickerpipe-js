@@ -4948,7 +4948,7 @@ window.StickersModule.Module = {};
 		iframe && iframe.contentWindow.postMessage(JSON.stringify({
 			action: action,
 			attrs: attrs
-		}), Plugin.Service.Helper.getDomain(Plugin.Configs.storeUrl));
+		}), Plugin.Service.Helper.getDomain(Plugin.Service.Url.buildStoreUrl('/')));
 	}
 
 	var ESC_CODE = 27;
