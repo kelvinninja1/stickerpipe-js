@@ -701,6 +701,15 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $rootScop
 
 });
 
+appStickerPipeStore.directive('basePage', function() {
+
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/view.tpl',
+		link: function($scope, $el, attrs) {}
+	};
+});
+
 appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack, $window, Helper) {
 
 	PlatformAPI.showBackButton('#/store');
@@ -766,38 +775,6 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 	});
 });
 
-appStickerPipeStore.directive('basePage', function() {
-
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/view.tpl',
-		link: function($scope, $el, attrs) {}
-	};
-});
-
-appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI, $location, Helper, PackService) {
-
-	PlatformAPI.showPagePreloader(false);
-
-	angular.extend($scope, {
-		isJSPlatform: Helper.isJS(),
-		packService: PackService,
-		packs: packs,
-		priceB: Config.priceB,
-		priceC: Config.priceC,
-
-		getPackTitle: function(pack) {
-			var title = pack.title;
-			if (title.length > 15) {
-				title = title.substr(0, 15);
-				title += '...';
-			}
-
-			return title;
-		}
-	});
-});
-
 appStickerPipeStore.value('En', {
 	download: 'Download',
 	open: 'Open',
@@ -817,8 +794,6 @@ appStickerPipeStore.value('Ru', {
 appStickerPipeStore.factory('JsPlatformProvider', function($rootScope, $window, $timeout, Config) {
 
 	function callSDKMethod(action, attrs) {
-		console.log(Config.clientDomain);
-
 		window.parent.postMessage(JSON.stringify({
 			action: action,
 			attrs: attrs
@@ -905,4 +880,27 @@ appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n
 		}
 
 	};
+});
+
+appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI, $location, Helper, PackService) {
+
+	PlatformAPI.showPagePreloader(false);
+
+	angular.extend($scope, {
+		isJSPlatform: Helper.isJS(),
+		packService: PackService,
+		packs: packs,
+		priceB: Config.priceB,
+		priceC: Config.priceC,
+
+		getPackTitle: function(pack) {
+			var title = pack.title;
+			if (title.length > 15) {
+				title = title.substr(0, 15);
+				title += '...';
+			}
+
+			return title;
+		}
+	});
 });
