@@ -3821,15 +3821,23 @@ window.StickersModule.Service = {};
 		buildStoreUrl: function(uri) {
 			uri = uri || '';
 
+			var platform = 'JS',
+				style = platform;
+
+			if (Plugin.Service.Helper.getMobileOS() == 'ios' || navigator.appVersion.indexOf('Mac') != -1) {
+				style = 'ios';
+			}
+
 			var params = {
 				apiKey: Plugin.Configs.apiKey,
-				platform: 'JS',
+				platform: platform,
 				userId: Plugin.Configs.userId,
 				density: Plugin.Configs.stickerResolutionType,
 				priceB: Plugin.Configs.priceB,
 				priceC: Plugin.Configs.priceC,
 				is_subscriber: (Plugin.Configs.userPremium ? 1 : 0),
-				localization: Plugin.Configs.lang
+				localization: Plugin.Configs.lang,
+				style: style
 			};
 
 			return Plugin.Configs.storeUrl + ((Plugin.Configs.storeUrl.indexOf('?') == -1) ? '?' : '&')
