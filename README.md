@@ -48,6 +48,7 @@ js
         
         enableEmojiTab: true,
         enableHistoryTab: true,
+        enableStoreTab: true,
 
         htmlForEmptyRecent: '<div class="emptyRecent">empty recent text</div>',
         storagePrefix: 'stickerPipe_',
@@ -87,9 +88,9 @@ js
     sticker.render([onRender]);
 ```
 
--  **parseStickerFromText** - parse text and return img url if text is sticker
+-  **parseStickerFromText** - parse text and return object to callback, with sticker data (stickerId, url, html) if text is sticker else return null
 ```js
-    sticker.parseStickerFromText(text);
+    sticker.parseStickerFromText(text, callback);
 ```
 
 -  **parseEmojiFromText** - parse text and return text with replaced emoji to html
@@ -100,12 +101,6 @@ js
 -  **parseEmojiFromHtml** - parse html and return text with replaced html to emoji text
 ```js
     sticker.parseEmojiFromHtml(html);
-```
-
-- **onUserMessageSent** - when message send (for statistic)
-
-```js
-    sticker.onUserMessageSent(isSticker);
 ```
 
 -  **open** - open pack tab or by default - history tab
@@ -120,12 +115,28 @@ js
 
 -  **openStore** - open store in modal window
 ```js
-    sticker.openStore();
+    sticker.openStore([stickerId]);
 ```
 
 -  **closeStore** - close store modal window
 ```js
     sticker.closeStore();
+```
+
+-  **purchaseSuccess** - call if purchase transaction was successful
+```js
+    sticker.purchaseSuccess(packName, pricePoint);
+```
+
+-  **purchaseFail** - call if purchase transaction was failed
+```js
+    sticker.purchaseFail();
+```
+
+- **onUserMessageSent** - call when message send (for statistic)
+
+```js
+    sticker.onUserMessageSent(isSticker);
 ```
 
 ## Events

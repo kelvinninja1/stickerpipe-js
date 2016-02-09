@@ -1,27 +1,29 @@
 {
-  "name": "stikers-js",
-  "version": "0.0.6",
-  "homepage": "http://stickerpipe.com",
-  "authors": [
-    "Dmitry Shevchuk shevchuk@908.dp.ua"
-  ],
-  "description": "Stickerpipe-js is a javascript library for fast injection stickers in your project",
-  "main": "build/js/stickerpipe.min.js",
-  "keywords": [
-    "stickers",
-    "stickerpipe",
-    "sticker"
-  ],
-  "license": "apache",
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "src",
-    "bower_components",
-    "test",
-    "tests",
-    "gulpfile.js",
-    "package.json",
-    "README.md"
-  ]
+	"name": "Stickerpipe",
+	"version": "0.0.7",
+	"homepage": "http://stickerpipe.com",
+	"authors": [
+		"Eduard Moiseenkov e.moiseenkov@908.dp.ua",
+		"Dmitry Shevchuk shevchuk@908.dp.ua"
+	],
+	"description": "Stickerpipe-js is a javascript library for fast injection stickers in your project",
+	"main": "build/js/stickerpipe.min.js",
+	"keywords": [
+		"stickers",
+		"stickerpipe",
+		"sticker",
+		"stikers-js"
+	],
+	"license": "apache",
+	"ignore": [
+		"**/.*",
+		"node_modules",
+		"src",
+		"bower_components",
+		"test",
+		"tests",
+		"gulpfile.js",
+		"package.json",
+		"README.md"
+	]
 }
