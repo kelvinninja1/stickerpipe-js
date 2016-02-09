@@ -18,6 +18,10 @@
 			return width;
 		},
 
+		appendAfter: function(newNode, referenceNode) {
+			referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+		},
+
 		getParents: function (elem, selector) {
 
 			var parents = [];

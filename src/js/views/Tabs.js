@@ -152,9 +152,9 @@
 
 			tabEl.classList.add.apply(tabEl.classList, classes);
 
-			Plugin.Service.Helper.forEach(attrs, function(value, name) {
-				tabEl.setAttribute(name, value);
-			});
+			for (var name in attrs) {
+				tabEl.setAttribute(name, attrs[name]);
+			}
 
 			tabEl.innerHTML = content;
 
@@ -164,15 +164,16 @@
 					return;
 				}
 
-				Plugin.Service.Helper.forEach(this.packTabs, (function(tabEl) {
-					tabEl.classList.remove(this.classes.tabActive);
-				}).bind(this));
+				for (var tabName in this.packTabs) {
+					this.packTabs[tabName].classList.remove(this.classes.tabActive);
+				}
 
-				Plugin.Service.Helper.forEach(this.controls, (function(controlTab) {
+				for (var controlName in this.controls) {
+					var controlTab = this.controls[controlName];
 					if (controlTab && controlTab.el) {
 						controlTab.el.classList.remove(this.classes.tabActive);
 					}
-				}).bind(this));
+				}
 
 				tabEl.classList.add(this.classes.tabActive);
 			}).bind(this));

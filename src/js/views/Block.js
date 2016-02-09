@@ -93,8 +93,7 @@
 			this.contentEl.classList.remove('sp-emojis');
 			this.contentEl.classList.add('sp-stickers');
 
-			Plugin.Service.Helper.forEach(stickersIds, function(stickerId) {
-
+			function appendSticker(stickerId) {
 				var stickersSpanEl = document.createElement('span');
 				stickersSpanEl.className = 'sp-sticker-placeholder';
 				stickersSpanEl.setAttribute('data-sticker-id', stickerId);
@@ -111,7 +110,12 @@
 				});
 
 				self.contentEl.appendChild(stickersSpanEl);
-			});
+			}
+
+			for (var i = 0; i < stickersIds.length; i++) {
+				var stickerId = stickersIds[i];
+				appendSticker(stickerId);
+			}
 
 			this.updateScroll('top');
 		},

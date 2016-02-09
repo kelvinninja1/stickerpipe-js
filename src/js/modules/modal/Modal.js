@@ -112,11 +112,6 @@
 		}
 	}
 
-	function insertAfter(newNode, referenceNode) {
-		referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
-	}
-
-
 	Plugin.Module.Modal = {
 
 		init: function(contentEl, options) {
@@ -235,7 +230,7 @@
 
 
 					//overlay.appendChild(this.modalEl); // openedModalElement
-					insertAfter(this.modalEl, overlay);
+					Plugin.Service.El.appendAfter(this.modalEl, overlay);
 
 					this.modalEl.style.display = 'block';
 

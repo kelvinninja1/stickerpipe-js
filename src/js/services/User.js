@@ -14,7 +14,7 @@
 
 			var storedUserData = Plugin.Service.Storage.getUserData() || {};
 
-			if (!Plugin.Service.Helper.deepCompare(Plugin.Configs.userData, storedUserData)) {
+			if (JSON.stringify(storedUserData) != JSON.stringify(Plugin.Configs.userData)) {
 				Plugin.Service.Api.updateUserData(Plugin.Configs.userData);
 				Plugin.Service.Storage.setUserData(Plugin.Configs.userData);
 			}

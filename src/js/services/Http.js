@@ -63,9 +63,9 @@
 			var xmlhttp = new XMLHttpRequest();
 			xmlhttp.open(options.type, options.url, true);
 
-			Plugin.Service.Helper.forEach(options.headers, function(value, name) {
-				xmlhttp.setRequestHeader(name, value);
-			});
+			for (var name in options.headers) {
+				xmlhttp.setRequestHeader(name, options.headers[name]);
+			}
 
 			xmlhttp.onreadystatechange = function() {
 				if (xmlhttp.readyState == 4) {
