@@ -13,7 +13,7 @@ appStickerPipeStore.run(function($rootScope, PlatformAPI, JsInterface) {
 	JsInterface.init();
 
 	$rootScope.$on('$stateChangeStart', function() {
-		PlatformAPI.showInProgress(true);
+		PlatformAPI.showPagePreloader(true);
 		PlatformAPI.showBackButton(false);
 	});
 
@@ -22,7 +22,7 @@ appStickerPipeStore.run(function($rootScope, PlatformAPI, JsInterface) {
 	});
 
 	$rootScope.$on('$stateChangeError', function() {
-		PlatformAPI.showInProgress(false);
+		PlatformAPI.showPagePreloader(false);
 		$rootScope.error = true;
 	});
 
@@ -118,6 +118,22 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/base-page/view.tpl',
+    '<!--<div class="version">0.0.65</div>-->\n' +
+    '<div class="store" data-sp-auto-scroll>\n' +
+    '	<div data-ng-show="!error && showContent" data-ui-view=""></div>\n' +
+    '	<div data-ng-show="error" data-error></div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/store/StoreView.tpl',
     '<div data-ng-class="{\'screen-header\': isJSPlatform }" data-ng-show="isJSPlatform"></div>\n' +
     '<div class="packs">\n' +
@@ -204,23 +220,6 @@ module.run(['$templateCache', function($templateCache) {
     '			     alt="" />\n' +
     '		</div>\n' +
     '	</div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/base-page/view.tpl',
-    '<!--<div class="version">0.0.65</div>-->\n' +
-    '<div class="store" data-sp-auto-scroll>\n' +
-    '	<div data-ng-show="!error && showContent" data-ui-view=""></div>\n' +
-    '	<div data-ng-show="error" data-error></div>\n' +
-    '	<div data-ng-show="preloader" data-preloader></div>\n' +
     '</div>');
 }]);
 })();
@@ -705,7 +704,7 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $rootScop
 			return provider.purchasePack(packTitle, packName, packPrice);
 		},
 
-		showInProgress: function(show) {
+		showPagePreloader: function(show) {
 			return provider.setInProgress(show);
 		},
 
@@ -723,15 +722,6 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $rootScop
 		}
 	};
 
-});
-
-appStickerPipeStore.directive('basePage', function() {
-
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/view.tpl',
-		link: function($scope, $el, attrs) {}
-	};
 });
 
 appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack, $window, Helper) {
@@ -775,7 +765,7 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 		},
 
 		onImgLoad: function() {
-			PlatformAPI.showInProgress(false);
+			PlatformAPI.showPagePreloader(false);
 			this.showPage = true;
 		}
 	});
@@ -801,7 +791,7 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 
 appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI, $location, Helper, PackService) {
 
-	PlatformAPI.showInProgress(false);
+	PlatformAPI.showPagePreloader(false);
 
 	angular.extend($scope, {
 		isJSPlatform: Helper.isJS(),
@@ -820,6 +810,15 @@ appStickerPipeStore.controller('StoreController', function($scope, packs, Config
 			return title;
 		}
 	});
+});
+
+appStickerPipeStore.directive('basePage', function() {
+
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/view.tpl',
+		link: function($scope, $el, attrs) {}
+	};
 });
 
 appStickerPipeStore.value('En', {
@@ -889,12 +888,6 @@ appStickerPipeStore.factory('JsPlatformProvider', function($rootScope, $window, 
 			callSDKMethod('showPagePreloader', {
 				show: show
 			});
-
-			if (show) {
-				$rootScope.$emit('preloaderShow');
-			} else {
-				$rootScope.$emit('preloaderHide');
-			}
 		},
 
 		showBackButton: function(show) {
