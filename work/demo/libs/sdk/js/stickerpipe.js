@@ -4994,6 +4994,10 @@ window.StickersModule.Module = {};
 			Module.Controller.purchasePack(attrs.packName, attrs.packTitle, attrs.pricePoint);
 		},
 
+		showPagePreloader: function(data) {
+			Module.View.showPagePreloader(data.attrs.show);
+		},
+
 		showBackButton: function(data) {
 			Module.View.showBackButton(data.attrs.show);
 		},
@@ -5017,7 +5021,7 @@ window.StickersModule.Module = {};
 				return;
 			}
 
-			window.addEventListener('message', (function(e) {
+			window.addEventListener('message', function(e) {
 				var data = JSON.parse(e.data);
 
 				if (!data.action) {
@@ -5026,8 +5030,7 @@ window.StickersModule.Module = {};
 
 				var api = Module.Api;
 				api[data.action] && api[data.action](data);
-
-			}).bind(this));
+			});
 
 			initialized = true;
 		}
@@ -5113,6 +5116,8 @@ window.StickersModule.Module = {};
 
 		modalBody: null,
 
+		preloader: null,
+
 		init: function() {
 			this.iframe = document.createElement('iframe');
 
@@ -5135,6 +5140,10 @@ window.StickersModule.Module = {};
 
 						this.modalBody = modalBody;
 					}
+
+
+					var modalDialog = modalEl.getElementsByClassName('sp-modal-dialog')[0];
+					this.preloader = new Plugin.View.Preloader(modalDialog);
 				}).bind(this)
 			});
 
@@ -5167,6 +5176,10 @@ window.StickersModule.Module = {};
 			if (this.modal && this.modal.hasGlobalOpened()) {
 				this.modal.close();
 			}
+		},
+
+		showPagePreloader: function(show) {
+			this.preloader[(show ? 'show' : 'hide')]();
 		},
 
 		showBackButton: function(show) {
@@ -5907,6 +5920,47 @@ window.StickersModule.View = {};
 		}
 
 	});
+
+})(window.StickersModule);
+
+(function(Plugin) {
+
+	Plugin.View.Preloader = function(parentEl) {
+
+		// Constructor
+
+		var el = document.createElement('div');
+		el.className = 'sp-preloader';
+
+		el.innerHTML = '' +
+			'<div class="sp-preloader-content">' +
+				'<div class="sp-preloader-chasing-dots">' +
+					'<div class="sp-preloader-child sp-preloader-dot1"></div>' +
+					'<div class="sp-preloader-child sp-preloader-dot2"></div>' +
+				'</div>' +
+			'</div>';
+
+		if (parentEl) {
+			parentEl.appendChild(el);
+		}
+
+		// ***********
+
+		return {
+
+			getEl: function() {
+				return el;
+			},
+
+			show: function() {
+				el.style.display = '';
+			},
+
+			hide: function() {
+				el.style.display = 'none';
+			}
+		};
+	};
 
 })(window.StickersModule);
 
