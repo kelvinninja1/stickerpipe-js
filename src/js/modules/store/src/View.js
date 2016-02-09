@@ -37,6 +37,7 @@
 					if (!this.preloader) {
 						var modalDialog = modalEl.getElementsByClassName('sp-modal-dialog')[0];
 						this.preloader = new Plugin.View.Preloader(modalDialog);
+						this.preloader.hide();
 					}
 				}).bind(this)
 			});
