@@ -37,11 +37,7 @@ appStickerPipeStore.controller('AppController', function(Config, envService, Hel
 	}
 
 	if (envService.is('local') || envService.is('development')) {
-		includeCss(Config.platform.toLocaleLowerCase());
-	}
-
-	if (Helper.getMobileOS() == 'ios' || navigator.appVersion.indexOf('Mac') != -1) {
-		includeCss('ios');
+		includeCss(Config.style.toLowerCase());
 	}
 });
 angular.module('environment',[]).provider('envService',function(){this.environment='development';this.data={};this.config=function(config){this.data=config;};this.set=function(environment){this.environment=environment;};this.get=function(){return this.environment;};this.read=function(variable){if(variable!=='all'){return this.data.vars[this.get()][variable];}

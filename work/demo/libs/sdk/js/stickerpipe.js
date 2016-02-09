@@ -3821,19 +3821,32 @@ window.StickersModule.Service = {};
 		buildStoreUrl: function(uri) {
 			uri = uri || '';
 
+			var platform = 'JS',
+				style = platform;
+
+			if (Plugin.Service.Helper.getMobileOS() == 'ios' || navigator.appVersion.indexOf('Mac') != -1) {
+				style = 'ios';
+			}
+
 			var params = {
 				apiKey: Plugin.Configs.apiKey,
-				platform: 'JS',
+				platform: platform,
 				userId: Plugin.Configs.userId,
 				density: Plugin.Configs.stickerResolutionType,
 				priceB: Plugin.Configs.priceB,
 				priceC: Plugin.Configs.priceC,
 				is_subscriber: (Plugin.Configs.userPremium ? 1 : 0),
-				localization: Plugin.Configs.lang
+				localization: Plugin.Configs.lang,
+				style: style
 			};
 
-			return Plugin.Configs.storeUrl + ((Plugin.Configs.storeUrl.indexOf('?') == -1) ? '?' : '&')
-				+ Plugin.Service.Helper.urlParamsSerialize(params) + '#/' + uri;
+			var url = Plugin.Configs.storeUrl || this.buildApiUrl('/web');
+
+			url += ((url.indexOf('?') == -1) ? '?' : '&')
+				+ Plugin.Service.Helper.urlParamsSerialize(params)
+				+ '#/' + uri;
+
+			return url;
 		},
 
 		buildApiUrl: function(uri) {
@@ -3939,10 +3952,9 @@ window.StickersModule.Configs = {};
 
 		htmlForEmptyRecent: '<div class="emptyRecent">No recent stickers</div>',
 
-		apiKey: null, // example: 72921666b5ff8651f374747bfefaf7b2
+		apiKey: null,
 
 		apiUrl: 'http://api.stickerpipe.com',
-		storeUrl: 'http://api.stickerpipe.com/api/v2/web',
 
 		storagePrefix: 'stickerpipe_',
 
@@ -6309,6 +6321,10 @@ window.StickersModule.View = {};
 
 		closeStore: function() {
 			Plugin.Module.Store.close();
+		},
+
+		md5: function(string) {
+			return Plugin.Service.Helper.md5(string);
 		},
 
 		////////////////////

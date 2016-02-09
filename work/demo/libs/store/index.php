@@ -19,7 +19,7 @@
 <!-- AngularJS -->
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.2/angular.min.js"></script>
 
-<script src="js/stickerPipeStore.js?v=1455018502423"></script>
+<script src="js/stickerPipeStore.js?v=1455027679710"></script>
 
 <script>
 	(function() {
@@ -32,7 +32,8 @@
 			clientDomain: '<?=($_SERVER['HTTP_HOST'] ?: 'localhost');?>',
 			priceB: '<?=($_GET['priceB'] ?: '');?>',
 			priceC: '<?=($_GET['priceC'] ?: '');?>',
-			isSubscriber: ('<?=($_GET['is_subscriber'] ?: '0');?>' == '1')
+			isSubscriber: ('<?=($_GET['is_subscriber'] ?: '0');?>' == '1'),
+			style: '<?=($_GET['style'] ?: 'js');?>'
 		});
 	})();
 </script>

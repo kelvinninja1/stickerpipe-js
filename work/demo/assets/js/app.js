@@ -16,9 +16,7 @@ var App = _makeClass(function(options) {
 	this._constructor(options);
 }, {
 
-	// todo: rename to stickerpipe
 	stickerpipe: null,
-	configs: null,
 	randomUsers: [],
 	currentUser: {},
 
@@ -31,11 +29,7 @@ var App = _makeClass(function(options) {
 	$textarea: $('.textarea'),
 	$wipeData: $('#wipeData'),
 
-	priceB: '4.99 UAH',
-	priceC: '9.99 UAH',
-
-	_constructor: function(configs) {
-		this.configs = configs;
+	_constructor: function() {
 
 		this.$wipeData.on('click', (function() {
 			localStorage.clear();
@@ -88,9 +82,6 @@ var App = _makeClass(function(options) {
 			enableHistoryTab: true,
 			enableStoreTab: true,
 
-			apiUrl: 'http://work.stk.908.vc',
-			storeUrl: this.configs.storeUrl,
-
 			userId: this.getUserId(),
 			userPremium: this.isUserPremium(),
 			userData: {
@@ -98,8 +89,8 @@ var App = _makeClass(function(options) {
 				gender: 'male'
 			},
 
-			priceB: this.priceB,
-			priceC: this.priceC
+			priceB: '4.99 UAH',
+			priceC: '9.99 UAH'
 		});
 
 		this.stickerpipe.render((function() {
