@@ -3840,8 +3840,13 @@ window.StickersModule.Service = {};
 				style: style
 			};
 
-			return Plugin.Configs.storeUrl + ((Plugin.Configs.storeUrl.indexOf('?') == -1) ? '?' : '&')
-				+ Plugin.Service.Helper.urlParamsSerialize(params) + '#/' + uri;
+			var url = Plugin.Configs.storeUrl || this.buildApiUrl('/web');
+
+			url += ((url.indexOf('?') == -1) ? '?' : '&')
+				+ Plugin.Service.Helper.urlParamsSerialize(params)
+				+ '#/' + uri;
+
+			return url;
 		},
 
 		buildApiUrl: function(uri) {
@@ -3947,10 +3952,9 @@ window.StickersModule.Configs = {};
 
 		htmlForEmptyRecent: '<div class="emptyRecent">No recent stickers</div>',
 
-		apiKey: null, // example: 72921666b5ff8651f374747bfefaf7b2
+		apiKey: null,
 
 		apiUrl: 'http://api.stickerpipe.com',
-		storeUrl: 'http://api.stickerpipe.com/api/v2/web',
 
 		storagePrefix: 'stickerpipe_',
 

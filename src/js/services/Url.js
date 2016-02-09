@@ -25,8 +25,13 @@
 				style: style
 			};
 
-			return Plugin.Configs.storeUrl + ((Plugin.Configs.storeUrl.indexOf('?') == -1) ? '?' : '&')
-				+ Plugin.Service.Helper.urlParamsSerialize(params) + '#/' + uri;
+			var url = Plugin.Configs.storeUrl || this.buildApiUrl('/web');
+
+			url += ((url.indexOf('?') == -1) ? '?' : '&')
+				+ Plugin.Service.Helper.urlParamsSerialize(params)
+				+ '#/' + uri;
+
+			return url;
 		},
 
 		buildApiUrl: function(uri) {
