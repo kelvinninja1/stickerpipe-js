@@ -724,6 +724,15 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $rootScop
 
 });
 
+appStickerPipeStore.directive('basePage', function() {
+
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/view.tpl',
+		link: function($scope, $el, attrs) {}
+	};
+});
+
 appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack, $window, Helper) {
 
 	PlatformAPI.showBackButton('#/store');
@@ -812,15 +821,6 @@ appStickerPipeStore.controller('StoreController', function($scope, packs, Config
 	});
 });
 
-appStickerPipeStore.directive('basePage', function() {
-
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/view.tpl',
-		link: function($scope, $el, attrs) {}
-	};
-});
-
 appStickerPipeStore.value('En', {
 	download: 'Download',
 	open: 'Open',
@@ -868,6 +868,10 @@ appStickerPipeStore.factory('JsPlatformProvider', function($rootScope, $window, 
 
 		init: function() {
 			runApiListener();
+
+			$window.addEventListener('keyup', (function(e) {
+				this.keyUp(e.keyCode);
+			}).bind(this));
 		},
 
 		showCollections: function(packName) {
@@ -900,6 +904,12 @@ appStickerPipeStore.factory('JsPlatformProvider', function($rootScope, $window, 
 			callSDKMethod('setYScroll', {
 				yPosition: yPosition
 			});
+		},
+
+		keyUp: function(keyCode) {
+			callSDKMethod('keyUp', {
+				keyCode: keyCode
+			});
 		}
 	});
 });
@@ -913,36 +923,6 @@ appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n
 
 			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
 			$scope.i18n = i18n;
-		}
-
-	};
-});
-
-appStickerPipeStore.directive('preloader', function($rootScope) {
-
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/preloader/view.tpl',
-		link: function($scope, $el, attrs) {
-
-			$rootScope.$on('preloaderShow', function() {
-				$scope.preloader = true;
-				document.body.style.overflow = 'hidden';
-
-				if(!$scope.$$phase) {
-					$scope.$apply();
-				}
-			});
-
-			$rootScope.$on('preloaderHide', function() {
-				$scope.preloader = false;
-				document.body.style.overflow = 'auto';
-
-				if(!$scope.$$phase) {
-					$scope.$apply();
-				}
-			});
-
 		}
 
 	};

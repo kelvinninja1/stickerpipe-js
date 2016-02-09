@@ -115,6 +115,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 .sp-modal-header {
   background: rgba(255, 255, 255, 0.8);
+  border-radius: 3px;
   display: table;
   height: 48px;
   width: 100%;
@@ -549,39 +550,40 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   overflow: hidden;
 }
 
-.sticker-pipe .sp-content {
+.sticker-pipe .sp-emojis,
+.sticker-pipe .sp-stickers {
   border-radius: 0 0 3px 3px;
   display: table;
 }
 
-.sticker-pipe .sp-content.sp-emojis {
+.sticker-pipe .sp-emojis {
   padding: 8px 16px;
 }
 
-.sticker-pipe .sp-content.sp-emojis .sp-emoji {
+.sticker-pipe .sp-emojis .sp-emoji {
   display: inline-table;
   float: left;
   padding: 8px;
   cursor: pointer;
 }
 
-.sticker-pipe .sp-content.sp-emojis .sp-emoji:hover {
+.sticker-pipe .sp-emojis .sp-emoji:hover {
   background: rgba(0, 0, 0, 0.1);
   border-radius: 5px;
 }
 
-.sticker-pipe .sp-content.sp-emojis .sp-emoji img {
+.sticker-pipe .sp-emojis .sp-emoji img {
   height: 24px;
   width: 24px;
 }
 
-.sticker-pipe .sp-content.sp-stickers .sp-sticker-item,
-.sticker-pipe .sp-content.sp-stickers .sp-sticker-placeholder {
+.sticker-pipe .sp-stickers .sp-sticker-item,
+.sticker-pipe .sp-stickers .sp-sticker-placeholder {
   float: left;
   display: inline-table;
 }
 
-.sticker-pipe .sp-content.sp-stickers .sp-sticker-placeholder {
+.sticker-pipe .sp-stickers .sp-sticker-placeholder {
   background: rgba(0, 0, 0, 0.1);
   border-radius: 50%;
   height: 40px;
@@ -589,7 +591,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   margin: 32px;
 }
 
-.sticker-pipe .sp-content.sp-stickers .sp-sticker-item {
+.sticker-pipe .sp-stickers .sp-sticker-item {
   cursor: pointer;
   display: inline-table;
   float: left;
@@ -597,12 +599,12 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   padding: 3px;
 }
 
-.sticker-pipe .sp-content.sp-stickers .sp-sticker-item:not(.sp-sticker-placeholder):hover {
+.sticker-pipe .sp-stickers .sp-sticker-item:not(.sp-sticker-placeholder):hover {
   background: rgba(0, 0, 0, 0.1);
   border-radius: 5px;
 }
 
-.sticker-pipe .sp-content.sp-stickers .sp-sticker-item img {
+.sticker-pipe .sp-stickers .sp-sticker-item img {
   height: 80px;
   width: 80px;
 }

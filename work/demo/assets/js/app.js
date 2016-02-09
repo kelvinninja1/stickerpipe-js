@@ -94,8 +94,8 @@ var App = _makeClass(function(options) {
 			userId: this.getUserId(),
 			userPremium: this.isUserPremium(),
 			userData: {
-				age: 18,
-				gender: 'female'
+				age: 20,
+				gender: 'male'
 			},
 
 			priceB: this.priceB,
