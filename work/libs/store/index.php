@@ -19,10 +19,14 @@
 <!-- AngularJS -->
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.2/angular.min.js"></script>
 
-<script src="js/stickerPipeStore.js?v=1455031905471"></script>
+<script src="js/stickerPipeStore.js?v=1455100978887"></script>
 
 <script>
 	(function() {
+		function valueOrNull(value) {
+			return (value && value != 'null') ? value : null;
+		}
+
 		appStickerPipeStore.constant('Config', {
 			apiKey: '<?=($_GET['apiKey'] ?: '1c0c4561cd005f6932f0de38934197ec');?>',
 			platform: '<?=($_GET['platform'] ?: 'Android');?>',
@@ -30,8 +34,8 @@
 			resolutionType: '<?=($_GET['density'] ?: 'xxhdpi');?>',
 			lang: '<?=($_GET['localization'] ?: 'ru');?>',
 			clientDomain: '<?=($_SERVER['HTTP_HOST'] ?: 'localhost');?>',
-			priceB: '<?=($_GET['priceB'] ?: '');?>',
-			priceC: '<?=($_GET['priceC'] ?: '');?>',
+			priceB: valueOrNull('<?=($_GET['priceB'] ?: 'null');?>'),
+			priceC: valueOrNull('<?=($_GET['priceC'] ?: 'null');?>'),
 			isSubscriber: ('<?=($_GET['is_subscriber'] ?: '0');?>' == '1'),
 			style: '<?=($_GET['style'] ?: 'js');?>'
 		});

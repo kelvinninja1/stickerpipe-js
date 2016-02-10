@@ -95,6 +95,87 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/pack/PackView.tpl',
+    '<div data-ng-show="showPage">\n' +
+    '	<div ng-class="{\'screen-header\': isJSPlatform }" data-ng-show="isJSPlatform"></div>\n' +
+    '	<div class="pack-header">\n' +
+    '		<div class="pack-main-sticker">\n' +
+    '			<img data-ng-src="{{ packService.getMainSticker(pack) }}" alt="Main sticker">\n' +
+    '		</div>\n' +
+    '\n' +
+    '		<div class="pack-info">\n' +
+    '			<div class="pack-owner">{{ pack.artist }}</div>\n' +
+    '			<div class="pack-title">{{ pack.title }}</div>\n' +
+    '\n' +
+    '			<div data-ng-show="showActionProgress">\n' +
+    '				<div class="preloader2">\n' +
+    '					<div class="bounce1"></div>\n' +
+    '					<div class="bounce2"></div>\n' +
+    '					<div class="bounce3"></div>\n' +
+    '				</div>\n' +
+    '			</div>\n' +
+    '\n' +
+    '			<div data-ng-show="!showActionProgress">\n' +
+    '\n' +
+    '				<!-- OPEN -->\n' +
+    '				<button\n' +
+    '					data-ng-show="packService.isActive(pack)"\n' +
+    '					class="btn btn-purple btn-action"\n' +
+    '					data-ng-click="showCollections()">\n' +
+    '					{{ i18n.open.toUpperCase() }}\n' +
+    '				</button>\n' +
+    '\n' +
+    '				<!-- DOWNLOAD -->\n' +
+    '				<button\n' +
+    '					data-ng-show="packService.isHidden(pack) || (packService.isDisable(pack) && (pack.pricepoint == \'A\') || (pack.pricepoint == \'B\' && isSubscriber))"\n' +
+    '					class="btn btn-purple btn-action"\n' +
+    '					data-ng-click="purchasePack()">\n' +
+    '					{{ i18n.download.toUpperCase() }}\n' +
+    '				</button>\n' +
+    '\n' +
+    '				<!-- PURCHASE PriceB -->\n' +
+    '				<button\n' +
+    '					data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'B\' && !isSubscriber && priceB"\n' +
+    '					class="btn btn-purple btn-action"\n' +
+    '					data-ng-click="purchasePack()">\n' +
+    '					{{ priceB }}\n' +
+    '				</button>\n' +
+    '\n' +
+    '				<!-- PURCHASE PriceC -->\n' +
+    '				<button\n' +
+    '					data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'C\' && priceC"\n' +
+    '					class="btn btn-purple btn-action"\n' +
+    '					data-ng-click="purchasePack()">\n' +
+    '					{{ priceC }}\n' +
+    '				</button>\n' +
+    '\n' +
+    '			</div>\n' +
+    '		</div>\n' +
+    '\n' +
+    '\n' +
+    '		<p class="pack-description" data-ng-show="pack.description">{{ pack.description || \'\' }}</p>\n' +
+    '	</div>\n' +
+    '\n' +
+    '	<div class="clearfix"></div>\n' +
+    '\n' +
+    '	<div class="pack-stickers-preview {{ isLandscape() ? \'landscape\' : \'\' }}">\n' +
+    '		<div class="pack-stickers-preview-image">\n' +
+    '			<img data-ng-src="{{ getStickersPreview() }}"\n' +
+    '			     data-sp-load="onImgLoad($event)"\n' +
+    '			     alt="" />\n' +
+    '		</div>\n' +
+    '	</div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/view.tpl',
     '<!--<div class="version">0.0.65</div>-->\n' +
     '<div class="store" data-sp-auto-scroll>\n' +
@@ -124,77 +205,12 @@ module.run(['$templateCache', function($templateCache) {
     '				<h5 class="pack-preview-price">\n' +
     '					&nbsp;\n' +
     '					<span data-ng-if="!packService.isActive(pack) && pack.pricepoint != \'A\'">\n' +
-    '						<span data-ng-if="pack.pricepoint == \'B\'">{{ priceB }}</span>\n' +
-    '						<span data-ng-if="pack.pricepoint == \'C\'">{{ priceC }}</span>\n' +
+    '						<span data-ng-show="pack.pricepoint == \'B\' && priceB">{{ priceB }}</span>\n' +
+    '						<span data-ng-show="pack.pricepoint == \'C\' && priceC">{{ priceC }}</span>\n' +
     '					</span>\n' +
     '					&nbsp;\n' +
     '				</h5>\n' +
     '			</a>\n' +
-    '		</div>\n' +
-    '	</div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/pack/PackView.tpl',
-    '<div data-ng-show="showPage">\n' +
-    '	<div ng-class="{\'screen-header\': isJSPlatform }" data-ng-show="isJSPlatform"></div>\n' +
-    '	<div class="pack-header">\n' +
-    '		<div class="pack-main-sticker">\n' +
-    '			<img data-ng-src="{{ packService.getMainSticker(pack) }}" alt="Main sticker">\n' +
-    '		</div>\n' +
-    '\n' +
-    '		<div class="pack-info">\n' +
-    '			<div class="pack-owner">{{ pack.artist }}</div>\n' +
-    '			<div class="pack-title">{{ pack.title }}</div>\n' +
-    '\n' +
-    '			<div data-ng-show="showActionProgress">\n' +
-    '				<div class="preloader2">\n' +
-    '					<div class="bounce1"></div>\n' +
-    '					<div class="bounce2"></div>\n' +
-    '					<div class="bounce3"></div>\n' +
-    '				</div>\n' +
-    '			</div>\n' +
-    '			<div data-ng-show="packService.isActive(pack) && !showActionProgress">\n' +
-    '				<button\n' +
-    '					class="btn btn-purple btn-action"\n' +
-    '					data-ng-click="showCollections()">\n' +
-    '					{{ i18n.open.toUpperCase() }}\n' +
-    '				</button>\n' +
-    '			</div>\n' +
-    '			<div data-ng-show="!packService.isActive(pack) && !showActionProgress">\n' +
-    '\n' +
-    '				<button class="btn btn-purple btn-action" data-ng-click="purchasePack()">\n' +
-    '					<span data-ng-show="packService.isHidden(pack) || (pack.pricepoint == \'A\') || (pack.pricepoint == \'B\' && isSubscriber)">\n' +
-    '						{{ i18n.download.toUpperCase() }}\n' +
-    '					</span>\n' +
-    '\n' +
-    '					<span data-ng-show="!packService.isHidden(pack) && (pack.pricepoint == \'C\' || (pack.pricepoint == \'B\' && !isSubscriber))">\n' +
-    '						<span data-ng-show="pack.pricepoint == \'B\' && !isSubscriber">{{ priceB }}</span>\n' +
-    '						<span data-ng-show="pack.pricepoint == \'C\'">{{ priceC }}</span>\n' +
-    '					</span>\n' +
-    '				</button>\n' +
-    '			</div>\n' +
-    '		</div>\n' +
-    '\n' +
-    '\n' +
-    '		<p class="pack-description" data-ng-show="pack.description">{{ pack.description || \'\' }}</p>\n' +
-    '	</div>\n' +
-    '\n' +
-    '	<div class="clearfix"></div>\n' +
-    '\n' +
-    '	<div class="pack-stickers-preview {{ isLandscape() ? \'landscape\' : \'\' }}">\n' +
-    '		<div class="pack-stickers-preview-image">\n' +
-    '			<img data-ng-src="{{ getStickersPreview() }}"\n' +
-    '			     data-sp-load="onImgLoad($event)"\n' +
-    '			     alt="" />\n' +
     '		</div>\n' +
     '	</div>\n' +
     '</div>');
@@ -215,25 +231,6 @@ module.run(['$templateCache', function($templateCache) {
     '			<img ng-src="{{ imgUrl }}" alt="">\n' +
     '		</div>\n' +
     '		<h5>{{ i18n.unavailableContent }}</h5>\n' +
-    '	</div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/base-page/preloader/view.tpl',
-    '<div class="preloader">\n' +
-    '	<div class="preloader-content">\n' +
-    '		<div class="preloader-chasing-dots">\n' +
-    '			<div class="preloader-child preloader-dot1"></div>\n' +
-    '			<div class="preloader-child preloader-dot2"></div>\n' +
-    '		</div>\n' +
     '	</div>\n' +
     '</div>');
 }]);
@@ -630,6 +627,10 @@ appStickerPipeStore.factory('PackService', function(Config) {
 			return pack.user_status == 'hidden';
 		},
 
+		isDisable: function(pack) {
+			return pack.user_status == 'none';
+		},
+
 		getMainSticker: function(pack) {
 			return pack.main_icon[Config.resolutionType];
 		}
@@ -775,6 +776,29 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 	});
 });
 
+appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI, $location, Helper, PackService) {
+
+	PlatformAPI.showPagePreloader(false);
+
+	angular.extend($scope, {
+		isJSPlatform: Helper.isJS(),
+		packService: PackService,
+		packs: packs,
+		priceB: Config.priceB,
+		priceC: Config.priceC,
+
+		getPackTitle: function(pack) {
+			var title = pack.title;
+			if (title.length > 15) {
+				title = title.substr(0, 15);
+				title += '...';
+			}
+
+			return title;
+		}
+	});
+});
+
 appStickerPipeStore.value('En', {
 	download: 'Download',
 	open: 'Open',
@@ -880,27 +904,4 @@ appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n
 		}
 
 	};
-});
-
-appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI, $location, Helper, PackService) {
-
-	PlatformAPI.showPagePreloader(false);
-
-	angular.extend($scope, {
-		isJSPlatform: Helper.isJS(),
-		packService: PackService,
-		packs: packs,
-		priceB: Config.priceB,
-		priceC: Config.priceC,
-
-		getPackTitle: function(pack) {
-			var title = pack.title;
-			if (title.length > 15) {
-				title = title.substr(0, 15);
-				title += '...';
-			}
-
-			return title;
-		}
-	});
 });
