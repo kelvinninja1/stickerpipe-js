@@ -64,24 +64,18 @@ appStickerPipeStore.config(function(envServiceProvider) {
 			local: {
 				cssUrl: 'css/',
 				notAvailableImgUrl: 'http://work.stk.908.vc/static/img/notavailable.png',
-				coinImgUrl: 'http://work.stk.908.vc/libs/store/current/coins/',
-				stickersStorageUrl: 'http://work.stk.908.vc/stk/',
-				apiUrl: 'http://work.stk.908.vc/api/'
+				apiUrl: 'http://work.stk.908.vc'
 			},
 			development: {
 				cssUrl: 'http://demo.stickerpipe.com/work/libs/store/css/',
 				notAvailableImgUrl: 'http://work.stk.908.vc/static/img/notavailable.png',
-				coinImgUrl: 'http://work.stk.908.vc/libs/store/current/coins/',
-				stickersStorageUrl: 'http://work.stk.908.vc/stk/',
-				apiUrl: 'http://work.stk.908.vc/api/'
+				apiUrl: 'http://work.stk.908.vc'
 			},
 			production: {
 				// todo: remove!!!
 				cssUrl: 'http://demo.stickerpipe.com/libs/store/current/css/',
 				notAvailableImgUrl: 'http://stickerpipe.com/static/img/notavailable.png',
-				coinImgUrl: 'http://stickerpipe.com/libs/store/current/coins/',
-				stickersStorageUrl: 'http://cdn.stickerpipe.com/stk/',
-				apiUrl: 'http://api.stickerpipe.com/api/'
+				apiUrl: 'http://api.stickerpipe.com'
 			}
 		}
 	});
@@ -532,7 +526,7 @@ appStickerPipeStore.factory('HttpApi', function(Http, EnvConfig, Config) {
 
     var apiVersion = 2,
         getUrl = function(uri) {
-            return EnvConfig.apiUrl + 'v' + apiVersion + '/' + uri;
+            return EnvConfig.apiUrl + '/api/v' + apiVersion + '/' + uri;
         };
 
 
