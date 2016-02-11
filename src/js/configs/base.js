@@ -13,7 +13,7 @@
 		stickerItemClass: 'sp-sticker-item',
 		emojiItemClass: 'sp-emoji',
 
-		htmlForEmptyRecent: '<div class="emptyRecent">No recent stickers</div>',
+		htmlForEmptyRecent: 'No recent stickers',
 
 		apiKey: null,
 

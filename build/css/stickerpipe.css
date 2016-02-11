@@ -609,9 +609,27 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   width: 80px;
 }
 
+.sticker-pipe .sp-recent-empty {
+  text-align: center;
+  margin-top: 135px;
+  font-size: 20px;
+}
+
 .stickerpipe-sticker {
   height: 160px;
   width: 160px;
+}
+
+.stickerpipe-content-highlight:after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  display: block;
+  position: absolute;
+  background-color: red;
+  border-radius: 50%;
+  margin-left: 16px;
+  margin-top: -24px !important;
 }
 
 .sp-icon-arrow-back {

@@ -3950,7 +3950,7 @@ window.StickersModule.Configs = {};
 		stickerItemClass: 'sp-sticker-item',
 		emojiItemClass: 'sp-emoji',
 
-		htmlForEmptyRecent: '<div class="emptyRecent">No recent stickers</div>',
+		htmlForEmptyRecent: 'No recent stickers',
 
 		apiKey: null,
 
@@ -5553,6 +5553,7 @@ window.StickersModule.View = {};
 			var recentStickers = Plugin.Service.Storage.getRecentStickers();
 
 			if (!recentStickers.length) {
+				this.contentEl.className = 'sp-recent-empty';
 				this.contentEl.innerHTML = Plugin.Configs.htmlForEmptyRecent;
 				this.updateScroll('top');
 				return false;
@@ -5723,6 +5724,14 @@ window.StickersModule.View = {};
 				if (!isDescendant(this.popoverEl, e.target) && !isDescendant(this.toggleEl.parentElement, e.target)) {
 					this.toggle();
 				}
+			}).bind(this));
+
+			window.addEventListener(Plugin.Service.Event.events.showContentHighlight, (function() {
+				this.toggleEl.classList.add('stickerpipe-content-highlight');
+			}).bind(this));
+
+			window.addEventListener(Plugin.Service.Event.events.hideContentHighlight, (function() {
+				this.toggleEl.classList.remove('stickerpipe-content-highlight');
 			}).bind(this));
 
 			// todo: addEventListener --> DOMEventService

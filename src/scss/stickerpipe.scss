@@ -238,6 +238,14 @@
 			}
 		}
 	}
+
+	.sp-recent-empty {
+		text-align: center;
+		margin-top: 135px;
+		font-size: 20px;
+	}
+
+
 }
 
 .stickerpipe-sticker {
@@ -245,6 +253,18 @@
 
 	height: $stickerSize;
 	width: $stickerSize;
+}
+
+.stickerpipe-content-highlight:after {
+	content: "";
+	width: 8px;
+	height: 8px;
+	display: block;
+	position: absolute;
+	background-color: red;
+	border-radius: 50%;
+	margin-left: 16px;
+	margin-top: -24px !important;
 }
 
 

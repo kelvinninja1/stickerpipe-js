@@ -62,6 +62,7 @@
 			var recentStickers = Plugin.Service.Storage.getRecentStickers();
 
 			if (!recentStickers.length) {
+				this.contentEl.className = 'sp-recent-empty';
 				this.contentEl.innerHTML = Plugin.Configs.htmlForEmptyRecent;
 				this.updateScroll('top');
 				return false;

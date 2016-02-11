@@ -55,6 +55,14 @@
 				}
 			}).bind(this));
 
+			window.addEventListener(Plugin.Service.Event.events.showContentHighlight, (function() {
+				this.toggleEl.classList.add('stickerpipe-content-highlight');
+			}).bind(this));
+
+			window.addEventListener(Plugin.Service.Event.events.hideContentHighlight, (function() {
+				this.toggleEl.classList.remove('stickerpipe-content-highlight');
+			}).bind(this));
+
 			// todo: addEventListener --> DOMEventService
 			if (window.addEventListener) {
 				window.addEventListener(Plugin.Service.Event.events.popoverShown, function() {
