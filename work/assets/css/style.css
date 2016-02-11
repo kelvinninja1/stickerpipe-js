@@ -204,25 +204,9 @@ body {
 #store {
   height: 400px; }
 
-.emptyRecent {
-  text-align: center;
-  padding: 135px 78px;
-  font-size: 20px; }
-
 .popover {
   height: 350px;
   width: 320px; }
-
-.has-new-content:after {
-  content: "";
-  width: 8px;
-  height: 8px;
-  display: block;
-  position: absolute;
-  background-color: red;
-  border-radius: 50%;
-  margin-left: 16px;
-  margin-top: -24px !important; }
 
 .navbar-custom {
   font-size: 14px;

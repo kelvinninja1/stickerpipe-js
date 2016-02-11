@@ -11,30 +11,30 @@ var gulp = require('gulp'),
 gulp.task('default', ['watcher'], function () {});
 
 gulp.task('watcher', function () {
-	gulp.watch(['work/demo/assets/scss/**/*.scss'], ['css']);
+	gulp.watch(['work/assets/scss/**/*.scss'], ['css']);
 
-	gulp.watch(['work/demo/assets/img/icons/*.*'], ['img:sprite']);
+	gulp.watch(['work/assets/img/icons/*.*'], ['img:sprite']);
 });
 
 gulp.task('css', ['clean:css'], function () {
-	return gulp.src('work/demo/assets/scss/**/*.scss')
+	return gulp.src('work/assets/scss/**/*.scss')
 		.pipe(sass())
 		.pipe(autoprefixer())
-		.pipe(gulp.dest('work/demo/assets/css'))
+		.pipe(gulp.dest('work/assets/css'))
 		//.pipe(git.add())
 		;
 });
 
 gulp.task('clean:css', function() {
-	return gulp.src('work/demo/assets/css', {read: false})
+	return gulp.src('work/assets/css', {read: false})
 		.pipe(clean());
 });
 
 gulp.task('img:sprite', function() {
-	var spriteData = gulp.src('work/demo/assets/img/icons/*.*')
+	var spriteData = gulp.src('work/assets/img/icons/*.*')
 		.pipe(spritesmith({
 			cssName: '_icons.scss',
-			retinaSrcFilter: ['work/demo/assets/img/icons/*@2x.*'],
+			retinaSrcFilter: ['work/assets/img/icons/*@2x.*'],
 
 			retinaImgName: 'icons_sprite@2x.png',
 			retinaImgPath: '../img/icons_sprite@2x.png',
@@ -46,6 +46,6 @@ gulp.task('img:sprite', function() {
 			}
 		}));
 
-	spriteData.img.pipe(gulp.dest('work/demo/assets/img/')); // путь, куда сохраняем картинку
-	return spriteData.css.pipe(gulp.dest('work/demo/assets/scss/'));
+	spriteData.img.pipe(gulp.dest('work/assets/img/')); // путь, куда сохраняем картинку
+	return spriteData.css.pipe(gulp.dest('work/assets/scss/'));
 });

@@ -116,15 +116,6 @@ var App = _makeClass(function(options) {
 
 		}).bind(this));
 
-		this.$window.on('sp:content:highlight:show', (function() {
-			this.$stickersToggle.addClass('has-new-content');
-		}).bind(this));
-
-		this.$window.on('sp:content:highlight:hide', (function() {
-			this.$stickersToggle.removeClass('has-new-content');
-		}).bind(this));
-
-
 		this.$window.on('sp:popover:shown', (function() {
 			this.$stickersToggle.addClass('active');
 		}).bind(this));
