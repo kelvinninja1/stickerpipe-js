@@ -11,7 +11,7 @@
 	position: fixed;
 	top: 0;
 	right: 0;
-	z-index: 1000;
+	z-index: 100000;
 
 	overflow: auto;
 
@@ -30,41 +30,13 @@
 	left: 0;
 	bottom: 0;
 	right: 0;
-	z-index: 1000;
+	z-index: 100005;
 
 
 	overflow-x: hidden;
 	overflow-y: auto;
 
 	-webkit-overflow-scrolling: touch;
-
-
-	//padding: 10px;
-	//
-	//background: white;
-	//border-radius: 3px;
-	//
-	//-webkit-box-shadow: 1px 1px 2px 0 rgba(50, 50, 50, 0.5);
-	//-moz-box-shadow:    1px 1px 2px 0 rgba(50, 50, 50, 0.5);
-	//box-shadow:         1px 1px 2px 0 rgba(50, 50, 50, 0.5);
-	//
-	//margin: 45px auto;
-	//max-width: 700px;
-	//overflow: hidden;
-	//
-	//-webkit-overflow-scrolling: touch;
-	//
-	//@media (max-width: $screen-sm-min) {
-	//	& {
-	//		border-radius: 0;
-	//		box-sizing: border-box;
-	//		//min-height: 100% !important;
-	//		//max-height: 100% !important;
-	//		//height: 100% !important;
-	//		//margin: 0;
-	//		width: 100%;
-	//	}
-	//}
 }
 
 .sp-modal-dialog {
