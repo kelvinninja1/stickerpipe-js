@@ -31,14 +31,14 @@
 				return;
 			}
 
-			Plugin.Service.Sticker.getById(stickerId, function(sticker) {
+			Plugin.Service.Sticker.getById(stickerId, function(sticker, async) {
 				var url = sticker.image && sticker.image[Plugin.Configs.stickerResolutionType];
 
 				callback && callback({
 					id: stickerId,
 					url: url,
 					html: '<img src="' + url + '" class="stickerpipe-sticker" data-sticker-id="' + stickerId + '">'
-				});
+				}, async);
 			});
 		},
 
@@ -46,13 +46,13 @@
 			var sticker = Plugin.Service.Storage.getContentById(contentId);
 
 			if (sticker) {
-				successCallback && successCallback(sticker);
+				successCallback && successCallback(sticker, false);
 				return;
 			}
 
 			Plugin.Service.Api.getContentById(contentId, function(sticker) {
 				Plugin.Service.Storage.setContentById(contentId, sticker);
-				successCallback && successCallback(sticker);
+				successCallback && successCallback(sticker, true);
 			});
 		},
 
