@@ -4,7 +4,10 @@
 
 	Plugin.Service.Sticker = {
 
-		parse: function(text, callback) {
+		parseStickerId: function(text) {
+			if (!text) {
+				return null;
+			}
 
 			var stickerId = null,
 				formatV1 = text.match(/\[\[(\S+)_(\S+)\]\]/),
@@ -15,6 +18,13 @@
 			} else if (formatV2) {
 				stickerId = formatV2[1];
 			}
+
+			return stickerId;
+		},
+
+		parse: function(text, callback) {
+
+			var stickerId = this.parseStickerId(text);
 
 			if (!stickerId) {
 				callback && callback(null);
@@ -44,6 +54,10 @@
 				Plugin.Service.Storage.setContentById(contentId, sticker);
 				successCallback && successCallback(sticker);
 			});
+		},
+
+		isSticker: function(text) {
+			return !!this.parseStickerId(text);
 		}
 	};
 })(window.StickersModule);

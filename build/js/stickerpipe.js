@@ -3614,7 +3614,10 @@ window.StickersModule.Service = {};
 
 	Plugin.Service.Sticker = {
 
-		parse: function(text, callback) {
+		parseStickerId: function(text) {
+			if (!text) {
+				return null;
+			}
 
 			var stickerId = null,
 				formatV1 = text.match(/\[\[(\S+)_(\S+)\]\]/),
@@ -3625,6 +3628,13 @@ window.StickersModule.Service = {};
 			} else if (formatV2) {
 				stickerId = formatV2[1];
 			}
+
+			return stickerId;
+		},
+
+		parse: function(text, callback) {
+
+			var stickerId = this.parseStickerId(text);
 
 			if (!stickerId) {
 				callback && callback(null);
@@ -3654,6 +3664,10 @@ window.StickersModule.Service = {};
 				Plugin.Service.Storage.setContentById(contentId, sticker);
 				successCallback && successCallback(sticker);
 			});
+		},
+
+		isSticker: function(text) {
+			return !!this.parseStickerId(text);
 		}
 	};
 })(window.StickersModule);
@@ -6291,6 +6305,10 @@ window.StickersModule.View = {};
 
 		fetchPacks: function(callback) {
 			Plugin.Service.Pack.fetchPacks(callback);
+		},
+
+		isSticker: function(text) {
+			return Plugin.Service.Sticker.isSticker(text);
 		},
 
 		parseStickerFromText: function(text, callback) {

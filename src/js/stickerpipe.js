@@ -142,6 +142,10 @@ window.StickersModule.View = {};
 			Plugin.Service.Pack.fetchPacks(callback);
 		},
 
+		isSticker: function(text) {
+			return Plugin.Service.Sticker.isSticker(text);
+		},
+
 		parseStickerFromText: function(text, callback) {
 			return Plugin.Service.Sticker.parse(text, callback);
 		},
