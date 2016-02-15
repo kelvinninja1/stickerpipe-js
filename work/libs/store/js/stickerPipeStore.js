@@ -89,6 +89,22 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/base-page/view.tpl',
+    '<!--<div class="version">0.0.65</div>-->\n' +
+    '<div class="store" data-sp-auto-scroll>\n' +
+    '	<div data-ng-show="!error && showContent" data-ui-view=""></div>\n' +
+    '	<div data-ng-show="error" data-error></div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/pack/PackView.tpl',
     '<div data-ng-show="showPage">\n' +
     '	<div ng-class="{\'screen-header\': isJSPlatform }" data-ng-show="isJSPlatform"></div>\n' +
@@ -170,22 +186,6 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/base-page/view.tpl',
-    '<!--<div class="version">0.0.65</div>-->\n' +
-    '<div class="store" data-sp-auto-scroll>\n' +
-    '	<div data-ng-show="!error && showContent" data-ui-view=""></div>\n' +
-    '	<div data-ng-show="error" data-error></div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/store/StoreView.tpl',
     '<div data-ng-class="{\'screen-header\': isJSPlatform }" data-ng-show="isJSPlatform"></div>\n' +
     '<div class="packs">\n' +
@@ -198,10 +198,11 @@ module.run(['$templateCache', function($templateCache) {
     '				<h5 class="pack-preview-name">{{ getPackTitle(pack) }}</h5>\n' +
     '				<h5 class="pack-preview-price">\n' +
     '					&nbsp;\n' +
-    '					<span data-ng-if="!packService.isActive(pack) && pack.pricepoint != \'A\'">\n' +
-    '						<span data-ng-show="pack.pricepoint == \'B\' && priceB">{{ priceB }}</span>\n' +
-    '						<span data-ng-show="pack.pricepoint == \'C\' && priceC">{{ priceC }}</span>\n' +
-    '					</span>\n' +
+    '					<span data-ng-show="packService.isActive(pack)">{{ i18n.free }}</span>\n' +
+    '					<span data-ng-show="packService.isHidden(pack)">{{ i18n.free }}</span>\n' +
+    '					<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'A\'">{{ i18n.free }}</span>\n' +
+    '					<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'B\' && priceB">{{ priceB }}</span>\n' +
+    '					<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'C\' && priceC">{{ priceC }}</span>\n' +
     '					&nbsp;\n' +
     '				</h5>\n' +
     '			</a>\n' +
@@ -696,109 +697,13 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $rootScop
 
 });
 
-appStickerPipeStore.directive('basePage', function() {
-
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/view.tpl',
-		link: function($scope, $el, attrs) {}
-	};
-});
-
-appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack, $window, Helper) {
-
-	PlatformAPI.showBackButton('#/store');
-
-	angular.extend($scope, {
-		i18n: i18n,
-		pack: pack,
-		packService: PackService,
-
-		isJSPlatform: Helper.isJS(),
-		showActionProgress: false,
-		showPage: false,
-
-		isSubscriber: Config.isSubscriber,
-		priceB: Config.priceB,
-		priceC: Config.priceC,
-
-		showCollections: function() {
-			PlatformAPI.showCollections(pack.pack_name);
-		},
-
-		purchasePack: function() {
-			$scope.showActionProgress = true;
-			PlatformAPI.purchasePack(pack.title, pack.pack_name, pack.pricepoint);
-		},
-
-		isLandscape: function() {
-			return ($window.innerWidth > $window.innerHeight || $window.innerWidth > 544);
-		},
-
-		getStickersPreview: function() {
-			var image = this.pack.preview;
-
-			if (this.isLandscape()) {
-				image = this.pack.preview_landscape;
-			}
-
-			return image[Config.resolutionType];
-		},
-
-		onImgLoad: function() {
-			PlatformAPI.showPagePreloader(false);
-			this.showPage = true;
-		}
-	});
-
-	$rootScope.$on('showActionProgress', function() {
-		$scope.showActionProgress = true;
-		if(!$scope.$$phase) {
-			$scope.$apply();
-		}
-	});
-
-	$rootScope.$on('hideActionProgress', function() {
-		$scope.showActionProgress = false;
-		if(!$scope.$$phase) {
-			$scope.$apply();
-		}
-	});
-
-	angular.element($window).bind('resize', function () {
-		$scope.$apply();
-	});
-});
-
-appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI, $location, Helper, PackService) {
-
-	PlatformAPI.showPagePreloader(false);
-
-	angular.extend($scope, {
-		isJSPlatform: Helper.isJS(),
-		packService: PackService,
-		packs: packs,
-		priceB: Config.priceB,
-		priceC: Config.priceC,
-
-		getPackTitle: function(pack) {
-			var title = pack.title;
-			if (title.length > 15) {
-				title = title.substr(0, 15);
-				title += '...';
-			}
-
-			return title;
-		}
-	});
-});
-
 appStickerPipeStore.value('En', {
 	download: 'Download',
 	open: 'Open',
 	buyPack: 'Buy pack',
 	unavailableContent: 'This content is currently unavailable',
-	get: 'Get'
+	get: 'Get',
+	free: 'Free'
 });
 
 appStickerPipeStore.value('Ru', {
@@ -806,7 +711,17 @@ appStickerPipeStore.value('Ru', {
 	open: 'Открыть',
 	buyPack: 'Купить',
 	unavailableContent: 'В данный момент этот контент недоступен',
-	get: 'Скачать'
+	get: 'Скачать',
+	free: 'Бесплатно'
+});
+
+appStickerPipeStore.directive('basePage', function() {
+
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/view.tpl',
+		link: function($scope, $el, attrs) {}
+	};
 });
 
 appStickerPipeStore.factory('JsPlatformProvider', function($rootScope, $window, $timeout, Config) {
@@ -882,6 +797,95 @@ appStickerPipeStore.factory('JsPlatformProvider', function($rootScope, $window, 
 			callSDKMethod('keyUp', {
 				keyCode: keyCode
 			});
+		}
+	});
+});
+
+appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack, $window, Helper) {
+
+	PlatformAPI.showBackButton('#/store');
+
+	angular.extend($scope, {
+		i18n: i18n,
+		pack: pack,
+		packService: PackService,
+
+		isJSPlatform: Helper.isJS(),
+		showActionProgress: false,
+		showPage: false,
+
+		isSubscriber: Config.isSubscriber,
+		priceB: Config.priceB,
+		priceC: Config.priceC,
+
+		showCollections: function() {
+			PlatformAPI.showCollections(pack.pack_name);
+		},
+
+		purchasePack: function() {
+			$scope.showActionProgress = true;
+			PlatformAPI.purchasePack(pack.title, pack.pack_name, pack.pricepoint);
+		},
+
+		isLandscape: function() {
+			return ($window.innerWidth > $window.innerHeight || $window.innerWidth > 544);
+		},
+
+		getStickersPreview: function() {
+			var image = this.pack.preview;
+
+			if (this.isLandscape()) {
+				image = this.pack.preview_landscape;
+			}
+
+			return image[Config.resolutionType];
+		},
+
+		onImgLoad: function() {
+			PlatformAPI.showPagePreloader(false);
+			this.showPage = true;
+		}
+	});
+
+	$rootScope.$on('showActionProgress', function() {
+		$scope.showActionProgress = true;
+		if(!$scope.$$phase) {
+			$scope.$apply();
+		}
+	});
+
+	$rootScope.$on('hideActionProgress', function() {
+		$scope.showActionProgress = false;
+		if(!$scope.$$phase) {
+			$scope.$apply();
+		}
+	});
+
+	angular.element($window).bind('resize', function () {
+		$scope.$apply();
+	});
+});
+
+appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI, $location, Helper, PackService, i18n) {
+
+	PlatformAPI.showPagePreloader(false);
+
+	angular.extend($scope, {
+		i18n: i18n,
+		isJSPlatform: Helper.isJS(),
+		packService: PackService,
+		packs: packs,
+		priceB: Config.priceB,
+		priceC: Config.priceC,
+
+		getPackTitle: function(pack) {
+			var title = pack.title;
+			if (title.length > 15) {
+				title = title.substr(0, 15);
+				title += '...';
+			}
+
+			return title;
 		}
 	});
 });
