@@ -268,7 +268,7 @@
 			var countFullShownTabs = parseInt((containerWidth / packTabSize), 10);
 
 			var offset = -(parseInt((i / countFullShownTabs), 10) * containerWidth);
-			//offset = (offset > 0) ? 0 : offset + 6;
+			//offset = (offset > 0) ? 0 : offset + 6; // old code
 			offset = (-offset < countFullShownTabs * packTabSize) ? 0 : offset + 6; // bugfix todo
 
 			this.scrollableContentEl.style.left = offset + 'px';
