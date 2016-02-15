@@ -3871,7 +3871,7 @@ window.StickersModule.Service = {};
 		// Last store visit
 		///////////////////////////////////////
 		getStoreLastVisit: function() {
-			return this.getMetadata()['last_store_visit'];
+			return this.getMetadata()['last_store_visit'] || 0;
 		},
 		setStoreLastVisit: function(time) {
 			time = time || +(new Date());
