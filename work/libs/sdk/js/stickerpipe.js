@@ -5870,13 +5870,14 @@ window.StickersModule.View = {};
 (function(Plugin) {
 
 
+	var packTabSize = 48;
+
 	Plugin.View.Tabs = Plugin.Libs.Class({
 
 		el: null,
 		scrollableContainerEl: null,
 		scrollableContentEl: null,
 
-		controls: null,
 		packTabs: {},
 		packTabsIndexes: {},
 
@@ -5893,54 +5894,54 @@ window.StickersModule.View = {};
 			tabs: 'sp-tabs'
 		},
 
+		controls: {
+			emoji: {
+				id: 'spTabEmoji',
+				class: 'sp-tab-emoji',
+				icon: 'sp-icon-face',
+				el: null,
+				isTab: true
+			},
+			history: {
+				id: 'spTabHistory',
+				class: 'sp-tab-history',
+				icon: 'sp-icon-clock',
+				el: null,
+				isTab: true
+			},
+			settings: {
+				id: 'spTabSettings',
+				class: 'sp-tab-settings',
+				icon: 'sp-icon-settings',
+				el: null,
+				isTab: false
+			},
+			store: {
+				id: 'spTabStore',
+				class: 'sp-tab-store',
+				icon: 'sp-icon-plus',
+				el: null,
+				isTab: false
+			},
+			prevPacks: {
+				id: 'spTabPrevPacks',
+				class: 'sp-tab-prev-packs',
+				icon: 'sp-icon-arrow-back',
+				el: null,
+				isTab: false
+			},
+			nextPacks: {
+				id: 'spTabNextPacks',
+				class: 'sp-tab-next-packs',
+				icon: 'sp-icon-arrow-forward',
+				el: null,
+				isTab: false
+			}
+		},
+
 		_constructor: function() {
 
 			this.el = document.createElement('div');
-
-			this.controls = {
-				emoji: {
-					id: 'spTabEmoji',
-					class: 'sp-tab-emoji',
-					icon: 'sp-icon-face',
-					el: null,
-					isTab: true
-				},
-				history: {
-					id: 'spTabHistory',
-					class: 'sp-tab-history',
-					icon: 'sp-icon-clock',
-					el: null,
-					isTab: true
-				},
-				settings: {
-					id: 'spTabSettings',
-					class: 'sp-tab-settings',
-					icon: 'sp-icon-settings',
-					el: null,
-					isTab: false
-				},
-				store: {
-					id: 'spTabStore',
-					class: 'sp-tab-store',
-					icon: 'sp-icon-plus',
-					el: null,
-					isTab: false
-				},
-				prevPacks: {
-					id: 'spTabPrevPacks',
-					class: 'sp-tab-prev-packs',
-					icon: 'sp-icon-arrow-back',
-					el: null,
-					isTab: false
-				},
-				nextPacks: {
-					id: 'spTabNextPacks',
-					class: 'sp-tab-next-packs',
-					icon: 'sp-icon-arrow-forward',
-					el: null,
-					isTab: false
-				}
-			};
 
 			window.addEventListener('resize', (function() {
 				this.onWindowResize();
@@ -5950,7 +5951,7 @@ window.StickersModule.View = {};
 
 		render: function() {
 
-			this.el.classList.add(this.classes.tabs);
+			this.el.className = this.classes.tabs;
 			this.el.innerHTML = '';
 
 			this.renderPrevPacksTab();
@@ -6097,23 +6098,21 @@ window.StickersModule.View = {};
 
 
 		onClickPrevPacksButton: function() {
-			var tabWidth = this.scrollableContentEl.getElementsByClassName(this.classes.packTab)[0].offsetWidth;
 			var containerWidth = this.scrollableContainerEl.offsetWidth;
 			var contentOffset = parseInt(this.scrollableContentEl.style.left, 10) || 0;
-			var countFullShownTabs = parseInt((containerWidth / tabWidth), 10);
+			var countFullShownTabs = parseInt((containerWidth / packTabSize), 10);
 
-			var offset = contentOffset + (tabWidth * countFullShownTabs);
+			var offset = contentOffset + (packTabSize * countFullShownTabs);
 			offset = (offset > 0) ? 0 : offset;
 			this.scrollableContentEl.style.left = offset + 'px';
 			this.onWindowResize();
 		},
 		onClickNextPacksButton: function() {
-			var tabWidth = this.scrollableContentEl.getElementsByClassName(this.classes.packTab)[0].offsetWidth;
 			var containerWidth = this.scrollableContainerEl.offsetWidth;
 			var contentOffset = parseInt(this.scrollableContentEl.style.left, 10) || 0;
-			var countFullShownTabs = parseInt((containerWidth / tabWidth), 10);
+			var countFullShownTabs = parseInt((containerWidth / packTabSize), 10);
 
-			var offset = -(tabWidth * countFullShownTabs) + contentOffset;
+			var offset = -(packTabSize * countFullShownTabs) + contentOffset;
 			this.scrollableContentEl.style.left = offset + 'px';
 			this.onWindowResize();
 		},
@@ -6132,12 +6131,14 @@ window.StickersModule.View = {};
 			this.packTabs[tabName].click();
 			this.hasActiveTab = true;
 
-			var tabWidth = this.scrollableContentEl.getElementsByClassName(this.classes.packTab)[0].offsetWidth;
+			var packTabSize = this.scrollableContentEl.getElementsByClassName(this.classes.packTab)[0].offsetWidth;
 			var containerWidth = this.scrollableContainerEl.offsetWidth;
-			var countFullShownTabs = parseInt((containerWidth / tabWidth), 10);
+			var countFullShownTabs = parseInt((containerWidth / packTabSize), 10);
 
 			var offset = -(parseInt((i / countFullShownTabs), 10) * containerWidth);
-			offset = (offset > 0) ? 0 : offset - 1;
+			//offset = (offset > 0) ? 0 : offset + 6;
+			offset = (-offset < countFullShownTabs * packTabSize) ? 0 : offset + 6; // bugfix todo
+
 			this.scrollableContentEl.style.left = offset + 'px';
 
 			this.onWindowResize();
