@@ -2,7 +2,17 @@
 (function(Plugin) {
 
 
-	var packTabSize = 48;
+	var packTabSize = 48,
+		classes = {
+			scrollableContainer: 'sp-tabs-scrollable-container',
+			scrollableContent: 'sp-tabs-scrollable-content',
+			controlTab: 'sp-control-tab',
+			controlButton: 'sp-control-button',
+			unwatched: 'sp-unwatched-content',
+			packTab: 'sp-pack-tab',
+			tabActive: 'sp-tab-active',
+			tabs: 'sp-tabs'
+		};
 
 	Plugin.View.Tabs = Plugin.Libs.Class({
 
@@ -14,17 +24,6 @@
 		packTabsIndexes: {},
 
 		hasActiveTab: false,
-
-		classes: {
-			scrollableContainer: 'sp-tabs-scrollable-container',
-			scrollableContent: 'sp-tabs-scrollable-content',
-			controlTab: 'sp-control-tab',
-			controlButton: 'sp-control-button',
-			unwatched: 'sp-unwatched-pack',
-			packTab: 'sp-pack-tab',
-			tabActive: 'sp-tab-active',
-			tabs: 'sp-tabs'
-		},
 
 		controls: {
 			emoji: {
@@ -83,7 +82,7 @@
 
 		render: function() {
 
-			this.el.className = this.classes.tabs;
+			this.el.className = classes.tabs;
 			this.el.innerHTML = '';
 
 			this.renderPrevPacksTab();
@@ -99,10 +98,10 @@
 		renderScrollableContainer: function() {
 
 			this.scrollableContentEl = document.createElement('div');
-			this.scrollableContentEl.className = this.classes.scrollableContent;
+			this.scrollableContentEl.className = classes.scrollableContent;
 
 			this.scrollableContainerEl = document.createElement('div');
-			this.scrollableContainerEl.className = this.classes.scrollableContainer;
+			this.scrollableContainerEl.className = classes.scrollableContainer;
 
 			this.scrollableContainerEl.appendChild(this.scrollableContentEl);
 			this.el.appendChild(this.scrollableContainerEl);
@@ -110,37 +109,37 @@
 		renderControlButton: function(controlButton) {
 			controlButton.isTab = controlButton.isTab || false;
 
-			var classes = [controlButton.class];
-			classes.push((controlButton.isTab) ? this.classes.controlTab : this.classes.controlButton);
+			var buttonClasses = [controlButton.class];
+			buttonClasses.push((controlButton.isTab) ? classes.controlTab : classes.controlButton);
 
 			var content = '<span class="' + controlButton.icon + '"></span>';
 
-			controlButton.el = this.renderTab(controlButton.id, classes, content);
+			controlButton.el = this.renderTab(controlButton.id, buttonClasses, content);
 			return controlButton.el;
 		},
 		renderPackTab: function(pack) {
-			var classes = [this.classes.packTab];
+			var tabClasses = [classes.packTab];
 
 			if (pack.isUnwatched) {
-				classes.push(this.classes.unwatched);
+				tabClasses.push(classes.unwatched);
 			}
 
 			var content = '<img src=' + pack.tab_icon[Plugin.Configs.tabResolutionType] + '>';
 
-			var tabEl = this.renderTab(null, classes, content, {
+			var tabEl = this.renderTab(null, tabClasses, content, {
 				'data-pack-name': pack.pack_name
 			});
 
 			tabEl.addEventListener('click', (function() {
-				tabEl.classList.remove(this.classes.unwatched);
+				tabEl.classList.remove(classes.unwatched);
 			}).bind(this));
 
 			this.packTabs[pack.pack_name] = tabEl;
 
 			return tabEl;
 		},
-		renderTab: function(id, classes, content, attrs) {
-			classes = classes || [];
+		renderTab: function(id, tabClasses, content, attrs) {
+			tabClasses = tabClasses || [];
 			attrs = attrs || {};
 
 			var tabEl = document.createElement('span');
@@ -149,9 +148,9 @@
 				tabEl.id = id;
 			}
 
-			classes.push(Plugin.Configs.tabItemClass);
+			tabClasses.push(Plugin.Configs.tabItemClass);
 
-			tabEl.classList.add.apply(tabEl.classList, classes);
+			tabEl.classList.add.apply(tabEl.classList, tabClasses);
 
 			for (var name in attrs) {
 				tabEl.setAttribute(name, attrs[name]);
@@ -160,23 +159,23 @@
 			tabEl.innerHTML = content;
 
 			tabEl.addEventListener('click', (function() {
-				if (!tabEl.classList.contains(this.classes.controlTab) &&
-					!tabEl.classList.contains(this.classes.packTab)) {
+				if (!tabEl.classList.contains(classes.controlTab) &&
+					!tabEl.classList.contains(classes.packTab)) {
 					return;
 				}
 
 				for (var tabName in this.packTabs) {
-					this.packTabs[tabName].classList.remove(this.classes.tabActive);
+					this.packTabs[tabName].classList.remove(classes.tabActive);
 				}
 
 				for (var controlName in this.controls) {
 					var controlTab = this.controls[controlName];
 					if (controlTab && controlTab.el) {
-						controlTab.el.classList.remove(this.classes.tabActive);
+						controlTab.el.classList.remove(classes.tabActive);
 					}
 				}
 
-				tabEl.classList.add(this.classes.tabActive);
+				tabEl.classList.add(classes.tabActive);
 			}).bind(this));
 
 			return tabEl;
@@ -217,6 +216,10 @@
 		renderStoreTab: function() {
 			if (Plugin.Configs.enableStoreTab) {
 				this.el.appendChild(this.renderControlButton(this.controls.store));
+
+				if (Plugin.Service.Storage.getStoreLastModified() > Plugin.Service.Storage.getStoreLastVisit()) {
+					this.controls.store.el.classList.add('sp-unwatched-content');
+				}
 			}
 		},
 		renderPrevPacksTab: function() {
@@ -263,7 +266,7 @@
 			this.packTabs[tabName].click();
 			this.hasActiveTab = true;
 
-			var packTabSize = this.scrollableContentEl.getElementsByClassName(this.classes.packTab)[0].offsetWidth;
+			var packTabSize = this.scrollableContentEl.getElementsByClassName(classes.packTab)[0].offsetWidth;
 			var containerWidth = this.scrollableContainerEl.offsetWidth;
 			var countFullShownTabs = parseInt((containerWidth / packTabSize), 10);
 
@@ -288,7 +291,7 @@
 			Plugin.Service.Helper.setEvent('click', this.el, this.controls.history.class, callback);
 		},
 		handleClickOnPackTab: function(callback) {
-			Plugin.Service.Helper.setEvent('click', this.el, this.classes.packTab, callback);
+			Plugin.Service.Helper.setEvent('click', this.el, classes.packTab, callback);
 		},
 		handleClickOnStoreTab: function(callback) {
 			Plugin.Service.Helper.setEvent('click', this.el, this.controls.store.class, callback);

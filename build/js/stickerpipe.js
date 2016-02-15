@@ -2977,6 +2977,12 @@ window.StickersModule.Service = {};
 
 			Plugin.Service.Http.get(url, {
 				success: function(response) {
+					response = response || {};
+					response.meta = response.meta || {};
+					response.meta.shop_last_modified = response.meta.shop_last_modified || 0;
+
+					Plugin.Service.Storage.setStoreLastModified(response.meta.shop_last_modified * 1000);
+
 					successCallback && successCallback(response.data);
 				}
 			});
@@ -3279,6 +3285,27 @@ window.StickersModule.Service = {};
 
 (function(Plugin) {
 
+	Plugin.Service.Highlight = {
+
+		check: function() {
+
+			var showContentHighlight = Plugin.Service.Pack.isExistUnwatchedPacks();
+			if (!showContentHighlight && Plugin.Service.Storage.getRecentStickers().length == 0) {
+				showContentHighlight = true;
+			}
+
+			if (!showContentHighlight &&
+				Plugin.Service.Storage.getStoreLastModified() > Plugin.Service.Storage.getStoreLastVisit()) {
+				showContentHighlight = true;
+			}
+			Plugin.Service.Event.changeContentHighlight(showContentHighlight);
+		}
+
+	};
+})(window.StickersModule);
+
+(function(Plugin) {
+
 	Plugin.Service.Http = {
 
 		// todo: refactor post(options) & get(options)
@@ -3462,8 +3489,6 @@ window.StickersModule.Service = {};
 
 		fetchPacks: function(callback) {
 
-			var self = this;
-
 			Plugin.Service.Api.getPacks(function(packs) {
 
 				packs = filterActivePacks(packs);
@@ -3505,7 +3530,7 @@ window.StickersModule.Service = {};
 
 				filterRecentStickers();
 
-				self.checkHighlight();
+				Plugin.Service.Highlight.check();
 
 				callback && callback();
 			});
@@ -3521,14 +3546,6 @@ window.StickersModule.Service = {};
 			}
 
 			return false;
-		},
-
-		checkHighlight: function() {
-			var showContentHighlight = this.isExistUnwatchedPacks();
-			if (!showContentHighlight && Plugin.Service.Storage.getRecentStickers().length == 0) {
-				showContentHighlight = true;
-			}
-			Plugin.Service.Event.changeContentHighlight(showContentHighlight);
 		}
 	};
 
@@ -3674,22 +3691,27 @@ window.StickersModule.Service = {};
 
 (function(Plugin) {
 
+	var lockr = Plugin.Libs.Lockr;
+
 	Plugin.Service.Storage = {
 
-		lockr: Plugin.Libs.Lockr,
-
-		setPrefix: function(storagePrefix) {
-			this.lockr.prefix = storagePrefix;
+		get: function(key) {
+			lockr.prefix = Plugin.Configs.storagePrefix;
+			return lockr.get(key);
+		},
+		set: function(key, data) {
+			lockr.prefix = Plugin.Configs.storagePrefix;
+			return lockr.set(key, data);
 		},
 
 		///////////////////////////////////////
 		// Used stickers
 		///////////////////////////////////////
 		getRecentStickers: function() {
-			return this.lockr.get('recent_stickers') || [];
+			return this.get('recent_stickers') || [];
 		},
 		setRecentStickers: function(recentStickers) {
-			return this.lockr.set('recent_stickers', recentStickers);
+			return this.set('recent_stickers', recentStickers);
 		},
 		addRecentSticker: function(stickerId) {
 
@@ -3710,10 +3732,10 @@ window.StickersModule.Service = {};
 		// Packs
 		///////////////////////////////////////
 		getPacks: function() {
-			return this.lockr.get('packs') || [];
+			return this.get('packs') || [];
 		},
 		setPacks: function(packs) {
-			return this.lockr.set('packs', packs)
+			return this.set('packs', packs)
 		},
 
 		getPack: function(packName) {
@@ -3751,10 +3773,10 @@ window.StickersModule.Service = {};
 		// Content
 		///////////////////////////////////////
 		getContent: function() {
-			return this.lockr.get('content') || {};
+			return this.get('content') || {};
 		},
 		setContent: function(content) {
-			return this.lockr.set('content', content || {})
+			return this.set('content', content || {})
 		},
 
 		getContentById: function(id) {
@@ -3769,11 +3791,11 @@ window.StickersModule.Service = {};
 		// Device ID
 		///////////////////////////////////////
 		getDeviceId: function() {
-			var deviceId = this.lockr.get('device_id');
+			var deviceId = this.get('device_id');
 
 			if (typeof deviceId == 'undefined') {
 				deviceId = + new Date();
-				this.lockr.set('device_id', deviceId);
+				this.set('device_id', deviceId);
 			}
 
 			return deviceId;
@@ -3783,30 +3805,30 @@ window.StickersModule.Service = {};
 		// User ID
 		///////////////////////////////////////
 		getUserId: function() {
-			return this.lockr.get('user_id');
+			return this.get('user_id');
 		},
 		setUserId: function(userId) {
-			return this.lockr.set('user_id', userId);
+			return this.set('user_id', userId);
 		},
 
 		///////////////////////////////////////
 		// User data
 		///////////////////////////////////////
 		getUserData: function() {
-			return this.lockr.get('user_data');
+			return this.get('user_data');
 		},
 		setUserData: function(userData) {
-			return this.lockr.set('user_data', userData);
+			return this.set('user_data', userData);
 		},
 
 		///////////////////////////////////////
 		// Pending request
 		///////////////////////////////////////
 		getPendingRequestTasks: function() {
-			return this.lockr.get('pending_request_tasks') || [];
+			return this.get('pending_request_tasks') || [];
 		},
 		setPendingRequestTasks: function(tasks) {
-			return this.lockr.set('pending_request_tasks', tasks);
+			return this.set('pending_request_tasks', tasks);
 		},
 		addPendingRequestTask: function(task) {
 
@@ -3823,6 +3845,48 @@ window.StickersModule.Service = {};
 			this.setPendingRequestTasks(tasks);
 
 			return task;
+		},
+
+		///////////////////////////////////////
+		// Metadata
+		///////////////////////////////////////
+		getMetadata: function(key) {
+			var metadata = this.get('metadata');
+
+			if (key) {
+				metadata = metadata[key];
+			}
+
+			return metadata;
+		},
+		setMetadata: function(key, value) {
+			var metadata = this.getMetadata() || {};
+
+			metadata[key] = value;
+
+			return this.set('metadata', metadata);
+		},
+
+		///////////////////////////////////////
+		// Last store visit
+		///////////////////////////////////////
+		getStoreLastVisit: function() {
+			return this.getMetadata()['last_store_visit'];
+		},
+		setStoreLastVisit: function(time) {
+			time = time || +(new Date());
+			return this.setMetadata('last_store_visit', time);
+		},
+
+		///////////////////////////////////////
+		// Last store visit
+		///////////////////////////////////////
+		getStoreLastModified: function() {
+			return this.getMetadata()['shop_last_modified'];
+		},
+		setStoreLastModified: function(time) {
+			time = time || +(new Date());
+			return this.setMetadata('shop_last_modified', time);
 		}
 	};
 
@@ -5870,7 +5934,17 @@ window.StickersModule.View = {};
 (function(Plugin) {
 
 
-	var packTabSize = 48;
+	var packTabSize = 48,
+		classes = {
+			scrollableContainer: 'sp-tabs-scrollable-container',
+			scrollableContent: 'sp-tabs-scrollable-content',
+			controlTab: 'sp-control-tab',
+			controlButton: 'sp-control-button',
+			unwatched: 'sp-unwatched-content',
+			packTab: 'sp-pack-tab',
+			tabActive: 'sp-tab-active',
+			tabs: 'sp-tabs'
+		};
 
 	Plugin.View.Tabs = Plugin.Libs.Class({
 
@@ -5882,17 +5956,6 @@ window.StickersModule.View = {};
 		packTabsIndexes: {},
 
 		hasActiveTab: false,
-
-		classes: {
-			scrollableContainer: 'sp-tabs-scrollable-container',
-			scrollableContent: 'sp-tabs-scrollable-content',
-			controlTab: 'sp-control-tab',
-			controlButton: 'sp-control-button',
-			unwatched: 'sp-unwatched-pack',
-			packTab: 'sp-pack-tab',
-			tabActive: 'sp-tab-active',
-			tabs: 'sp-tabs'
-		},
 
 		controls: {
 			emoji: {
@@ -5951,7 +6014,7 @@ window.StickersModule.View = {};
 
 		render: function() {
 
-			this.el.className = this.classes.tabs;
+			this.el.className = classes.tabs;
 			this.el.innerHTML = '';
 
 			this.renderPrevPacksTab();
@@ -5967,10 +6030,10 @@ window.StickersModule.View = {};
 		renderScrollableContainer: function() {
 
 			this.scrollableContentEl = document.createElement('div');
-			this.scrollableContentEl.className = this.classes.scrollableContent;
+			this.scrollableContentEl.className = classes.scrollableContent;
 
 			this.scrollableContainerEl = document.createElement('div');
-			this.scrollableContainerEl.className = this.classes.scrollableContainer;
+			this.scrollableContainerEl.className = classes.scrollableContainer;
 
 			this.scrollableContainerEl.appendChild(this.scrollableContentEl);
 			this.el.appendChild(this.scrollableContainerEl);
@@ -5978,37 +6041,37 @@ window.StickersModule.View = {};
 		renderControlButton: function(controlButton) {
 			controlButton.isTab = controlButton.isTab || false;
 
-			var classes = [controlButton.class];
-			classes.push((controlButton.isTab) ? this.classes.controlTab : this.classes.controlButton);
+			var buttonClasses = [controlButton.class];
+			buttonClasses.push((controlButton.isTab) ? classes.controlTab : classes.controlButton);
 
 			var content = '<span class="' + controlButton.icon + '"></span>';
 
-			controlButton.el = this.renderTab(controlButton.id, classes, content);
+			controlButton.el = this.renderTab(controlButton.id, buttonClasses, content);
 			return controlButton.el;
 		},
 		renderPackTab: function(pack) {
-			var classes = [this.classes.packTab];
+			var tabClasses = [classes.packTab];
 
 			if (pack.isUnwatched) {
-				classes.push(this.classes.unwatched);
+				tabClasses.push(classes.unwatched);
 			}
 
 			var content = '<img src=' + pack.tab_icon[Plugin.Configs.tabResolutionType] + '>';
 
-			var tabEl = this.renderTab(null, classes, content, {
+			var tabEl = this.renderTab(null, tabClasses, content, {
 				'data-pack-name': pack.pack_name
 			});
 
 			tabEl.addEventListener('click', (function() {
-				tabEl.classList.remove(this.classes.unwatched);
+				tabEl.classList.remove(classes.unwatched);
 			}).bind(this));
 
 			this.packTabs[pack.pack_name] = tabEl;
 
 			return tabEl;
 		},
-		renderTab: function(id, classes, content, attrs) {
-			classes = classes || [];
+		renderTab: function(id, tabClasses, content, attrs) {
+			tabClasses = tabClasses || [];
 			attrs = attrs || {};
 
 			var tabEl = document.createElement('span');
@@ -6017,9 +6080,9 @@ window.StickersModule.View = {};
 				tabEl.id = id;
 			}
 
-			classes.push(Plugin.Configs.tabItemClass);
+			tabClasses.push(Plugin.Configs.tabItemClass);
 
-			tabEl.classList.add.apply(tabEl.classList, classes);
+			tabEl.classList.add.apply(tabEl.classList, tabClasses);
 
 			for (var name in attrs) {
 				tabEl.setAttribute(name, attrs[name]);
@@ -6028,23 +6091,23 @@ window.StickersModule.View = {};
 			tabEl.innerHTML = content;
 
 			tabEl.addEventListener('click', (function() {
-				if (!tabEl.classList.contains(this.classes.controlTab) &&
-					!tabEl.classList.contains(this.classes.packTab)) {
+				if (!tabEl.classList.contains(classes.controlTab) &&
+					!tabEl.classList.contains(classes.packTab)) {
 					return;
 				}
 
 				for (var tabName in this.packTabs) {
-					this.packTabs[tabName].classList.remove(this.classes.tabActive);
+					this.packTabs[tabName].classList.remove(classes.tabActive);
 				}
 
 				for (var controlName in this.controls) {
 					var controlTab = this.controls[controlName];
 					if (controlTab && controlTab.el) {
-						controlTab.el.classList.remove(this.classes.tabActive);
+						controlTab.el.classList.remove(classes.tabActive);
 					}
 				}
 
-				tabEl.classList.add(this.classes.tabActive);
+				tabEl.classList.add(classes.tabActive);
 			}).bind(this));
 
 			return tabEl;
@@ -6085,6 +6148,10 @@ window.StickersModule.View = {};
 		renderStoreTab: function() {
 			if (Plugin.Configs.enableStoreTab) {
 				this.el.appendChild(this.renderControlButton(this.controls.store));
+
+				if (Plugin.Service.Storage.getStoreLastModified() > Plugin.Service.Storage.getStoreLastVisit()) {
+					this.controls.store.el.classList.add('sp-unwatched-content');
+				}
 			}
 		},
 		renderPrevPacksTab: function() {
@@ -6131,7 +6198,7 @@ window.StickersModule.View = {};
 			this.packTabs[tabName].click();
 			this.hasActiveTab = true;
 
-			var packTabSize = this.scrollableContentEl.getElementsByClassName(this.classes.packTab)[0].offsetWidth;
+			var packTabSize = this.scrollableContentEl.getElementsByClassName(classes.packTab)[0].offsetWidth;
 			var containerWidth = this.scrollableContainerEl.offsetWidth;
 			var countFullShownTabs = parseInt((containerWidth / packTabSize), 10);
 
@@ -6156,7 +6223,7 @@ window.StickersModule.View = {};
 			Plugin.Service.Helper.setEvent('click', this.el, this.controls.history.class, callback);
 		},
 		handleClickOnPackTab: function(callback) {
-			Plugin.Service.Helper.setEvent('click', this.el, this.classes.packTab, callback);
+			Plugin.Service.Helper.setEvent('click', this.el, classes.packTab, callback);
 		},
 		handleClickOnStoreTab: function(callback) {
 			Plugin.Service.Helper.setEvent('click', this.el, this.controls.store.class, callback);
@@ -6204,9 +6271,6 @@ window.StickersModule.View = {};
 
 			Plugin.Service.Helper.setConfig(config);
 
-			// ***** Init Storage ******
-			Plugin.Service.Storage.setPrefix(Plugin.Configs.storagePrefix);
-
 			// ***** Init Emoji tab *****
 			var mobileOS = Plugin.Service.Helper.getMobileOS();
 			if (mobileOS == 'ios' || mobileOS == 'android') {
@@ -6227,7 +6291,7 @@ window.StickersModule.View = {};
 
 			Plugin.Service.Storage.setUserId(Plugin.Configs.userId);
 
-			// ***** Init store *****
+			// ***** Init modules *****
 			Plugin.Module.Store.init(this);
 
 			// ***** Init services ******
@@ -6273,6 +6337,11 @@ window.StickersModule.View = {};
 
 			this.view.tabsView.handleClickOnStoreTab(function() {
 				Plugin.Module.Store.open();
+
+				Plugin.Service.Storage.setStoreLastVisit(+(new Date()));
+				Plugin.Service.Highlight.check();
+
+				self.view.tabsView.controls.store.el.classList.remove('sp-unwatched-content');
 			});
 
 			this.view.tabsView.handleClickOnPackTab(function(el) {
@@ -6285,7 +6354,7 @@ window.StickersModule.View = {};
 					self.view.renderPack(pack);
 				}
 
-				Plugin.Service.Pack.checkHighlight();
+				Plugin.Service.Highlight.check();
 			});
 
 			this.view.handleClickOnSticker(function(el) {
@@ -6295,7 +6364,7 @@ window.StickersModule.View = {};
 				Plugin.Service.Statistic.useSticker(stickerId);
 				Plugin.Service.Storage.addRecentSticker(stickerId);
 
-				Plugin.Service.Pack.checkHighlight();
+				Plugin.Service.Highlight.check();
 			});
 
 			this.view.handleClickOnEmoji(function(el) {

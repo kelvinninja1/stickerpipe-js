@@ -1,22 +1,27 @@
 
 (function(Plugin) {
 
+	var lockr = Plugin.Libs.Lockr;
+
 	Plugin.Service.Storage = {
 
-		lockr: Plugin.Libs.Lockr,
-
-		setPrefix: function(storagePrefix) {
-			this.lockr.prefix = storagePrefix;
+		get: function(key) {
+			lockr.prefix = Plugin.Configs.storagePrefix;
+			return lockr.get(key);
+		},
+		set: function(key, data) {
+			lockr.prefix = Plugin.Configs.storagePrefix;
+			return lockr.set(key, data);
 		},
 
 		///////////////////////////////////////
 		// Used stickers
 		///////////////////////////////////////
 		getRecentStickers: function() {
-			return this.lockr.get('recent_stickers') || [];
+			return this.get('recent_stickers') || [];
 		},
 		setRecentStickers: function(recentStickers) {
-			return this.lockr.set('recent_stickers', recentStickers);
+			return this.set('recent_stickers', recentStickers);
 		},
 		addRecentSticker: function(stickerId) {
 
@@ -37,10 +42,10 @@
 		// Packs
 		///////////////////////////////////////
 		getPacks: function() {
-			return this.lockr.get('packs') || [];
+			return this.get('packs') || [];
 		},
 		setPacks: function(packs) {
-			return this.lockr.set('packs', packs)
+			return this.set('packs', packs)
 		},
 
 		getPack: function(packName) {
@@ -78,10 +83,10 @@
 		// Content
 		///////////////////////////////////////
 		getContent: function() {
-			return this.lockr.get('content') || {};
+			return this.get('content') || {};
 		},
 		setContent: function(content) {
-			return this.lockr.set('content', content || {})
+			return this.set('content', content || {})
 		},
 
 		getContentById: function(id) {
@@ -96,11 +101,11 @@
 		// Device ID
 		///////////////////////////////////////
 		getDeviceId: function() {
-			var deviceId = this.lockr.get('device_id');
+			var deviceId = this.get('device_id');
 
 			if (typeof deviceId == 'undefined') {
 				deviceId = + new Date();
-				this.lockr.set('device_id', deviceId);
+				this.set('device_id', deviceId);
 			}
 
 			return deviceId;
@@ -110,30 +115,30 @@
 		// User ID
 		///////////////////////////////////////
 		getUserId: function() {
-			return this.lockr.get('user_id');
+			return this.get('user_id');
 		},
 		setUserId: function(userId) {
-			return this.lockr.set('user_id', userId);
+			return this.set('user_id', userId);
 		},
 
 		///////////////////////////////////////
 		// User data
 		///////////////////////////////////////
 		getUserData: function() {
-			return this.lockr.get('user_data');
+			return this.get('user_data');
 		},
 		setUserData: function(userData) {
-			return this.lockr.set('user_data', userData);
+			return this.set('user_data', userData);
 		},
 
 		///////////////////////////////////////
 		// Pending request
 		///////////////////////////////////////
 		getPendingRequestTasks: function() {
-			return this.lockr.get('pending_request_tasks') || [];
+			return this.get('pending_request_tasks') || [];
 		},
 		setPendingRequestTasks: function(tasks) {
-			return this.lockr.set('pending_request_tasks', tasks);
+			return this.set('pending_request_tasks', tasks);
 		},
 		addPendingRequestTask: function(task) {
 
@@ -150,6 +155,48 @@
 			this.setPendingRequestTasks(tasks);
 
 			return task;
+		},
+
+		///////////////////////////////////////
+		// Metadata
+		///////////////////////////////////////
+		getMetadata: function(key) {
+			var metadata = this.get('metadata');
+
+			if (key) {
+				metadata = metadata[key];
+			}
+
+			return metadata;
+		},
+		setMetadata: function(key, value) {
+			var metadata = this.getMetadata() || {};
+
+			metadata[key] = value;
+
+			return this.set('metadata', metadata);
+		},
+
+		///////////////////////////////////////
+		// Last store visit
+		///////////////////////////////////////
+		getStoreLastVisit: function() {
+			return this.getMetadata()['last_store_visit'];
+		},
+		setStoreLastVisit: function(time) {
+			time = time || +(new Date());
+			return this.setMetadata('last_store_visit', time);
+		},
+
+		///////////////////////////////////////
+		// Last store visit
+		///////////////////////////////////////
+		getStoreLastModified: function() {
+			return this.getMetadata()['shop_last_modified'];
+		},
+		setStoreLastModified: function(time) {
+			time = time || +(new Date());
+			return this.setMetadata('shop_last_modified', time);
 		}
 	};
 

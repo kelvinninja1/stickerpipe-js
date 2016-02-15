@@ -14,6 +14,12 @@
 
 			Plugin.Service.Http.get(url, {
 				success: function(response) {
+					response = response || {};
+					response.meta = response.meta || {};
+					response.meta.shop_last_modified = response.meta.shop_last_modified || 0;
+
+					Plugin.Service.Storage.setStoreLastModified(response.meta.shop_last_modified * 1000);
+
 					successCallback && successCallback(response.data);
 				}
 			});

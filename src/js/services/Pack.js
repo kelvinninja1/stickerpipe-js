@@ -93,8 +93,6 @@
 
 		fetchPacks: function(callback) {
 
-			var self = this;
-
 			Plugin.Service.Api.getPacks(function(packs) {
 
 				packs = filterActivePacks(packs);
@@ -136,7 +134,7 @@
 
 				filterRecentStickers();
 
-				self.checkHighlight();
+				Plugin.Service.Highlight.check();
 
 				callback && callback();
 			});
@@ -152,14 +150,6 @@
 			}
 
 			return false;
-		},
-
-		checkHighlight: function() {
-			var showContentHighlight = this.isExistUnwatchedPacks();
-			if (!showContentHighlight && Plugin.Service.Storage.getRecentStickers().length == 0) {
-				showContentHighlight = true;
-			}
-			Plugin.Service.Event.changeContentHighlight(showContentHighlight);
 		}
 	};
 

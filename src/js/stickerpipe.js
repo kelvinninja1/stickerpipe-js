@@ -38,9 +38,6 @@ window.StickersModule.View = {};
 
 			Plugin.Service.Helper.setConfig(config);
 
-			// ***** Init Storage ******
-			Plugin.Service.Storage.setPrefix(Plugin.Configs.storagePrefix);
-
 			// ***** Init Emoji tab *****
 			var mobileOS = Plugin.Service.Helper.getMobileOS();
 			if (mobileOS == 'ios' || mobileOS == 'android') {
@@ -61,7 +58,7 @@ window.StickersModule.View = {};
 
 			Plugin.Service.Storage.setUserId(Plugin.Configs.userId);
 
-			// ***** Init store *****
+			// ***** Init modules *****
 			Plugin.Module.Store.init(this);
 
 			// ***** Init services ******
@@ -107,6 +104,11 @@ window.StickersModule.View = {};
 
 			this.view.tabsView.handleClickOnStoreTab(function() {
 				Plugin.Module.Store.open();
+
+				Plugin.Service.Storage.setStoreLastVisit(+(new Date()));
+				Plugin.Service.Highlight.check();
+
+				self.view.tabsView.controls.store.el.classList.remove('sp-unwatched-content');
 			});
 
 			this.view.tabsView.handleClickOnPackTab(function(el) {
@@ -119,7 +121,7 @@ window.StickersModule.View = {};
 					self.view.renderPack(pack);
 				}
 
-				Plugin.Service.Pack.checkHighlight();
+				Plugin.Service.Highlight.check();
 			});
 
 			this.view.handleClickOnSticker(function(el) {
@@ -129,7 +131,7 @@ window.StickersModule.View = {};
 				Plugin.Service.Statistic.useSticker(stickerId);
 				Plugin.Service.Storage.addRecentSticker(stickerId);
 
-				Plugin.Service.Pack.checkHighlight();
+				Plugin.Service.Highlight.check();
 			});
 
 			this.view.handleClickOnEmoji(function(el) {
