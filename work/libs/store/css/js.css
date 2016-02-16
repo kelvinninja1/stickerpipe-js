@@ -366,3 +366,7 @@ h6 {
     box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.2); }
   .btn:active {
     box-shadow: none; }
+
+.preloader-btn {
+  height: 36px;
+  line-height: 36px; }
