@@ -33,6 +33,8 @@
 		priceB: null,
 		priceC: null,
 
+		primaryColor: '#e1e1e1',
+
 		// todo: block or popover
 		display: 'block',
 		height: '350px',

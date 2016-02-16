@@ -7,10 +7,15 @@
 			uri = uri || '';
 
 			var platform = 'JS',
-				style = platform;
+				style = platform,
+				primaryColor = Plugin.Configs.primaryColor;
 
 			if (Plugin.Service.Helper.getMobileOS() == 'ios' || navigator.appVersion.indexOf('Mac') != -1) {
 				style = 'ios';
+			}
+
+			if (primaryColor.charAt(0) == '#') {
+				primaryColor = primaryColor.substr(1);
 			}
 
 			var params = {
@@ -22,7 +27,8 @@
 				priceC: Plugin.Configs.priceC,
 				is_subscriber: (Plugin.Configs.userPremium ? 1 : 0),
 				localization: Plugin.Configs.lang,
-				style: style
+				style: style,
+				primaryColor: primaryColor
 			};
 
 			var url = Plugin.Configs.storeUrl || this.buildApiUrl('/web');

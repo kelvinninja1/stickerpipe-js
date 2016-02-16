@@ -92,11 +92,13 @@
 			function appendSticker(stickerId) {
 				var stickersSpanEl = document.createElement('span');
 				stickersSpanEl.className = 'sp-sticker-placeholder';
+				stickersSpanEl.style.background = Plugin.Configs.primaryColor;
 				stickersSpanEl.setAttribute('data-sticker-id', stickerId);
 
 				var image = new Image();
 				image.onload = function() {
 					stickersSpanEl.className = Plugin.Configs.stickerItemClass;
+					stickersSpanEl.style.background = '';
 					stickersSpanEl.appendChild(image);
 				};
 				image.onerror = function() {};

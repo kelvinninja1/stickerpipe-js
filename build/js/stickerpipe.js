@@ -3900,10 +3900,15 @@ window.StickersModule.Service = {};
 			uri = uri || '';
 
 			var platform = 'JS',
-				style = platform;
+				style = platform,
+				primaryColor = Plugin.Configs.primaryColor;
 
 			if (Plugin.Service.Helper.getMobileOS() == 'ios' || navigator.appVersion.indexOf('Mac') != -1) {
 				style = 'ios';
+			}
+
+			if (primaryColor.charAt(0) == '#') {
+				primaryColor = primaryColor.substr(1);
 			}
 
 			var params = {
@@ -3915,7 +3920,8 @@ window.StickersModule.Service = {};
 				priceC: Plugin.Configs.priceC,
 				is_subscriber: (Plugin.Configs.userPremium ? 1 : 0),
 				localization: Plugin.Configs.lang,
-				style: style
+				style: style,
+				primaryColor: primaryColor
 			};
 
 			var url = Plugin.Configs.storeUrl || this.buildApiUrl('/web');
@@ -4047,6 +4053,8 @@ window.StickersModule.Configs = {};
 
 		priceB: null,
 		priceC: null,
+
+		primaryColor: '#e1e1e1',
 
 		// todo: block or popover
 		display: 'block',
@@ -5661,11 +5669,13 @@ window.StickersModule.View = {};
 			function appendSticker(stickerId) {
 				var stickersSpanEl = document.createElement('span');
 				stickersSpanEl.className = 'sp-sticker-placeholder';
+				stickersSpanEl.style.background = Plugin.Configs.primaryColor;
 				stickersSpanEl.setAttribute('data-sticker-id', stickerId);
 
 				var image = new Image();
 				image.onload = function() {
 					stickersSpanEl.className = Plugin.Configs.stickerItemClass;
+					stickersSpanEl.style.background = '';
 					stickersSpanEl.appendChild(image);
 				};
 				image.onerror = function() {};
