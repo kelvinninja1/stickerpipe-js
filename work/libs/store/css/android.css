@@ -303,6 +303,10 @@ h6 {
 .pack-stickers-preview.landscape .pack-stickers-preview-image {
   max-width: 696px; }
 
+.pack-preview-undefined {
+  margin-top: 50px;
+  text-align: center; }
+
 .btn-action {
   margin-bottom: 8px; }
 
