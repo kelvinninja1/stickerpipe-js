@@ -91,6 +91,7 @@ js
 | userPremium           | boolean     | Flag is user - premium                        |
 | priceB                | string      | Price for packs with pricePoint = B           |
 | priceC                | string      | Price for packs with pricePoint = C           |
+| primaryColor          | string      | Color for sticker placeholder (HEX)           |
 
 
 
