@@ -329,6 +329,7 @@ h6 {
   display: table; }
   .pack-main-sticker img {
     height: 120px;
+    vertical-align: top;
     width: 120px; }
 
 .packs .col {
@@ -346,6 +347,14 @@ h6 {
   @media screen and (min-width: 768px) {
     .packs .col {
       width: 20%; } }
+
+.sticker-placeholder {
+  width: 60px;
+  height: 60px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 50%;
+  margin: 30px;
+  display: table; }
 
 .btn {
   border: 1px solid;

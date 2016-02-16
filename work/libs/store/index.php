@@ -19,7 +19,7 @@
 <!-- AngularJS -->
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.2/angular.min.js"></script>
 
-<script src="js/stickerPipeStore.js?v=1455550350948"></script>
+<script src="js/stickerPipeStore.js?v=1455620312035"></script>
 
 <script>
 	(function() {
@@ -37,7 +37,8 @@
 			priceB: valueOrNull('<?=($_GET['priceB'] ?: 'null');?>'),
 			priceC: valueOrNull('<?=($_GET['priceC'] ?: 'null');?>'),
 			isSubscriber: ('<?=($_GET['is_subscriber'] ?: '0');?>' == '1'),
-			style: '<?=($_GET['style'] ?: 'js');?>'
+			style: '<?=($_GET['style'] ?: 'js');?>',
+			primaryColor: '<?=($_GET['primaryColor'] ?: '#e1e1e1');?>'
 		});
 	})();
 </script>
