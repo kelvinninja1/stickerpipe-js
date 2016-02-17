@@ -3904,7 +3904,7 @@ window.StickersModule.Service = {};
 				primaryColor = Plugin.Configs.primaryColor;
 
 			if (Plugin.Service.Helper.getMobileOS() == 'ios' || navigator.appVersion.indexOf('Mac') != -1) {
-				style = 'ios';
+				//style = 'ios';
 			}
 
 			if (primaryColor.charAt(0) == '#') {
