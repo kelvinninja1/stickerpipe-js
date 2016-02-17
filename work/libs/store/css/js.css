@@ -322,6 +322,9 @@ h6 {
   display: block;
   text-decoration: none; }
 
+.pack-preview-name {
+  padding-top: 5px; }
+
 .pack-preview-name,
 .pack-preview-price {
   color: #333;
