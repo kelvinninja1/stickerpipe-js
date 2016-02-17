@@ -104,6 +104,30 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/directives/sp-button/view.tpl',
+    '<button data-ng-show="!btnInProgress"\n' +
+    '		data-ng-click="btnClick()"\n' +
+    '        class="{{ btnClass }}"\n' +
+    '        data-ng-transclude>\n' +
+    '</button>\n' +
+    '\n' +
+    '<div data-ng-show="btnInProgress" style="display: inline-table;">\n' +
+    '	<div class="progress">\n' +
+    '		<div class="bounce1"></div>\n' +
+    '		<div class="bounce2"></div>\n' +
+    '		<div class="bounce3"></div>\n' +
+    '	</div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/view.tpl',
     '<!--<div class="version">0.0.65</div>-->\n' +
     '<div class="store" data-sp-auto-scroll>\n' +
@@ -124,59 +148,58 @@ module.run(['$templateCache', function($templateCache) {
     '<div data-ng-show="showPage">\n' +
     '	<div ng-class="{\'screen-header\': isJSPlatform }" data-ng-show="isJSPlatform"></div>\n' +
     '	<div class="pack-header">\n' +
-    '		<div class="pack-main-sticker">\n' +
-    '			<img data-ng-src="{{ packService.getMainSticker(pack) }}" alt="Main sticker">\n' +
-    '		</div>\n' +
     '\n' +
     '		<div class="pack-info">\n' +
-    '			<div class="pack-owner">{{ pack.artist }}</div>\n' +
-    '			<div class="pack-title">{{ pack.title }}</div>\n' +
-    '\n' +
-    '			<div data-ng-show="showActionProgress">\n' +
-    '				<div class="preloader-btn preloader2">\n' +
-    '					<div class="bounce1"></div>\n' +
-    '					<div class="bounce2"></div>\n' +
-    '					<div class="bounce3"></div>\n' +
-    '				</div>\n' +
+    '			<div class="main-sticker">\n' +
+    '				<img data-ng-src="{{ packService.getMainSticker(pack) }}" alt="Main sticker">\n' +
     '			</div>\n' +
     '\n' +
-    '			<div data-ng-show="!showActionProgress">\n' +
-    '\n' +
-    '				<!-- OPEN -->\n' +
-    '				<button\n' +
-    '					data-ng-show="packService.isActive(pack)"\n' +
-    '					class="btn btn-primary btn-action"\n' +
-    '					data-ng-click="showCollections()">\n' +
-    '					{{ i18n.open.toUpperCase() }}\n' +
-    '				</button>\n' +
-    '\n' +
-    '				<!-- DOWNLOAD -->\n' +
-    '				<button\n' +
-    '					data-ng-show="packService.isHidden(pack) || (packService.isDisable(pack) && (pack.pricepoint == \'A\') || (pack.pricepoint == \'B\' && isSubscriber))"\n' +
-    '					class="btn btn-primary btn-action"\n' +
-    '					data-ng-click="purchasePack()">\n' +
-    '					{{ i18n.download.toUpperCase() }}\n' +
-    '				</button>\n' +
-    '\n' +
-    '				<!-- PURCHASE PriceB -->\n' +
-    '				<button\n' +
-    '					data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'B\' && !isSubscriber && priceB"\n' +
-    '					class="btn btn-primary btn-action"\n' +
-    '					data-ng-click="purchasePack()">\n' +
-    '					{{ priceB }}\n' +
-    '				</button>\n' +
-    '\n' +
-    '				<!-- PURCHASE PriceC -->\n' +
-    '				<button\n' +
-    '					data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'C\' && priceC"\n' +
-    '					class="btn btn-primary btn-action"\n' +
-    '					data-ng-click="purchasePack()">\n' +
-    '					{{ priceC }}\n' +
-    '				</button>\n' +
-    '\n' +
+    '			<div class="pack-info-details">\n' +
+    '				<div class="pack-title">{{ pack.title }}</div>\n' +
+    '				<div class="pack-owner">{{ pack.artist }}</div>\n' +
     '			</div>\n' +
     '		</div>\n' +
     '\n' +
+    '		<div class="clearfix"></div>\n' +
+    '\n' +
+    '		<div class="pack-controls">\n' +
+    '\n' +
+    '			<!--<button class="btn btn-primary"-->\n' +
+    '			     <!--data-ng-click="removePack()"-->\n' +
+    '			<!--&gt;{{ i18n.remove.toUpperCase() }}</button>-->\n' +
+    '\n' +
+    '			<!-- OPEN -->\n' +
+    '			<div data-sp-button\n' +
+    '			     data-ng-show="packService.isActive(pack)"\n' +
+    '			     data-btn-class="btn btn-primary"\n' +
+    '			     data-btn-click="showCollections()"\n' +
+    '			>{{ i18n.sendSticker.toUpperCase() }}</div>\n' +
+    '\n' +
+    '			<!-- DOWNLOAD -->\n' +
+    '			<div data-sp-button\n' +
+    '			     data-ng-show="packService.isHidden(pack) || (packService.isDisable(pack) && (pack.pricepoint == \'A\') || (pack.pricepoint == \'B\' && isSubscriber))"\n' +
+    '			     data-btn-class="btn btn-primary"\n' +
+    '			     data-btn-click="purchasePack()"\n' +
+    '			     data-btn-in-progress="inProgress"\n' +
+    '			>{{ i18n.download.toUpperCase() }}</div>\n' +
+    '\n' +
+    '			<!-- PURCHASE PriceB -->\n' +
+    '			<div data-sp-button\n' +
+    '			     data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'B\' && !isSubscriber && priceB"\n' +
+    '			     data-btn-class="btn btn-primary"\n' +
+    '			     data-btn-click="purchasePack()"\n' +
+    '			     data-btn-in-progress="inProgress"\n' +
+    '			>{{ priceB }}</div>\n' +
+    '\n' +
+    '			<!-- PURCHASE PriceC -->\n' +
+    '			<div data-sp-button\n' +
+    '			     data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'C\' && priceC"\n' +
+    '			     data-btn-class="btn btn-primary"\n' +
+    '			     data-btn-click="purchasePack()"\n' +
+    '			     data-btn-in-progress="inProgress"\n' +
+    '			>{{ priceC }}</div>\n' +
+    '\n' +
+    '		</div>\n' +
     '\n' +
     '		<p class="pack-description" data-ng-show="pack.description">{{ pack.description || \'\' }}</p>\n' +
     '	</div>\n' +
@@ -213,7 +236,10 @@ module.run(['$templateCache', function($templateCache) {
     '		<div class="pack-preview center-block">\n' +
     '			<a href="#/packs/{{ pack.pack_name }}">\n' +
     '\n' +
-    '				<div data-sp-sticker data-url="{{ packService.getMainSticker(pack) }}" data-complete-class="pack-main-sticker"></div>\n' +
+    '				<div data-sp-sticker\n' +
+    '				     data-url="{{ packService.getMainSticker(pack) }}"\n' +
+    '				     data-complete-class="main-sticker">\n' +
+    '				</div>\n' +
     '\n' +
     '				<h5 class="pack-preview-name">{{ getPackTitle(pack) }}</h5>\n' +
     '				<h5 class="pack-preview-price">\n' +
@@ -369,39 +395,6 @@ appStickerPipeStore.directive('spLoad', function ($parse) {
 				scope.$apply(function() {
 					fn(scope, { $event: event });
 				});
-			});
-		}
-	};
-});
-appStickerPipeStore.directive('spOnLongPress', function($timeout) {
-	return {
-		restrict: 'A',
-		link: function($scope, $elm, $attrs) {
-			$elm.bind('touchstart', function(evt) {
-				// Locally scoped variable that will keep track of the long press
-				$scope.longPress = true;
-
-				// We'll set a timeout for 600 ms for a long press
-				$timeout(function() {
-					if ($scope.longPress) {
-						// If the touchend event hasn't fired,
-						// apply the function given in on the element's on-long-press attribute
-						$scope.$apply(function() {
-							$scope.$eval($attrs.onLongPress)
-						});
-					}
-				}, 600);
-			});
-
-			$elm.bind('touchend', function(evt) {
-				// Prevent the onLongPress event from firing
-				$scope.longPress = false;
-				// If there is an on-touch-end function attached to this element, apply it
-				if ($attrs.spOnTouchEnd) {
-					$scope.$apply(function() {
-						$scope.$eval($attrs.spOnTouchEnd)
-					});
-				}
 			});
 		}
 	};
@@ -856,6 +849,30 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $rootScop
 	};
 
 });
+appStickerPipeStore.directive('spButton', function () {
+	return {
+		restrict: 'AE',
+		transclude: true,
+		templateUrl: '/directives/sp-button/view.tpl',
+		scope: {
+			btnClick: '&',
+			btnClass: '@',
+			btnInProgress: '='
+		},
+		link: function (scope, el, attrs) {
+			var border = 2,
+				progressEl = el[0].getElementsByClassName('progress')[0];
+			var buttonEl = el[0].getElementsByTagName('button')[0];
+
+
+			scope.$watch('btnInProgress', function() {
+				if (progressEl.clientWidth < buttonEl.clientWidth) {
+					progressEl.style.width = buttonEl.clientWidth + border + 'px';
+				}
+			});
+		}
+	};
+});
 
 appStickerPipeStore.directive('basePage', function() {
 
@@ -880,12 +897,17 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 		packService: PackService,
 
 		isJSPlatform: Helper.isJS(),
-		showActionProgress: false,
 		showPage: false,
 
 		isSubscriber: Config.isSubscriber,
 		priceB: Config.priceB,
 		priceC: Config.priceC,
+
+		inProgress: false,
+
+		removePack: function() {
+			this.inProgress = false;
+		},
 
 		orientation: function() {
 			return isLandscape() ? 'landscape' : 'portrait';
@@ -896,7 +918,7 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 		},
 
 		purchasePack: function() {
-			$scope.showActionProgress = true;
+			$scope.inProgress = true;
 			PlatformAPI.purchasePack(pack.title, pack.pack_name, pack.pricepoint);
 		},
 
@@ -921,14 +943,14 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 	});
 
 	$rootScope.$on('showActionProgress', function() {
-		$scope.showActionProgress = true;
+		$scope.inProgress = true;
 		if(!$scope.$$phase) {
 			$scope.$apply();
 		}
 	});
 
 	$rootScope.$on('hideActionProgress', function() {
-		$scope.showActionProgress = false;
+		$scope.inProgress  = false;
 		if(!$scope.$$phase) {
 			$scope.$apply();
 		}
@@ -965,22 +987,24 @@ appStickerPipeStore.controller('StoreController', function($scope, packs, Config
 
 appStickerPipeStore.value('En', {
 	download: 'Download',
-	open: 'Open',
+	sendSticker: 'Send sticker',
 	buyPack: 'Buy pack',
 	unavailableContent: 'This content is currently unavailable',
 	get: 'Get',
 	free: 'Free',
-	previewIsUndefined: 'Pack preview is undefined'
+	previewIsUndefined: 'Pack preview is undefined',
+	remove: 'Remove'
 });
 
 appStickerPipeStore.value('Ru', {
 	download: 'Скачать',
-	open: 'Открыть',
+	sendSticker: 'Отправить стикер',
 	buyPack: 'Купить',
 	unavailableContent: 'В данный момент этот контент недоступен',
 	get: 'Скачать',
 	free: 'Бесплатно',
-	previewIsUndefined: 'Превью пака недоступно'
+	previewIsUndefined: 'Превью пака недоступно',
+	remove: 'Удалить'
 });
 
 appStickerPipeStore.factory('JsPlatformProvider', function($rootScope, $window, $timeout, Config) {

@@ -91,11 +91,6 @@ var App = _makeClass(function(options) {
 
 			primaryColor: '#9c27b0',
 
-			//primaryColor: '#ffffff',
-			//primaryColor: '#000000',
-			//primaryColor: '#9c27b0',
-			//primaryColor: '#ff5722',
-
 			priceB: '4.99 UAH',
 			priceC: '9.99 UAH'
 		});
