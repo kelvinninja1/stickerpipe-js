@@ -36,7 +36,6 @@ appStickerPipeStore.controller('AppController', function(Config, envService, Hel
 
 	function includeCss(filename) {
 		document.getElementById('css').setAttribute('href', envService.read('cssUrl') + filename + '.css?v='+(+(new Date())));
-		document.getElementsByClassName('version')[0].innerHTML = envService.read('cssUrl') + filename + '.css?v='+(+(new Date()));
 	}
 
 	if (envService.is('local') || envService.is('development')) {
@@ -921,6 +920,15 @@ appStickerPipeStore.directive('spButton', function () {
 	};
 });
 
+appStickerPipeStore.directive('basePage', function() {
+
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/view.tpl',
+		link: function($scope, $el, attrs) {}
+	};
+});
+
 appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack, $window, Helper) {
 
 	PlatformAPI.showBackButton('#/store');
@@ -999,15 +1007,6 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 	angular.element($window).bind('resize', function () {
 		$scope.$apply();
 	});
-});
-
-appStickerPipeStore.directive('basePage', function() {
-
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/view.tpl',
-		link: function($scope, $el, attrs) {}
-	};
 });
 
 appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI, $location, Helper, PackService, i18n) {
