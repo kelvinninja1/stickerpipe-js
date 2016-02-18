@@ -5570,12 +5570,10 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 .screen-header + div {
   margin-top: 48px; }
 
-.main-sticker {
-  display: table; }
-  .main-sticker img {
-    height: 120px;
-    vertical-align: top;
-    width: 120px; }
+.main-sticker img {
+  height: 120px;
+  vertical-align: top;
+  width: 120px; }
 
 .icon {
   display: table; }
