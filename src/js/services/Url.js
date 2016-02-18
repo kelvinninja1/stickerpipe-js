@@ -90,6 +90,10 @@
 			return this.buildApiUrl('/content/' + contentId);
 		},
 
+		getHidePackUrl: function(packName) {
+			return this.buildApiUrl('/packs/' + packName);
+		},
+
 		getStoreUrl: function() {
 			return this.buildStoreUrl('store/');
 		},

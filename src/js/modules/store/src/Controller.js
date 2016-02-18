@@ -10,48 +10,34 @@
 		}), Plugin.Service.Helper.getDomain(Plugin.Service.Url.buildStoreUrl('/')));
 	}
 
-	var ESC_CODE = 27;
-
 	Module.Controller = {
-
-		stickerpipe: null,
 
 		onPurchaseCallback: null,
 
-		init: function(stickerpipe) {
-			this.stickerpipe = stickerpipe;
-		},
-
-		showCollections: function(packName) {
-			Module.View.close();
-			this.stickerpipe.open(packName);
+		configureStore: function() {
+			callStoreMethod('configure', {
+				canRemovePack: true
+			});
 		},
 
 		downloadPack: function(packName, pricePoint) {
 			Plugin.Service.Pack.purchase(packName, pricePoint, function() {
-				callStoreMethod('reload');
+
+				Module.Controller.reloadStore();
+
 				callStoreMethod('onPackDownloaded', {
 					packName: packName
 				});
-			}, true);
-		},
 
-		purchasePack: function(packName, packTitle, pricePoint) {
-			if (pricePoint == 'A' || (pricePoint == 'B' && Plugin.Configs.userPremium)) {
-				this.downloadPack(packName, pricePoint);
-			} else {
-				this.onPurchaseCallback && this.onPurchaseCallback(packName, packTitle, pricePoint);
-			}
+			}, true);
 		},
 
 		goBack: function() {
 			callStoreMethod('goBack');
 		},
 
-		keyUp: function(keyCode) {
-			if (keyCode == ESC_CODE) {
-				Module.View.close();
-			}
+		reloadStore: function() {
+			callStoreMethod('reload');
 		},
 
 		///////////////////////////////////////////

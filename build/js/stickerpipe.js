@@ -3024,6 +3024,16 @@ window.StickersModule.Service = {};
 					successCallback && successCallback(response.data);
 				}
 			});
+		},
+
+		hidePack: function(packName, successCallback) {
+			return Plugin.Service.Http.ajax({
+				type: 'DELETE',
+				url: Plugin.Service.Url.getHidePackUrl(packName),
+				success: function(response) {
+					successCallback && successCallback(response.data);
+				}
+			});
 		}
 	};
 })(window.StickersModule);
@@ -3536,6 +3546,26 @@ window.StickersModule.Service = {};
 			});
 		},
 
+		remove: function(packName, doneCallback) {
+			Plugin.Service.Api.hidePack(packName, function() {
+
+				var packs = Plugin.Service.Storage.getPacks();
+				for (var i = 0; i < packs.length; i++) {
+					if (packs[i].pack_name == packName) {
+						packs.splice(i, 1);
+					}
+				}
+				Plugin.Service.Storage.setPacks(packs);
+
+				if (stickerpipe && stickerpipe.view.isRendered) {
+					stickerpipe.view.tabsView.renderPacks();
+					stickerpipe.view.tabsView.controls.history.el.click();
+				}
+
+				doneCallback && doneCallback();
+			});
+		},
+
 		isExistUnwatchedPacks: function() {
 			var packs = Plugin.Service.Storage.getPacks();
 
@@ -3981,6 +4011,10 @@ window.StickersModule.Service = {};
 
 		getContentByIdUrl: function(contentId) {
 			return this.buildApiUrl('/content/' + contentId);
+		},
+
+		getHidePackUrl: function(packName) {
+			return this.buildApiUrl('/packs/' + packName);
 		},
 
 		getStoreUrl: function() {
@@ -4938,7 +4972,7 @@ window.StickersModule.Module = {};
 		init: function(stickerpipe) {
 			Plugin.Module.Store.View.init();
 			Plugin.Module.Store.ApiListener.init();
-			Plugin.Module.Store.Controller.init(stickerpipe);
+			Plugin.Module.Store.Api.init(stickerpipe);
 		},
 
 		open: function(contentId) {
@@ -4967,19 +5001,40 @@ window.StickersModule.Module = {};
 
 (function(Plugin, Module) {
 
+	var stickerpipe;
+
 	Module.Api= {
 
+		init: function(_stickerpipe) {
+			stickerpipe = _stickerpipe;
+		},
+
 		showCollections: function(data) {
-			Module.Controller.showCollections(data.attrs.packName);
+			Module.View.close();
+			stickerpipe.open(data.attrs.packName);
 		},
 
 		purchasePack: function(data) {
-			var attrs = data.attrs;
-			Module.Controller.purchasePack(attrs.packName, attrs.packTitle, attrs.pricePoint);
+			var packName = data.attrs.packName,
+				packTitle = data.attrs.packTitle,
+				pricePoint = data.attrs.pricePoint;
+
+			if (pricePoint == 'A' || (pricePoint == 'B' && Plugin.Configs.userPremium)) {
+				Module.Controller.downloadPack(packName, pricePoint);
+			} else {
+				Module.Controller.onPurchaseCallback &&
+				Module.Controller.onPurchaseCallback(packName, packTitle, pricePoint);
+			}
 		},
 
 		showPagePreloader: function(data) {
 			Module.View.showPagePreloader(data.attrs.show);
+		},
+
+		removePack: function(data) {
+			Plugin.Service.Pack.remove(data.attrs.packName, function() {
+				Module.Controller.reloadStore();
+			});
 		},
 
 		showBackButton: function(data) {
@@ -4991,7 +5046,11 @@ window.StickersModule.Module = {};
 		},
 
 		keyUp: function(data) {
-			Module.Controller.keyUp(data.attrs.keyCode);
+			var ESC_CODE = 27;
+
+			if (data.attrs.keyCode == ESC_CODE) {
+				Module.View.close();
+			}
 		}
 	};
 
@@ -5037,48 +5096,34 @@ window.StickersModule.Module = {};
 		}), Plugin.Service.Helper.getDomain(Plugin.Service.Url.buildStoreUrl('/')));
 	}
 
-	var ESC_CODE = 27;
-
 	Module.Controller = {
-
-		stickerpipe: null,
 
 		onPurchaseCallback: null,
 
-		init: function(stickerpipe) {
-			this.stickerpipe = stickerpipe;
-		},
-
-		showCollections: function(packName) {
-			Module.View.close();
-			this.stickerpipe.open(packName);
+		configureStore: function() {
+			callStoreMethod('configure', {
+				canRemovePack: true
+			});
 		},
 
 		downloadPack: function(packName, pricePoint) {
 			Plugin.Service.Pack.purchase(packName, pricePoint, function() {
-				callStoreMethod('reload');
+
+				Module.Controller.reloadStore();
+
 				callStoreMethod('onPackDownloaded', {
 					packName: packName
 				});
-			}, true);
-		},
 
-		purchasePack: function(packName, packTitle, pricePoint) {
-			if (pricePoint == 'A' || (pricePoint == 'B' && Plugin.Configs.userPremium)) {
-				this.downloadPack(packName, pricePoint);
-			} else {
-				this.onPurchaseCallback && this.onPurchaseCallback(packName, packTitle, pricePoint);
-			}
+			}, true);
 		},
 
 		goBack: function() {
 			callStoreMethod('goBack');
 		},
 
-		keyUp: function(keyCode) {
-			if (keyCode == ESC_CODE) {
-				Module.View.close();
-			}
+		reloadStore: function() {
+			callStoreMethod('reload');
 		},
 
 		///////////////////////////////////////////
@@ -5136,6 +5181,10 @@ window.StickersModule.Module = {};
 
 						this.modalBody = modalBody;
 					}
+
+					this.iframe.onload = function() {
+						Module.Controller.configureStore();
+					};
 
 
 					if (!this.preloader) {

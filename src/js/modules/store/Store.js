@@ -6,7 +6,7 @@
 		init: function(stickerpipe) {
 			Plugin.Module.Store.View.init();
 			Plugin.Module.Store.ApiListener.init();
-			Plugin.Module.Store.Controller.init(stickerpipe);
+			Plugin.Module.Store.Api.init(stickerpipe);
 		},
 
 		open: function(contentId) {

@@ -1,19 +1,40 @@
 
 (function(Plugin, Module) {
 
+	var stickerpipe;
+
 	Module.Api= {
 
+		init: function(_stickerpipe) {
+			stickerpipe = _stickerpipe;
+		},
+
 		showCollections: function(data) {
-			Module.Controller.showCollections(data.attrs.packName);
+			Module.View.close();
+			stickerpipe.open(data.attrs.packName);
 		},
 
 		purchasePack: function(data) {
-			var attrs = data.attrs;
-			Module.Controller.purchasePack(attrs.packName, attrs.packTitle, attrs.pricePoint);
+			var packName = data.attrs.packName,
+				packTitle = data.attrs.packTitle,
+				pricePoint = data.attrs.pricePoint;
+
+			if (pricePoint == 'A' || (pricePoint == 'B' && Plugin.Configs.userPremium)) {
+				Module.Controller.downloadPack(packName, pricePoint);
+			} else {
+				Module.Controller.onPurchaseCallback &&
+				Module.Controller.onPurchaseCallback(packName, packTitle, pricePoint);
+			}
 		},
 
 		showPagePreloader: function(data) {
 			Module.View.showPagePreloader(data.attrs.show);
+		},
+
+		removePack: function(data) {
+			Plugin.Service.Pack.remove(data.attrs.packName, function() {
+				Module.Controller.reloadStore();
+			});
 		},
 
 		showBackButton: function(data) {
@@ -25,7 +46,11 @@
 		},
 
 		keyUp: function(data) {
-			Module.Controller.keyUp(data.attrs.keyCode);
+			var ESC_CODE = 27;
+
+			if (data.attrs.keyCode == ESC_CODE) {
+				Module.View.close();
+			}
 		}
 	};
 

@@ -33,6 +33,10 @@
 						this.modalBody = modalBody;
 					}
 
+					this.iframe.onload = function() {
+						Module.Controller.configureStore();
+					};
+
 
 					if (!this.preloader) {
 						var modalDialog = modalEl.getElementsByClassName('sp-modal-dialog')[0];

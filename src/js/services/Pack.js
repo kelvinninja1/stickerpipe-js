@@ -140,6 +140,26 @@
 			});
 		},
 
+		remove: function(packName, doneCallback) {
+			Plugin.Service.Api.hidePack(packName, function() {
+
+				var packs = Plugin.Service.Storage.getPacks();
+				for (var i = 0; i < packs.length; i++) {
+					if (packs[i].pack_name == packName) {
+						packs.splice(i, 1);
+					}
+				}
+				Plugin.Service.Storage.setPacks(packs);
+
+				if (stickerpipe && stickerpipe.view.isRendered) {
+					stickerpipe.view.tabsView.renderPacks();
+					stickerpipe.view.tabsView.controls.history.el.click();
+				}
+
+				doneCallback && doneCallback();
+			});
+		},
+
 		isExistUnwatchedPacks: function() {
 			var packs = Plugin.Service.Storage.getPacks();
 

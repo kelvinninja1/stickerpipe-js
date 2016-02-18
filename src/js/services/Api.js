@@ -61,6 +61,16 @@
 					successCallback && successCallback(response.data);
 				}
 			});
+		},
+
+		hidePack: function(packName, successCallback) {
+			return Plugin.Service.Http.ajax({
+				type: 'DELETE',
+				url: Plugin.Service.Url.getHidePackUrl(packName),
+				success: function(response) {
+					successCallback && successCallback(response.data);
+				}
+			});
 		}
 	};
 })(window.StickersModule);
