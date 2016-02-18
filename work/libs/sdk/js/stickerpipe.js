@@ -3024,6 +3024,10 @@ window.StickersModule.Service = {};
 					successCallback && successCallback(response.data);
 				}
 			});
+		},
+
+		hidePack: function(packName) {
+
 		}
 	};
 })(window.StickersModule);
@@ -4938,7 +4942,7 @@ window.StickersModule.Module = {};
 		init: function(stickerpipe) {
 			Plugin.Module.Store.View.init();
 			Plugin.Module.Store.ApiListener.init();
-			Plugin.Module.Store.Controller.init(stickerpipe);
+			Plugin.Module.Store.Api.init(stickerpipe);
 		},
 
 		open: function(contentId) {
@@ -4967,7 +4971,13 @@ window.StickersModule.Module = {};
 
 (function(Plugin, Module) {
 
+	var stickerpipe;
+
 	Module.Api= {
+
+		init: function(_stickerpipe) {
+			stickerpipe = _stickerpipe;
+		},
 
 		showCollections: function(data) {
 			Module.Controller.showCollections(data.attrs.packName);
@@ -4982,6 +4992,10 @@ window.StickersModule.Module = {};
 			Module.View.showPagePreloader(data.attrs.show);
 		},
 
+		removePack: function(data) {
+			Plugin.Service.Api.hidePack(data.attrs.packName);
+		},
+
 		showBackButton: function(data) {
 			Module.View.showBackButton(data.attrs.show);
 		},
@@ -4991,7 +5005,11 @@ window.StickersModule.Module = {};
 		},
 
 		keyUp: function(data) {
-			Module.Controller.keyUp(data.attrs.keyCode);
+			var ESC_CODE = 27;
+
+			if (data.attrs.keyCode == ESC_CODE) {
+				Module.View.close();
+			}
 		}
 	};
 
@@ -5037,16 +5055,15 @@ window.StickersModule.Module = {};
 		}), Plugin.Service.Helper.getDomain(Plugin.Service.Url.buildStoreUrl('/')));
 	}
 
-	var ESC_CODE = 27;
-
 	Module.Controller = {
 
-		stickerpipe: null,
 
 		onPurchaseCallback: null,
 
-		init: function(stickerpipe) {
-			this.stickerpipe = stickerpipe;
+		configureStore: function() {
+			callStoreMethod('configure', {
+				canRemovePack: true
+			})
 		},
 
 		showCollections: function(packName) {
@@ -5055,8 +5072,10 @@ window.StickersModule.Module = {};
 		},
 
 		downloadPack: function(packName, pricePoint) {
+			var self = this;
+
 			Plugin.Service.Pack.purchase(packName, pricePoint, function() {
-				callStoreMethod('reload');
+				self.reloadStore();
 				callStoreMethod('onPackDownloaded', {
 					packName: packName
 				});
@@ -5075,10 +5094,8 @@ window.StickersModule.Module = {};
 			callStoreMethod('goBack');
 		},
 
-		keyUp: function(keyCode) {
-			if (keyCode == ESC_CODE) {
-				Module.View.close();
-			}
+		reloadStore: function() {
+			callStoreMethod('reload');
 		},
 
 		///////////////////////////////////////////
@@ -5120,6 +5137,9 @@ window.StickersModule.Module = {};
 			this.iframe.style.width = '100%';
 			this.iframe.style.height = '100%';
 			this.iframe.style.border = '0';
+			this.iframe.onload = function() {
+				Module.Controller.configureStore();
+			};
 
 			this.modal = Plugin.Module.Modal.init(this.iframe, {
 				onOpen: (function(contentEl, modalEl, overlay) {
