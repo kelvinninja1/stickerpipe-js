@@ -5570,10 +5570,10 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 .screen-header + div {
   margin-top: 48px; }
 
-.main-sticker {
+.main-sticker-123 {
   height: 120px;
   width: 120px; }
-  .main-sticker img {
+  .main-sticker-123 img {
     height: 120px;
     vertical-align: top;
     width: 120px; }
@@ -5687,7 +5687,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 .pack-info {
   margin-bottom: 8px; }
-  .pack-info .main-sticker {
+  .pack-info .main-sticker-123 {
     float: left;
     margin-right: 8px; }
 
