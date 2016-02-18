@@ -195,6 +195,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 .main-sticker {
   display: table; }
   .main-sticker img {
+    display: table;
     height: 120px;
     vertical-align: top;
     width: 120px; }

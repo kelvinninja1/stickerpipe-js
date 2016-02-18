@@ -38,19 +38,6 @@ appStickerPipeStore.controller('AppController', function(Config, envService, Hel
 		document.getElementById('css').setAttribute('href', envService.read('cssUrl') + filename + '.css?v='+(+(new Date())));
 	}
 
-
-	//////////////////////////////////////////////////////////////////////////
-
-	var head  = document.getElementsByTagName('head')[0];
-	var link  = document.createElement('link');
-	link.rel  = 'stylesheet';
-	link.type = 'text/css';
-	link.href = 'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css';
-	link.media = 'all';
-	head.appendChild(link);
-
-	//////////////////////////////////////////////////////////////////////////
-
 	if (envService.is('local') || envService.is('development')) {
 		includeCss(Config.style.toLowerCase());
 	}
