@@ -129,7 +129,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/view.tpl',
-    '<div class="version">0.0.68</div>\n' +
+    '<div class="version">0.0.69</div>\n' +
     '<div class="store" data-sp-auto-scroll>\n' +
     '	<div data-ng-show="!error && showContent" data-ui-view=""></div>\n' +
     '	<div data-ng-show="error" data-error></div>\n' +
@@ -309,6 +309,28 @@ appStickerPipeStore.config(function($stateProvider, $urlRouterProvider) {
 		});
 });
 
+appStickerPipeStore.value('En', {
+	download: 'Download',
+	sendSticker: 'Send sticker',
+	buyPack: 'Buy pack',
+	unavailableContent: 'This content is currently unavailable',
+	get: 'Get',
+	free: 'Free',
+	previewIsUndefined: 'Pack preview is undefined',
+	remove: 'Remove'
+});
+
+appStickerPipeStore.value('Ru', {
+	download: 'Скачать',
+	sendSticker: 'Отправить стикер',
+	buyPack: 'Купить',
+	unavailableContent: 'В данный момент этот контент недоступен',
+	get: 'Скачать',
+	free: 'Бесплатно',
+	previewIsUndefined: 'Превью пака недоступно',
+	remove: 'Удалить'
+});
+
 appStickerPipeStore.directive('spAutoScroll', function ($document, $timeout, $location, $window, $rootScope, PlatformAPI) {
 	return {
 		restrict: 'A',
@@ -424,28 +446,6 @@ appStickerPipeStore.directive('spSticker', function (Config) {
 			image.src = attrs.url;
 		}
 	};
-});
-
-appStickerPipeStore.value('En', {
-	download: 'Download',
-	sendSticker: 'Send sticker',
-	buyPack: 'Buy pack',
-	unavailableContent: 'This content is currently unavailable',
-	get: 'Get',
-	free: 'Free',
-	previewIsUndefined: 'Pack preview is undefined',
-	remove: 'Remove'
-});
-
-appStickerPipeStore.value('Ru', {
-	download: 'Скачать',
-	sendSticker: 'Отправить стикер',
-	buyPack: 'Купить',
-	unavailableContent: 'В данный момент этот контент недоступен',
-	get: 'Скачать',
-	free: 'Бесплатно',
-	previewIsUndefined: 'Превью пака недоступно',
-	remove: 'Удалить'
 });
 appStickerPipeStore.factory('Api', function(Http, EnvConfig, Config) {
 

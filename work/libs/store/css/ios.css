@@ -264,7 +264,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
     border-radius: 5px; }
 
 .pack-preview a {
-  display: table;
+  display: block;
   text-decoration: none; }
 
 .pack-preview-name {
