@@ -12,7 +12,9 @@
 		getPacks: function(successCallback) {
 			var url = Plugin.Service.Url.getPacksUrl();
 
-			Plugin.Service.Http.get(url, {
+			Plugin.Service.Ajax({
+				type: 'get',
+				url: url,
 				success: function(response) {
 					response = response || {};
 					response.meta = response.meta || {};
@@ -26,12 +28,16 @@
 		},
 
 		sendStatistic: function(statistic) {
-			Plugin.Service.Http.post(Plugin.Service.Url.getStatisticUrl(), statistic);
+			Plugin.Service.Ajax({
+				type: 'post',
+				url: Plugin.Service.Url.getStatisticUrl(),
+				data: statistic
+			});
 		},
 
 		updateUserData: function(userData) {
-			return Plugin.Service.Http.ajax({
-				type: 'PUT',
+			return Plugin.Service.Ajax({
+				type: 'put',
 				url: Plugin.Service.Url.getUserDataUrl(),
 				data: userData,
 				headers: {
@@ -41,7 +47,9 @@
 		},
 
 		purchasePack: function(packName, pricePoint, successCallback) {
-			Plugin.Service.Http.post(Plugin.Service.Url.getPurchaseUrl(packName, pricePoint), {}, {
+			Plugin.Service.Ajax({
+				type: 'post',
+				url: Plugin.Service.Url.getPurchaseUrl(packName, pricePoint),
 				success: function(response) {
 					successCallback && successCallback(response.data);
 				},
@@ -56,7 +64,9 @@
 		},
 
 		getContentById: function(contentId, successCallback) {
-			Plugin.Service.Http.get(Plugin.Service.Url.getContentByIdUrl(contentId), {
+			Plugin.Service.Ajax({
+				type: 'get',
+				url: Plugin.Service.Url.getContentByIdUrl(contentId),
 				success: function(response) {
 					successCallback && successCallback(response.data);
 				}
@@ -64,7 +74,7 @@
 		},
 
 		hidePack: function(packName, successCallback) {
-			return Plugin.Service.Http.ajax({
+			return Plugin.Service.Ajax({
 				type: 'DELETE',
 				url: Plugin.Service.Url.getHidePackUrl(packName),
 				success: function(response) {
