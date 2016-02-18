@@ -5137,9 +5137,6 @@ window.StickersModule.Module = {};
 			this.iframe.style.width = '100%';
 			this.iframe.style.height = '100%';
 			this.iframe.style.border = '0';
-			this.iframe.onload = function() {
-				Module.Controller.configureStore();
-			};
 
 			this.modal = Plugin.Module.Modal.init(this.iframe, {
 				onOpen: (function(contentEl, modalEl, overlay) {
@@ -5156,6 +5153,10 @@ window.StickersModule.Module = {};
 
 						this.modalBody = modalBody;
 					}
+
+					this.iframe.onload = function() {
+						Module.Controller.configureStore();
+					};
 
 
 					if (!this.preloader) {
