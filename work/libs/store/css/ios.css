@@ -193,12 +193,11 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   margin-top: 48px; }
 
 .main-sticker {
-  display: table; }
+  display: table-cell; }
   .main-sticker img {
-    display: table;
-    height: 120px !important;
+    height: 120px;
     vertical-align: top;
-    width: 120px !important; }
+    width: 120px; }
 
 .icon {
   display: table; }
