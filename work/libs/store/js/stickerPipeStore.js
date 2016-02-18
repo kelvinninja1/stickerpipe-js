@@ -36,6 +36,7 @@ appStickerPipeStore.controller('AppController', function(Config, envService, Hel
 
 	function includeCss(filename) {
 		document.getElementById('css').setAttribute('href', envService.read('cssUrl') + filename + '.css?v='+(+(new Date())));
+		document.getElementsByClassName('version')[0].innerHTML = envService.read('cssUrl') + filename + '.css?v='+(+(new Date()));
 	}
 
 	if (envService.is('local') || envService.is('development')) {
@@ -920,6 +921,119 @@ appStickerPipeStore.directive('spButton', function () {
 	};
 });
 
+appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack, $window, Helper) {
+
+	PlatformAPI.showBackButton('#/store');
+
+	function isLandscape() {
+		return ($window.innerWidth > $window.innerHeight || $window.innerWidth > 544);
+	}
+
+	angular.extend($scope, {
+		i18n: i18n,
+		pack: pack,
+		packService: PackService,
+
+		isJSPlatform: Helper.isJS(),
+		showPage: false,
+
+		isSubscriber: Config.isSubscriber,
+		priceB: Config.priceB,
+		priceC: Config.priceC,
+
+		inProgress: false,
+
+		canRemovePack: PlatformAPI.canRemovePack(),
+
+		removePack: function() {
+			PlatformAPI.removePack(pack.pack_name);
+		},
+
+		orientation: function() {
+			return isLandscape() ? 'landscape' : 'portrait';
+		},
+
+		showCollections: function() {
+			PlatformAPI.showCollections(pack.pack_name);
+		},
+
+		purchasePack: function() {
+			$scope.inProgress = true;
+			PlatformAPI.purchasePack(pack.title, pack.pack_name, pack.pricepoint);
+		},
+
+		getStickersPreview: function() {
+			if (!this.pack) {
+				return false;
+			}
+
+			var image = this.pack[isLandscape() ? 'preview_landscape' : 'preview'] || {},
+				url = image[Config.resolutionType] || false;
+
+			if (!url) {
+				this.hidePagePreloader();
+			}
+			return url;
+		},
+
+		hidePagePreloader: function() {
+			PlatformAPI.showPagePreloader(false);
+			this.showPage = true;
+		}
+	});
+
+	$rootScope.$on('showActionProgress', function() {
+		$scope.inProgress = true;
+		if(!$scope.$$phase) {
+			$scope.$apply();
+		}
+	});
+
+	$rootScope.$on('hideActionProgress', function() {
+		$scope.inProgress  = false;
+		if(!$scope.$$phase) {
+			$scope.$apply();
+		}
+	});
+
+	angular.element($window).bind('resize', function () {
+		$scope.$apply();
+	});
+});
+
+appStickerPipeStore.directive('basePage', function() {
+
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/view.tpl',
+		link: function($scope, $el, attrs) {}
+	};
+});
+
+appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI, $location, Helper, PackService, i18n) {
+
+	PlatformAPI.showPagePreloader(false);
+
+	angular.extend($scope, {
+		i18n: i18n,
+		isJSPlatform: Helper.isJS(),
+		packService: PackService,
+		packs: packs,
+		priceB: Config.priceB,
+		priceC: Config.priceC,
+
+		getPackTitle: function(pack) {
+			var title = pack.title;
+			if (title.length > 15) {
+				title = title.substr(0, 15);
+				title += '...';
+			}
+
+			return title;
+		}
+	});
+});
+
 appStickerPipeStore.factory('JsPlatformProvider', function($rootScope, $window, $timeout, Config) {
 
 	function callSDKMethod(action, attrs) {
@@ -1014,119 +1128,6 @@ appStickerPipeStore.factory('JsPlatformProvider', function($rootScope, $window, 
 			});
 		}
 	};
-});
-
-appStickerPipeStore.directive('basePage', function() {
-
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/view.tpl',
-		link: function($scope, $el, attrs) {}
-	};
-});
-
-appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack, $window, Helper) {
-
-	PlatformAPI.showBackButton('#/store');
-
-	function isLandscape() {
-		return ($window.innerWidth > $window.innerHeight || $window.innerWidth > 544);
-	}
-
-	angular.extend($scope, {
-		i18n: i18n,
-		pack: pack,
-		packService: PackService,
-
-		isJSPlatform: Helper.isJS(),
-		showPage: false,
-
-		isSubscriber: Config.isSubscriber,
-		priceB: Config.priceB,
-		priceC: Config.priceC,
-
-		inProgress: false,
-
-		canRemovePack: PlatformAPI.canRemovePack(),
-
-		removePack: function() {
-			PlatformAPI.removePack(pack.pack_name);
-		},
-
-		orientation: function() {
-			return isLandscape() ? 'landscape' : 'portrait';
-		},
-
-		showCollections: function() {
-			PlatformAPI.showCollections(pack.pack_name);
-		},
-
-		purchasePack: function() {
-			$scope.inProgress = true;
-			PlatformAPI.purchasePack(pack.title, pack.pack_name, pack.pricepoint);
-		},
-
-		getStickersPreview: function() {
-			if (!this.pack) {
-				return false;
-			}
-
-			var image = this.pack[isLandscape() ? 'preview_landscape' : 'preview'] || {},
-				url = image[Config.resolutionType] || false;
-
-			if (!url) {
-				this.hidePagePreloader();
-			}
-			return url;
-		},
-
-		hidePagePreloader: function() {
-			PlatformAPI.showPagePreloader(false);
-			this.showPage = true;
-		}
-	});
-
-	$rootScope.$on('showActionProgress', function() {
-		$scope.inProgress = true;
-		if(!$scope.$$phase) {
-			$scope.$apply();
-		}
-	});
-
-	$rootScope.$on('hideActionProgress', function() {
-		$scope.inProgress  = false;
-		if(!$scope.$$phase) {
-			$scope.$apply();
-		}
-	});
-
-	angular.element($window).bind('resize', function () {
-		$scope.$apply();
-	});
-});
-
-appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI, $location, Helper, PackService, i18n) {
-
-	PlatformAPI.showPagePreloader(false);
-
-	angular.extend($scope, {
-		i18n: i18n,
-		isJSPlatform: Helper.isJS(),
-		packService: PackService,
-		packs: packs,
-		priceB: Config.priceB,
-		priceC: Config.priceC,
-
-		getPackTitle: function(pack) {
-			var title = pack.title;
-			if (title.length > 15) {
-				title = title.substr(0, 15);
-				title += '...';
-			}
-
-			return title;
-		}
-	});
 });
 
 appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
