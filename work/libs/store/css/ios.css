@@ -193,9 +193,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   margin-top: 48px; }
 
 .main-sticker {
-  display: block;
-  height: 120px;
-  width: 120px; }
+  display: table; }
   .main-sticker img {
     height: 120px;
     vertical-align: top;
@@ -266,7 +264,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
     border-radius: 5px; }
 
 .pack-preview a {
-  display: block;
+  display: table;
   text-decoration: none; }
 
 .pack-preview-name {
