@@ -3026,8 +3026,14 @@ window.StickersModule.Service = {};
 			});
 		},
 
-		hidePack: function(packName) {
-
+		hidePack: function(packName, successCallback) {
+			return Plugin.Service.Http.ajax({
+				type: 'DELETE',
+				url: Plugin.Service.Url.getHidePackUrl(packName),
+				success: function(response) {
+					successCallback && successCallback(response.data);
+				}
+			});
 		}
 	};
 })(window.StickersModule);
@@ -3540,6 +3546,26 @@ window.StickersModule.Service = {};
 			});
 		},
 
+		remove: function(packName, doneCallback) {
+			Plugin.Service.Api.hidePack(packName, function() {
+
+				var packs = Plugin.Service.Storage.getPacks();
+				for (var i = 0; i < packs.length; i++) {
+					if (packs[i].pack_name == packName) {
+						packs.splice(i, 1);
+					}
+				}
+				Plugin.Service.Storage.setPacks(packs);
+
+				if (stickerpipe && stickerpipe.view.isRendered) {
+					stickerpipe.view.tabsView.renderPacks();
+					stickerpipe.view.tabsView.controls.history.el.click();
+				}
+
+				doneCallback && doneCallback();
+			});
+		},
+
 		isExistUnwatchedPacks: function() {
 			var packs = Plugin.Service.Storage.getPacks();
 
@@ -3985,6 +4011,10 @@ window.StickersModule.Service = {};
 
 		getContentByIdUrl: function(contentId) {
 			return this.buildApiUrl('/content/' + contentId);
+		},
+
+		getHidePackUrl: function(packName) {
+			return this.buildApiUrl('/packs/' + packName);
 		},
 
 		getStoreUrl: function() {
@@ -4980,12 +5010,21 @@ window.StickersModule.Module = {};
 		},
 
 		showCollections: function(data) {
-			Module.Controller.showCollections(data.attrs.packName);
+			Module.View.close();
+			stickerpipe.open(data.attrs.packName);
 		},
 
 		purchasePack: function(data) {
-			var attrs = data.attrs;
-			Module.Controller.purchasePack(attrs.packName, attrs.packTitle, attrs.pricePoint);
+			var packName = data.attrs.packName,
+				packTitle = data.attrs.packTitle,
+				pricePoint = data.attrs.pricePoint;
+
+			if (pricePoint == 'A' || (pricePoint == 'B' && Plugin.Configs.userPremium)) {
+				Module.Controller.downloadPack(packName, pricePoint);
+			} else {
+				Module.Controller.onPurchaseCallback &&
+				Module.Controller.onPurchaseCallback(packName, packTitle, pricePoint);
+			}
 		},
 
 		showPagePreloader: function(data) {
@@ -4993,7 +5032,9 @@ window.StickersModule.Module = {};
 		},
 
 		removePack: function(data) {
-			Plugin.Service.Api.hidePack(data.attrs.packName);
+			Plugin.Service.Pack.remove(data.attrs.packName, function() {
+				Module.Controller.reloadStore();
+			});
 		},
 
 		showBackButton: function(data) {
@@ -5057,37 +5098,24 @@ window.StickersModule.Module = {};
 
 	Module.Controller = {
 
-
 		onPurchaseCallback: null,
 
 		configureStore: function() {
 			callStoreMethod('configure', {
 				canRemovePack: true
-			})
-		},
-
-		showCollections: function(packName) {
-			Module.View.close();
-			this.stickerpipe.open(packName);
+			});
 		},
 
 		downloadPack: function(packName, pricePoint) {
-			var self = this;
-
 			Plugin.Service.Pack.purchase(packName, pricePoint, function() {
-				self.reloadStore();
+
+				Module.Controller.reloadStore();
+
 				callStoreMethod('onPackDownloaded', {
 					packName: packName
 				});
-			}, true);
-		},
 
-		purchasePack: function(packName, packTitle, pricePoint) {
-			if (pricePoint == 'A' || (pricePoint == 'B' && Plugin.Configs.userPremium)) {
-				this.downloadPack(packName, pricePoint);
-			} else {
-				this.onPurchaseCallback && this.onPurchaseCallback(packName, packTitle, pricePoint);
-			}
+			}, true);
 		},
 
 		goBack: function() {
