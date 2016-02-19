@@ -95,6 +95,22 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/base-page/view.tpl',
+    '<div class="version">0.0.1</div>\n' +
+    '<div class="store" data-sp-auto-scroll>\n' +
+    '	<div data-ng-show="!error && showContent" data-ui-view=""></div>\n' +
+    '	<div data-ng-show="error" data-error></div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/directives/sp-button/view.tpl',
     '<button data-ng-show="!btnInProgress"\n' +
     '		data-ng-click="btnClick()"\n' +
@@ -108,22 +124,6 @@ module.run(['$templateCache', function($templateCache) {
     '		<div class="bounce2"></div>\n' +
     '		<div class="bounce3"></div>\n' +
     '	</div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/base-page/view.tpl',
-    '<!--<div class="version">0.0.1</div>-->\n' +
-    '<div class="store" data-sp-auto-scroll>\n' +
-    '	<div data-ng-show="!error && showContent" data-ui-view=""></div>\n' +
-    '	<div data-ng-show="error" data-error></div>\n' +
     '</div>');
 }]);
 })();
@@ -282,6 +282,7 @@ appStickerPipeStore.config(function($stateProvider, $urlRouterProvider) {
 			url: '/store',
 			controller: 'StoreController as storeController',
 			templateUrl: '/modules/store/StoreView.tpl',
+			reloadOnSearch: false,
 			resolve: {
 				packs: function(Api) {
 					return Api.getPacks();
@@ -292,6 +293,7 @@ appStickerPipeStore.config(function($stateProvider, $urlRouterProvider) {
 			url: '/packs/:packName',
 			controller: 'PackController as packController',
 			templateUrl: '/modules/pack/PackView.tpl',
+			reloadOnSearch: false,
 			resolve: {
 				pack: function($stateParams, Api) {
 					return Api.getPack($stateParams.packName);
@@ -923,39 +925,6 @@ appStickerPipeStore.directive('spButton', function () {
 	};
 });
 
-appStickerPipeStore.directive('basePage', function() {
-
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/view.tpl',
-		link: function($scope, $el, attrs) {}
-	};
-});
-
-appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI, $location, Helper, PackService, i18n) {
-
-	PlatformAPI.showPagePreloader(false);
-
-	angular.extend($scope, {
-		i18n: i18n,
-		isJSPlatform: Helper.isJS(),
-		packService: PackService,
-		packs: packs,
-		priceB: Config.priceB,
-		priceC: Config.priceC,
-
-		getPackTitle: function(pack) {
-			var title = pack.title;
-			if (title.length > 15) {
-				title = title.substr(0, 15);
-				title += '...';
-			}
-
-			return title;
-		}
-	});
-});
-
 appStickerPipeStore.controller('PackController', function($scope, Config, EnvConfig, PlatformAPI, i18n, $rootScope, PackService, pack, $window, Helper) {
 
 	PlatformAPI.showBackButton('#/store');
@@ -1035,6 +1004,39 @@ appStickerPipeStore.controller('PackController', function($scope, Config, EnvCon
 	angular.element($window).bind('resize', function () {
 		$scope.$apply();
 	});
+});
+
+appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI, $location, Helper, PackService, i18n) {
+
+	PlatformAPI.showPagePreloader(false);
+
+	angular.extend($scope, {
+		i18n: i18n,
+		isJSPlatform: Helper.isJS(),
+		packService: PackService,
+		packs: packs,
+		priceB: Config.priceB,
+		priceC: Config.priceC,
+
+		getPackTitle: function(pack) {
+			var title = pack.title;
+			if (title.length > 15) {
+				title = title.substr(0, 15);
+				title += '...';
+			}
+
+			return title;
+		}
+	});
+});
+
+appStickerPipeStore.directive('basePage', function() {
+
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/view.tpl',
+		link: function($scope, $el, attrs) {}
+	};
 });
 
 appStickerPipeStore.factory('JsPlatformProvider', function($rootScope, $window, $timeout, Config) {
