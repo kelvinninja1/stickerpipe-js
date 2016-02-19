@@ -16,6 +16,7 @@
 
 		configureStore: function() {
 			callStoreMethod('configure', {
+				canShowPack: true,
 				canRemovePack: true
 			});
 		},

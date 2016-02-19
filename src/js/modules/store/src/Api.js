@@ -9,7 +9,7 @@
 			stickerpipe = _stickerpipe;
 		},
 
-		showCollections: function(data) {
+		showPack: function(data) {
 			Module.View.close();
 			stickerpipe.open(data.attrs.packName);
 		},

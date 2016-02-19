@@ -4985,7 +4985,7 @@ window.StickersModule.Module = {};
 			stickerpipe = _stickerpipe;
 		},
 
-		showCollections: function(data) {
+		showPack: function(data) {
 			Module.View.close();
 			stickerpipe.open(data.attrs.packName);
 		},
@@ -5078,6 +5078,7 @@ window.StickersModule.Module = {};
 
 		configureStore: function() {
 			callStoreMethod('configure', {
+				canShowPack: true,
 				canRemovePack: true
 			});
 		},
