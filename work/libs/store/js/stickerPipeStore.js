@@ -1,12 +1,5 @@
 angular.module('environment',[]).provider('envService',function(){this.environment='development';this.data={};this.config=function(config){this.data=config;};this.set=function(environment){this.environment=environment;};this.get=function(){return this.environment;};this.read=function(variable){if(variable!=='all'){return this.data.vars[this.get()][variable];}
 	return this.data.vars[this.get()];};this.is=function(environment){return(environment===this.environment);};this.check=function(){var	location=window.location.href,self=this;angular.forEach(this.data.domains,function(v,k){angular.forEach(v,function(v){if(location.match('//'+v)){self.environment=k;}});});};this.$get=function(){return this;};});
-/**
- * An Angular module that gives you access to the browsers local storage
- * @version v0.2.3 - 2015-10-11
- * @link https://github.com/grevory/angular-local-storage
- * @author grevory <greg@gregpike.ca>
- * @license MIT License, http://www.opensource.org/licenses/MIT
- */!function(a,b){"use strict";var c=b.isDefined,d=b.isUndefined,e=b.isNumber,f=b.isObject,g=b.isArray,h=b.extend,i=b.toJson,j=b.module("LocalStorageModule",[]);j.provider("localStorageService",function(){this.prefix="ls",this.storageType="localStorage",this.cookie={expiry:30,path:"/"},this.notify={setItem:!0,removeItem:!1},this.setPrefix=function(a){return this.prefix=a,this},this.setStorageType=function(a){return this.storageType=a,this},this.setStorageCookie=function(a,b){return this.cookie.expiry=a,this.cookie.path=b,this},this.setStorageCookieDomain=function(a){return this.cookie.domain=a,this},this.setNotify=function(a,b){return this.notify={setItem:a,removeItem:b},this},this.$get=["$rootScope","$window","$document","$parse",function(a,b,j,k){var l,m=this,n=m.prefix,o=m.cookie,p=m.notify,q=m.storageType;j?j[0]&&(j=j[0]):j=document,"."!==n.substr(-1)&&(n=n?n+".":"");var r=function(a){return n+a},s=function(){try{var c=q in b&&null!==b[q],d=r("__"+Math.round(1e7*Math.random()));return c&&(l=b[q],l.setItem(d,""),l.removeItem(d)),c}catch(e){return q="cookie",a.$broadcast("LocalStorageModule.notification.error",e.message),!1}}(),t=function(b,c){if(c=d(c)?null:i(c),!s||"cookie"===m.storageType)return s||a.$broadcast("LocalStorageModule.notification.warning","LOCAL_STORAGE_NOT_SUPPORTED"),p.setItem&&a.$broadcast("LocalStorageModule.notification.setitem",{key:b,newvalue:c,storageType:"cookie"}),z(b,c);try{l&&l.setItem(r(b),c),p.setItem&&a.$broadcast("LocalStorageModule.notification.setitem",{key:b,newvalue:c,storageType:m.storageType})}catch(e){return a.$broadcast("LocalStorageModule.notification.error",e.message),z(b,c)}return!0},u=function(b){if(!s||"cookie"===m.storageType)return s||a.$broadcast("LocalStorageModule.notification.warning","LOCAL_STORAGE_NOT_SUPPORTED"),A(b);var c=l?l.getItem(r(b)):null;if(!c||"null"===c)return null;try{return JSON.parse(c)}catch(d){return c}},v=function(){var b,c;for(b=0;b<arguments.length;b++)if(c=arguments[b],s&&"cookie"!==m.storageType)try{l.removeItem(r(c)),p.removeItem&&a.$broadcast("LocalStorageModule.notification.removeitem",{key:c,storageType:m.storageType})}catch(d){a.$broadcast("LocalStorageModule.notification.error",d.message),B(c)}else s||a.$broadcast("LocalStorageModule.notification.warning","LOCAL_STORAGE_NOT_SUPPORTED"),p.removeItem&&a.$broadcast("LocalStorageModule.notification.removeitem",{key:c,storageType:"cookie"}),B(c)},w=function(){if(!s)return a.$broadcast("LocalStorageModule.notification.warning","LOCAL_STORAGE_NOT_SUPPORTED"),!1;var b=n.length,c=[];for(var d in l)if(d.substr(0,b)===n)try{c.push(d.substr(b))}catch(e){return a.$broadcast("LocalStorageModule.notification.error",e.Description),[]}return c},x=function(b){var c=n?new RegExp("^"+n):new RegExp,d=b?new RegExp(b):new RegExp;if(!s||"cookie"===m.storageType)return s||a.$broadcast("LocalStorageModule.notification.warning","LOCAL_STORAGE_NOT_SUPPORTED"),C();var e=n.length;for(var f in l)if(c.test(f)&&d.test(f.substr(e)))try{v(f.substr(e))}catch(g){return a.$broadcast("LocalStorageModule.notification.error",g.message),C()}return!0},y=function(){try{return b.navigator.cookieEnabled||"cookie"in j&&(j.cookie.length>0||(j.cookie="test").indexOf.call(j.cookie,"test")>-1)}catch(c){return a.$broadcast("LocalStorageModule.notification.error",c.message),!1}}(),z=function(b,c,h){if(d(c))return!1;if((g(c)||f(c))&&(c=i(c)),!y)return a.$broadcast("LocalStorageModule.notification.error","COOKIES_NOT_SUPPORTED"),!1;try{var k="",l=new Date,m="";if(null===c?(l.setTime(l.getTime()+-864e5),k="; expires="+l.toGMTString(),c=""):e(h)&&0!==h?(l.setTime(l.getTime()+24*h*60*60*1e3),k="; expires="+l.toGMTString()):0!==o.expiry&&(l.setTime(l.getTime()+24*o.expiry*60*60*1e3),k="; expires="+l.toGMTString()),b){var n="; path="+o.path;o.domain&&(m="; domain="+o.domain),j.cookie=r(b)+"="+encodeURIComponent(c)+k+n+m}}catch(p){return a.$broadcast("LocalStorageModule.notification.error",p.message),!1}return!0},A=function(b){if(!y)return a.$broadcast("LocalStorageModule.notification.error","COOKIES_NOT_SUPPORTED"),!1;for(var c=j.cookie&&j.cookie.split(";")||[],d=0;d<c.length;d++){for(var e=c[d];" "===e.charAt(0);)e=e.substring(1,e.length);if(0===e.indexOf(r(b)+"=")){var f=decodeURIComponent(e.substring(n.length+b.length+1,e.length));try{return JSON.parse(f)}catch(g){return f}}}return null},B=function(a){z(a,null)},C=function(){for(var a=null,b=n.length,c=j.cookie.split(";"),d=0;d<c.length;d++){for(a=c[d];" "===a.charAt(0);)a=a.substring(1,a.length);var e=a.substring(b,a.indexOf("="));B(e)}},D=function(){return q},E=function(a,b,d,e){e=e||b;var g=u(e);return null===g&&c(d)?g=d:f(g)&&f(d)&&(g=h(d,g)),k(b).assign(a,g),a.$watch(b,function(a){t(e,a)},f(a[b]))},F=function(){for(var a=0,c=b[q],d=0;d<c.length;d++)0===c.key(d).indexOf(n)&&a++;return a};return{isSupported:s,getStorageType:D,set:t,add:t,get:u,keys:w,remove:v,clearAll:x,bind:E,deriveKey:r,length:F,cookie:{isSupported:y,set:z,add:z,get:A,remove:B,clearAll:C}}}]})}(window,window.angular);
 /*
  AngularJS v1.4.2
  (c) 2010-2015 Google, Inc. http://angularjs.org
@@ -26,8 +19,7 @@ angular.module('environment',[]).provider('envService',function(){this.environme
 var appStickerPipeStore = angular.module('appStickerPipeStore', [
 	'ngRoute',
 	'partials',
-	'environment',
-	'LocalStorageModule'
+	'environment'
 ]);
 
 appStickerPipeStore.run(function($rootScope, PlatformAPI, JsInterface, Config) {
@@ -135,46 +127,10 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/view.tpl',
-    '<div class="version">0.0.9</div>\n' +
+    '<div class="version">0.0.10</div>\n' +
     '<div class="store" data-sp-auto-scroll>\n' +
     '	<div data-ng-show="!error && showContent" data-ng-view></div>\n' +
     '	<div data-ng-show="error" data-error></div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/store/StoreView.tpl',
-    '<div data-ng-class="{\'screen-header\': isJSPlatform }" data-ng-show="isJSPlatform"></div>\n' +
-    '<div class="packs">\n' +
-    '	<div class="col" data-ng-repeat="pack in packs">\n' +
-    '		<div class="pack-preview center-block">\n' +
-    '			<a href="#/packs/{{ pack.pack_name }}">\n' +
-    '\n' +
-    '				<div data-sp-sticker\n' +
-    '				     data-url="{{ packService.getMainSticker(pack) }}"\n' +
-    '				     data-complete-class="main-sticker">\n' +
-    '				</div>\n' +
-    '\n' +
-    '				<h5 class="pack-preview-name">{{ getPackTitle(pack) }}</h5>\n' +
-    '				<h5 class="pack-preview-price">\n' +
-    '					&nbsp;\n' +
-    '					<span data-ng-show="packService.isActive(pack)">{{ i18n.free }}</span>\n' +
-    '					<span data-ng-show="packService.isHidden(pack)">{{ i18n.free }}</span>\n' +
-    '					<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'A\'">{{ i18n.free }}</span>\n' +
-    '					<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'B\' && priceB">{{ priceB }}</span>\n' +
-    '					<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'C\' && priceC">{{ priceC }}</span>\n' +
-    '					&nbsp;\n' +
-    '				</h5>\n' +
-    '			</a>\n' +
-    '		</div>\n' +
-    '	</div>\n' +
     '</div>');
 }]);
 })();
@@ -263,6 +219,42 @@ module.run(['$templateCache', function($templateCache) {
     '\n' +
     '	<div data-ng-show="!getStickersPreview()">\n' +
     '		<p class="pack-preview-undefined">{{ i18n.previewIsUndefined }}</p>\n' +
+    '	</div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/store/StoreView.tpl',
+    '<div data-ng-class="{\'screen-header\': isJSPlatform }" data-ng-show="isJSPlatform"></div>\n' +
+    '<div class="packs">\n' +
+    '	<div class="col" data-ng-repeat="pack in packs">\n' +
+    '		<div class="pack-preview center-block">\n' +
+    '			<a href="#/packs/{{ pack.pack_name }}">\n' +
+    '\n' +
+    '				<div data-sp-sticker\n' +
+    '				     data-url="{{ packService.getMainSticker(pack) }}"\n' +
+    '				     data-complete-class="main-sticker">\n' +
+    '				</div>\n' +
+    '\n' +
+    '				<h5 class="pack-preview-name">{{ getPackTitle(pack) }}</h5>\n' +
+    '				<h5 class="pack-preview-price">\n' +
+    '					&nbsp;\n' +
+    '					<span data-ng-show="packService.isActive(pack)">{{ i18n.free }}</span>\n' +
+    '					<span data-ng-show="packService.isHidden(pack)">{{ i18n.free }}</span>\n' +
+    '					<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'A\'">{{ i18n.free }}</span>\n' +
+    '					<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'B\' && priceB">{{ priceB }}</span>\n' +
+    '					<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'C\' && priceC">{{ priceC }}</span>\n' +
+    '					&nbsp;\n' +
+    '				</h5>\n' +
+    '			</a>\n' +
+    '		</div>\n' +
     '	</div>\n' +
     '</div>');
 }]);
@@ -408,11 +400,13 @@ appStickerPipeStore.directive('spLoad', function ($parse) {
 		}
 	};
 });
-appStickerPipeStore.directive('spSticker', function (Config, $rootScope, localStorageService) {
+appStickerPipeStore.directive('spSticker', function (Config, $rootScope) {
 	return {
 		restrict: 'AE',
 		template: '',
 		link: function (scope, elem, attrs) {
+
+			$rootScope.imgCache = $rootScope.imgCache || {};
 
 			var image = new Image();
 			image.onerror = function() {};
@@ -424,9 +418,7 @@ appStickerPipeStore.directive('spSticker', function (Config, $rootScope, localSt
 
 				elem[0].appendChild(image);
 
-				var imgCache = localStorageService.get('imgCache') || {};
-				imgCache[attrs.url] = attrs.url;
-				localStorageService.set('imgCache', imgCache);
+				$rootScope.imgCache[attrs.url] = attrs.url;
 
 				image.onload = function() {};
 			}
@@ -434,8 +426,7 @@ appStickerPipeStore.directive('spSticker', function (Config, $rootScope, localSt
 			image.src = attrs.url;
 
 
-			var imgCache = localStorageService.get('imgCache') || {};
-			if (!imgCache[attrs.url]) {
+			if (!$rootScope.imgCache[attrs.url]) {
 				elem.addClass('sticker-placeholder');
 				elem[0].style.background = Config.primaryColor;
 
@@ -954,6 +945,120 @@ appStickerPipeStore.directive('spButton', function () {
 	};
 });
 
+appStickerPipeStore.directive('basePage', function() {
+
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/view.tpl',
+		link: function($scope, $el, attrs) {}
+	};
+});
+
+appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI, Helper, PackService, i18n) {
+
+	PlatformAPI.showPagePreloader(false);
+
+	angular.extend($scope, {
+		i18n: i18n,
+		isJSPlatform: Helper.isJS(),
+		packService: PackService,
+		packs: packs,
+		priceB: Config.priceB,
+		priceC: Config.priceC,
+
+		getPackTitle: function(pack) {
+			var title = pack.title;
+			if (title.length > 15) {
+				title = title.substr(0, 15);
+				title += '...';
+			}
+
+			return title;
+		}
+	});
+});
+
+appStickerPipeStore.controller('PackController', function($scope, Config, PlatformAPI, i18n, $rootScope, PackService, pack, $window, Helper) {
+
+	PlatformAPI.showBackButton('#/store');
+
+	function isLandscape() {
+		return ($window.innerWidth > $window.innerHeight || $window.innerWidth > 544);
+	}
+
+	angular.extend($scope, {
+		i18n: i18n,
+		pack: pack,
+		packService: PackService,
+
+		isJSPlatform: Helper.isJS(),
+		showPage: false,
+
+		isSubscriber: Config.isSubscriber,
+		priceB: Config.priceB,
+		priceC: Config.priceC,
+
+		inProgress: false,
+
+		canShowPack: PlatformAPI.canShowPack(),
+		canRemovePack: PlatformAPI.canRemovePack(),
+
+		showPack: function() {
+			PlatformAPI.showPack(pack.pack_name);
+		},
+
+		removePack: function() {
+			PlatformAPI.removePack(pack.pack_name);
+		},
+
+		orientation: function() {
+			return isLandscape() ? 'landscape' : 'portrait';
+		},
+
+		purchasePack: function() {
+			$scope.inProgress = true;
+			PlatformAPI.purchasePack(pack.title, pack.pack_name, pack.pricepoint);
+		},
+
+		getStickersPreview: function() {
+			if (!this.pack) {
+				return false;
+			}
+
+			var image = this.pack[isLandscape() ? 'preview_landscape' : 'preview'] || {},
+				url = image[Config.resolutionType] || false;
+
+			if (!url) {
+				this.hidePagePreloader();
+			}
+			return url;
+		},
+
+		hidePagePreloader: function() {
+			PlatformAPI.showPagePreloader(false);
+			this.showPage = true;
+		}
+	});
+
+	$rootScope.$on('showActionProgress', function() {
+		$scope.inProgress = true;
+		if(!$scope.$$phase) {
+			$scope.$apply();
+		}
+	});
+
+	$rootScope.$on('hideActionProgress', function() {
+		$scope.inProgress  = false;
+		if(!$scope.$$phase) {
+			$scope.$apply();
+		}
+	});
+
+	angular.element($window).bind('resize', function () {
+		$scope.$apply();
+	});
+});
+
 appStickerPipeStore.factory('JsPlatformProvider', function($rootScope, $window, $timeout, Config) {
 
 	function callSDKMethod(action, attrs) {
@@ -1056,120 +1161,6 @@ appStickerPipeStore.factory('JsPlatformProvider', function($rootScope, $window, 
 			});
 		}
 	};
-});
-
-appStickerPipeStore.directive('basePage', function() {
-
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/view.tpl',
-		link: function($scope, $el, attrs) {}
-	};
-});
-
-appStickerPipeStore.controller('PackController', function($scope, Config, PlatformAPI, i18n, $rootScope, PackService, pack, $window, Helper) {
-
-	PlatformAPI.showBackButton('#/store');
-
-	function isLandscape() {
-		return ($window.innerWidth > $window.innerHeight || $window.innerWidth > 544);
-	}
-
-	angular.extend($scope, {
-		i18n: i18n,
-		pack: pack,
-		packService: PackService,
-
-		isJSPlatform: Helper.isJS(),
-		showPage: false,
-
-		isSubscriber: Config.isSubscriber,
-		priceB: Config.priceB,
-		priceC: Config.priceC,
-
-		inProgress: false,
-
-		canShowPack: PlatformAPI.canShowPack(),
-		canRemovePack: PlatformAPI.canRemovePack(),
-
-		showPack: function() {
-			PlatformAPI.showPack(pack.pack_name);
-		},
-
-		removePack: function() {
-			PlatformAPI.removePack(pack.pack_name);
-		},
-
-		orientation: function() {
-			return isLandscape() ? 'landscape' : 'portrait';
-		},
-
-		purchasePack: function() {
-			$scope.inProgress = true;
-			PlatformAPI.purchasePack(pack.title, pack.pack_name, pack.pricepoint);
-		},
-
-		getStickersPreview: function() {
-			if (!this.pack) {
-				return false;
-			}
-
-			var image = this.pack[isLandscape() ? 'preview_landscape' : 'preview'] || {},
-				url = image[Config.resolutionType] || false;
-
-			if (!url) {
-				this.hidePagePreloader();
-			}
-			return url;
-		},
-
-		hidePagePreloader: function() {
-			PlatformAPI.showPagePreloader(false);
-			this.showPage = true;
-		}
-	});
-
-	$rootScope.$on('showActionProgress', function() {
-		$scope.inProgress = true;
-		if(!$scope.$$phase) {
-			$scope.$apply();
-		}
-	});
-
-	$rootScope.$on('hideActionProgress', function() {
-		$scope.inProgress  = false;
-		if(!$scope.$$phase) {
-			$scope.$apply();
-		}
-	});
-
-	angular.element($window).bind('resize', function () {
-		$scope.$apply();
-	});
-});
-
-appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI, Helper, PackService, i18n) {
-
-	PlatformAPI.showPagePreloader(false);
-
-	angular.extend($scope, {
-		i18n: i18n,
-		isJSPlatform: Helper.isJS(),
-		packService: PackService,
-		packs: packs,
-		priceB: Config.priceB,
-		priceC: Config.priceC,
-
-		getPackTitle: function(pack) {
-			var title = pack.title;
-			if (title.length > 15) {
-				title = title.substr(0, 15);
-				title += '...';
-			}
-
-			return title;
-		}
-	});
 });
 
 appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
