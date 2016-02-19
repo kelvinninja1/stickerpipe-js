@@ -127,7 +127,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/view.tpl',
-    '<div class="version">0.0.7</div>\n' +
+    '<div class="version">0.0.8</div>\n' +
     '<div class="store" data-sp-auto-scroll>\n' +
     '	<div data-ng-show="!error && showContent" data-ng-view></div>\n' +
     '	<div data-ng-show="error" data-error></div>\n' +
@@ -434,7 +434,7 @@ appStickerPipeStore.directive('spSticker', function (Config, $rootScope) {
 					onload();
 				};
 			} else {
-				onload();
+				//onload();
 			}
 		}
 	};
