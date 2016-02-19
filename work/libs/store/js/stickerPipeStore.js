@@ -126,6 +126,22 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/base-page/view.tpl',
+    '<div class="version">0.0.7</div>\n' +
+    '<div class="store" data-sp-auto-scroll>\n' +
+    '	<div data-ng-show="!error && showContent" data-ng-view></div>\n' +
+    '	<div data-ng-show="error" data-error></div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/pack/PackView.tpl',
     '<div data-ng-show="showPage">\n' +
     '	<div ng-class="{\'screen-header\': isJSPlatform }" data-ng-show="isJSPlatform"></div>\n' +
@@ -204,22 +220,6 @@ module.run(['$templateCache', function($templateCache) {
     '	<div data-ng-show="!getStickersPreview()">\n' +
     '		<p class="pack-preview-undefined">{{ i18n.previewIsUndefined }}</p>\n' +
     '	</div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/base-page/view.tpl',
-    '<div class="version">0.0.6</div>\n' +
-    '<div class="store" data-sp-auto-scroll>\n' +
-    '	<div data-ng-show="!error && showContent" data-ng-view></div>\n' +
-    '	<div data-ng-show="error" data-error></div>\n' +
     '</div>');
 }]);
 })();
@@ -408,6 +408,9 @@ appStickerPipeStore.directive('spSticker', function (Config, $rootScope) {
 
 			$rootScope.imgCache = $rootScope.imgCache || {};
 
+			var image = new Image();
+			image.onerror = function() {};
+
 			function onload() {
 				elem.removeClass('sticker-placeholder');
 				elem[0].style.background = '';
@@ -416,10 +419,9 @@ appStickerPipeStore.directive('spSticker', function (Config, $rootScope) {
 				elem[0].appendChild(image);
 
 				$rootScope.imgCache[attrs.url] = attrs.url;
-			}
 
-			var image = new Image();
-			image.onerror = function() {};
+				image.onload = function() {};
+			}
 
 			image.src = attrs.url;
 
