@@ -3,10 +3,11 @@ var appStickerPipeStore = angular.module('appStickerPipeStore', [
 	//'ngRoute',
 	'partials',
 	'environment',
-	'ui.router'
+	'ui.router',
+	'ngLocationUpdate'
 ]);
 
-appStickerPipeStore.run(function($rootScope, PlatformAPI, JsInterface, Config, $location, $state) {
+appStickerPipeStore.run(function($rootScope, PlatformAPI, JsInterface, Config) {
 
 	Config.primaryColor = Config.primaryColor || '9c27b0';
 	Config.primaryColor = '#' + Config.primaryColor;
@@ -28,19 +29,6 @@ appStickerPipeStore.run(function($rootScope, PlatformAPI, JsInterface, Config, $
 		$rootScope.error = true;
 	});
 
-
-	var original = $location.path;
-	$location.path = function (path, reload) {
-		if (reload === false) {
-			var lastRoute = $state.current;
-			var un = $rootScope.$on('$locationChangeSuccess', function () {
-				$state.current = lastRoute;
-				un();
-			});
-		}
-		return original.apply($location, [path]);
-	};
-
 });
 
 appStickerPipeStore.controller('AppController', function(Config, envService, Helper, Css) {
@@ -61,6 +49,28 @@ appStickerPipeStore.controller('AppController', function(Config, envService, Hel
 });
 angular.module('environment',[]).provider('envService',function(){this.environment='development';this.data={};this.config=function(config){this.data=config;};this.set=function(environment){this.environment=environment;};this.get=function(){return this.environment;};this.read=function(variable){if(variable!=='all'){return this.data.vars[this.get()][variable];}
 	return this.data.vars[this.get()];};this.is=function(environment){return(environment===this.environment);};this.check=function(){var	location=window.location.href,self=this;angular.forEach(this.data.domains,function(v,k){angular.forEach(v,function(v){if(location.match('//'+v)){self.environment=k;}});});};this.$get=function(){return this;};});
+!function(angular, undefined) { 'use strict';
+
+	angular.module('ngLocationUpdate', [])
+		.run(['$state', '$rootScope', '$location', function ($state, $rootScope, $location) {
+			// todo: would be proper to change this to decorators of $location and $route
+			$location.update_path = function (path, keep_previous_path_in_history) {
+				if ($location.path() == path) return;
+
+				var routeToKeep = $state.$current;
+				$rootScope.$on('$locationChangeSuccess', function () {
+					if (routeToKeep) {
+						$state.$current = routeToKeep;
+						routeToKeep = null;
+					}
+				});
+
+				$location.path(path);
+				if (!keep_previous_path_in_history) $location.replace();
+			};
+		}]);
+
+}(window.angular);
 /**
  * State-based routing for AngularJS
  * @version v0.2.15
@@ -108,22 +118,6 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/base-page/view.tpl',
-    '<div class="version">0.0.2</div>\n' +
-    '<div class="store" data-sp-auto-scroll>\n' +
-    '	<div data-ng-show="!error && showContent" data-ui-view=""></div>\n' +
-    '	<div data-ng-show="error" data-error></div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/directives/sp-button/view.tpl',
     '<button data-ng-show="!btnInProgress"\n' +
     '		data-ng-click="btnClick()"\n' +
@@ -136,42 +130,6 @@ module.run(['$templateCache', function($templateCache) {
     '		<div class="bounce1"></div>\n' +
     '		<div class="bounce2"></div>\n' +
     '		<div class="bounce3"></div>\n' +
-    '	</div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/store/StoreView.tpl',
-    '<div data-ng-class="{\'screen-header\': isJSPlatform }" data-ng-show="isJSPlatform"></div>\n' +
-    '<div class="packs">\n' +
-    '	<div class="col" data-ng-repeat="pack in packs">\n' +
-    '		<div class="pack-preview center-block">\n' +
-    '			<a href="#/packs/{{ pack.pack_name }}">\n' +
-    '\n' +
-    '				<div data-sp-sticker\n' +
-    '				     data-url="{{ packService.getMainSticker(pack) }}"\n' +
-    '				     data-complete-class="main-sticker">\n' +
-    '				</div>\n' +
-    '\n' +
-    '				<h5 class="pack-preview-name">{{ getPackTitle(pack) }}</h5>\n' +
-    '				<h5 class="pack-preview-price">\n' +
-    '					&nbsp;\n' +
-    '					<span data-ng-show="packService.isActive(pack)">{{ i18n.free }}</span>\n' +
-    '					<span data-ng-show="packService.isHidden(pack)">{{ i18n.free }}</span>\n' +
-    '					<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'A\'">{{ i18n.free }}</span>\n' +
-    '					<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'B\' && priceB">{{ priceB }}</span>\n' +
-    '					<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'C\' && priceC">{{ priceC }}</span>\n' +
-    '					&nbsp;\n' +
-    '				</h5>\n' +
-    '			</a>\n' +
-    '		</div>\n' +
     '	</div>\n' +
     '</div>');
 }]);
@@ -261,6 +219,58 @@ module.run(['$templateCache', function($templateCache) {
     '\n' +
     '	<div data-ng-show="!getStickersPreview()">\n' +
     '		<p class="pack-preview-undefined">{{ i18n.previewIsUndefined }}</p>\n' +
+    '	</div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/base-page/view.tpl',
+    '<div class="version">0.0.3</div>\n' +
+    '<div class="store" data-sp-auto-scroll>\n' +
+    '	<div data-ng-show="!error && showContent" data-ui-view=""></div>\n' +
+    '	<div data-ng-show="error" data-error></div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/store/StoreView.tpl',
+    '<div data-ng-class="{\'screen-header\': isJSPlatform }" data-ng-show="isJSPlatform"></div>\n' +
+    '<div class="packs">\n' +
+    '	<div class="col" data-ng-repeat="pack in packs">\n' +
+    '		<div class="pack-preview center-block">\n' +
+    '			<a href="#/packs/{{ pack.pack_name }}">\n' +
+    '\n' +
+    '				<div data-sp-sticker\n' +
+    '				     data-url="{{ packService.getMainSticker(pack) }}"\n' +
+    '				     data-complete-class="main-sticker">\n' +
+    '				</div>\n' +
+    '\n' +
+    '				<h5 class="pack-preview-name">{{ getPackTitle(pack) }}</h5>\n' +
+    '				<h5 class="pack-preview-price">\n' +
+    '					&nbsp;\n' +
+    '					<span data-ng-show="packService.isActive(pack)">{{ i18n.free }}</span>\n' +
+    '					<span data-ng-show="packService.isHidden(pack)">{{ i18n.free }}</span>\n' +
+    '					<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'A\'">{{ i18n.free }}</span>\n' +
+    '					<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'B\' && priceB">{{ priceB }}</span>\n' +
+    '					<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'C\' && priceC">{{ priceC }}</span>\n' +
+    '					&nbsp;\n' +
+    '				</h5>\n' +
+    '			</a>\n' +
+    '		</div>\n' +
     '	</div>\n' +
     '</div>');
 }]);
@@ -782,7 +792,7 @@ appStickerPipeStore.factory('JsInterface', function($rootScope, $state, Platform
 		goBack: function() {
 			if ($rootScope.goBackUrl) {
 				//window.location.href = $rootScope.goBackUrl;
-				$location.path($rootScope.goBackUrl, false);
+				$location.update_path($rootScope.goBackUrl, true);
 			}
 		},
 
@@ -912,6 +922,30 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $rootScop
 	};
 
 });
+appStickerPipeStore.directive('spButton', function () {
+	return {
+		restrict: 'AE',
+		transclude: true,
+		templateUrl: '/directives/sp-button/view.tpl',
+		scope: {
+			btnClick: '&',
+			btnClass: '@',
+			btnInProgress: '='
+		},
+		link: function (scope, el, attrs) {
+			var border = 2,
+				progressEl = el[0].getElementsByClassName('progress')[0];
+			var buttonEl = el[0].getElementsByTagName('button')[0];
+
+
+			scope.$watch('btnInProgress', function() {
+				if (progressEl.clientWidth < buttonEl.clientWidth) {
+					progressEl.style.width = buttonEl.clientWidth + border + 'px';
+				}
+			});
+		}
+	};
+});
 
 appStickerPipeStore.directive('basePage', function() {
 
@@ -1025,30 +1059,6 @@ appStickerPipeStore.controller('StoreController', function($scope, packs, Config
 			return title;
 		}
 	});
-});
-appStickerPipeStore.directive('spButton', function () {
-	return {
-		restrict: 'AE',
-		transclude: true,
-		templateUrl: '/directives/sp-button/view.tpl',
-		scope: {
-			btnClick: '&',
-			btnClass: '@',
-			btnInProgress: '='
-		},
-		link: function (scope, el, attrs) {
-			var border = 2,
-				progressEl = el[0].getElementsByClassName('progress')[0];
-			var buttonEl = el[0].getElementsByTagName('button')[0];
-
-
-			scope.$watch('btnInProgress', function() {
-				if (progressEl.clientWidth < buttonEl.clientWidth) {
-					progressEl.style.width = buttonEl.clientWidth + border + 'px';
-				}
-			});
-		}
-	};
 });
 
 appStickerPipeStore.factory('JsPlatformProvider', function($rootScope, $window, $timeout, Config) {
