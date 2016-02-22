@@ -1,11 +1,12 @@
 ## About
 
-**Stickerpipe-js** is a javascript library for easy integration stickers in your project.
+**StickerPipe** is a stickers SDK for web (JS platform).
 
 ## Demo
 
-http://demo.stickerpipe.com (Example)
+This sample demonstrates how to add stickers to your chat. If you want to build your own implementation, you can use our [public api](https://docs.google.com/document/d/1l0IZOSEZn1qzhCen4-YzlwnXL4xYHndNcE3xyGYvPrg/edit#heading=h.smt8analmeuq).
 
+http://demo.stickerpipe.com (Example) <br/>
 https://github.com/908Inc/stickerpipe-js/tree/gh-pages (Example sources)
 
 ## Install
@@ -18,21 +19,69 @@ https://github.com/908Inc/stickerpipe-js/tree/gh-pages (Example sources)
 ### CDN
 
 ```js
-<script src="http://cdnjs.stickerpipe.com/libs/sdk/0.0.3/stickers.js"></script>
+<script src="http://cdnjs.stickerpipe.com/libs/sdk/0.0.9/stickers.js"></script>
 <!-- or -->
-<script src="http://cdnjs.stickerpipe.com/libs/sdk/0.0.3/stickers.min.js"></script>
+<script src="http://cdnjs.stickerpipe.com/libs/sdk/0.0.9/stickers.min.js"></script>
 ```
 
 ### Bower
 
-Bower: bower install stickers --save
+Bower: `bower install stickerpipe --save`
 
+## Options
 
-## Initialize
+| Name                  | Type        | Description                                   |
+| --------------------- | ----------- | --------------------------------------------- |
+| elId                  | string      | Container id where will be render plugin      |
+| apiKey                | string      | Your api key                                  |
+| enableEmojiTab        | boolean     | If you want use emoji tab                     |
+| enableHistoryTab      | boolean     | If you want use history tab                   |
+| enableStoreTab        | boolean     | If you want use store                         |
+| htmlForEmptyRecent    | string      | Insert in empty recent block                  |
+| storagePrefix         | string      | Prefix for local storage                      |
+| lang                  | string      | Localization in ISO 2 format ("en", "ru")     |
+| userId                | string      | User id (hash)                                |
+| userData              | object      | Data of user for statistic                    |
+| userPremium           | boolean     | Flag is user - premium (true / false)         |
+| priceB                | string      | Price for packs with pricePoint = B           |
+| priceC                | string      | Price for packs with pricePoint = C           |
+| primaryColor          | string      | Primary color (HEX)                           |
 
-Demo apiKey: 72921666b5ff8651f374747bfefaf7b2
+## Methods
 
-If you want use own apiKey: http://stickerpipe.com/
+- **render([onRender])** - rendering sticker pipe keyboard
+- **parseStickerFromText(text, callback)** - parse text and return object to callback, with sticker data (stickerId, url, html) if text is sticker else return null
+- **parseEmojiFromText(text)** - parse text and return text with replaced emoji to html
+- **parseEmojiFromHtml(html)** - parse html and return text with replaced html to emoji text
+- **open([packName])** - open pack tab or by default - history tab
+- **close()** - close sticker pipe popover
+- **openStore([stickerId])** - open store in modal window
+- **closeStore()** - close store modal window
+- **purchaseSuccess(packName, pricePoint)** - call if purchase transaction was successful
+- **purchaseFail()** - call if purchase transaction was failed
+- **onUserMessageSent(isSticker)** - call when message send (for statistic)
+
+## Events
+
+| Name                      |  description                                                        |
+| ------------------------- | ------------------------------------------------------------------- |
+| sp:popover:shown          | fire on popover was shown                                           |
+| sp:popover:hidden         | fire on popover was hidden                                          |
+| sp:content:highlight:show | fire on getting new content (unseen or when stickers history empty) |
+| sp:content:highlight:hide | fire on have not new contend and stickers history not empty         |
+
+## Callbacks
+
+- **onClickSticker(function(stickerCode) {...}, context)** - fired when user click on sticker
+- **onClickEmoji(function(emoji) {...}, context)** - fired when user click on emoji
+- **onPurchase(function(packName, packTitle, pricePoint) {...}, context)** - fired when user try purchase content
+
+## Usage
+
+### Initialize
+
+Demo apiKey: 72921666b5ff8651f374747bfefaf7b2 <br/>
+You can get your own API Key on http://stickerpipe.com to have customized packs set.
 
 html
 ```html
@@ -67,109 +116,50 @@ js
     	priceC: '1.99 $'
     	
     });
-    
+```
+
+### Rendering
+
+```js
     sticker.render(function() {
     	// on render callback
     });
 ```
 
-## Options
-
-
-| Name                  | Type        | Description                                   |
-| --------------------- | ----------- | --------------------------------------------- |
-| elId                  | string      | Container id where will be render plugin      |
-| apiKey                | string      | Your api key                                  |
-| enableEmojiTab        | boolean     | If you want use emoji tab                     |
-| enableHistoryTab      | boolean     | If you want use history tab                   |
-| enableStoreTab        | boolean     | If you want use store                         |
-| htmlForEmptyRecent    | string      | Insert in empty recent block                  |
-| storagePrefix         | string      | Prefix for local storage                      |
-| lang                  | string      | Language ISO 2 ("en", "ru")                   |
-| userId                | string      | User id (hash)                                |
-| userData              | object      | Data of user for statistic                    |
-| userPremium           | boolean     | Flag is user - premium                        |
-| priceB                | string      | Price for packs with pricePoint = B           |
-| priceC                | string      | Price for packs with pricePoint = C           |
-| primaryColor          | string      | Color for sticker placeholder (HEX)           |
-
-
-
-## Methods
-
--  **render** - rendering sticker pipe keyboard
+### Parse sticker from text
 
 ```js
-    sticker.render([onRender]);
+    sticker.parseStickerFromText('[[1593]]', function(sticker, isAsync) {
+    	if (!sticker) {
+    		return;
+    	}
+    	
+    	// do something
+    	console.log(sticker);
+    });
 ```
 
--  **parseStickerFromText** - parse text and return object to callback, with sticker data (stickerId, url, html) if text is sticker else return null
-```js
-    sticker.parseStickerFromText(text, callback);
-```
-
--  **parseEmojiFromText** - parse text and return text with replaced emoji to html
-```js
-    sticker.parseEmojiFromText(text);
-```
-
--  **parseEmojiFromHtml** - parse html and return text with replaced html to emoji text
-```js
-    sticker.parseEmojiFromHtml(html);
-```
-
--  **open** - open pack tab or by default - history tab
-```js
-    sticker.open([packName]);
-```
-
--  **close** - close sticker pipe popover
-```js
-    sticker.close();
-```
-
--  **openStore** - open store in modal window
-```js
-    sticker.openStore([stickerId]);
-```
-
--  **closeStore** - close store modal window
-```js
-    sticker.closeStore();
-```
-
--  **purchaseSuccess** - call if purchase transaction was successful
-```js
-    sticker.purchaseSuccess(packName, pricePoint);
-```
-
--  **purchaseFail** - call if purchase transaction was failed
-```js
-    sticker.purchaseFail();
-```
-
-- **onUserMessageSent** - call when message send (for statistic)
+### Parse emoji from text
 
 ```js
-    sticker.onUserMessageSent(isSticker);
+    var emojiHtml = sticker.parseEmojiFromText('?');
+    console.log(emojiHtml);
+    
+    // return:
+    // <img class="emoji" draggable="false" alt="😃" src="http://twemoji.maxcdn.com/72x72/1f603.png">
 ```
 
-- **md5** - return md5 hash of string
+### Parse emoji from html
 
 ```js
-    sticker.md5(string);
+    var emoji = sticker.parseEmojiFromText('<img class="emoji" draggable="false" alt="😃" src="http://twemoji.maxcdn.com/72x72/1f603.png">');
+    console.log(emoji);
+    
+    // return:
+    // ?
 ```
 
-## Events
-
-| Name                      |  description                                                        |
-| ------------------------- | ------------------------------------------------------------------- |
-| sp:popover:shown          | fire on popover was shown                                           |
-| sp:popover:hidden         | fire on popover was hidden                                          |
-| sp:content:highlight:show | fire on getting new content (unseen or when stickers history empty) |
-| sp:content:highlight:hide | fire on have not new contend and stickers history not empty         |
-
-### Example
+### Subscribe on events
 
 ```js
     window.addEventListener('sp:popover:shown', function() {
@@ -183,24 +173,29 @@ js
     });
 ```
 
-## Callbacks
+### Subscribe on callback
 
-- **onClickSticker** - fired when user click on sticker
-    
 ```js
-    sticker.onClickSticker(function(text) {...}, context);
+	stickerpipe.onClickSticker(function(stickerCode) {
+		stickerpipe.onUserMessageSent(true);
+		
+		sendMessage(stickerCode); // your function
+	});
 ```
 
-- **onClickEmoji** - fired when user click on emoji
+### Purchase
 
 ```js
-    sticker.onClickEmoji(function(text) {...}, context);
-```
+	stickerpipe.onPurchase(function(packName, packTitle, pricePoint) {
+		var result = confirm('Do you want by pack ' + packTitle + ' ?');
 
-- **onClickCustomTab** - fired when user click on custom tab
-    
-```js
-    sticker.onClickCustomTab(function(el) {...}, context);
+		if (result) {
+			// do transaction ...
+			stickerpipe.purchaseSuccess(packName, pricePoint);
+		} else {
+			stickerpipe.purchaseFail();
+		}
+	});
 ```
 
 ## Credits
