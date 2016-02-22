@@ -21,6 +21,7 @@
 	* [Subscribe on events](#subscribe-on-events)
 	* [Subscribe on callback](#subscribe-on-callback)
 	* [Purchase](#purchase)
+	* [Statistic](#statistic)
 * [Credits](#credits)
 * [Contact](#contact)
 * [License](#license)
@@ -88,7 +89,7 @@ Bower: `bower install stickerpipe --save`
 - **closeStore()** - close store modal window
 - **purchaseSuccess(packName, pricePoint)** - call if purchase transaction was successful
 - **purchaseFail()** - call if purchase transaction was failed
-- **onUserMessageSent(isSticker)** - call when message send (for statistic)
+- **onUserMessageSent(isSticker)** - call this method when a user sent a message (for statistic)
 
 ## Events
 
@@ -232,6 +233,15 @@ js
 			stickerpipe.purchaseFail();
 		}
 	});
+```
+
+### Statistic
+
+To count the number of sendings messages and stickers, you need call an analysts method onUserMessageSent (boolean)
+
+```js
+	// when user send message
+	stickerpipe.onUserMessageSent(stickerpipe.isSticker(message));
 ```
 
 ## Credits
