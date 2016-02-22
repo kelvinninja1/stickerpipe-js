@@ -4,7 +4,8 @@
 
 ## Demo
 
-This sample demonstrates how to add stickers to your chat. If you want to build your own implementation, you can use our [public api](https://docs.google.com/document/d/1l0IZOSEZn1qzhCen4-YzlwnXL4xYHndNcE3xyGYvPrg/edit#heading=h.smt8analmeuq).
+This sample demonstrates how to add stickers to your chat. <br/>
+If you want to build your own implementation, you can use our [public api](https://docs.google.com/document/d/1l0IZOSEZn1qzhCen4-YzlwnXL4xYHndNcE3xyGYvPrg/edit#heading=h.smt8analmeuq).
 
 http://demo.stickerpipe.com (Example) <br/>
 https://github.com/908Inc/stickerpipe-js/tree/gh-pages (Example sources)
