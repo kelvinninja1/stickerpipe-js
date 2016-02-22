@@ -198,6 +198,7 @@ js
     $(window).on('sp:popover:shown', function() {
     	// do something ...
     });
+    
 ```
 
 ### Subscribe on callback
