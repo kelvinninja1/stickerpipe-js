@@ -101,7 +101,7 @@ Bower: `bower install stickerpipe --save`
 
 - **onClickSticker(function(stickerCode) {...}, context)** - fired when user click on sticker
 - **onClickEmoji(function(emoji) {...}, context)** - fired when user click on emoji
-- **onPurchase(function(packName, packTitle, pricePoint) {...}, context)** - fired when user try purchase content
+- **onPurchase(function(packName, packTitle, pricePoint) {...})** - fired when user try purchase content
 
 ## Usage
 
