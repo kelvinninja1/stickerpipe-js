@@ -1,3 +1,29 @@
+
+## Table of contents
+
+* [About](#About)
+* [Demo](#Demo)
+* [Install](#Install)
+	* [Download](#Download)
+	* [CDN](#CDN)
+	* [Bower](#Bower)
+* [Options](#Options)
+* [Methods](#Methods)
+* [Events](#Events)
+* [Callbacks](#Callbacks)
+* [Usage](#Usage)
+	* [Initialize](#Initialize)
+	* [Rendering](#Rendering)
+	* [Parse sticker from text](#Parse-sticker-from-text)
+	* [Parse emoji from text](#Parse-emoji-from-text)
+	* [Parse emoji from html](#Parse-emoji-from-html)
+	* [Subscribe on events](#Subscribe-on-events)
+	* [Subscribe on callback](#Subscribe-on-callback)
+	* [Purchase](#Purchase)
+* [Credits](#Credits)
+* [Contact](#Contact)
+* [License](#License)
+
 ## About
 
 **StickerPipe** is a stickers SDK for web (JS platform).
@@ -188,7 +214,7 @@ js
 
 ```js
 	stickerpipe.onPurchase(function(packName, packTitle, pricePoint) {
-		var result = confirm('Do you want by pack ' + packTitle + ' ?');
+		var result = confirm('Do you want buy pack ' + packTitle + ' ?');
 
 		if (result) {
 			// do transaction ...
