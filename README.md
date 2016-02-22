@@ -14,6 +14,7 @@
 * [Usage](#usage)
 	* [Initialize](#initialize)
 	* [Rendering](#rendering)
+	* [Check sticker](#check-sticker)
 	* [Parse sticker from text](#parse-sticker-from-text)
 	* [Parse emoji from text](#parse-emoji-from-text)
 	* [Parse emoji from html](#parse-emoji-from-html)
@@ -26,7 +27,7 @@
 
 ## About
 
-**StickerPipe** is a stickers SDK for web (JS platform).
+**Stickerpipe-js** is a stickers SDK for web (JS platform).
 
 ## Demo
 
@@ -77,6 +78,7 @@ Bower: `bower install stickerpipe --save`
 ## Methods
 
 - **render([onRender])** - rendering sticker pipe keyboard
+- **isSticker(text)** - return true if text is sticker
 - **parseStickerFromText(text, callback)** - parse text and return object to callback, with sticker data (stickerId, url, html) if text is sticker else return null
 - **parseEmojiFromText(text)** - parse text and return text with replaced emoji to html
 - **parseEmojiFromHtml(html)** - parse html and return text with replaced html to emoji text
@@ -151,6 +153,13 @@ js
     sticker.render(function() {
     	// on render callback
     });
+```
+
+### Check sticker
+
+```js
+    sticker.isSticker('[[1593]]'); // return true
+    sticker.isSticker('hello world'); // return false
 ```
 
 ### Parse sticker from text
