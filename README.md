@@ -169,7 +169,7 @@ js
 ### Parse emoji from text
 
 ```js
-    var emojiHtml = sticker.parseEmojiFromText('?');
+    var emojiHtml = sticker.parseEmojiFromText('😃');
     console.log(emojiHtml);
     
     // return:
@@ -183,7 +183,7 @@ js
     console.log(emoji);
     
     // return:
-    // ?
+    // 😃
 ```
 
 ### Subscribe on events
@@ -198,7 +198,6 @@ js
     $(window).on('sp:popover:shown', function() {
     	// do something ...
     });
-    
 ```
 
 ### Subscribe on callback
