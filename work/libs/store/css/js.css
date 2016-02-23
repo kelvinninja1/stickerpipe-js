@@ -370,10 +370,6 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   margin-top: 50px;
   text-align: center; }
 
-.pack-preview:active {
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 5px; }
-
 .btn {
   min-height: 36px;
   min-width: 64px;
@@ -387,7 +383,3 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 .progress {
   line-height: 36px; }
-
-.pack-preview:hover {
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 5px; }
