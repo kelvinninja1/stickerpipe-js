@@ -102,8 +102,32 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/directives/sp-button/view.tpl',
+    '<button data-ng-show="!btnInProgress"\n' +
+    '		data-ng-click="btnClick()"\n' +
+    '        class="{{ btnClass }}"\n' +
+    '        data-ng-transclude>\n' +
+    '</button>\n' +
+    '\n' +
+    '<div data-ng-show="btnInProgress" style="display: inline-table;">\n' +
+    '	<div class="progress">\n' +
+    '		<div class="bounce1"></div>\n' +
+    '		<div class="bounce2"></div>\n' +
+    '		<div class="bounce3"></div>\n' +
+    '	</div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/view.tpl',
-    '<div class="version">0.0.13</div>\n' +
+    '<div class="version">0.0.14</div>\n' +
     '<div class="store" data-sp-auto-scroll>\n' +
     '	<div data-ng-show="!error && showContent" data-ng-view></div>\n' +
     '	<div data-ng-show="error" data-error></div>\n' +
@@ -214,30 +238,6 @@ module.run(['$templateCache', function($templateCache) {
     '<div class="packs">\n' +
     '	<div class="col" data-ng-repeat="pack in packs">\n' +
     '		<div data-pack-preview data-pack="pack"></div>\n' +
-    '	</div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/directives/sp-button/view.tpl',
-    '<button data-ng-show="!btnInProgress"\n' +
-    '		data-ng-click="btnClick()"\n' +
-    '        class="{{ btnClass }}"\n' +
-    '        data-ng-transclude>\n' +
-    '</button>\n' +
-    '\n' +
-    '<div data-ng-show="btnInProgress" style="display: inline-table;">\n' +
-    '	<div class="progress">\n' +
-    '		<div class="bounce1"></div>\n' +
-    '		<div class="bounce2"></div>\n' +
-    '		<div class="bounce3"></div>\n' +
     '	</div>\n' +
     '</div>');
 }]);
@@ -1237,8 +1237,23 @@ appStickerPipeStore.directive('packPreview', function($rootScope, PackService, C
 					$packPreview.removeClass('active');
 				});
 			} else {
+
+				var bodyScrolled = false;
+
+				document.addEventListener('touchmove', function() {
+					bodyScrolled = true;
+				});
+
+				document.addEventListener('touchend', function() {
+					bodyScrolled = false;
+				});
+
 				$packPreview.bind('touchstart', function () {
-					$packPreview.addClass('active');
+					setTimeout(function() {
+						if (!bodyScrolled) {
+							$packPreview.addClass('active');
+						}
+					}, 100);
 				});
 
 				$packPreview.bind('touchend', function () {
