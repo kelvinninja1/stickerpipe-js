@@ -261,7 +261,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   padding: 8px; }
 
 .pack-preview a {
-  display: block;
+  display: table;
   text-decoration: none; }
 
 .pack-preview-name {
