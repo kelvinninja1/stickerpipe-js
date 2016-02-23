@@ -103,7 +103,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/view.tpl',
-    '<div class="version">0.0.12</div>\n' +
+    '<div class="version">0.0.13</div>\n' +
     '<div class="store" data-sp-auto-scroll>\n' +
     '	<div data-ng-show="!error && showContent" data-ng-view></div>\n' +
     '	<div data-ng-show="error" data-error></div>\n' +
@@ -1229,14 +1229,23 @@ appStickerPipeStore.directive('packPreview', function($rootScope, PackService, C
 			var isTouchDevice = 'ontouchstart' in document.documentElement;
 
 			if (!isTouchDevice) {
-				$packPreview.bind('mouseover', function() {
+				$packPreview.bind('mouseover', function () {
 					$packPreview.addClass('active');
 				});
 
-				$packPreview.bind('mouseleave', function() {
+				$packPreview.bind('mouseleave', function () {
+					$packPreview.removeClass('active');
+				});
+			} else {
+				$packPreview.bind('touchstart', function () {
+					$packPreview.addClass('active');
+				});
+
+				$packPreview.bind('touchend', function () {
 					$packPreview.removeClass('active');
 				});
 			}
+
 
 			$packPreview[0].onclick = function() {
 				//alert('1234');
