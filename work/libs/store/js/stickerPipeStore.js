@@ -400,42 +400,25 @@ appStickerPipeStore.directive('spLoad', function ($parse) {
 		}
 	};
 });
-appStickerPipeStore.directive('spSticker', function (Config, $rootScope) {
+appStickerPipeStore.directive('spSticker', function (Config) {
 	return {
 		restrict: 'AE',
 		template: '',
 		link: function (scope, elem, attrs) {
-
-			$rootScope.imgCache = $rootScope.imgCache || {};
+			elem.addClass('sticker-placeholder');
+			elem[0].style.background = Config.primaryColor;
 
 			var image = new Image();
-			image.onerror = function() {};
-
-			function onload() {
+			image.onload = function() {
 				elem.removeClass('sticker-placeholder');
 				elem[0].style.background = '';
 				elem.addClass(attrs.completeClass);
 
 				elem[0].appendChild(image);
-
-				$rootScope.imgCache[attrs.url] = attrs.url;
-
-				image.onload = function() {};
-			}
+			};
+			image.onerror = function() {};
 
 			image.src = attrs.url;
-
-
-			if (!$rootScope.imgCache[attrs.url]) {
-				elem.addClass('sticker-placeholder');
-				elem[0].style.background = Config.primaryColor;
-
-				image.onload = function() {
-					onload();
-				};
-			} else {
-				onload();
-			}
 		}
 	};
 });
@@ -954,30 +937,6 @@ appStickerPipeStore.directive('basePage', function() {
 	};
 });
 
-appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI, Helper, PackService, i18n) {
-
-	PlatformAPI.showPagePreloader(false);
-
-	angular.extend($scope, {
-		i18n: i18n,
-		isJSPlatform: Helper.isJS(),
-		packService: PackService,
-		packs: packs,
-		priceB: Config.priceB,
-		priceC: Config.priceC,
-
-		getPackTitle: function(pack) {
-			var title = pack.title;
-			if (title.length > 15) {
-				title = title.substr(0, 15);
-				title += '...';
-			}
-
-			return title;
-		}
-	});
-});
-
 appStickerPipeStore.controller('PackController', function($scope, Config, PlatformAPI, i18n, $rootScope, PackService, pack, $window, Helper) {
 
 	PlatformAPI.showBackButton('#/store');
@@ -1056,6 +1015,30 @@ appStickerPipeStore.controller('PackController', function($scope, Config, Platfo
 
 	angular.element($window).bind('resize', function () {
 		$scope.$apply();
+	});
+});
+
+appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI, Helper, PackService, i18n) {
+
+	PlatformAPI.showPagePreloader(false);
+
+	angular.extend($scope, {
+		i18n: i18n,
+		isJSPlatform: Helper.isJS(),
+		packService: PackService,
+		packs: packs,
+		priceB: Config.priceB,
+		priceC: Config.priceC,
+
+		getPackTitle: function(pack) {
+			var title = pack.title;
+			if (title.length > 15) {
+				title = title.substr(0, 15);
+				title += '...';
+			}
+
+			return title;
+		}
 	});
 });
 
