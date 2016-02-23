@@ -5118,7 +5118,7 @@ window.StickersModule.Module = {};
 		},
 
 		onPurchaseFail: function() {
-			callStoreMethod('hideActionProgress');
+			callStoreMethod('onPackPurchaseFail');
 		},
 
 		onScrollContent: function(yPosition) {
