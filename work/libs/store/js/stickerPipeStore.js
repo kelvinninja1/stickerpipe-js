@@ -970,6 +970,15 @@ appStickerPipeStore.directive('spButton', function () {
 	};
 });
 
+appStickerPipeStore.directive('basePage', function() {
+
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/view.tpl',
+		link: function($scope, $el, attrs) {}
+	};
+});
+
 appStickerPipeStore.controller('PackController', function($scope, Config, PlatformAPI, $rootScope, PackService, pack, $window, Helper) {
 
 	PlatformAPI.showBackButton('#/store');
@@ -1091,15 +1100,6 @@ appStickerPipeStore.controller('StoreController', function($scope, packs, Platfo
 	});
 });
 
-appStickerPipeStore.directive('basePage', function() {
-
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/view.tpl',
-		link: function($scope, $el, attrs) {}
-	};
-});
-
 appStickerPipeStore.factory('JsPlatformProvider', function($rootScope, $window, $timeout, Config) {
 
 	function callSDKMethod(action, attrs) {
@@ -1203,6 +1203,19 @@ appStickerPipeStore.factory('JsPlatformProvider', function($rootScope, $window, 
 		}
 	};
 });
+
+appStickerPipeStore.directive('error', function(Config,  $window, $timeout, EnvConfig) {
+	
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/error/view.tpl',
+		link: function($scope, $el, attrs) {
+
+			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
+		}
+
+	};
+});
 appStickerPipeStore.directive('packPreview', function($rootScope, PackService, Config, $location) {
 
 	return {
@@ -1216,7 +1229,7 @@ appStickerPipeStore.directive('packPreview', function($rootScope, PackService, C
 			var $packPreview = angular.element($el[0].getElementsByClassName('pack-preview')[0]);
 
 			$el.bind('mouseover', function() {
-				//$packPreview.addClass('active');
+				$packPreview.addClass('active');
 			});
 
 			$el.bind('click', function() {
@@ -1252,18 +1265,5 @@ appStickerPipeStore.directive('packPreview', function($rootScope, PackService, C
 				}
 			});
 		}
-	};
-});
-
-appStickerPipeStore.directive('error', function(Config,  $window, $timeout, EnvConfig) {
-	
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/error/view.tpl',
-		link: function($scope, $el, attrs) {
-
-			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
-		}
-
 	};
 });
