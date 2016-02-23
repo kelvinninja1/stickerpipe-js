@@ -64,132 +64,6 @@ angular.module('environment',[]).provider('envService',function(){this.environme
 	g=f[1];d.push(b[g]);d.push(f[2]||"");delete b[g]}});return d.join("")}var w=!1,n,v,s={routes:g,reload:function(){w=!0;a.$evalAsync(function(){l();m()})},updateParams:function(a){if(this.current&&this.current.$$route)a=c.extend({},this.current.params,a),f.path(t(this.current.$$route.originalPath,a)),f.search(a);else throw B("norout");}};a.$on("$locationChangeStart",l);a.$on("$locationChangeSuccess",m);return s}]});var B=c.$$minErr("ngRoute");p.provider("$routeParams",function(){this.$get=function(){return{}}});
 	p.directive("ngView",v);p.directive("ngView",A);v.$inject=["$route","$anchorScroll","$animate"];A.$inject=["$compile","$controller","$route"]})(window,window.angular);
 //# sourceMappingURL=angular-route.min.js.map
-
-appStickerPipeStore.directive('spAutoScroll', function ($document, $timeout, $location, $window, $rootScope, PlatformAPI) {
-	return {
-		restrict: 'A',
-		link: function (scope, element, attrs) {
-
-			$rootScope.showContent = true;
-			scope.okSaveScroll = true;
-			scope.history = [];
-
-			// --------------------------------------------------------------
-
-			$document.bind('scroll', function () {
-				if (scope.okSaveScroll && scope.history.length > 0) {
-					scope.history[scope.history.length - 1].y = $window.scrollY;
-				}
-			});
-
-			$rootScope.$on('sp-auto-scroll:scrollContent', function(e, yPosition) {
-				if (scope.okSaveScroll && scope.history.length > 0) {
-					scope.history[scope.history.length - 1].y = yPosition;
-				}
-			});
-
-			// --------------------------------------------------------------
-
-			scope.$on('$locationChangeStart', function () {
-				scope.okSaveScroll = false;
-				$rootScope.showContent = false;
-			});
-
-			// --------------------------------------------------------------
-
-			function onContentLoad() {
-				$rootScope.showContent = true;
-
-				$timeout(function() {
-					scope.okSaveScroll = true;
-
-					var y = scope.history[scope.history.length - 1].y;
-
-					PlatformAPI.setYScroll(y);
-				}, 100);
-			}
-
-			$rootScope.$on('$routeChangeSuccess', function() {
-				onContentLoad();
-			});
-
-			$rootScope.$on('$routeChangeError', function() {
-				onContentLoad();
-			});
-
-			// --------------------------------------------------------------
-
-			$rootScope.$watch(function () { return $location.path() }, function (newLocation, oldLocation) {
-
-				function forward() {
-					scope.history[scope.history.length] = {
-						url: newLocation,
-						y: 0
-					};
-				}
-
-				function back() {
-					scope.history.splice(scope.history.length - 1, 1);
-				}
-
-				if (scope.history.length > 1) {
-					if (newLocation == scope.history[scope.history.length - 2].url ||
-						newLocation + '/' == scope.history[scope.history.length - 2].url) {
-						back();
-					} else {
-						forward();
-					}
-				} else {
-					forward();
-				}
-			});
-		}
-	};
-});
-appStickerPipeStore.directive('spLoad', function ($parse) {
-	return {
-		restrict: 'A',
-		link: function (scope, elem, attrs) {
-			var fn = $parse(attrs.spLoad);
-			elem.on('load', function (event) {
-				scope.$apply(function() {
-					fn(scope, { $event: event });
-				});
-			});
-		}
-	};
-});
-appStickerPipeStore.directive('spSticker', function (Config) {
-	return {
-		restrict: 'AE',
-		template: '',
-		scope: {
-			url: '@'
-		},
-		link: function ($scope, $el, attrs) {
-
-			var el = $el[0];
-
-			$el.addClass('sticker-placeholder');
-
-			el.style.background = Config.primaryColor;
-
-			var image = new Image();
-			image.onload = function() {
-				$el.removeClass('sticker-placeholder');
-				$el.addClass(attrs.completeClass);
-
-				el.style.background = '';
-				el.appendChild(image);
-			};
-			image.onerror = function() {};
-
-			$scope.$watch('url', function (value) {
-				image.src = value;
-			});
-		}
-	};
-});
 appStickerPipeStore.config(function(envServiceProvider) {
 
 	// default development(work)
@@ -223,6 +97,30 @@ appStickerPipeStore.config(function(envServiceProvider) {
 
 	envServiceProvider.check();
 });
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/directives/sp-button/view.tpl',
+    '<button data-ng-show="!btnInProgress"\n' +
+    '		data-ng-click="btnClick()"\n' +
+    '        class="{{ btnClass }}"\n' +
+    '        data-ng-transclude>\n' +
+    '</button>\n' +
+    '\n' +
+    '<div data-ng-show="btnInProgress" style="display: inline-table;">\n' +
+    '	<div class="progress">\n' +
+    '		<div class="bounce1"></div>\n' +
+    '		<div class="bounce2"></div>\n' +
+    '		<div class="bounce3"></div>\n' +
+    '	</div>\n' +
+    '</div>');
+}]);
+})();
+
 (function(module) {
 try {
   module = angular.module('partials');
@@ -354,18 +252,13 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/directives/sp-button/view.tpl',
-    '<button data-ng-show="!btnInProgress"\n' +
-    '		data-ng-click="btnClick()"\n' +
-    '        class="{{ btnClass }}"\n' +
-    '        data-ng-transclude>\n' +
-    '</button>\n' +
-    '\n' +
-    '<div data-ng-show="btnInProgress" style="display: inline-table;">\n' +
-    '	<div class="progress">\n' +
-    '		<div class="bounce1"></div>\n' +
-    '		<div class="bounce2"></div>\n' +
-    '		<div class="bounce3"></div>\n' +
+  $templateCache.put('/modules/base-page/error/view.tpl',
+    '<div class="error">\n' +
+    '	<div class="error-content">\n' +
+    '		<div class="error-image">\n' +
+    '			<img ng-src="{{ imgUrl }}" alt="">\n' +
+    '		</div>\n' +
+    '		<h5>{{ $root.i18n.unavailableContent }}</h5>\n' +
     '	</div>\n' +
     '</div>');
 }]);
@@ -380,43 +273,21 @@ try {
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/store/pack-preview/view.tpl',
     '<div class="pack-preview center-block">\n' +
-    '	<a href="#/packs/{{ pack.pack_name }}">\n' +
-    '\n' +
-    '		<div data-sp-sticker\n' +
-    '		     data-url="{{ getMainStickerUrl() }}"\n' +
-    '		     data-complete-class="main-sticker">\n' +
-    '		</div>\n' +
-    '\n' +
-    '		<h5 class="pack-preview-name">{{ getPackTitle(pack) }}</h5>\n' +
-    '		<h5 class="pack-preview-price">\n' +
-    '			&nbsp;\n' +
-    '			<span data-ng-show="packService.isActive(pack)">{{ $root.i18n.free }}</span>\n' +
-    '			<span data-ng-show="packService.isHidden(pack)">{{ $root.i18n.free }}</span>\n' +
-    '			<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'A\'">{{ $root.i18n.free }}</span>\n' +
-    '			<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'B\' && priceB">{{ priceB }}</span>\n' +
-    '			<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'C\' && priceC">{{ priceC }}</span>\n' +
-    '			&nbsp;\n' +
-    '		</h5>\n' +
-    '	</a>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/base-page/error/view.tpl',
-    '<div class="error">\n' +
-    '	<div class="error-content">\n' +
-    '		<div class="error-image">\n' +
-    '			<img ng-src="{{ imgUrl }}" alt="">\n' +
-    '		</div>\n' +
-    '		<h5>{{ $root.i18n.unavailableContent }}</h5>\n' +
+    '	<div data-sp-sticker\n' +
+    '	     data-url="{{ getMainStickerUrl() }}"\n' +
+    '	     data-complete-class="main-sticker">\n' +
     '	</div>\n' +
+    '\n' +
+    '	<h5 class="pack-preview-name">{{ getPackTitle() }}</h5>\n' +
+    '	<h5 class="pack-preview-price">\n' +
+    '		&nbsp;\n' +
+    '		<span data-ng-show="packService.isActive(pack)">{{ $root.i18n.free }}</span>\n' +
+    '		<span data-ng-show="packService.isHidden(pack)">{{ $root.i18n.free }}</span>\n' +
+    '		<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'A\'">{{ $root.i18n.free }}</span>\n' +
+    '		<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'B\' && priceB">{{ priceB }}</span>\n' +
+    '		<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'C\' && priceC">{{ priceC }}</span>\n' +
+    '		&nbsp;\n' +
+    '	</h5>\n' +
     '</div>');
 }]);
 })();
@@ -446,6 +317,132 @@ appStickerPipeStore.config(function($routeProvider) {
 		.otherwise({
 			redirectTo:'/store'
 		});
+});
+
+appStickerPipeStore.directive('spAutoScroll', function ($document, $timeout, $location, $window, $rootScope, PlatformAPI) {
+	return {
+		restrict: 'A',
+		link: function (scope, element, attrs) {
+
+			$rootScope.showContent = true;
+			scope.okSaveScroll = true;
+			scope.history = [];
+
+			// --------------------------------------------------------------
+
+			$document.bind('scroll', function () {
+				if (scope.okSaveScroll && scope.history.length > 0) {
+					scope.history[scope.history.length - 1].y = $window.scrollY;
+				}
+			});
+
+			$rootScope.$on('sp-auto-scroll:scrollContent', function(e, yPosition) {
+				if (scope.okSaveScroll && scope.history.length > 0) {
+					scope.history[scope.history.length - 1].y = yPosition;
+				}
+			});
+
+			// --------------------------------------------------------------
+
+			scope.$on('$locationChangeStart', function () {
+				scope.okSaveScroll = false;
+				$rootScope.showContent = false;
+			});
+
+			// --------------------------------------------------------------
+
+			function onContentLoad() {
+				$rootScope.showContent = true;
+
+				$timeout(function() {
+					scope.okSaveScroll = true;
+
+					var y = scope.history[scope.history.length - 1].y;
+
+					PlatformAPI.setYScroll(y);
+				}, 100);
+			}
+
+			$rootScope.$on('$routeChangeSuccess', function() {
+				onContentLoad();
+			});
+
+			$rootScope.$on('$routeChangeError', function() {
+				onContentLoad();
+			});
+
+			// --------------------------------------------------------------
+
+			$rootScope.$watch(function () { return $location.path() }, function (newLocation, oldLocation) {
+
+				function forward() {
+					scope.history[scope.history.length] = {
+						url: newLocation,
+						y: 0
+					};
+				}
+
+				function back() {
+					scope.history.splice(scope.history.length - 1, 1);
+				}
+
+				if (scope.history.length > 1) {
+					if (newLocation == scope.history[scope.history.length - 2].url ||
+						newLocation + '/' == scope.history[scope.history.length - 2].url) {
+						back();
+					} else {
+						forward();
+					}
+				} else {
+					forward();
+				}
+			});
+		}
+	};
+});
+appStickerPipeStore.directive('spLoad', function ($parse) {
+	return {
+		restrict: 'A',
+		link: function (scope, elem, attrs) {
+			var fn = $parse(attrs.spLoad);
+			elem.on('load', function (event) {
+				scope.$apply(function() {
+					fn(scope, { $event: event });
+				});
+			});
+		}
+	};
+});
+appStickerPipeStore.directive('spSticker', function (Config) {
+	return {
+		restrict: 'AE',
+		template: '',
+		scope: {
+			url: '@'
+		},
+		link: function ($scope, $el, attrs) {
+
+			var el = $el[0];
+
+			$el.addClass('sticker-placeholder');
+
+			el.style.background = Config.primaryColor;
+
+			var image = new Image();
+			image.onload = function() {
+				$el.removeClass('sticker-placeholder');
+				$el.addClass(attrs.completeClass);
+
+				el.style.background = '';
+				el.appendChild(image);
+			};
+			image.onerror = function() {};
+
+			$scope.$watch('url', function (value) {
+				image.src = value;
+			});
+		}
+	};
 });
 
 appStickerPipeStore.value('En', {
@@ -948,30 +945,6 @@ appStickerPipeStore.factory('StoreApi', function($rootScope, $route, PlatformAPI
 	};
 
 });
-appStickerPipeStore.directive('spButton', function () {
-	return {
-		restrict: 'AE',
-		transclude: true,
-		templateUrl: '/directives/sp-button/view.tpl',
-		scope: {
-			btnClick: '&',
-			btnClass: '@',
-			btnInProgress: '='
-		},
-		link: function (scope, el, attrs) {
-			var border = 2,
-				progressEl = el[0].getElementsByClassName('progress')[0];
-			var buttonEl = el[0].getElementsByTagName('button')[0];
-
-
-			scope.$watch('btnInProgress', function() {
-				if (progressEl.clientWidth < buttonEl.clientWidth) {
-					progressEl.style.width = buttonEl.clientWidth + border + 'px';
-				}
-			});
-		}
-	};
-});
 
 appStickerPipeStore.directive('basePage', function() {
 
@@ -1102,6 +1075,30 @@ appStickerPipeStore.controller('StoreController', function($scope, packs, Platfo
 		packs: packs
 	});
 });
+appStickerPipeStore.directive('spButton', function () {
+	return {
+		restrict: 'AE',
+		transclude: true,
+		templateUrl: '/directives/sp-button/view.tpl',
+		scope: {
+			btnClick: '&',
+			btnClass: '@',
+			btnInProgress: '='
+		},
+		link: function (scope, el, attrs) {
+			var border = 2,
+				progressEl = el[0].getElementsByClassName('progress')[0];
+			var buttonEl = el[0].getElementsByTagName('button')[0];
+
+
+			scope.$watch('btnInProgress', function() {
+				if (progressEl.clientWidth < buttonEl.clientWidth) {
+					progressEl.style.width = buttonEl.clientWidth + border + 'px';
+				}
+			});
+		}
+	};
+});
 
 appStickerPipeStore.factory('JsPlatformProvider', function($rootScope, $window, $timeout, Config) {
 
@@ -1219,7 +1216,7 @@ appStickerPipeStore.directive('error', function(Config,  $window, $timeout, EnvC
 
 	};
 });
-appStickerPipeStore.directive('packPreview', function($rootScope, PackService, Config) {
+appStickerPipeStore.directive('packPreview', function($rootScope, PackService, Config, $location) {
 
 	return {
 		restrict: 'AE',
@@ -1236,7 +1233,13 @@ appStickerPipeStore.directive('packPreview', function($rootScope, PackService, C
 			});
 
 			$el.bind('click', function() {
+				console.log(123);
 				$packPreview.addClass('active');
+				//$location.path('#/packs/' + $scope.pack.pack_name);
+
+				//$rootScope.$apply(function() {
+				//	$location.path('#/packs/' + $scope.pack.pack_name);
+				//});
 			});
 
 			$el.bind('mouseleave', function() {
@@ -1252,8 +1255,8 @@ appStickerPipeStore.directive('packPreview', function($rootScope, PackService, C
 					return PackService.getMainSticker($scope.pack);
 				},
 
-				getPackTitle: function(pack) {
-					var title = pack.title;
+				getPackTitle: function() {
+					var title = $scope.pack.title;
 					if (title.length > 15) {
 						title = title.substr(0, 15);
 						title += '...';
