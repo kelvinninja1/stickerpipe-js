@@ -128,6 +128,22 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/base-page/view.tpl',
+    '<div class="version">0.0.11</div>\n' +
+    '<div class="store" data-sp-auto-scroll>\n' +
+    '	<div data-ng-show="!error && showContent" data-ng-view></div>\n' +
+    '	<div data-ng-show="error" data-error></div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/pack/PackView.tpl',
     '<div data-ng-show="showPage">\n' +
     '	<div ng-class="{\'screen-header\': isJSPlatform }" data-ng-show="isJSPlatform"></div>\n' +
@@ -236,22 +252,6 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/base-page/view.tpl',
-    '<!--<div class="version">0.0.10</div>-->\n' +
-    '<div class="store" data-sp-auto-scroll>\n' +
-    '	<div data-ng-show="!error && showContent" data-ng-view></div>\n' +
-    '	<div data-ng-show="error" data-error></div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/error/view.tpl',
     '<div class="error">\n' +
     '	<div class="error-content">\n' +
@@ -317,154 +317,6 @@ appStickerPipeStore.config(function($routeProvider) {
 		.otherwise({
 			redirectTo:'/store'
 		});
-});
-
-appStickerPipeStore.value('En', {
-	download: 'Download',
-	sendSticker: 'Send sticker',
-	buyPack: 'Buy pack',
-	unavailableContent: 'This content is currently unavailable',
-	get: 'Get',
-	free: 'Free',
-	previewIsUndefined: 'Pack preview is undefined',
-	remove: 'Remove'
-});
-
-appStickerPipeStore.value('Ru', {
-	download: 'Скачать',
-	sendSticker: 'Отправить стикер',
-	buyPack: 'Купить',
-	unavailableContent: 'В данный момент этот контент недоступен',
-	get: 'Скачать',
-	free: 'Бесплатно',
-	previewIsUndefined: 'Превью пака недоступно',
-	remove: 'Удалить'
-});
-
-appStickerPipeStore.directive('spAutoScroll', function ($document, $timeout, $location, $window, $rootScope, PlatformAPI) {
-	return {
-		restrict: 'A',
-		link: function (scope, element, attrs) {
-
-			$rootScope.showContent = true;
-			scope.okSaveScroll = true;
-			scope.history = [];
-
-			// --------------------------------------------------------------
-
-			$document.bind('scroll', function () {
-				if (scope.okSaveScroll && scope.history.length > 0) {
-					scope.history[scope.history.length - 1].y = $window.scrollY;
-				}
-			});
-
-			$rootScope.$on('sp-auto-scroll:scrollContent', function(e, yPosition) {
-				if (scope.okSaveScroll && scope.history.length > 0) {
-					scope.history[scope.history.length - 1].y = yPosition;
-				}
-			});
-
-			// --------------------------------------------------------------
-
-			scope.$on('$locationChangeStart', function () {
-				scope.okSaveScroll = false;
-				$rootScope.showContent = false;
-			});
-
-			// --------------------------------------------------------------
-
-			function onContentLoad() {
-				$rootScope.showContent = true;
-
-				$timeout(function() {
-					scope.okSaveScroll = true;
-
-					var y = scope.history[scope.history.length - 1].y;
-
-					PlatformAPI.setYScroll(y);
-				}, 100);
-			}
-
-			$rootScope.$on('$routeChangeSuccess', function() {
-				onContentLoad();
-			});
-
-			$rootScope.$on('$routeChangeError', function() {
-				onContentLoad();
-			});
-
-			// --------------------------------------------------------------
-
-			$rootScope.$watch(function () { return $location.path() }, function (newLocation, oldLocation) {
-
-				function forward() {
-					scope.history[scope.history.length] = {
-						url: newLocation,
-						y: 0
-					};
-				}
-
-				function back() {
-					scope.history.splice(scope.history.length - 1, 1);
-				}
-
-				if (scope.history.length > 1) {
-					if (newLocation == scope.history[scope.history.length - 2].url ||
-						newLocation + '/' == scope.history[scope.history.length - 2].url) {
-						back();
-					} else {
-						forward();
-					}
-				} else {
-					forward();
-				}
-			});
-		}
-	};
-});
-appStickerPipeStore.directive('spLoad', function ($parse) {
-	return {
-		restrict: 'A',
-		link: function (scope, elem, attrs) {
-			var fn = $parse(attrs.spLoad);
-			elem.on('load', function (event) {
-				scope.$apply(function() {
-					fn(scope, { $event: event });
-				});
-			});
-		}
-	};
-});
-appStickerPipeStore.directive('spSticker', function (Config) {
-	return {
-		restrict: 'AE',
-		template: '',
-		scope: {
-			url: '@'
-		},
-		link: function ($scope, $el, attrs) {
-
-			var el = $el[0];
-
-			$el.addClass('sticker-placeholder');
-
-			el.style.background = Config.primaryColor;
-
-			var image = new Image();
-			image.onload = function() {
-				$el.removeClass('sticker-placeholder');
-				$el.addClass(attrs.completeClass);
-
-				el.style.background = '';
-				el.appendChild(image);
-			};
-			image.onerror = function() {};
-
-			$scope.$watch('url', function (value) {
-				image.src = value;
-			});
-		}
-	};
 });
 appStickerPipeStore.factory('Api', function(Http, EnvConfig, Config) {
 
@@ -945,28 +797,161 @@ appStickerPipeStore.factory('StoreApi', function($rootScope, $route, PlatformAPI
 	};
 
 });
-appStickerPipeStore.directive('spButton', function () {
+
+appStickerPipeStore.value('En', {
+	download: 'Download',
+	sendSticker: 'Send sticker',
+	buyPack: 'Buy pack',
+	unavailableContent: 'This content is currently unavailable',
+	get: 'Get',
+	free: 'Free',
+	previewIsUndefined: 'Pack preview is undefined',
+	remove: 'Remove'
+});
+
+appStickerPipeStore.value('Ru', {
+	download: 'Скачать',
+	sendSticker: 'Отправить стикер',
+	buyPack: 'Купить',
+	unavailableContent: 'В данный момент этот контент недоступен',
+	get: 'Скачать',
+	free: 'Бесплатно',
+	previewIsUndefined: 'Превью пака недоступно',
+	remove: 'Удалить'
+});
+
+appStickerPipeStore.directive('spAutoScroll', function ($document, $timeout, $location, $window, $rootScope, PlatformAPI) {
 	return {
-		restrict: 'AE',
-		transclude: true,
-		templateUrl: '/directives/sp-button/view.tpl',
-		scope: {
-			btnClick: '&',
-			btnClass: '@',
-			btnInProgress: '='
-		},
-		link: function (scope, el, attrs) {
-			var border = 2,
-				progressEl = el[0].getElementsByClassName('progress')[0];
-			var buttonEl = el[0].getElementsByTagName('button')[0];
+		restrict: 'A',
+		link: function (scope, element, attrs) {
 
+			$rootScope.showContent = true;
+			scope.okSaveScroll = true;
+			scope.history = [];
 
-			scope.$watch('btnInProgress', function() {
-				if (progressEl.clientWidth < buttonEl.clientWidth) {
-					progressEl.style.width = buttonEl.clientWidth + border + 'px';
+			// --------------------------------------------------------------
+
+			$document.bind('scroll', function () {
+				if (scope.okSaveScroll && scope.history.length > 0) {
+					scope.history[scope.history.length - 1].y = $window.scrollY;
+				}
+			});
+
+			$rootScope.$on('sp-auto-scroll:scrollContent', function(e, yPosition) {
+				if (scope.okSaveScroll && scope.history.length > 0) {
+					scope.history[scope.history.length - 1].y = yPosition;
+				}
+			});
+
+			// --------------------------------------------------------------
+
+			scope.$on('$locationChangeStart', function () {
+				scope.okSaveScroll = false;
+				$rootScope.showContent = false;
+			});
+
+			// --------------------------------------------------------------
+
+			function onContentLoad() {
+				$rootScope.showContent = true;
+
+				$timeout(function() {
+					scope.okSaveScroll = true;
+
+					var y = scope.history[scope.history.length - 1].y;
+
+					PlatformAPI.setYScroll(y);
+				}, 100);
+			}
+
+			$rootScope.$on('$routeChangeSuccess', function() {
+				onContentLoad();
+			});
+
+			$rootScope.$on('$routeChangeError', function() {
+				onContentLoad();
+			});
+
+			// --------------------------------------------------------------
+
+			$rootScope.$watch(function () { return $location.path() }, function (newLocation, oldLocation) {
+
+				function forward() {
+					scope.history[scope.history.length] = {
+						url: newLocation,
+						y: 0
+					};
+				}
+
+				function back() {
+					scope.history.splice(scope.history.length - 1, 1);
+				}
+
+				if (scope.history.length > 1) {
+					if (newLocation == scope.history[scope.history.length - 2].url ||
+						newLocation + '/' == scope.history[scope.history.length - 2].url) {
+						back();
+					} else {
+						forward();
+					}
+				} else {
+					forward();
 				}
 			});
 		}
+	};
+});
+appStickerPipeStore.directive('spLoad', function ($parse) {
+	return {
+		restrict: 'A',
+		link: function (scope, elem, attrs) {
+			var fn = $parse(attrs.spLoad);
+			elem.on('load', function (event) {
+				scope.$apply(function() {
+					fn(scope, { $event: event });
+				});
+			});
+		}
+	};
+});
+appStickerPipeStore.directive('spSticker', function (Config) {
+	return {
+		restrict: 'AE',
+		template: '',
+		scope: {
+			url: '@'
+		},
+		link: function ($scope, $el, attrs) {
+
+			var el = $el[0];
+
+			$el.addClass('sticker-placeholder');
+
+			el.style.background = Config.primaryColor;
+
+			var image = new Image();
+			image.onload = function() {
+				$el.removeClass('sticker-placeholder');
+				$el.addClass(attrs.completeClass);
+
+				el.style.background = '';
+				el.appendChild(image);
+			};
+			image.onerror = function() {};
+
+			$scope.$watch('url', function (value) {
+				image.src = value;
+			});
+		}
+	};
+});
+
+appStickerPipeStore.directive('basePage', function() {
+
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/view.tpl',
+		link: function($scope, $el, attrs) {}
 	};
 });
 
@@ -1081,15 +1066,6 @@ appStickerPipeStore.controller('PackController', function($scope, Config, Platfo
 	});
 });
 
-appStickerPipeStore.directive('basePage', function() {
-
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/view.tpl',
-		link: function($scope, $el, attrs) {}
-	};
-});
-
 appStickerPipeStore.controller('StoreController', function($scope, packs, PlatformAPI, Helper) {
 
 	PlatformAPI.showPagePreloader(false);
@@ -1199,6 +1175,30 @@ appStickerPipeStore.factory('JsPlatformProvider', function($rootScope, $window, 
 		removePack: function(packName) {
 			callSDKMethod('removePack', {
 				packName: packName
+			});
+		}
+	};
+});
+appStickerPipeStore.directive('spButton', function () {
+	return {
+		restrict: 'AE',
+		transclude: true,
+		templateUrl: '/directives/sp-button/view.tpl',
+		scope: {
+			btnClick: '&',
+			btnClass: '@',
+			btnInProgress: '='
+		},
+		link: function (scope, el, attrs) {
+			var border = 2,
+				progressEl = el[0].getElementsByClassName('progress')[0];
+			var buttonEl = el[0].getElementsByTagName('button')[0];
+
+
+			scope.$watch('btnInProgress', function() {
+				if (progressEl.clientWidth < buttonEl.clientWidth) {
+					progressEl.style.width = buttonEl.clientWidth + border + 'px';
+				}
 			});
 		}
 	};
