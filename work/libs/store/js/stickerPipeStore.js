@@ -982,16 +982,6 @@ appStickerPipeStore.directive('basePage', function() {
 	};
 });
 
-appStickerPipeStore.controller('StoreController', function($scope, packs, PlatformAPI, Helper) {
-
-	PlatformAPI.showPagePreloader(false);
-
-	angular.extend($scope, {
-		isJSPlatform: Helper.isJS(),
-		packs: packs
-	});
-});
-
 appStickerPipeStore.controller('PackController', function($scope, Config, PlatformAPI, $rootScope, PackService, pack, $window, Helper) {
 
 	PlatformAPI.showBackButton('#/store');
@@ -1100,6 +1090,16 @@ appStickerPipeStore.controller('PackController', function($scope, Config, Platfo
 		$scope.purchaseProgress = false;
 		$scope.removeProgress = false;
 		apply();
+	});
+});
+
+appStickerPipeStore.controller('StoreController', function($scope, packs, PlatformAPI, Helper) {
+
+	PlatformAPI.showPagePreloader(false);
+
+	angular.extend($scope, {
+		isJSPlatform: Helper.isJS(),
+		packs: packs
 	});
 });
 
@@ -1232,6 +1232,10 @@ appStickerPipeStore.directive('packPreview', function($rootScope, PackService, C
 			var $packPreview = angular.element($el[0].getElementsByClassName('pack-preview')[0]);
 
 			$el.bind('mouseover', function() {
+				$packPreview.addClass('active');
+			});
+
+			$el.bind('click', function() {
 				$packPreview.addClass('active');
 			});
 
