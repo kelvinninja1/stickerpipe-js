@@ -945,6 +945,30 @@ appStickerPipeStore.factory('StoreApi', function($rootScope, $route, PlatformAPI
 	};
 
 });
+appStickerPipeStore.directive('spButton', function () {
+	return {
+		restrict: 'AE',
+		transclude: true,
+		templateUrl: '/directives/sp-button/view.tpl',
+		scope: {
+			btnClick: '&',
+			btnClass: '@',
+			btnInProgress: '='
+		},
+		link: function (scope, el, attrs) {
+			var border = 2,
+				progressEl = el[0].getElementsByClassName('progress')[0];
+			var buttonEl = el[0].getElementsByTagName('button')[0];
+
+
+			scope.$watch('btnInProgress', function() {
+				if (progressEl.clientWidth < buttonEl.clientWidth) {
+					progressEl.style.width = buttonEl.clientWidth + border + 'px';
+				}
+			});
+		}
+	};
+});
 
 appStickerPipeStore.directive('basePage', function() {
 
@@ -1074,30 +1098,6 @@ appStickerPipeStore.controller('StoreController', function($scope, packs, Platfo
 		isJSPlatform: Helper.isJS(),
 		packs: packs
 	});
-});
-appStickerPipeStore.directive('spButton', function () {
-	return {
-		restrict: 'AE',
-		transclude: true,
-		templateUrl: '/directives/sp-button/view.tpl',
-		scope: {
-			btnClick: '&',
-			btnClass: '@',
-			btnInProgress: '='
-		},
-		link: function (scope, el, attrs) {
-			var border = 2,
-				progressEl = el[0].getElementsByClassName('progress')[0];
-			var buttonEl = el[0].getElementsByTagName('button')[0];
-
-
-			scope.$watch('btnInProgress', function() {
-				if (progressEl.clientWidth < buttonEl.clientWidth) {
-					progressEl.style.width = buttonEl.clientWidth + border + 'px';
-				}
-			});
-		}
-	};
 });
 
 appStickerPipeStore.factory('JsPlatformProvider', function($rootScope, $window, $timeout, Config) {
@@ -1234,7 +1234,7 @@ appStickerPipeStore.directive('packPreview', function($rootScope, PackService, C
 
 			$el.bind('click', function() {
 				console.log(123);
-				$packPreview.addClass('active');
+				//$packPreview.addClass('active');
 				//$location.path('#/packs/' + $scope.pack.pack_name);
 
 				//$rootScope.$apply(function() {
