@@ -46,7 +46,7 @@
 			});
 		},
 
-		purchasePack: function(packName, pricePoint, successCallback) {
+		purchasePack: function(packName, pricePoint, successCallback, failCallback) {
 			Plugin.Service.Ajax({
 				type: 'post',
 				url: Plugin.Service.Url.getPurchaseUrl(packName, pricePoint),
@@ -59,6 +59,8 @@
 						packName: packName,
 						pricePoint: pricePoint
 					});
+
+					failCallback && failCallback();
 				}
 			});
 		},
@@ -73,12 +75,15 @@
 			});
 		},
 
-		hidePack: function(packName, successCallback) {
+		hidePack: function(packName, successCallback, failCallback) {
 			return Plugin.Service.Ajax({
 				type: 'DELETE',
 				url: Plugin.Service.Url.getHidePackUrl(packName),
 				success: function(response) {
 					successCallback && successCallback(response.data);
+				},
+				error: function() {
+					failCallback && failCallback();
 				}
 			});
 		}

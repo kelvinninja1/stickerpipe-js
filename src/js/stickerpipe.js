@@ -72,6 +72,7 @@ window.StickersModule.View = {};
 		//   Functions
 		////////////////////
 
+		// todo: add elId
 		render: function(callback) {
 			var self = this;
 
@@ -145,6 +146,7 @@ window.StickersModule.View = {};
 		},
 
 		isSticker: function(text) {
+			console.log(Plugin.Service.Sticker.isSticker(text));
 			return Plugin.Service.Sticker.isSticker(text);
 		},
 

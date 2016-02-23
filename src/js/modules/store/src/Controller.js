@@ -22,23 +22,23 @@
 		},
 
 		downloadPack: function(packName, pricePoint) {
-			Plugin.Service.Pack.purchase(packName, pricePoint, function() {
+			Plugin.Service.Pack.purchase(packName, pricePoint, true, function() {
+				callStoreMethod('onPackPurchaseSuccess');
+			}, function() {
+				callStoreMethod('onPackPurchaseFail');
+			});
+		},
 
-				Module.Controller.reloadStore();
-
-				callStoreMethod('onPackDownloaded', {
-					packName: packName
-				});
-
-			}, true);
+		removePack: function(packName) {
+			Plugin.Service.Pack.remove(packName, function() {
+				callStoreMethod('onPackRemoveSuccess');
+			}, function() {
+				callStoreMethod('onPackRemoveFail');
+			});
 		},
 
 		goBack: function() {
 			callStoreMethod('goBack');
-		},
-
-		reloadStore: function() {
-			callStoreMethod('reload');
 		},
 
 		///////////////////////////////////////////
@@ -50,7 +50,7 @@
 		},
 
 		onPurchaseFail: function() {
-			callStoreMethod('hideActionProgress');
+			callStoreMethod('onPackPurchaseFail');
 		},
 
 		onScrollContent: function(yPosition) {

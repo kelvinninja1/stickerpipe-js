@@ -3066,7 +3066,7 @@ window.StickersModule.Service = {};
 			});
 		},
 
-		purchasePack: function(packName, pricePoint, successCallback) {
+		purchasePack: function(packName, pricePoint, successCallback, failCallback) {
 			Plugin.Service.Ajax({
 				type: 'post',
 				url: Plugin.Service.Url.getPurchaseUrl(packName, pricePoint),
@@ -3079,6 +3079,8 @@ window.StickersModule.Service = {};
 						packName: packName,
 						pricePoint: pricePoint
 					});
+
+					failCallback && failCallback();
 				}
 			});
 		},
@@ -3093,12 +3095,15 @@ window.StickersModule.Service = {};
 			});
 		},
 
-		hidePack: function(packName, successCallback) {
+		hidePack: function(packName, successCallback, failCallback) {
 			return Plugin.Service.Ajax({
 				type: 'DELETE',
 				url: Plugin.Service.Url.getHidePackUrl(packName),
 				success: function(response) {
 					successCallback && successCallback(response.data);
+				},
+				error: function() {
+					failCallback && failCallback();
 				}
 			});
 		}
@@ -3445,7 +3450,7 @@ window.StickersModule.Service = {};
 			stickerpipe = _stickerpipe;
 		},
 
-		purchase: function(packName, pricePoint, doneCallback, isUnwatched) {
+		purchase: function(packName, pricePoint, isUnwatched, successCallback, failCallback) {
 			isUnwatched = (typeof isUnwatched == 'undefined') ? true : isUnwatched;
 
 			Plugin.Service.Api.purchasePack(packName, pricePoint, function(pack) {
@@ -3469,7 +3474,9 @@ window.StickersModule.Service = {};
 					stickerpipe.view.tabsView.renderPacks();
 				}
 
-				doneCallback && doneCallback(pack);
+				successCallback && successCallback(pack);
+			}, function() {
+				failCallback && failCallback();
 			});
 		},
 
@@ -3509,7 +3516,6 @@ window.StickersModule.Service = {};
 					Plugin.Service.Pack.purchase(
 						undefinedPacksInStorage[i].pack_name,
 						undefinedPacksInStorage[i].pricepoint,
-						null,
 						(packsInStorage.length) ? true : false
 					);
 				}
@@ -3522,7 +3528,7 @@ window.StickersModule.Service = {};
 			});
 		},
 
-		remove: function(packName, doneCallback) {
+		remove: function(packName, successCallback, failCallback) {
 			Plugin.Service.Api.hidePack(packName, function() {
 
 				var packs = Plugin.Service.Storage.getPacks();
@@ -3538,7 +3544,9 @@ window.StickersModule.Service = {};
 					stickerpipe.view.tabsView.controls.history.el.click();
 				}
 
-				doneCallback && doneCallback();
+				successCallback && successCallback();
+			}, function() {
+				failCallback && failCallback();
 			});
 		},
 
@@ -5008,9 +5016,7 @@ window.StickersModule.Module = {};
 		},
 
 		removePack: function(data) {
-			Plugin.Service.Pack.remove(data.attrs.packName, function() {
-				Module.Controller.reloadStore();
-			});
+			Module.Controller.removePack(data.attrs.packName);
 		},
 
 		showBackButton: function(data) {
@@ -5084,23 +5090,23 @@ window.StickersModule.Module = {};
 		},
 
 		downloadPack: function(packName, pricePoint) {
-			Plugin.Service.Pack.purchase(packName, pricePoint, function() {
+			Plugin.Service.Pack.purchase(packName, pricePoint, true, function() {
+				callStoreMethod('onPackPurchaseSuccess');
+			}, function() {
+				callStoreMethod('onPackPurchaseFail');
+			});
+		},
 
-				Module.Controller.reloadStore();
-
-				callStoreMethod('onPackDownloaded', {
-					packName: packName
-				});
-
-			}, true);
+		removePack: function(packName) {
+			Plugin.Service.Pack.remove(packName, function() {
+				callStoreMethod('onPackRemoveSuccess');
+			}, function() {
+				callStoreMethod('onPackRemoveFail');
+			});
 		},
 
 		goBack: function() {
 			callStoreMethod('goBack');
-		},
-
-		reloadStore: function() {
-			callStoreMethod('reload');
 		},
 
 		///////////////////////////////////////////
@@ -5112,7 +5118,7 @@ window.StickersModule.Module = {};
 		},
 
 		onPurchaseFail: function() {
-			callStoreMethod('hideActionProgress');
+			callStoreMethod('onPackPurchaseFail');
 		},
 
 		onScrollContent: function(yPosition) {
@@ -6341,6 +6347,7 @@ window.StickersModule.View = {};
 		//   Functions
 		////////////////////
 
+		// todo: add elId
 		render: function(callback) {
 			var self = this;
 
@@ -6414,6 +6421,7 @@ window.StickersModule.View = {};
 		},
 
 		isSticker: function(text) {
+			console.log(Plugin.Service.Sticker.isSticker(text));
 			return Plugin.Service.Sticker.isSticker(text);
 		},
 

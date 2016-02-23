@@ -32,9 +32,7 @@
 		},
 
 		removePack: function(data) {
-			Plugin.Service.Pack.remove(data.attrs.packName, function() {
-				Module.Controller.reloadStore();
-			});
+			Module.Controller.removePack(data.attrs.packName);
 		},
 
 		showBackButton: function(data) {

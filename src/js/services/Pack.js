@@ -63,7 +63,7 @@
 			stickerpipe = _stickerpipe;
 		},
 
-		purchase: function(packName, pricePoint, doneCallback, isUnwatched) {
+		purchase: function(packName, pricePoint, isUnwatched, successCallback, failCallback) {
 			isUnwatched = (typeof isUnwatched == 'undefined') ? true : isUnwatched;
 
 			Plugin.Service.Api.purchasePack(packName, pricePoint, function(pack) {
@@ -87,7 +87,9 @@
 					stickerpipe.view.tabsView.renderPacks();
 				}
 
-				doneCallback && doneCallback(pack);
+				successCallback && successCallback(pack);
+			}, function() {
+				failCallback && failCallback();
 			});
 		},
 
@@ -127,7 +129,6 @@
 					Plugin.Service.Pack.purchase(
 						undefinedPacksInStorage[i].pack_name,
 						undefinedPacksInStorage[i].pricepoint,
-						null,
 						(packsInStorage.length) ? true : false
 					);
 				}
@@ -140,7 +141,7 @@
 			});
 		},
 
-		remove: function(packName, doneCallback) {
+		remove: function(packName, successCallback, failCallback) {
 			Plugin.Service.Api.hidePack(packName, function() {
 
 				var packs = Plugin.Service.Storage.getPacks();
@@ -156,7 +157,9 @@
 					stickerpipe.view.tabsView.controls.history.el.click();
 				}
 
-				doneCallback && doneCallback();
+				successCallback && successCallback();
+			}, function() {
+				failCallback && failCallback();
 			});
 		},
 
