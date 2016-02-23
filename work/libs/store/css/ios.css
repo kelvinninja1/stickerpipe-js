@@ -259,6 +259,9 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   display: table;
   margin: 8px auto;
   padding: 8px; }
+  .pack-preview.active {
+    background: blue;
+    border-radius: 5px; }
 
 .pack-preview a {
   display: table;
@@ -369,10 +372,6 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 .pack-preview-undefined {
   margin-top: 50px;
   text-align: center; }
-
-.pack-preview:active {
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 5px; }
 
 .btn {
   border: 1px solid;
