@@ -5,13 +5,15 @@ var appStickerPipeStore = angular.module('appStickerPipeStore', [
 	'environment'
 ]);
 
-appStickerPipeStore.run(function($rootScope, PlatformAPI, JsInterface, Config) {
+appStickerPipeStore.run(function($rootScope, PlatformAPI, StoreApi, Config, i18n) {
 
 	Config.primaryColor = Config.primaryColor || '9c27b0';
 	Config.primaryColor = '#' + Config.primaryColor;
 
 	PlatformAPI.init();
-	JsInterface.init();
+	StoreApi.init();
+
+	$rootScope.i18n = i18n;
 
 	$rootScope.$on('$routeChangeStart', function() {
 		PlatformAPI.showPagePreloader(true);
@@ -228,46 +230,6 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/directives/sp-button/view.tpl',
-    '<button data-ng-show="!btnInProgress"\n' +
-    '		data-ng-click="btnClick()"\n' +
-    '        class="{{ btnClass }}"\n' +
-    '        data-ng-transclude>\n' +
-    '</button>\n' +
-    '\n' +
-    '<div data-ng-show="btnInProgress" style="display: inline-table;">\n' +
-    '	<div class="progress">\n' +
-    '		<div class="bounce1"></div>\n' +
-    '		<div class="bounce2"></div>\n' +
-    '		<div class="bounce3"></div>\n' +
-    '	</div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/base-page/view.tpl',
-    '<!--<div class="version">0.0.10</div>-->\n' +
-    '<div class="store" data-sp-auto-scroll>\n' +
-    '	<div data-ng-show="!error && showContent" data-ng-view></div>\n' +
-    '	<div data-ng-show="error" data-error></div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/pack/PackView.tpl',
     '<div data-ng-show="showPage">\n' +
     '	<div ng-class="{\'screen-header\': isJSPlatform }" data-ng-show="isJSPlatform"></div>\n' +
@@ -290,17 +252,19 @@ module.run(['$templateCache', function($templateCache) {
     '\n' +
     '			<span data-ng-show="packService.isActive(pack)">\n' +
     '				<!-- REMOVE -->\n' +
-    '				<button data-ng-show="canRemovePack"\n' +
-    '				        class="btn btn-primary"\n' +
-    '				        data-ng-click="removePack()"\n' +
-    '				>{{ i18n.remove.toUpperCase() }}</button>\n' +
+    '				<div data-sp-button\n' +
+    '				     data-ng-show="canRemovePack"\n' +
+    '				     data-btn-class="btn btn-primary"\n' +
+    '				     data-btn-click="removePack()"\n' +
+    '				     data-btn-in-progress="removeProgress"\n' +
+    '				>{{ $root.i18n.remove.toUpperCase() }}</div>\n' +
     '\n' +
     '				<!-- OPEN -->\n' +
     '				<div data-sp-button\n' +
     '				     data-ng-show="canShowPack"\n' +
     '				     data-btn-class="btn btn-primary"\n' +
     '				     data-btn-click="showPack()"\n' +
-    '				>{{ i18n.sendSticker.toUpperCase() }}</div>\n' +
+    '				>{{ $root.i18n.sendSticker.toUpperCase() }}</div>\n' +
     '			</span>\n' +
     '\n' +
     '			<!-- DOWNLOAD -->\n' +
@@ -308,15 +272,15 @@ module.run(['$templateCache', function($templateCache) {
     '			     data-ng-show="packService.isHidden(pack) || (packService.isDisable(pack) && (pack.pricepoint == \'A\') || (packService.isDisable(pack) && pack.pricepoint == \'B\' && isSubscriber))"\n' +
     '			     data-btn-class="btn btn-primary"\n' +
     '			     data-btn-click="purchasePack()"\n' +
-    '			     data-btn-in-progress="inProgress"\n' +
-    '			>{{ i18n.download.toUpperCase() }}</div>\n' +
+    '			     data-btn-in-progress="purchaseProgress"\n' +
+    '			>{{ $root.i18n.download.toUpperCase() }}</div>\n' +
     '\n' +
     '			<!-- PURCHASE PriceB -->\n' +
     '			<div data-sp-button\n' +
     '			     data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'B\' && !isSubscriber && priceB"\n' +
     '			     data-btn-class="btn btn-primary"\n' +
     '			     data-btn-click="purchasePack()"\n' +
-    '			     data-btn-in-progress="inProgress"\n' +
+    '			     data-btn-in-progress="purchaseProgress"\n' +
     '			>{{ priceB }}</div>\n' +
     '\n' +
     '			<!-- PURCHASE PriceC -->\n' +
@@ -324,7 +288,7 @@ module.run(['$templateCache', function($templateCache) {
     '			     data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'C\' && priceC"\n' +
     '			     data-btn-class="btn btn-primary"\n' +
     '			     data-btn-click="purchasePack()"\n' +
-    '			     data-btn-in-progress="inProgress"\n' +
+    '			     data-btn-in-progress="purchaseProgress"\n' +
     '			>{{ priceC }}</div>\n' +
     '\n' +
     '		</div>\n' +
@@ -334,17 +298,17 @@ module.run(['$templateCache', function($templateCache) {
     '\n' +
     '	<div class="clearfix"></div>\n' +
     '\n' +
-    '	<div class="pack-stickers-preview {{ orientation() }}" data-ng-show="!!getStickersPreview()">\n' +
+    '	<div class="pack-stickers-preview {{ orientation() }}" data-ng-show="!!getPackPreview()">\n' +
     '		<div class="pack-stickers-preview-image">\n' +
     '			<img\n' +
-    '				 data-ng-src="{{ getStickersPreview() }}"\n' +
-    '			     data-sp-load="hidePagePreloader()"\n' +
+    '				 data-ng-src="{{ getPackPreview() }}"\n' +
+    '			     data-sp-load="onPackPreviewLoad()"\n' +
     '			     alt="" />\n' +
     '		</div>\n' +
     '	</div>\n' +
     '\n' +
-    '	<div data-ng-show="!getStickersPreview()">\n' +
-    '		<p class="pack-preview-undefined">{{ i18n.previewIsUndefined }}</p>\n' +
+    '	<div data-ng-show="!getPackPreview()">\n' +
+    '		<p class="pack-preview-undefined">{{ $root.i18n.previewIsUndefined }}</p>\n' +
     '	</div>\n' +
     '</div>');
 }]);
@@ -374,13 +338,34 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/base-page/error/view.tpl',
-    '<div class="error">\n' +
-    '	<div class="error-content">\n' +
-    '		<div class="error-image">\n' +
-    '			<img ng-src="{{ imgUrl }}" alt="">\n' +
-    '		</div>\n' +
-    '		<h5>{{ i18n.unavailableContent }}</h5>\n' +
+  $templateCache.put('/modules/base-page/view.tpl',
+    '<!--<div class="version">0.0.10</div>-->\n' +
+    '<div class="store" data-sp-auto-scroll>\n' +
+    '	<div data-ng-show="!error && showContent" data-ng-view></div>\n' +
+    '	<div data-ng-show="error" data-error></div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/directives/sp-button/view.tpl',
+    '<button data-ng-show="!btnInProgress"\n' +
+    '		data-ng-click="btnClick()"\n' +
+    '        class="{{ btnClass }}"\n' +
+    '        data-ng-transclude>\n' +
+    '</button>\n' +
+    '\n' +
+    '<div data-ng-show="btnInProgress" style="display: inline-table;">\n' +
+    '	<div class="progress">\n' +
+    '		<div class="bounce1"></div>\n' +
+    '		<div class="bounce2"></div>\n' +
+    '		<div class="bounce3"></div>\n' +
     '	</div>\n' +
     '</div>');
 }]);
@@ -405,14 +390,33 @@ module.run(['$templateCache', function($templateCache) {
     '		<h5 class="pack-preview-name">{{ getPackTitle(pack) }}</h5>\n' +
     '		<h5 class="pack-preview-price">\n' +
     '			&nbsp;\n' +
-    '			<span data-ng-show="packService.isActive(pack)">{{ i18n.free }}</span>\n' +
-    '			<span data-ng-show="packService.isHidden(pack)">{{ i18n.free }}</span>\n' +
-    '			<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'A\'">{{ i18n.free }}</span>\n' +
+    '			<span data-ng-show="packService.isActive(pack)">{{ $root.i18n.free }}</span>\n' +
+    '			<span data-ng-show="packService.isHidden(pack)">{{ $root.i18n.free }}</span>\n' +
+    '			<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'A\'">{{ $root.i18n.free }}</span>\n' +
     '			<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'B\' && priceB">{{ priceB }}</span>\n' +
     '			<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'C\' && priceC">{{ priceC }}</span>\n' +
     '			&nbsp;\n' +
     '		</h5>\n' +
     '	</a>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/base-page/error/view.tpl',
+    '<div class="error">\n' +
+    '	<div class="error-content">\n' +
+    '		<div class="error-image">\n' +
+    '			<img ng-src="{{ imgUrl }}" alt="">\n' +
+    '		</div>\n' +
+    '		<h5>{{ $root.i18n.unavailableContent }}</h5>\n' +
+    '	</div>\n' +
     '</div>');
 }]);
 })();
@@ -766,51 +770,6 @@ appStickerPipeStore.factory('i18n', function(Config, $injector) {
 
 
 
-appStickerPipeStore.factory('JsInterface', function($rootScope, $route, PlatformAPI) {
-
-	var JsInterface = {
-		configure: function() {
-			PlatformAPI.configure.apply(PlatformAPI, arguments);
-		},
-
-		onPackDownloaded: function(arrts) {
-			var packName = (arrts && arrts.packName) || null;
-
-			this.hideActionProgress();
-			PlatformAPI.showCollections(packName);
-		},
-
-		reload: function() {
-			$route.reload();
-		},
-
-		showActionProgress: function() {
-			$rootScope.$emit('showActionProgress');
-		},
-
-		hideActionProgress: function() {
-			$rootScope.$emit('hideActionProgress');
-		},
-
-		goBack: function() {
-			if ($rootScope.goBackUrl) {
-				window.location.href = $rootScope.goBackUrl;
-			}
-		},
-
-		onScrollContent: function(attrs) {
-			$rootScope.$emit('sp-auto-scroll:scrollContent', attrs.yPosition);
-		}
-	};
-
-	return {
-		init: function() {
-			window.JsInterface = JsInterface;
-		}
-	};
-
-});
-
 appStickerPipeStore.factory('PackService', function(Config) {
 
 	return {
@@ -924,6 +883,71 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $rootScop
 	};
 
 });
+
+appStickerPipeStore.factory('StoreApi', function($rootScope, $route, PlatformAPI) {
+
+	var StoreApi = {
+
+		// COMMON
+
+		onPackPurchaseSuccess: function() {
+			$rootScope.$emit('onPackPurchaseSuccess');
+		},
+		onPackPurchaseFail: function() {
+			$rootScope.$emit('onPackPurchaseFail');
+		},
+
+		onPackRemoveSuccess: function() {
+			$rootScope.$emit('onPackRemoveSuccess');
+		},
+		onPackRemoveFail: function() {
+			$rootScope.$emit('onPackRemoveFail');
+		},
+
+		goBack: function() {
+			if ($rootScope.goBackUrl) {
+				window.location.href = $rootScope.goBackUrl;
+			}
+		},
+
+		// JS
+
+		configure: function() {
+			PlatformAPI.configure.apply(PlatformAPI, arguments);
+		},
+		onScrollContent: function(attrs) {
+			$rootScope.$emit('sp-auto-scroll:scrollContent', attrs.yPosition);
+		},
+
+		// DEPRECATED
+
+		onPackDownloaded: function(arrts) {
+			var packName = (arrts && arrts.packName) || null;
+
+			this.hideActionProgress();
+			PlatformAPI.showCollections(packName);
+		},
+		reload: function() {
+			$route.reload();
+		},
+		showActionProgress: function() {
+			$rootScope.$emit('showActionProgress');
+		},
+		hideActionProgress: function() {
+			$rootScope.$emit('hideActionProgress');
+		}
+	};
+
+	return {
+		init: function() {
+			window.StoreApi = StoreApi;
+
+			// deprecated
+			window.JsInterface = StoreApi;
+		}
+	};
+
+});
 appStickerPipeStore.directive('spButton', function () {
 	return {
 		restrict: 'AE',
@@ -958,7 +982,17 @@ appStickerPipeStore.directive('basePage', function() {
 	};
 });
 
-appStickerPipeStore.controller('PackController', function($scope, Config, PlatformAPI, i18n, $rootScope, PackService, pack, $window, Helper) {
+appStickerPipeStore.controller('StoreController', function($scope, packs, PlatformAPI, Helper) {
+
+	PlatformAPI.showPagePreloader(false);
+
+	angular.extend($scope, {
+		isJSPlatform: Helper.isJS(),
+		packs: packs
+	});
+});
+
+appStickerPipeStore.controller('PackController', function($scope, Config, PlatformAPI, $rootScope, PackService, pack, $window, Helper) {
 
 	PlatformAPI.showBackButton('#/store');
 
@@ -966,8 +1000,13 @@ appStickerPipeStore.controller('PackController', function($scope, Config, Platfo
 		return ($window.innerWidth > $window.innerHeight || $window.innerWidth > 544);
 	}
 
+	function apply() {
+		if(!$scope.$$phase) {
+			$scope.$apply();
+		}
+	}
+
 	angular.extend($scope, {
-		i18n: i18n,
 		pack: pack,
 		packService: PackService,
 
@@ -978,7 +1017,8 @@ appStickerPipeStore.controller('PackController', function($scope, Config, Platfo
 		priceB: Config.priceB,
 		priceC: Config.priceC,
 
-		inProgress: false,
+		purchaseProgress: false,
+		removeProgress: false,
 
 		canShowPack: PlatformAPI.canShowPack(),
 		canRemovePack: PlatformAPI.canRemovePack(),
@@ -987,7 +1027,13 @@ appStickerPipeStore.controller('PackController', function($scope, Config, Platfo
 			PlatformAPI.showPack(pack.pack_name);
 		},
 
+		purchasePack: function() {
+			$scope.purchaseProgress = true;
+			PlatformAPI.purchasePack(pack.title, pack.pack_name, pack.pricepoint);
+		},
+
 		removePack: function() {
+			$scope.removeProgress = true;
 			PlatformAPI.removePack(pack.pack_name);
 		},
 
@@ -995,12 +1041,7 @@ appStickerPipeStore.controller('PackController', function($scope, Config, Platfo
 			return isLandscape() ? 'landscape' : 'portrait';
 		},
 
-		purchasePack: function() {
-			$scope.inProgress = true;
-			PlatformAPI.purchasePack(pack.title, pack.pack_name, pack.pricepoint);
-		},
-
-		getStickersPreview: function() {
+		getPackPreview: function() {
 			if (!this.pack) {
 				return false;
 			}
@@ -1014,39 +1055,51 @@ appStickerPipeStore.controller('PackController', function($scope, Config, Platfo
 			return url;
 		},
 
-		hidePagePreloader: function() {
+		onPackPreviewLoad: function() {
 			PlatformAPI.showPagePreloader(false);
 			this.showPage = true;
 		}
 	});
 
-	$rootScope.$on('showActionProgress', function() {
-		$scope.inProgress = true;
-		if(!$scope.$$phase) {
-			$scope.$apply();
-		}
+	$rootScope.$on('onPackPurchaseSuccess', function() {
+		$scope.purchaseProgress = false;
+		pack.user_status = 'active';
+		PlatformAPI.showPack(pack.pack_name);
+		apply();
 	});
 
-	$rootScope.$on('hideActionProgress', function() {
-		$scope.inProgress  = false;
-		if(!$scope.$$phase) {
-			$scope.$apply();
-		}
+	$rootScope.$on('onPackPurchaseFail', function() {
+		$scope.purchaseProgress = false;
+		apply();
+	});
+
+	$rootScope.$on('onPackRemoveSuccess', function() {
+		$scope.removeProgress = false;
+		pack.user_status = 'hidden';
+		apply();
+	});
+
+	$rootScope.$on('onPackRemoveFail', function() {
+		$scope.removeProgress = false;
+		apply();
 	});
 
 	angular.element($window).bind('resize', function () {
-		$scope.$apply();
+		apply();
 	});
-});
 
-appStickerPipeStore.controller('StoreController', function($scope, packs, PlatformAPI, Helper, i18n) {
+	// Deprecated
 
-	PlatformAPI.showPagePreloader(false);
+	$rootScope.$on('showActionProgress', function() {
+		$scope.purchaseProgress = true;
+		$scope.removeProgress = true;
+		apply();
+	});
 
-	angular.extend($scope, {
-		i18n: i18n,
-		isJSPlatform: Helper.isJS(),
-		packs: packs
+	$rootScope.$on('hideActionProgress', function() {
+		$scope.purchaseProgress = false;
+		$scope.removeProgress = false;
+		apply();
 	});
 });
 
@@ -1070,9 +1123,9 @@ appStickerPipeStore.factory('JsPlatformProvider', function($rootScope, $window, 
 				return;
 			}
 
-			var JsInterface = window.JsInterface;
-			if (JsInterface) {
-				JsInterface[data.action] && JsInterface[data.action](data.attrs);
+			var StoreApi = window.StoreApi;
+			if (StoreApi) {
+				StoreApi[data.action] && StoreApi[data.action](data.attrs);
 			}
 		}).bind(this));
 	}
@@ -1154,7 +1207,7 @@ appStickerPipeStore.factory('JsPlatformProvider', function($rootScope, $window, 
 	};
 });
 
-appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n, EnvConfig) {
+appStickerPipeStore.directive('error', function(Config,  $window, $timeout, EnvConfig) {
 	
 	return {
 		restrict: 'AE',
@@ -1162,12 +1215,11 @@ appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n
 		link: function($scope, $el, attrs) {
 
 			$scope.imgUrl = EnvConfig.notAvailableImgUrl;
-			$scope.i18n = i18n;
 		}
 
 	};
 });
-appStickerPipeStore.directive('packPreview', function(PackService, Config) {
+appStickerPipeStore.directive('packPreview', function($rootScope, PackService, Config) {
 
 	return {
 		restrict: 'AE',
@@ -1190,6 +1242,7 @@ appStickerPipeStore.directive('packPreview', function(PackService, Config) {
 			angular.extend($scope, {
 				priceB: Config.priceB,
 				priceC: Config.priceC,
+				packService: PackService,
 
 				getMainStickerUrl: function() {
 					return PackService.getMainSticker($scope.pack);
