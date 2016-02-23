@@ -102,22 +102,6 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/base-page/view.tpl',
-    '<!--<div class="version">0.0.10</div>-->\n' +
-    '<div class="store" data-sp-auto-scroll>\n' +
-    '	<div data-ng-show="!error && showContent" data-ng-view></div>\n' +
-    '	<div data-ng-show="error" data-error></div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/directives/sp-button/view.tpl',
     '<button data-ng-show="!btnInProgress"\n' +
     '		data-ng-click="btnClick()"\n' +
@@ -131,6 +115,22 @@ module.run(['$templateCache', function($templateCache) {
     '		<div class="bounce2"></div>\n' +
     '		<div class="bounce3"></div>\n' +
     '	</div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/base-page/view.tpl',
+    '<!--<div class="version">0.0.10</div>-->\n' +
+    '<div class="store" data-sp-auto-scroll>\n' +
+    '	<div data-ng-show="!error && showContent" data-ng-view></div>\n' +
+    '	<div data-ng-show="error" data-error></div>\n' +
     '</div>');
 }]);
 })();
@@ -235,26 +235,7 @@ module.run(['$templateCache', function($templateCache) {
     '<div data-ng-class="{\'screen-header\': isJSPlatform }" data-ng-show="isJSPlatform"></div>\n' +
     '<div class="packs">\n' +
     '	<div class="col" data-ng-repeat="pack in packs">\n' +
-    '		<div class="pack-preview center-block">\n' +
-    '			<a href="#/packs/{{ pack.pack_name }}">\n' +
-    '\n' +
-    '				<div data-sp-sticker\n' +
-    '				     data-url="{{ packService.getMainSticker(pack) }}"\n' +
-    '				     data-complete-class="main-sticker">\n' +
-    '				</div>\n' +
-    '\n' +
-    '				<h5 class="pack-preview-name">{{ getPackTitle(pack) }}</h5>\n' +
-    '				<h5 class="pack-preview-price">\n' +
-    '					&nbsp;\n' +
-    '					<span data-ng-show="packService.isActive(pack)">{{ i18n.free }}</span>\n' +
-    '					<span data-ng-show="packService.isHidden(pack)">{{ i18n.free }}</span>\n' +
-    '					<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'A\'">{{ i18n.free }}</span>\n' +
-    '					<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'B\' && priceB">{{ priceB }}</span>\n' +
-    '					<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'C\' && priceC">{{ priceC }}</span>\n' +
-    '					&nbsp;\n' +
-    '				</h5>\n' +
-    '			</a>\n' +
-    '		</div>\n' +
+    '		<div data-pack-preview data-pack="pack"></div>\n' +
     '	</div>\n' +
     '</div>');
 }]);
@@ -275,6 +256,37 @@ module.run(['$templateCache', function($templateCache) {
     '		</div>\n' +
     '		<h5>{{ i18n.unavailableContent }}</h5>\n' +
     '	</div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/store/pack-preview/view.tpl',
+    '<div class="pack-preview center-block">\n' +
+    '	<a href="#/packs/{{ pack.pack_name }}">\n' +
+    '\n' +
+    '		<div data-sp-sticker\n' +
+    '		     data-url="{{ getMainStickerUrl() }}"\n' +
+    '		     data-complete-class="main-sticker">\n' +
+    '		</div>\n' +
+    '\n' +
+    '		<h5 class="pack-preview-name">{{ getPackTitle(pack) }}</h5>\n' +
+    '		<h5 class="pack-preview-price">\n' +
+    '			&nbsp;\n' +
+    '			<span data-ng-show="packService.isActive(pack)">{{ i18n.free }}</span>\n' +
+    '			<span data-ng-show="packService.isHidden(pack)">{{ i18n.free }}</span>\n' +
+    '			<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'A\'">{{ i18n.free }}</span>\n' +
+    '			<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'B\' && priceB">{{ priceB }}</span>\n' +
+    '			<span data-ng-show="packService.isDisable(pack) && pack.pricepoint == \'C\' && priceC">{{ priceC }}</span>\n' +
+    '			&nbsp;\n' +
+    '		</h5>\n' +
+    '	</a>\n' +
     '</div>');
 }]);
 })();
@@ -404,7 +416,11 @@ appStickerPipeStore.directive('spSticker', function (Config) {
 	return {
 		restrict: 'AE',
 		template: '',
+		scope: {
+			url: '@'
+		},
 		link: function (scope, elem, attrs) {
+
 			elem.addClass('sticker-placeholder');
 			elem[0].style.background = Config.primaryColor;
 
@@ -418,7 +434,9 @@ appStickerPipeStore.directive('spSticker', function (Config) {
 			};
 			image.onerror = function() {};
 
-			image.src = attrs.url;
+			scope.$watch('url', function (value) {
+				image.src = value;
+			});
 		}
 	};
 });
@@ -1018,27 +1036,14 @@ appStickerPipeStore.controller('PackController', function($scope, Config, Platfo
 	});
 });
 
-appStickerPipeStore.controller('StoreController', function($scope, packs, Config, PlatformAPI, Helper, PackService, i18n) {
+appStickerPipeStore.controller('StoreController', function($scope, packs, PlatformAPI, Helper, i18n) {
 
 	PlatformAPI.showPagePreloader(false);
 
 	angular.extend($scope, {
 		i18n: i18n,
 		isJSPlatform: Helper.isJS(),
-		packService: PackService,
-		packs: packs,
-		priceB: Config.priceB,
-		priceC: Config.priceC,
-
-		getPackTitle: function(pack) {
-			var title = pack.title;
-			if (title.length > 15) {
-				title = title.substr(0, 15);
-				title += '...';
-			}
-
-			return title;
-		}
+		packs: packs
 	});
 });
 
@@ -1157,5 +1162,46 @@ appStickerPipeStore.directive('error', function(Config,  $window, $timeout, i18n
 			$scope.i18n = i18n;
 		}
 
+	};
+});
+appStickerPipeStore.directive('packPreview', function(PackService, Config) {
+
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/store/pack-preview/view.tpl',
+		scope: {
+			pack: '='
+		},
+		link: function($scope, $el, attrs) {
+
+			var $packPreview = angular.element($el[0].getElementsByClassName('pack-preview')[0]);
+
+			$el.bind('mouseover', function() {
+				$packPreview.addClass('active');
+			});
+
+			$el.bind('mouseleave', function() {
+				$packPreview.removeClass('active');
+			});
+
+			angular.extend($scope, {
+				priceB: Config.priceB,
+				priceC: Config.priceC,
+
+				getMainStickerUrl: function() {
+					return PackService.getMainSticker($scope.pack);
+				},
+
+				getPackTitle: function(pack) {
+					var title = pack.title;
+					if (title.length > 15) {
+						title = title.substr(0, 15);
+						title += '...';
+					}
+
+					return title;
+				}
+			});
+		}
 	};
 });
