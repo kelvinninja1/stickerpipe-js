@@ -1,4 +1,57 @@
 @charset "UTF-8";
+/*
+SCSS variables are information about icon's compiled state, stored under its original file name
+
+.icon-home {
+  width: $icon-home-width;
+}
+
+The large array-like variables contain all information about a single icon
+$icon-home: x y offset_x offset_y width height total_width total_height image_path;
+
+At the bottom of this section, we provide information about the spritesheet itself
+$spritesheet: width height image $spritesheet-sprites;
+*/
+/*
+These "retina group" variables are mappings for the naming and pairing of normal and retina sprites.
+
+The list formatted variables are intended for mixins like `retina-sprite` and `retina-sprites`.
+*/
+/*
+The provided mixins are intended to be used with the array-like variables
+
+.icon-home {
+  @include sprite-width($icon-home);
+}
+
+.icon-email {
+  @include sprite($icon-email);
+}
+*/
+/*
+The `retina-sprite` mixin sets up rules and a media query for a sprite/retina sprite.
+  It should be used with a "retina group" variable.
+
+The media query is from CSS Tricks: https://css-tricks.com/snippets/css/retina-display-media-query/
+
+$icon-home-group: ('icon-home', $icon-home, $icon-home-2x, );
+
+.icon-home {
+  @include retina-sprite($icon-home-group);
+}
+*/
+/*
+The `sprites` mixin generates identical output to the CSS template
+  but can be overridden inside of SCSS
+
+@include sprites($spritesheet-sprites);
+*/
+/*
+The `retina-sprites` mixin generates a CSS rule and media query for retina groups
+  This yields the same output as CSS retina template but can be overridden in SCSS
+
+@include retina-sprites($retina-groups);
+*/
 /* http://meyerweb.com/eric/tools/css/reset/
    v2.0 | 20110126
    License: none (public domain)
@@ -73,91 +126,6 @@ h5 {
 h6 {
   font-size: 12px; }
 
-/*
-SCSS variables are information about icon's compiled state, stored under its original file name
-
-.icon-home {
-  width: $icon-home-width;
-}
-
-The large array-like variables contain all information about a single icon
-$icon-home: x y offset_x offset_y width height total_width total_height image_path;
-
-At the bottom of this section, we provide information about the spritesheet itself
-$spritesheet: width height image $spritesheet-sprites;
-*/
-/*
-These "retina group" variables are mappings for the naming and pairing of normal and retina sprites.
-
-The list formatted variables are intended for mixins like `retina-sprite` and `retina-sprites`.
-*/
-/*
-The provided mixins are intended to be used with the array-like variables
-
-.icon-home {
-  @include sprite-width($icon-home);
-}
-
-.icon-email {
-  @include sprite($icon-email);
-}
-*/
-/*
-The `retina-sprite` mixin sets up rules and a media query for a sprite/retina sprite.
-  It should be used with a "retina group" variable.
-
-The media query is from CSS Tricks: https://css-tricks.com/snippets/css/retina-display-media-query/
-
-$icon-home-group: ('icon-home', $icon-home, $icon-home-2x, );
-
-.icon-home {
-  @include retina-sprite($icon-home-group);
-}
-*/
-/*
-The `sprites` mixin generates identical output to the CSS template
-  but can be overridden inside of SCSS
-
-@include sprites($spritesheet-sprites);
-*/
-/*
-The `retina-sprites` mixin generates a CSS rule and media query for retina groups
-  This yields the same output as CSS retina template but can be overridden in SCSS
-
-@include retina-sprites($retina-groups);
-*/
-.progress {
-  text-align: center;
-  width: 70px; }
-  .progress > div {
-    width: 10px;
-    height: 10px;
-    background-color: #333;
-    border-radius: 100%;
-    display: inline-block;
-    -webkit-animation: progress-sk-bounce-delay 1.4s infinite ease-in-out both;
-    animation: progress-sk-bounce-delay 1.4s infinite ease-in-out both; }
-  .progress .bounce1 {
-    -webkit-animation-delay: -0.32s;
-    animation-delay: -0.32s; }
-  .progress .bounce2 {
-    -webkit-animation-delay: -0.16s;
-    animation-delay: -0.16s; }
-
-@-webkit-keyframes progress-sk-bounce-delay {
-  0%, 80%, 100% {
-    -webkit-transform: scale(0); }
-  40% {
-    -webkit-transform: scale(1); } }
-
-@keyframes progress-sk-bounce-delay {
-  0%, 80%, 100% {
-    -webkit-transform: scale(0);
-    transform: scale(0); }
-  40% {
-    -webkit-transform: scale(1);
-    transform: scale(1); } }
-
 .icon-back {
   background-image: url(../img/icons_sprite.png);
   background-position: 0px 0px;
@@ -173,6 +141,38 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
     .icon-back {
       background-image: url(../img/icons_sprite@2x.png);
       background-size: 24px 24px; } }
+
+.preloader2 {
+  width: 70px;
+  text-align: center; }
+  .preloader2 > div {
+    width: 10px;
+    height: 10px;
+    background-color: #333;
+    border-radius: 100%;
+    display: inline-block;
+    -webkit-animation: preloader2-sk-bouncedelay 1.4s infinite ease-in-out both;
+    animation: preloader2-sk-bouncedelay 1.4s infinite ease-in-out both; }
+  .preloader2 .bounce1 {
+    -webkit-animation-delay: -0.32s;
+    animation-delay: -0.32s; }
+  .preloader2 .bounce2 {
+    -webkit-animation-delay: -0.16s;
+    animation-delay: -0.16s; }
+
+@-webkit-keyframes preloader2-sk-bouncedelay {
+  0%, 80%, 100% {
+    -webkit-transform: scale(0); }
+  40% {
+    -webkit-transform: scale(1); } }
+
+@keyframes preloader2-sk-bouncedelay {
+  0%, 80%, 100% {
+    -webkit-transform: scale(0);
+    transform: scale(0); }
+  40% {
+    -webkit-transform: scale(1);
+    transform: scale(1); } }
 
 .version {
   position: fixed;
@@ -192,13 +192,6 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 .screen-header + div {
   margin-top: 48px; }
 
-.main-sticker {
-  display: table; }
-  .main-sticker img {
-    height: 120px;
-    vertical-align: top;
-    width: 120px; }
-
 .icon {
   display: table; }
 
@@ -208,6 +201,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   font-size: 14px;
   font-weight: bolder;
   line-height: 14px;
+  margin-right: 10px;
   outline: none;
   padding: 0 18px; }
   .btn:hover,
@@ -247,80 +241,26 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   .error h5 {
     text-transform: uppercase; }
 
-.clearfix {
-  clear: both; }
-
-[data-sp-button] {
-  display: inline; }
-  [data-sp-button][data-btn-in-progress] button, [data-sp-button][data-btn-in-progress] .btn {
-    min-width: 70px; }
-
-.pack-preview {
-  display: table;
-  margin: 8px auto;
-  padding: 8px; }
-  .pack-preview.active {
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
-    cursor: pointer; }
-
-.pack-preview a {
-  display: table;
-  text-decoration: none; }
-
-.pack-preview-name {
-  padding-top: 5px; }
-
-.pack-preview-name,
-.pack-preview-price {
-  color: #333;
-  line-height: 16px;
-  margin: 0;
-  text-align: center; }
-
-.packs .col {
-  float: left;
-  width: 50%; }
-  @media screen and (min-width: 300px) {
-    .packs .col {
-      width: 50%; } }
-  @media screen and (min-width: 480px) {
-    .packs .col {
-      width: 33.33333%; } }
-  @media screen and (min-width: 600px) {
-    .packs .col {
-      width: 25%; } }
-  @media screen and (min-width: 768px) {
-    .packs .col {
-      width: 20%; } }
-
-.sticker-placeholder {
-  width: 60px;
-  height: 60px;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 50%;
-  margin: 30px;
-  display: table; }
-
 .pack-header {
   background: #eee;
   margin-bottom: 8px;
   padding: 16px; }
+  .pack-header .pack-main-sticker {
+    display: table-cell; }
 
 .pack-info {
-  margin-bottom: 8px; }
-  .pack-info .main-sticker {
-    float: left;
-    margin-right: 8px; }
-
-.pack-info-details {
   display: table-cell;
-  height: 120px;
-  vertical-align: middle; }
+  padding-top: 15px;
+  padding-left: 16px;
+  vertical-align: top; }
+
+.pack-description {
+  padding-bottom: 8px; }
 
 .pack-title {
   font-size: 24px;
-  line-height: 24px; }
+  line-height: 24px;
+  margin-bottom: 8px; }
 
 .pack-owner {
   font-size: 14px;
@@ -328,13 +268,6 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   .pack-owner:before {
     content: "©";
     margin-right: 5px; }
-
-.pack-controls {
-  text-align: right; }
-
-.pack-description {
-  margin-top: 16px;
-  text-align: center; }
 
 .pack-stickers {
   display: table;
@@ -370,16 +303,55 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 .pack-stickers-preview.landscape .pack-stickers-preview-image {
   max-width: 696px; }
 
-.pack-preview-undefined {
-  margin-top: 50px;
+.btn-action {
+  margin-bottom: 8px; }
+
+.pack-preview {
+  display: table;
+  margin: 8px auto;
+  padding: 8px; }
+  .pack-preview:hover {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 5px; }
+
+.pack-preview a {
+  display: block;
+  text-decoration: none; }
+
+.pack-preview-name,
+.pack-preview-price {
+  color: #333;
+  line-height: 16px;
+  margin: 0;
   text-align: center; }
+
+.pack-main-sticker {
+  display: table; }
+  .pack-main-sticker img {
+    height: 120px;
+    width: 120px; }
+
+.packs .col {
+  float: left;
+  width: 50%; }
+  @media screen and (min-width: 300px) {
+    .packs .col {
+      width: 50%; } }
+  @media screen and (min-width: 480px) {
+    .packs .col {
+      width: 33.33333%; } }
+  @media screen and (min-width: 600px) {
+    .packs .col {
+      width: 25%; } }
+  @media screen and (min-width: 768px) {
+    .packs .col {
+      width: 20%; } }
 
 .btn {
   border: 1px solid;
   border-radius: 3px;
   font-size: 13px;
-  min-height: 24px;
-  padding: 0 8px; }
+  padding: 4px 8px; }
 
 .btn-purple,
 .btn-purple:focus {
@@ -396,6 +368,3 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   background: #7b1fa2;
   border-color: #7b1fa2;
   color: white; }
-
-.progress {
-  line-height: 24px; }
