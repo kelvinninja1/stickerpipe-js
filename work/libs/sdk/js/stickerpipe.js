@@ -6448,7 +6448,6 @@ window.StickersModule.View = {};
 		},
 
 		isSticker: function(text) {
-			console.log(Plugin.Service.Sticker.isSticker(text));
 			return Plugin.Service.Sticker.isSticker(text);
 		},
 

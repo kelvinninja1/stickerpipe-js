@@ -216,7 +216,11 @@ body {
   .navbar-custom.navbar-fixed-top {
     z-index: 99; }
   .navbar-custom .navbar-brand {
-    color: white; }
+    color: white;
+    padding: 0; }
+    .navbar-custom .navbar-brand > img {
+      float: left;
+      height: 50px; }
   .navbar-custom .navbar-nav > li > a {
     color: white;
     background-color: #6607b5; }
@@ -226,12 +230,44 @@ body {
   .navbar-custom .navbar-nav .active > a, .navbar-custom .navbar-nav .active > a:hover, .navbar-custom .navbar-nav .active > a:focus {
     color: white;
     background-color: #6607b5; }
-  .navbar-custom .navbar-toggle:hover, .navbar-custom .navbar-toggle:focus {
-    background-color: transparent; }
-    .navbar-custom .navbar-toggle:hover .icon-bar, .navbar-custom .navbar-toggle:focus .icon-bar {
-      background-color: white; }
-  .navbar-custom .navbar-toggle .icon-bar {
-    background-color: white; }
+  .navbar-custom .navbar-toggle {
+    border: none;
+    background: transparent !important; }
+    .navbar-custom .navbar-toggle:hover, .navbar-custom .navbar-toggle:focus {
+      background: transparent !important; }
+      .navbar-custom .navbar-toggle:hover .icon-bar, .navbar-custom .navbar-toggle:focus .icon-bar {
+        background-color: white; }
+    .navbar-custom .navbar-toggle .icon-bar {
+      background-color: white;
+      -webkit-transition: all 0.2s;
+      transition: all 0.2s;
+      width: 22px; }
+    .navbar-custom .navbar-toggle .top-bar {
+      -webkit-transform: rotate(45deg);
+          -ms-transform: rotate(45deg);
+              transform: rotate(45deg);
+      -webkit-transform-origin: 10% 10%;
+          -ms-transform-origin: 10% 10%;
+              transform-origin: 10% 10%; }
+    .navbar-custom .navbar-toggle .middle-bar {
+      opacity: 0; }
+    .navbar-custom .navbar-toggle .bottom-bar {
+      -webkit-transform: rotate(-45deg);
+          -ms-transform: rotate(-45deg);
+              transform: rotate(-45deg);
+      -webkit-transform-origin: 10% 90%;
+          -ms-transform-origin: 10% 90%;
+              transform-origin: 10% 90%; }
+    .navbar-custom .navbar-toggle.collapsed .top-bar {
+      -webkit-transform: rotate(0);
+          -ms-transform: rotate(0);
+              transform: rotate(0); }
+    .navbar-custom .navbar-toggle.collapsed .middle-bar {
+      opacity: 1; }
+    .navbar-custom .navbar-toggle.collapsed .bottom-bar {
+      -webkit-transform: rotate(0);
+          -ms-transform: rotate(0);
+              transform: rotate(0); }
 
 .message {
   display: table;
@@ -312,42 +348,6 @@ body {
     background: #d9d9d9;
     border-bottom-right-radius: 10px;
     -webkit-transform: translate(-30px, -2px); }
-
-.navbar-toggle {
-  border: none;
-  background: transparent !important; }
-  .navbar-toggle:hover {
-    background: transparent !important; }
-  .navbar-toggle .icon-bar {
-    width: 22px;
-    -webkit-transition: all 0.2s;
-    transition: all 0.2s; }
-  .navbar-toggle .top-bar {
-    -webkit-transform: rotate(45deg);
-        -ms-transform: rotate(45deg);
-            transform: rotate(45deg);
-    -webkit-transform-origin: 10% 10%;
-        -ms-transform-origin: 10% 10%;
-            transform-origin: 10% 10%; }
-  .navbar-toggle .middle-bar {
-    opacity: 0; }
-  .navbar-toggle .bottom-bar {
-    -webkit-transform: rotate(-45deg);
-        -ms-transform: rotate(-45deg);
-            transform: rotate(-45deg);
-    -webkit-transform-origin: 10% 90%;
-        -ms-transform-origin: 10% 90%;
-            transform-origin: 10% 90%; }
-  .navbar-toggle.collapsed .top-bar {
-    -webkit-transform: rotate(0);
-        -ms-transform: rotate(0);
-            transform: rotate(0); }
-  .navbar-toggle.collapsed .middle-bar {
-    opacity: 1; }
-  .navbar-toggle.collapsed .bottom-bar {
-    -webkit-transform: rotate(0);
-        -ms-transform: rotate(0);
-            transform: rotate(0); }
 
 .icon-send {
   background-image: url(../img/icons_sprite.png);
