@@ -127,7 +127,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/view.tpl',
-    '<div class="version">0.0.24</div>\n' +
+    '<div class="version">0.0.25</div>\n' +
     '<div class="store" data-sp-auto-scroll>\n' +
     '	<div data-ng-show="!error && showContent" data-ng-view></div>\n' +
     '	<div data-ng-show="error" data-error></div>\n' +
@@ -415,7 +415,10 @@ appStickerPipeStore.directive('spSticker', function (Config, DataCache) { 
 
 	return { 
 		restrict: 'AE', 
-		template: '', 
+		template: '',
+		scope: {
+			url: '@'
+		},
 		link: function (scope, elem, attrs) {
 			DataCache.packsMainStickers = DataCache.packsMainStickers || {};  
 
@@ -430,9 +433,11 @@ appStickerPipeStore.directive('spSticker', function (Config, DataCache) { 
 				elem[0].appendChild(image);
 				DataCache.packsMainStickers[attrs.url] = attrs.url;
 				image.onload = function() {}; 
-			}  
+			}
 
-			image.src = attrs.url;   
+			scope.$watch('url', function (value) {
+				image.src = value;
+			});
 
 			if (!DataCache.packsMainStickers[attrs.url]) { 
 				elem.addClass('sticker-placeholder'); 
@@ -985,12 +990,107 @@ appStickerPipeStore.directive('spButton', function () {
 	};
 });
 
-appStickerPipeStore.directive('basePage', function() {
+appStickerPipeStore.factory('JsPlatformProvider', function($rootScope, $window, $timeout, Config) {
+
+	function callSDKMethod(action, attrs) {
+		window.parent.postMessage(JSON.stringify({
+			action: action,
+			attrs: attrs
+		}), 'http://' + Config.clientDomain);
+	}
+
+	function runApiListener() {
+		$window.addEventListener('message', (function(e) {
+
+			var data = JSON.parse(e.data);
+
+			data.attrs = data.attrs || {};
+
+			if (!data.action) {
+				return;
+			}
+
+			var StoreApi = window.StoreApi;
+			if (StoreApi) {
+				StoreApi[data.action] && StoreApi[data.action](data.attrs);
+			}
+		}).bind(this));
+	}
 
 	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/view.tpl',
-		link: function($scope, $el, attrs) {}
+
+		configs: {
+			canShowPack: false,
+			canRemovePack: false
+		},
+
+		init: function() {
+			runApiListener();
+
+			$window.addEventListener('keyup', (function(e) {
+				this.keyUp(e.keyCode);
+			}).bind(this));
+		},
+
+		configure: function(attrs) {
+			this.configs.canShowPack = !!attrs.canShowPack;
+			this.configs.canRemovePack = !!attrs.canRemovePack;
+		},
+
+		showBackButton: function(show) {
+			callSDKMethod('showBackButton', {
+				show: show
+			});
+		},
+
+		setYScroll: function(yPosition) {
+			callSDKMethod('setYScroll', {
+				yPosition: yPosition
+			});
+		},
+
+		keyUp: function(keyCode) {
+			callSDKMethod('keyUp', {
+				keyCode: keyCode
+			});
+		},
+
+		///////////////////////////////////////////////////////////////
+		// Common methods
+		///////////////////////////////////////////////////////////////
+
+
+		showCollections: function(packName) {
+			callSDKMethod('showCollections', {
+				packName: packName
+			});
+		},
+
+		showPack: function(packName) {
+			callSDKMethod('showPack', {
+				packName: packName
+			});
+		},
+
+		purchasePack: function(packTitle, packName, packPrice) {
+			callSDKMethod('purchasePack', {
+				packTitle: packTitle,
+				packName: packName,
+				pricePoint: packPrice
+			});
+		},
+
+		setInProgress: function(show) {
+			callSDKMethod('showPagePreloader', {
+				show: show
+			});
+		},
+
+		removePack: function(packName) {
+			callSDKMethod('removePack', {
+				packName: packName
+			});
+		}
 	};
 });
 
@@ -1105,6 +1205,15 @@ appStickerPipeStore.controller('PackController', function($scope, Config, Platfo
 	});
 });
 
+appStickerPipeStore.directive('basePage', function() {
+
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/view.tpl',
+		link: function($scope, $el, attrs) {}
+	};
+});
+
 appStickerPipeStore.controller('StoreController', function($scope, packs, PlatformAPI, Helper) {
 
 	PlatformAPI.showPagePreloader(false);
@@ -1113,110 +1222,6 @@ appStickerPipeStore.controller('StoreController', function($scope, packs, Platfo
 		isJSPlatform: Helper.isJS(),
 		packs: packs
 	});
-});
-
-appStickerPipeStore.factory('JsPlatformProvider', function($rootScope, $window, $timeout, Config) {
-
-	function callSDKMethod(action, attrs) {
-		window.parent.postMessage(JSON.stringify({
-			action: action,
-			attrs: attrs
-		}), 'http://' + Config.clientDomain);
-	}
-
-	function runApiListener() {
-		$window.addEventListener('message', (function(e) {
-
-			var data = JSON.parse(e.data);
-
-			data.attrs = data.attrs || {};
-
-			if (!data.action) {
-				return;
-			}
-
-			var StoreApi = window.StoreApi;
-			if (StoreApi) {
-				StoreApi[data.action] && StoreApi[data.action](data.attrs);
-			}
-		}).bind(this));
-	}
-
-	return {
-
-		configs: {
-			canShowPack: false,
-			canRemovePack: false
-		},
-
-		init: function() {
-			runApiListener();
-
-			$window.addEventListener('keyup', (function(e) {
-				this.keyUp(e.keyCode);
-			}).bind(this));
-		},
-
-		configure: function(attrs) {
-			this.configs.canShowPack = !!attrs.canShowPack;
-			this.configs.canRemovePack = !!attrs.canRemovePack;
-		},
-
-		showBackButton: function(show) {
-			callSDKMethod('showBackButton', {
-				show: show
-			});
-		},
-
-		setYScroll: function(yPosition) {
-			callSDKMethod('setYScroll', {
-				yPosition: yPosition
-			});
-		},
-
-		keyUp: function(keyCode) {
-			callSDKMethod('keyUp', {
-				keyCode: keyCode
-			});
-		},
-
-		///////////////////////////////////////////////////////////////
-		// Common methods
-		///////////////////////////////////////////////////////////////
-
-
-		showCollections: function(packName) {
-			callSDKMethod('showCollections', {
-				packName: packName
-			});
-		},
-
-		showPack: function(packName) {
-			callSDKMethod('showPack', {
-				packName: packName
-			});
-		},
-
-		purchasePack: function(packTitle, packName, packPrice) {
-			callSDKMethod('purchasePack', {
-				packTitle: packTitle,
-				packName: packName,
-				pricePoint: packPrice
-			});
-		},
-
-		setInProgress: function(show) {
-			callSDKMethod('showPagePreloader', {
-				show: show
-			});
-		},
-
-		removePack: function(packName) {
-			callSDKMethod('removePack', {
-				packName: packName
-			});
-		}
-	};
 });
 
 appStickerPipeStore.directive('error', function(Config,  $window, $timeout, EnvConfig) {
