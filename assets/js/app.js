@@ -29,6 +29,10 @@ var App = _makeClass(function(options) {
 	$textarea: $('.textarea'),
 	$wipeData: $('#wipeData'),
 
+	configs: {
+		stickerpipe: {}
+	},
+
 	_constructor: function() {
 
 		this.$wipeData.on('click', (function() {
@@ -57,23 +61,7 @@ var App = _makeClass(function(options) {
 	},
 
 	init: function() {
-		this.initStickers();
-
-		var self = this;
-
-		setTimeout(function() {
-			self.sendMessage(false, '', true, false);
-			self.sendMessage(true, '', true, false);
-			self.sendMessage(false, '', true, false);
-			self.sendMessage(true, '[[stevie40_1576]]', false, false);
-		}, 500);
-
-		this.fetchRandomUsersMock();
-		this.initMessageBox();
-	},
-	initStickers: function() {
-		this.stickerpipe = new Stickers({
-
+		this.configs.stickerpipe = {
 			elId: 'stickersToggle',
 
 			apiKey: '72921666b5ff8651f374747bfefaf7b2',
@@ -89,9 +77,29 @@ var App = _makeClass(function(options) {
 				gender: 'male'
 			},
 
+			primaryColor: '#9c27b0',
+
 			priceB: '4.99 UAH',
 			priceC: '9.99 UAH'
-		});
+		};
+
+		this.initStickers();
+
+		var self = this;
+
+		setTimeout(function() {
+			self.sendMessage(false, '', true, false);
+			self.sendMessage(true, '', true, false);
+			self.sendMessage(false, '', true, false);
+			self.sendMessage(true, '[[stevie40_1576]]', false, false);
+		}, 500);
+
+		this.fetchRandomUsersMock();
+		this.initMessageBox();
+	},
+	initStickers: function() {
+
+		this.stickerpipe = new Stickers(this.configs.stickerpipe);
 
 		this.stickerpipe.render((function() {
 			// todo: make as event
@@ -126,7 +134,7 @@ var App = _makeClass(function(options) {
 
 		this.stickerpipe.onPurchase((function(packName, packTitle, pricePoint) {
 
-			var result = confirm('Вы действительно хотите купить пак "' + packTitle + '" за ' + this['price' + pricePoint] + '?');
+			var result = confirm('Вы действительно хотите купить пак "' + packTitle + '" за ' + this.configs.stickerpipe['price' + pricePoint] + '?');
 
 			if (result) {
 				this.stickerpipe.purchaseSuccess(packName, pricePoint);
