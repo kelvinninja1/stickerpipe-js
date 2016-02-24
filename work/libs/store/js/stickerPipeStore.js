@@ -131,7 +131,8 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/view.tpl',
-    '<div class="version">0.0.27</div>\n' +
+    '<div class="version">0.0.28</div>\n' +
+    '<div data-ng-class="{\'screen-header\': isJSPlatform }" data-ng-show="isJSPlatform"></div>\n' +
     '<div class="store" data-sp-auto-scroll>\n' +
     '	<div data-ng-show="!error && showContent" data-ng-view></div>\n' +
     '	<div data-ng-show="error" data-error></div>\n' +
@@ -146,9 +147,24 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/store/StoreView.tpl',
+    '<div class="packs">\n' +
+    '	<div class="col" data-ng-repeat="pack in packs">\n' +
+    '		<div data-pack-preview data-pack="pack"></div>\n' +
+    '	</div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/pack/PackView.tpl',
     '<div data-ng-show="showPage">\n' +
-    '	<div ng-class="{\'screen-header\': isJSPlatform }" data-ng-show="isJSPlatform"></div>\n' +
     '	<div class="pack-header">\n' +
     '\n' +
     '		<div class="pack-info">\n' +
@@ -225,23 +241,6 @@ module.run(['$templateCache', function($templateCache) {
     '\n' +
     '	<div data-ng-show="!getPackPreview()">\n' +
     '		<p class="pack-preview-undefined">{{ $root.i18n.previewIsUndefined }}</p>\n' +
-    '	</div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/store/StoreView.tpl',
-    '<div data-ng-class="{\'screen-header\': isJSPlatform }" data-ng-show="isJSPlatform"></div>\n' +
-    '<div class="packs">\n' +
-    '	<div class="col" data-ng-repeat="pack in packs">\n' +
-    '		<div data-pack-preview data-pack="pack"></div>\n' +
     '	</div>\n' +
     '</div>');
 }]);
@@ -362,7 +361,7 @@ appStickerPipeStore.directive('spAutoScroll', function ($document, $timeout, $lo
 					var y = scope.history[scope.history.length - 1].y;
 
 					PlatformAPI.setYScroll(y);
-				}, 0); // 100
+				}, 100);
 			}
 
 			$rootScope.$on('$routeChangeSuccess', function() {
@@ -456,6 +455,28 @@ appStickerPipeStore.directive('spSticker', function (Config, DataCache) { 
 		} 
 	};
  });
+
+appStickerPipeStore.value('En', {
+	download: 'Download',
+	sendSticker: 'Send sticker',
+	buyPack: 'Buy pack',
+	unavailableContent: 'This content is currently unavailable',
+	get: 'Get',
+	free: 'Free',
+	previewIsUndefined: 'Pack preview is undefined',
+	remove: 'Remove'
+});
+
+appStickerPipeStore.value('Ru', {
+	download: 'Скачать',
+	sendSticker: 'Отправить стикер',
+	buyPack: 'Купить',
+	unavailableContent: 'В данный момент этот контент недоступен',
+	get: 'Скачать',
+	free: 'Бесплатно',
+	previewIsUndefined: 'Превью пака недоступно',
+	remove: 'Удалить'
+});
 appStickerPipeStore.factory('Api', function(Http, EnvConfig, Config, DataCache, $q) {
 
     var apiVersion = 2,
@@ -875,11 +896,7 @@ appStickerPipeStore.factory('PlatformAPI', function(Config, $injector, $rootScop
 
 		setYScroll: function(yPosition) {
 			if (Helper.isJS() && Helper.getMobileOS() == 'ios') {
-				var timeout = (yPosition == 0) ? 0 : 100;
-
-				setTimeout(function() {
-					provider.setYScroll && provider.setYScroll(yPosition);
-				}, timeout);
+				provider.setYScroll && provider.setYScroll(yPosition);
 			} else {
 				$window.scrollTo(0, yPosition);
 			}
@@ -953,28 +970,6 @@ appStickerPipeStore.factory('StoreApi', function($rootScope, $route, PlatformAPI
 	};
 
 });
-
-appStickerPipeStore.value('En', {
-	download: 'Download',
-	sendSticker: 'Send sticker',
-	buyPack: 'Buy pack',
-	unavailableContent: 'This content is currently unavailable',
-	get: 'Get',
-	free: 'Free',
-	previewIsUndefined: 'Pack preview is undefined',
-	remove: 'Remove'
-});
-
-appStickerPipeStore.value('Ru', {
-	download: 'Скачать',
-	sendSticker: 'Отправить стикер',
-	buyPack: 'Купить',
-	unavailableContent: 'В данный момент этот контент недоступен',
-	get: 'Скачать',
-	free: 'Бесплатно',
-	previewIsUndefined: 'Превью пака недоступно',
-	remove: 'Удалить'
-});
 appStickerPipeStore.directive('spButton', function () {
 	return {
 		restrict: 'AE',
@@ -998,6 +993,136 @@ appStickerPipeStore.directive('spButton', function () {
 			});
 		}
 	};
+});
+
+appStickerPipeStore.directive('basePage', function(Helper) {
+
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/view.tpl',
+		link: function($scope, $el, attrs) {
+			$scope.isJSPlatform = Helper.isJS();
+		}
+	};
+});
+
+appStickerPipeStore.controller('PackController', function($scope, Config, PlatformAPI, $rootScope, PackService, pack, $window) {
+
+	PlatformAPI.showBackButton('#/store');
+
+	function isLandscape() {
+		return ($window.innerWidth > $window.innerHeight || $window.innerWidth > 544);
+	}
+
+	function apply() {
+		if(!$scope.$$phase) {
+			$scope.$apply();
+		}
+	}
+
+	angular.extend($scope, {
+		pack: pack,
+		packService: PackService,
+
+		showPage: false,
+
+		isSubscriber: Config.isSubscriber,
+		priceB: Config.priceB,
+		priceC: Config.priceC,
+
+		purchaseProgress: false,
+		removeProgress: false,
+
+		canShowPack: PlatformAPI.canShowPack(),
+		canRemovePack: PlatformAPI.canRemovePack(),
+
+		showPack: function() {
+			PlatformAPI.showPack(pack.pack_name);
+		},
+
+		purchasePack: function() {
+			$scope.purchaseProgress = true;
+			PlatformAPI.purchasePack(pack.title, pack.pack_name, pack.pricepoint);
+		},
+
+		removePack: function() {
+			$scope.removeProgress = true;
+			PlatformAPI.removePack(pack.pack_name);
+		},
+
+		orientation: function() {
+			return isLandscape() ? 'landscape' : 'portrait';
+		},
+
+		getPackPreview: function() {
+			if (!this.pack) {
+				return false;
+			}
+
+			var image = this.pack[isLandscape() ? 'preview_landscape' : 'preview'] || {},
+				url = image[Config.resolutionType] || false;
+
+			if (!url) {
+				this.hidePagePreloader();
+			}
+			return url;
+		},
+
+		onPackPreviewLoad: function() {
+			PlatformAPI.showPagePreloader(false);
+			this.showPage = true;
+		}
+	});
+
+	$rootScope.$on('onPackPurchaseSuccess', function() {
+		$scope.purchaseProgress = false;
+		pack.user_status = 'active';
+		PlatformAPI.showPack(pack.pack_name);
+		apply();
+	});
+
+	$rootScope.$on('onPackPurchaseFail', function() {
+		$scope.purchaseProgress = false;
+		apply();
+	});
+
+	$rootScope.$on('onPackRemoveSuccess', function() {
+		$scope.removeProgress = false;
+		pack.user_status = 'hidden';
+		apply();
+	});
+
+	$rootScope.$on('onPackRemoveFail', function() {
+		$scope.removeProgress = false;
+		apply();
+	});
+
+	angular.element($window).bind('resize', function () {
+		apply();
+	});
+
+	// Deprecated
+
+	$rootScope.$on('showActionProgress', function() {
+		$scope.purchaseProgress = true;
+		$scope.removeProgress = true;
+		apply();
+	});
+
+	$rootScope.$on('hideActionProgress', function() {
+		$scope.purchaseProgress = false;
+		$scope.removeProgress = false;
+		apply();
+	});
+});
+
+appStickerPipeStore.controller('StoreController', function($scope, packs, PlatformAPI) {
+
+	PlatformAPI.showPagePreloader(false);
+
+	angular.extend($scope, {
+		packs: packs
+	});
 });
 
 appStickerPipeStore.factory('JsPlatformProvider', function($rootScope, $window, $timeout, Config) {
@@ -1102,136 +1227,6 @@ appStickerPipeStore.factory('JsPlatformProvider', function($rootScope, $window, 
 			});
 		}
 	};
-});
-
-appStickerPipeStore.directive('basePage', function() {
-
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/view.tpl',
-		link: function($scope, $el, attrs) {}
-	};
-});
-
-appStickerPipeStore.controller('PackController', function($scope, Config, PlatformAPI, $rootScope, PackService, pack, $window, Helper) {
-
-	PlatformAPI.showBackButton('#/store');
-
-	function isLandscape() {
-		return ($window.innerWidth > $window.innerHeight || $window.innerWidth > 544);
-	}
-
-	function apply() {
-		if(!$scope.$$phase) {
-			$scope.$apply();
-		}
-	}
-
-	angular.extend($scope, {
-		pack: pack,
-		packService: PackService,
-
-		isJSPlatform: Helper.isJS(),
-		showPage: false,
-
-		isSubscriber: Config.isSubscriber,
-		priceB: Config.priceB,
-		priceC: Config.priceC,
-
-		purchaseProgress: false,
-		removeProgress: false,
-
-		canShowPack: PlatformAPI.canShowPack(),
-		canRemovePack: PlatformAPI.canRemovePack(),
-
-		showPack: function() {
-			PlatformAPI.showPack(pack.pack_name);
-		},
-
-		purchasePack: function() {
-			$scope.purchaseProgress = true;
-			PlatformAPI.purchasePack(pack.title, pack.pack_name, pack.pricepoint);
-		},
-
-		removePack: function() {
-			$scope.removeProgress = true;
-			PlatformAPI.removePack(pack.pack_name);
-		},
-
-		orientation: function() {
-			return isLandscape() ? 'landscape' : 'portrait';
-		},
-
-		getPackPreview: function() {
-			if (!this.pack) {
-				return false;
-			}
-
-			var image = this.pack[isLandscape() ? 'preview_landscape' : 'preview'] || {},
-				url = image[Config.resolutionType] || false;
-
-			if (!url) {
-				this.hidePagePreloader();
-			}
-			return url;
-		},
-
-		onPackPreviewLoad: function() {
-			PlatformAPI.showPagePreloader(false);
-			this.showPage = true;
-		}
-	});
-
-	$rootScope.$on('onPackPurchaseSuccess', function() {
-		$scope.purchaseProgress = false;
-		pack.user_status = 'active';
-		PlatformAPI.showPack(pack.pack_name);
-		apply();
-	});
-
-	$rootScope.$on('onPackPurchaseFail', function() {
-		$scope.purchaseProgress = false;
-		apply();
-	});
-
-	$rootScope.$on('onPackRemoveSuccess', function() {
-		$scope.removeProgress = false;
-		pack.user_status = 'hidden';
-		apply();
-	});
-
-	$rootScope.$on('onPackRemoveFail', function() {
-		$scope.removeProgress = false;
-		apply();
-	});
-
-	angular.element($window).bind('resize', function () {
-		apply();
-	});
-
-	// Deprecated
-
-	$rootScope.$on('showActionProgress', function() {
-		$scope.purchaseProgress = true;
-		$scope.removeProgress = true;
-		apply();
-	});
-
-	$rootScope.$on('hideActionProgress', function() {
-		$scope.purchaseProgress = false;
-		$scope.removeProgress = false;
-		apply();
-	});
-});
-
-appStickerPipeStore.controller('StoreController', function($scope, packs, PlatformAPI, Helper) {
-
-	PlatformAPI.showPagePreloader(false);
-
-	angular.extend($scope, {
-		isJSPlatform: Helper.isJS(),
-		packs: packs
-	});
 });
 
 appStickerPipeStore.directive('error', function(Config,  $window, $timeout, EnvConfig) {
