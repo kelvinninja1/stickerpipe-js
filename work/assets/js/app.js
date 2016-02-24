@@ -128,6 +128,10 @@ var App = _makeClass(function(options) {
 
 		this.stickerpipe.onPurchase((function(packName, packTitle, pricePoint) {
 
+			this.stickerpipe.getPackMainIcon(packName, function(url) {
+				console.log('ok', url);
+			});
+
 			var result = confirm('Вы действительно хотите купить пак "' + packTitle + '" за ' + this['price' + pricePoint] + '?');
 
 			if (result) {
