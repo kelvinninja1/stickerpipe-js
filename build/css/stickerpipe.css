@@ -68,7 +68,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   position: fixed;
   top: 0;
   right: 0;
-  z-index: 100000;
+  z-index: 1000;
   overflow: auto;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = #7F000000, endColorstr = #7F000000);
   zoom: 1;
@@ -84,7 +84,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   left: 0;
   bottom: 0;
   right: 0;
-  z-index: 100005;
+  z-index: 1050;
   overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
