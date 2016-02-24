@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
 
 	<!-- Bootstrap -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
@@ -114,9 +114,10 @@
 		} else if (window.location.href.indexOf('work') != -1) {
 			//StickersModule.Configs.apiUrl = 'http://work.stk.908.vc';
 
-
-			StickersModule.Configs.storeUrl = 'http://work.stk.908.vc/api/v1/web';
 		}
+
+//		StickersModule.Configs.storeUrl = 'http://work.stk.908.vc/api/v1/web';
+		StickersModule.Configs.storeUrl = 'http://work.stk.908.vc/api/v1/web?uri=http://demo.stickerpipe.com/work/libs/store/js/stickerPipeStore.js';
 
 		window.app = new App();
 	})();
