@@ -6347,8 +6347,9 @@ window.StickersModule.View = {};
 		//   Functions
 		////////////////////
 
-		// todo: add elId
-		render: function(callback) {
+		render: function(callback, elId) {
+			Plugin.Configs.elId = elId || Plugin.Configs.elId;
+
 			var self = this;
 
 			this.view = new Plugin.View.Popover();
