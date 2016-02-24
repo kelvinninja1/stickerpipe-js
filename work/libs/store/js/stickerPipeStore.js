@@ -69,8 +69,8 @@ appStickerPipeStore.config(function(envServiceProvider) {
 	envServiceProvider.config({
 		domains: {
 			local: ['localhost', '192.168.56.1'],
-			//development: ['work.stk.908.vc'],
-			production: ['work.stk.908.vc', 'api.stickerpipe.com']
+			development: ['work.stk.908.vc'],
+			production: ['api.stickerpipe.com']
 		},
 
 		vars: {
@@ -127,7 +127,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/view.tpl',
-    '<div class="version">0.0.20</div>\n' +
+    '<div class="version">0.0.21</div>\n' +
     '<div class="store" data-sp-auto-scroll>\n' +
     '	<div data-ng-show="!error && showContent" data-ng-view></div>\n' +
     '	<div data-ng-show="error" data-error></div>\n' +
@@ -317,6 +317,28 @@ appStickerPipeStore.config(function($routeProvider) {
 		});
 });
 
+appStickerPipeStore.value('En', {
+	download: 'Download',
+	sendSticker: 'Send sticker',
+	buyPack: 'Buy pack',
+	unavailableContent: 'This content is currently unavailable',
+	get: 'Get',
+	free: 'Free',
+	previewIsUndefined: 'Pack preview is undefined',
+	remove: 'Remove'
+});
+
+appStickerPipeStore.value('Ru', {
+	download: 'Скачать',
+	sendSticker: 'Отправить стикер',
+	buyPack: 'Купить',
+	unavailableContent: 'В данный момент этот контент недоступен',
+	get: 'Скачать',
+	free: 'Бесплатно',
+	previewIsUndefined: 'Превью пака недоступно',
+	remove: 'Удалить'
+});
+
 appStickerPipeStore.directive('spAutoScroll', function ($document, $timeout, $location, $window, $rootScope, PlatformAPI) {
 	return {
 		restrict: 'A',
@@ -358,7 +380,7 @@ appStickerPipeStore.directive('spAutoScroll', function ($document, $timeout, $lo
 					var y = scope.history[scope.history.length - 1].y;
 
 					PlatformAPI.setYScroll(y);
-				}, 100);
+				}, 0);
 			}
 
 			$rootScope.$on('$routeChangeSuccess', function() {
@@ -441,28 +463,6 @@ appStickerPipeStore.directive('spSticker', function (Config) {
 			});
 		}
 	};
-});
-
-appStickerPipeStore.value('En', {
-	download: 'Download',
-	sendSticker: 'Send sticker',
-	buyPack: 'Buy pack',
-	unavailableContent: 'This content is currently unavailable',
-	get: 'Get',
-	free: 'Free',
-	previewIsUndefined: 'Pack preview is undefined',
-	remove: 'Remove'
-});
-
-appStickerPipeStore.value('Ru', {
-	download: 'Скачать',
-	sendSticker: 'Отправить стикер',
-	buyPack: 'Купить',
-	unavailableContent: 'В данный момент этот контент недоступен',
-	get: 'Скачать',
-	free: 'Бесплатно',
-	previewIsUndefined: 'Превью пака недоступно',
-	remove: 'Удалить'
 });
 appStickerPipeStore.factory('Api', function(Http, EnvConfig, Config, DataCache, $q) {
 
@@ -981,6 +981,110 @@ appStickerPipeStore.directive('spButton', function () {
 	};
 });
 
+appStickerPipeStore.factory('JsPlatformProvider', function($rootScope, $window, $timeout, Config) {
+
+	function callSDKMethod(action, attrs) {
+		window.parent.postMessage(JSON.stringify({
+			action: action,
+			attrs: attrs
+		}), 'http://' + Config.clientDomain);
+	}
+
+	function runApiListener() {
+		$window.addEventListener('message', (function(e) {
+
+			var data = JSON.parse(e.data);
+
+			data.attrs = data.attrs || {};
+
+			if (!data.action) {
+				return;
+			}
+
+			var StoreApi = window.StoreApi;
+			if (StoreApi) {
+				StoreApi[data.action] && StoreApi[data.action](data.attrs);
+			}
+		}).bind(this));
+	}
+
+	return {
+
+		configs: {
+			canShowPack: false,
+			canRemovePack: false
+		},
+
+		init: function() {
+			runApiListener();
+
+			$window.addEventListener('keyup', (function(e) {
+				this.keyUp(e.keyCode);
+			}).bind(this));
+		},
+
+		configure: function(attrs) {
+			this.configs.canShowPack = !!attrs.canShowPack;
+			this.configs.canRemovePack = !!attrs.canRemovePack;
+		},
+
+		showBackButton: function(show) {
+			callSDKMethod('showBackButton', {
+				show: show
+			});
+		},
+
+		setYScroll: function(yPosition) {
+			callSDKMethod('setYScroll', {
+				yPosition: yPosition
+			});
+		},
+
+		keyUp: function(keyCode) {
+			callSDKMethod('keyUp', {
+				keyCode: keyCode
+			});
+		},
+
+		///////////////////////////////////////////////////////////////
+		// Common methods
+		///////////////////////////////////////////////////////////////
+
+
+		showCollections: function(packName) {
+			callSDKMethod('showCollections', {
+				packName: packName
+			});
+		},
+
+		showPack: function(packName) {
+			callSDKMethod('showPack', {
+				packName: packName
+			});
+		},
+
+		purchasePack: function(packTitle, packName, packPrice) {
+			callSDKMethod('purchasePack', {
+				packTitle: packTitle,
+				packName: packName,
+				pricePoint: packPrice
+			});
+		},
+
+		setInProgress: function(show) {
+			callSDKMethod('showPagePreloader', {
+				show: show
+			});
+		},
+
+		removePack: function(packName) {
+			callSDKMethod('removePack', {
+				packName: packName
+			});
+		}
+	};
+});
+
 appStickerPipeStore.directive('basePage', function() {
 
 	return {
@@ -988,6 +1092,16 @@ appStickerPipeStore.directive('basePage', function() {
 		templateUrl: '/modules/base-page/view.tpl',
 		link: function($scope, $el, attrs) {}
 	};
+});
+
+appStickerPipeStore.controller('StoreController', function($scope, packs, PlatformAPI, Helper) {
+
+	PlatformAPI.showPagePreloader(false);
+
+	angular.extend($scope, {
+		isJSPlatform: Helper.isJS(),
+		packs: packs
+	});
 });
 
 appStickerPipeStore.controller('PackController', function($scope, Config, PlatformAPI, $rootScope, PackService, pack, $window, Helper) {
@@ -1099,120 +1213,6 @@ appStickerPipeStore.controller('PackController', function($scope, Config, Platfo
 		$scope.removeProgress = false;
 		apply();
 	});
-});
-
-appStickerPipeStore.controller('StoreController', function($scope, packs, PlatformAPI, Helper) {
-
-	PlatformAPI.showPagePreloader(false);
-
-	angular.extend($scope, {
-		isJSPlatform: Helper.isJS(),
-		packs: packs
-	});
-});
-
-appStickerPipeStore.factory('JsPlatformProvider', function($rootScope, $window, $timeout, Config) {
-
-	function callSDKMethod(action, attrs) {
-		window.parent.postMessage(JSON.stringify({
-			action: action,
-			attrs: attrs
-		}), 'http://' + Config.clientDomain);
-	}
-
-	function runApiListener() {
-		$window.addEventListener('message', (function(e) {
-
-			var data = JSON.parse(e.data);
-
-			data.attrs = data.attrs || {};
-
-			if (!data.action) {
-				return;
-			}
-
-			var StoreApi = window.StoreApi;
-			if (StoreApi) {
-				StoreApi[data.action] && StoreApi[data.action](data.attrs);
-			}
-		}).bind(this));
-	}
-
-	return {
-
-		configs: {
-			canShowPack: false,
-			canRemovePack: false
-		},
-
-		init: function() {
-			runApiListener();
-
-			$window.addEventListener('keyup', (function(e) {
-				this.keyUp(e.keyCode);
-			}).bind(this));
-		},
-
-		configure: function(attrs) {
-			this.configs.canShowPack = !!attrs.canShowPack;
-			this.configs.canRemovePack = !!attrs.canRemovePack;
-		},
-
-		showBackButton: function(show) {
-			callSDKMethod('showBackButton', {
-				show: show
-			});
-		},
-
-		setYScroll: function(yPosition) {
-			callSDKMethod('setYScroll', {
-				yPosition: yPosition
-			});
-		},
-
-		keyUp: function(keyCode) {
-			callSDKMethod('keyUp', {
-				keyCode: keyCode
-			});
-		},
-
-		///////////////////////////////////////////////////////////////
-		// Common methods
-		///////////////////////////////////////////////////////////////
-
-
-		showCollections: function(packName) {
-			callSDKMethod('showCollections', {
-				packName: packName
-			});
-		},
-
-		showPack: function(packName) {
-			callSDKMethod('showPack', {
-				packName: packName
-			});
-		},
-
-		purchasePack: function(packTitle, packName, packPrice) {
-			callSDKMethod('purchasePack', {
-				packTitle: packTitle,
-				packName: packName,
-				pricePoint: packPrice
-			});
-		},
-
-		setInProgress: function(show) {
-			callSDKMethod('showPagePreloader', {
-				show: show
-			});
-		},
-
-		removePack: function(packName) {
-			callSDKMethod('removePack', {
-				packName: packName
-			});
-		}
-	};
 });
 
 appStickerPipeStore.directive('error', function(Config,  $window, $timeout, EnvConfig) {
