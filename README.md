@@ -21,6 +21,7 @@
 	* [Subscribe on events](#subscribe-on-events)
 	* [Subscribe on callback](#subscribe-on-callback)
 	* [Purchase](#purchase)
+	* [Get pack main icon](#get-pack-main-icon)
 	* [Statistic](#statistic)
 * [Credits](#credits)
 * [Contact](#contact)
@@ -89,6 +90,7 @@ Bower: `bower install stickerpipe --save`
 - **closeStore()** - close store modal window
 - **purchaseSuccess(packName, pricePoint)** - call if purchase transaction was successful
 - **purchaseFail()** - call if purchase transaction was failed
+- **getPackMainIcon(packName, callback)** - call this method if you need get pack main icon url
 - **onUserMessageSent(isSticker)** - call this method when a user sent a message (for statistic)
 
 ## Events
@@ -232,6 +234,14 @@ js
 		} else {
 			stickerpipe.purchaseFail();
 		}
+	});
+```
+
+### Get pack main icon
+
+```js
+	stickerpipe.getPackMainIcon('pinkgorilla', function(url) {
+		// do something
 	});
 ```
 

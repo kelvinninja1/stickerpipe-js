@@ -46,8 +46,18 @@
 			return Plugin.Configs.apiUrl + '/api/v' + Plugin.Service.Api.getApiVersion() + uri;
 		},
 
-		getPacksUrl: function() {
+		getUserPacksUrl: function() {
 			var url = this.buildApiUrl('/shop/my');
+
+			if (Plugin.Configs.userPremium) {
+				url += '?is_subscriber=1';
+			}
+
+			return url;
+		},
+
+		getPackPreviewUrl: function(packName) {
+			var url = this.buildApiUrl('/packs/' + packName);
 
 			if (Plugin.Configs.userPremium) {
 				url += '?is_subscriber=1';

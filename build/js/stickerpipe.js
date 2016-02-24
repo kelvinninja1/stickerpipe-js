@@ -3030,11 +3030,9 @@ window.StickersModule.Service = {};
 		},
 
 		getPacks: function(successCallback) {
-			var url = Plugin.Service.Url.getPacksUrl();
-
 			Plugin.Service.Ajax({
 				type: 'get',
-				url: url,
+				url: Plugin.Service.Url.getUserPacksUrl(),
 				success: function(response) {
 					response = response || {};
 					response.meta = response.meta || {};
@@ -3042,6 +3040,16 @@ window.StickersModule.Service = {};
 
 					Plugin.Service.Storage.setStoreLastModified(response.meta.shop_last_modified * 1000);
 
+					successCallback && successCallback(response.data);
+				}
+			});
+		},
+
+		getPackPreview: function(packName, successCallback) {
+			Plugin.Service.Ajax({
+				type: 'get',
+				url: Plugin.Service.Url.getPackPreviewUrl(packName),
+				success: function(response) {
 					successCallback && successCallback(response.data);
 				}
 			});
@@ -3550,6 +3558,14 @@ window.StickersModule.Service = {};
 			});
 		},
 
+		getMainIcon: function(packName, successCallback) {
+			Plugin.Service.Api.getPackPreview(packName, function(pack) {
+				var url = (pack && pack.main_icon && pack.main_icon[Plugin.Configs.stickerResolutionType]) || null;
+
+				successCallback && successCallback(url);
+			});
+		},
+
 		isExistUnwatchedPacks: function() {
 			var packs = Plugin.Service.Storage.getPacks();
 
@@ -3953,8 +3969,18 @@ window.StickersModule.Service = {};
 			return Plugin.Configs.apiUrl + '/api/v' + Plugin.Service.Api.getApiVersion() + uri;
 		},
 
-		getPacksUrl: function() {
+		getUserPacksUrl: function() {
 			var url = this.buildApiUrl('/shop/my');
+
+			if (Plugin.Configs.userPremium) {
+				url += '?is_subscriber=1';
+			}
+
+			return url;
+		},
+
+		getPackPreviewUrl: function(packName) {
+			var url = this.buildApiUrl('/packs/' + packName);
 
 			if (Plugin.Configs.userPremium) {
 				url += '?is_subscriber=1';
@@ -6466,8 +6492,8 @@ window.StickersModule.View = {};
 			Plugin.Module.Store.close();
 		},
 
-		md5: function(string) {
-			return Plugin.Service.Helper.md5(string);
+		getPackMainIcon: function(packName, callback) {
+			Plugin.Service.Pack.getMainIcon(packName, callback);
 		},
 
 		////////////////////

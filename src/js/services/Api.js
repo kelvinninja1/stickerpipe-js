@@ -10,11 +10,9 @@
 		},
 
 		getPacks: function(successCallback) {
-			var url = Plugin.Service.Url.getPacksUrl();
-
 			Plugin.Service.Ajax({
 				type: 'get',
-				url: url,
+				url: Plugin.Service.Url.getUserPacksUrl(),
 				success: function(response) {
 					response = response || {};
 					response.meta = response.meta || {};
@@ -22,6 +20,16 @@
 
 					Plugin.Service.Storage.setStoreLastModified(response.meta.shop_last_modified * 1000);
 
+					successCallback && successCallback(response.data);
+				}
+			});
+		},
+
+		getPackPreview: function(packName, successCallback) {
+			Plugin.Service.Ajax({
+				type: 'get',
+				url: Plugin.Service.Url.getPackPreviewUrl(packName),
+				success: function(response) {
 					successCallback && successCallback(response.data);
 				}
 			});

@@ -191,8 +191,8 @@ window.StickersModule.View = {};
 			Plugin.Module.Store.close();
 		},
 
-		md5: function(string) {
-			return Plugin.Service.Helper.md5(string);
+		getPackMainIcon: function(packName, callback) {
+			Plugin.Service.Pack.getMainIcon(packName, callback);
 		},
 
 		////////////////////
