@@ -131,27 +131,11 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/view.tpl',
-    '<div class="version">0.0.28</div>\n' +
+    '<div class="version">0.0.29</div>\n' +
     '<div data-ng-class="{\'screen-header\': isJSPlatform }" data-ng-show="isJSPlatform"></div>\n' +
     '<div class="store" data-sp-auto-scroll>\n' +
     '	<div data-ng-show="!error && showContent" data-ng-view></div>\n' +
     '	<div data-ng-show="error" data-error></div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/store/StoreView.tpl',
-    '<div class="packs">\n' +
-    '	<div class="col" data-ng-repeat="pack in packs">\n' +
-    '		<div data-pack-preview data-pack="pack"></div>\n' +
-    '	</div>\n' +
     '</div>');
 }]);
 })();
@@ -253,6 +237,22 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/store/StoreView.tpl',
+    '<div class="packs">\n' +
+    '	<div class="col" data-ng-repeat="pack in packs">\n' +
+    '		<div data-pack-preview data-pack="pack"></div>\n' +
+    '	</div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/error/view.tpl',
     '<div class="error">\n' +
     '	<div class="error-content">\n' +
@@ -320,142 +320,6 @@ appStickerPipeStore.config(function($routeProvider) {
 		});
 });
 
-appStickerPipeStore.directive('spAutoScroll', function ($document, $timeout, $location, $window, $rootScope, PlatformAPI) {
-	return {
-		restrict: 'A',
-		link: function (scope, element, attrs) {
-
-			$rootScope.showContent = true;
-			scope.okSaveScroll = true;
-			scope.history = [];
-
-			// --------------------------------------------------------------
-
-			$document.bind('scroll', function () {
-				if (scope.okSaveScroll && scope.history.length > 0) {
-					scope.history[scope.history.length - 1].y = $window.scrollY;
-				}
-			});
-
-			$rootScope.$on('sp-auto-scroll:scrollContent', function(e, yPosition) {
-				if (scope.okSaveScroll && scope.history.length > 0) {
-					scope.history[scope.history.length - 1].y = yPosition;
-				}
-			});
-
-			// --------------------------------------------------------------
-
-			scope.$on('$locationChangeStart', function () {
-				scope.okSaveScroll = false;
-				$rootScope.showContent = false;
-			});
-
-			// --------------------------------------------------------------
-
-			function onContentLoad() {
-				$rootScope.showContent = true;
-
-				$timeout(function() {
-					scope.okSaveScroll = true;
-
-					var y = scope.history[scope.history.length - 1].y;
-
-					PlatformAPI.setYScroll(y);
-				}, 100);
-			}
-
-			$rootScope.$on('$routeChangeSuccess', function() {
-				onContentLoad();
-			});
-
-			$rootScope.$on('$routeChangeError', function() {
-				onContentLoad();
-			});
-
-			// --------------------------------------------------------------
-
-			$rootScope.$watch(function () { return $location.path() }, function (newLocation, oldLocation) {
-
-				function forward() {
-					scope.history[scope.history.length] = {
-						url: newLocation,
-						y: 0
-					};
-				}
-
-				function back() {
-					scope.history.splice(scope.history.length - 1, 1);
-				}
-
-				if (scope.history.length > 1) {
-					if (newLocation == scope.history[scope.history.length - 2].url ||
-						newLocation + '/' == scope.history[scope.history.length - 2].url) {
-						back();
-					} else {
-						forward();
-					}
-				} else {
-					forward();
-				}
-			});
-		}
-	};
-});
-appStickerPipeStore.directive('spLoad', function ($parse) {
-	return {
-		restrict: 'A',
-		link: function (scope, elem, attrs) {
-			var fn = $parse(attrs.spLoad);
-			elem.on('load', function (event) {
-				scope.$apply(function() {
-					fn(scope, { $event: event });
-				});
-			});
-		}
-	};
-});
-appStickerPipeStore.directive('spSticker', function (Config, DataCache) { 
-
-	return { 
-		restrict: 'AE', 
-		template: '',
-		scope: {
-			url: '@'
-		},
-		link: function (scope, elem, attrs) {
-			DataCache.packsMainStickers = DataCache.packsMainStickers || {};  
-
-			var image = new Image(); 
-			image.onerror = function() {};  
-
-			function onload() { 
-				elem.removeClass('sticker-placeholder'); 
-				elem[0].style.background = ''; 
-				elem.addClass(attrs.completeClass);  
-
-				elem[0].appendChild(image);
-				DataCache.packsMainStickers[attrs.url] = attrs.url;
-				image.onload = function() {}; 
-			}
-
-			scope.$watch('url', function (value) {
-				image.src = value;
-			});
-
-			if (!DataCache.packsMainStickers[attrs.url]) { 
-				elem.addClass('sticker-placeholder'); 
-				elem[0].style.background = Config.primaryColor;  
-
-				image.onload = function() { 
-					onload(); 
-				}; 
-			} else { 
-				onload(); 
-			} 
-		} 
-	};
- });
-
 appStickerPipeStore.value('En', {
 	download: 'Download',
 	sendSticker: 'Send sticker',
@@ -477,6 +341,143 @@ appStickerPipeStore.value('Ru', {
 	previewIsUndefined: 'Превью пака недоступно',
 	remove: 'Удалить'
 });
+
+appStickerPipeStore.directive('spAutoScroll', function ($document, $timeout, $location, $window, $rootScope, PlatformAPI) {
+	return {
+		restrict: 'A',
+		link: function ($scope, $el, attrs) {
+
+			$rootScope.showContent = true;
+			$scope.okSaveScroll = true;
+			$scope.history = [];
+
+			// --------------------------------------------------------------
+
+			$document.bind('scroll', function () {
+				if ($scope.okSaveScroll && $scope.history.length > 0) {
+					$scope.history[$scope.history.length - 1].y = $window.scrollY;
+				}
+			});
+
+			$rootScope.$on('sp-auto-scroll:scrollContent', function(e, yPosition) {
+				if ($scope.okSaveScroll && $scope.history.length > 0) {
+					$scope.history[$scope.history.length - 1].y = yPosition;
+				}
+			});
+
+			// --------------------------------------------------------------
+
+			$scope.$on('$locationChangeStart', function () {
+				$scope.okSaveScroll = false;
+				$rootScope.showContent = false;
+			});
+
+			// --------------------------------------------------------------
+
+			function onContentLoad() {
+				$rootScope.showContent = true;
+
+				$timeout(function() {
+					$scope.okSaveScroll = true;
+
+					var y = $scope.history[$scope.history.length - 1].y;
+
+					PlatformAPI.setYScroll(y);
+				}, 100);
+			}
+
+			$rootScope.$on('$routeChangeSuccess', function() {
+				onContentLoad();
+			});
+
+			$rootScope.$on('$routeChangeError', function() {
+				onContentLoad();
+			});
+
+			// --------------------------------------------------------------
+
+			$rootScope.$watch(function () { return $location.path() }, function (newLocation, oldLocation) {
+
+				function forward() {
+					$scope.history[$scope.history.length] = {
+						url: newLocation,
+						y: 0
+					};
+				}
+
+				function back() {
+					$scope.history.splice($scope.history.length - 1, 1);
+				}
+
+				if ($scope.history.length > 1) {
+					if (newLocation == $scope.history[$scope.history.length - 2].url ||
+						newLocation + '/' == $scope.history[$scope.history.length - 2].url) {
+						back();
+					} else {
+						forward();
+					}
+				} else {
+					forward();
+				}
+			});
+		}
+	};
+});
+appStickerPipeStore.directive('spLoad', function ($parse) {
+	return {
+		restrict: 'A',
+		link: function ($scope, $el, attrs) {
+			var fn = $parse(attrs.spLoad);
+
+			$el.on('load', function (event) {
+				$scope.$apply(function() {
+					fn($scope, { $event: event });
+				});
+			});
+		}
+	};
+});
+appStickerPipeStore.directive('spSticker', function (Config, DataCache) { 
+
+	return { 
+		restrict: 'AE', 
+		template: '',
+		scope: {
+			url: '@'
+		},
+		link: function ($scope, $el, attrs) {
+			DataCache.packsMainStickers = DataCache.packsMainStickers || {};  
+
+			var image = new Image(); 
+			image.onerror = function() {};  
+
+			function onload() { 
+				$el.removeClass('sticker-placeholder'); 
+				$el[0].style.background = ''; 
+				$el.addClass(attrs.completeClass);  
+
+				$el[0].appendChild(image);
+				DataCache.packsMainStickers[attrs.url] = attrs.url;
+				image.onload = function() {}; 
+			}
+
+			$scope.$watch('url', function (value) {
+				image.src = value;
+			});
+
+			if (!DataCache.packsMainStickers[attrs.url]) { 
+				$el.addClass('sticker-placeholder'); 
+				$el[0].style.background = Config.primaryColor;  
+
+				image.onload = function() { 
+					onload(); 
+				}; 
+			} else { 
+				onload(); 
+			} 
+		} 
+	};
+ });
 appStickerPipeStore.factory('Api', function(Http, EnvConfig, Config, DataCache, $q) {
 
     var apiVersion = 2,
@@ -980,16 +981,120 @@ appStickerPipeStore.directive('spButton', function () {
 			btnClass: '@',
 			btnInProgress: '='
 		},
-		link: function (scope, el, attrs) {
+		link: function ($scope, $el, attrs) {
 			var border = 2,
-				progressEl = el[0].getElementsByClassName('progress')[0];
-			var buttonEl = el[0].getElementsByTagName('button')[0];
+				progressEl = $el[0].getElementsByClassName('progress')[0];
+			var buttonEl = $el[0].getElementsByTagName('button')[0];
 
 
-			scope.$watch('btnInProgress', function() {
+			$scope.$watch('btnInProgress', function() {
 				if (progressEl.clientWidth < buttonEl.clientWidth) {
 					progressEl.style.width = buttonEl.clientWidth + border + 'px';
 				}
+			});
+		}
+	};
+});
+
+appStickerPipeStore.factory('JsPlatformProvider', function($rootScope, $window, $timeout, Config) {
+
+	function callSDKMethod(action, attrs) {
+		window.parent.postMessage(JSON.stringify({
+			action: action,
+			attrs: attrs
+		}), 'http://' + Config.clientDomain);
+	}
+
+	function runApiListener() {
+		$window.addEventListener('message', (function(e) {
+
+			var data = JSON.parse(e.data);
+
+			data.attrs = data.attrs || {};
+
+			if (!data.action) {
+				return;
+			}
+
+			var StoreApi = window.StoreApi;
+			if (StoreApi) {
+				StoreApi[data.action] && StoreApi[data.action](data.attrs);
+			}
+		}).bind(this));
+	}
+
+	return {
+
+		configs: {
+			canShowPack: false,
+			canRemovePack: false
+		},
+
+		init: function() {
+			runApiListener();
+
+			$window.addEventListener('keyup', (function(e) {
+				this.keyUp(e.keyCode);
+			}).bind(this));
+		},
+
+		configure: function(attrs) {
+			this.configs.canShowPack = !!attrs.canShowPack;
+			this.configs.canRemovePack = !!attrs.canRemovePack;
+		},
+
+		showBackButton: function(show) {
+			callSDKMethod('showBackButton', {
+				show: show
+			});
+		},
+
+		setYScroll: function(yPosition) {
+			callSDKMethod('setYScroll', {
+				yPosition: yPosition
+			});
+		},
+
+		keyUp: function(keyCode) {
+			callSDKMethod('keyUp', {
+				keyCode: keyCode
+			});
+		},
+
+		///////////////////////////////////////////////////////////////
+		// Common methods
+		///////////////////////////////////////////////////////////////
+
+
+		showCollections: function(packName) {
+			callSDKMethod('showCollections', {
+				packName: packName
+			});
+		},
+
+		showPack: function(packName) {
+			callSDKMethod('showPack', {
+				packName: packName
+			});
+		},
+
+		purchasePack: function(packTitle, packName, packPrice) {
+			callSDKMethod('purchasePack', {
+				packTitle: packTitle,
+				packName: packName,
+				pricePoint: packPrice
+			});
+		},
+
+		setInProgress: function(show) {
+			callSDKMethod('showPagePreloader', {
+				show: show
+			});
+		},
+
+		removePack: function(packName) {
+			callSDKMethod('removePack', {
+				packName: packName
 			});
 		}
 	};
@@ -1004,6 +1109,15 @@ appStickerPipeStore.directive('basePage', function(Helper) {
 			$scope.isJSPlatform = Helper.isJS();
 		}
 	};
+});
+
+appStickerPipeStore.controller('StoreController', function($scope, packs, PlatformAPI) {
+
+	PlatformAPI.showPagePreloader(false);
+
+	angular.extend($scope, {
+		packs: packs
+	});
 });
 
 appStickerPipeStore.controller('PackController', function($scope, Config, PlatformAPI, $rootScope, PackService, pack, $window) {
@@ -1116,119 +1230,6 @@ appStickerPipeStore.controller('PackController', function($scope, Config, Platfo
 	});
 });
 
-appStickerPipeStore.controller('StoreController', function($scope, packs, PlatformAPI) {
-
-	PlatformAPI.showPagePreloader(false);
-
-	angular.extend($scope, {
-		packs: packs
-	});
-});
-
-appStickerPipeStore.factory('JsPlatformProvider', function($rootScope, $window, $timeout, Config) {
-
-	function callSDKMethod(action, attrs) {
-		window.parent.postMessage(JSON.stringify({
-			action: action,
-			attrs: attrs
-		}), 'http://' + Config.clientDomain);
-	}
-
-	function runApiListener() {
-		$window.addEventListener('message', (function(e) {
-
-			var data = JSON.parse(e.data);
-
-			data.attrs = data.attrs || {};
-
-			if (!data.action) {
-				return;
-			}
-
-			var StoreApi = window.StoreApi;
-			if (StoreApi) {
-				StoreApi[data.action] && StoreApi[data.action](data.attrs);
-			}
-		}).bind(this));
-	}
-
-	return {
-
-		configs: {
-			canShowPack: false,
-			canRemovePack: false
-		},
-
-		init: function() {
-			runApiListener();
-
-			$window.addEventListener('keyup', (function(e) {
-				this.keyUp(e.keyCode);
-			}).bind(this));
-		},
-
-		configure: function(attrs) {
-			this.configs.canShowPack = !!attrs.canShowPack;
-			this.configs.canRemovePack = !!attrs.canRemovePack;
-		},
-
-		showBackButton: function(show) {
-			callSDKMethod('showBackButton', {
-				show: show
-			});
-		},
-
-		setYScroll: function(yPosition) {
-			callSDKMethod('setYScroll', {
-				yPosition: yPosition
-			});
-		},
-
-		keyUp: function(keyCode) {
-			callSDKMethod('keyUp', {
-				keyCode: keyCode
-			});
-		},
-
-		///////////////////////////////////////////////////////////////
-		// Common methods
-		///////////////////////////////////////////////////////////////
-
-
-		showCollections: function(packName) {
-			callSDKMethod('showCollections', {
-				packName: packName
-			});
-		},
-
-		showPack: function(packName) {
-			callSDKMethod('showPack', {
-				packName: packName
-			});
-		},
-
-		purchasePack: function(packTitle, packName, packPrice) {
-			callSDKMethod('purchasePack', {
-				packTitle: packTitle,
-				packName: packName,
-				pricePoint: packPrice
-			});
-		},
-
-		setInProgress: function(show) {
-			callSDKMethod('showPagePreloader', {
-				show: show
-			});
-		},
-
-		removePack: function(packName) {
-			callSDKMethod('removePack', {
-				packName: packName
-			});
-		}
-	};
-});
-
 appStickerPipeStore.directive('error', function(Config,  $window, $timeout, EnvConfig) {
 	
 	return {
@@ -1272,19 +1273,14 @@ appStickerPipeStore.directive('packPreview', function($rootScope, PackService, C
 					$packPreview.removeClass('active');
 				});
 
-				document.addEventListener('touchend', function() {
-					bodyScrolled = false;
-				});
-
 				$packPreview.bind('touchstart', function () {
-					setTimeout(function() {
-						if (!bodyScrolled) {
-							$packPreview.addClass('active');
-						}
-					}, 100);
+					if (!bodyScrolled) {
+						$packPreview.addClass('active');
+					}
 				});
 
 				$packPreview.bind('touchend', function () {
+					bodyScrolled = false;
 					$packPreview.removeClass('active');
 				});
 			}
