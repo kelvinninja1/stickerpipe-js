@@ -9,7 +9,7 @@
 <!--	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">-->
 <!--	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">-->
 
-	<link id="css" type="text/css" rel="stylesheet" href="css/<?=($_GET['style'] ?: 'js');?>" />
+	<link id="css" type="text/css" rel="stylesheet" />
 </head>
 
 <body>
@@ -19,7 +19,7 @@
 <!-- AngularJS -->
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.2/angular.min.js"></script>
 
-<script src="js/stickerPipeStore.js?v=1456391267686"></script>
+<script src="js/stickerPipeStore.js?v=1455100978887"></script>
 
 <script>
 	(function() {
@@ -37,8 +37,7 @@
 			priceB: valueOrNull('<?=($_GET['priceB'] ?: 'null');?>'),
 			priceC: valueOrNull('<?=($_GET['priceC'] ?: 'null');?>'),
 			isSubscriber: ('<?=($_GET['is_subscriber'] ?: '0');?>' == '1'),
-			style: '<?=($_GET['style'] ?: 'js');?>',
-			primaryColor: '<?=($_GET['primaryColor'] ?: '');?>'
+			style: '<?=($_GET['style'] ?: 'js');?>'
 		});
 	})();
 </script>
