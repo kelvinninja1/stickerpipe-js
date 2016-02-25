@@ -319,6 +319,28 @@ appStickerPipeStore.config(function($routeProvider) {
 		});
 });
 
+appStickerPipeStore.value('En', {
+	download: 'Download',
+	sendSticker: 'Send sticker',
+	buyPack: 'Buy pack',
+	unavailableContent: 'This content is currently unavailable',
+	get: 'Get',
+	free: 'Free',
+	previewIsUndefined: 'Pack preview is undefined',
+	remove: 'Remove'
+});
+
+appStickerPipeStore.value('Ru', {
+	download: 'Скачать',
+	sendSticker: 'Отправить стикер',
+	buyPack: 'Купить',
+	unavailableContent: 'В данный момент этот контент недоступен',
+	get: 'Скачать',
+	free: 'Бесплатно',
+	previewIsUndefined: 'Превью пака недоступно',
+	remove: 'Удалить'
+});
+
 appStickerPipeStore.directive('spAutoScroll', function ($document, $timeout, $location, $window, $rootScope, PlatformAPI) {
 	return {
 		restrict: 'A',
@@ -455,28 +477,6 @@ appStickerPipeStore.directive('spSticker', function (Config, DataCache) { 
 		} 
 	};
  });
-
-appStickerPipeStore.value('En', {
-	download: 'Download',
-	sendSticker: 'Send sticker',
-	buyPack: 'Buy pack',
-	unavailableContent: 'This content is currently unavailable',
-	get: 'Get',
-	free: 'Free',
-	previewIsUndefined: 'Pack preview is undefined',
-	remove: 'Remove'
-});
-
-appStickerPipeStore.value('Ru', {
-	download: 'Скачать',
-	sendSticker: 'Отправить стикер',
-	buyPack: 'Купить',
-	unavailableContent: 'В данный момент этот контент недоступен',
-	get: 'Скачать',
-	free: 'Бесплатно',
-	previewIsUndefined: 'Превью пака недоступно',
-	remove: 'Удалить'
-});
 appStickerPipeStore.factory('Api', function(Http, EnvConfig, Config, DataCache, $q) {
 
     var apiVersion = 2,
@@ -1006,15 +1006,6 @@ appStickerPipeStore.directive('basePage', function(Helper) {
 	};
 });
 
-appStickerPipeStore.controller('StoreController', function($scope, packs, PlatformAPI) {
-
-	PlatformAPI.showPagePreloader(false);
-
-	angular.extend($scope, {
-		packs: packs
-	});
-});
-
 appStickerPipeStore.controller('PackController', function($scope, Config, PlatformAPI, $rootScope, PackService, pack, $window) {
 
 	PlatformAPI.showBackButton('#/store');
@@ -1122,6 +1113,15 @@ appStickerPipeStore.controller('PackController', function($scope, Config, Platfo
 		$scope.purchaseProgress = false;
 		$scope.removeProgress = false;
 		apply();
+	});
+});
+
+appStickerPipeStore.controller('StoreController', function($scope, packs, PlatformAPI) {
+
+	PlatformAPI.showPagePreloader(false);
+
+	angular.extend($scope, {
+		packs: packs
 	});
 });
 
