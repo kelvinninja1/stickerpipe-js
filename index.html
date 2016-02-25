@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+	<!-- Bootstrap -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+
+	<link rel="stylesheet" type="text/css" href="libs/sdk/css/stickerpipe.css" />
+	<link rel="stylesheet" type="text/css" href="assets/css/style.css" />
+	<title>Stickers</title>
+</head>
+<body>
+
+<nav class="navbar navbar-custom navbar-fixed-top">
+	<div class="container">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar top-bar"></span>
+				<span class="icon-bar middle-bar"></span>
+				<span class="icon-bar bottom-bar"></span>
+			</button>
+			<a class="navbar-brand" href="#">
+				<img src="assets/img/logo.png" alt="">
+			</a>
+		</div>
+		<div id="navbar" class="navbar-collapse collapse">
+			<ul class="nav navbar-nav navbar-right">
+				<li><a href="javascript: void(0);" id="wipeData">Wipe user data</a></li>
+			</ul>
+		</div><!--/.nav-collapse -->
+	</div>
+</nav>
+
+<div class="container">
+	<div class="row">
+		<div class="col-sm-12">
+			<div class="content">
+				<div id="log"></div>
+				<div id="messages"></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="message-box-container">
+	<div class="container">
+		<div id="messageBox">
+			<div class="input-group">
+                <span class="input-group-btn">
+                    <button class="btn btn-default" id="stickersToggle">
+                        <span class="icon icon-smile"></span>
+                    </button>
+                </span>
+
+				<div class="form-control textarea" placeholder="Message..." contenteditable="true"></div>
+
+				<span class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <span class="icon icon-send"></span>
+                    </button>
+                </span>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script id="messageTemplate" type="text/template">
+	<div class="message {{ (!!sticker && 'is-sticker') || '' }}">
+		{[ if (!isCurrentUser) { ]}
+		<div class="message-user-photo">
+			<img src="{{ user.picture }}" class="img-circle">
+		</div>
+		{[ } ]}
+		<div class="message-body">
+			{[ if (!sticker) { ]}
+			<div class="{{ isCurrentUser ? 'message-bubble-from-me' : 'message-bubble-from-them' }}">
+				<p>{{ text }}</p>
+			</div>
+			<div class="clearfix"></div>
+			{[ } else { ]}
+			<div class="text-center {{ !isCurrentUser ? 'pull-left' : 'pull-right' }}"
+			     style="margin-bottom: 30px;">
+				{{ sticker.html }}
+			</div>
+			{[ } ]}
+		</div>
+		{[ if (isCurrentUser) { ]}
+		<div class="message-user-photo">
+			<img src="{{ user.picture }}" class="img-circle">
+		</div>
+		{[ } ]}
+	</div>
+</script>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/3.0.13/autosize.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
+<script src="libs/sdk/js/stickerpipe.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+	(function() {
+
+		if (window.location.href.indexOf('localhost') != -1) {
+			StickersModule.Configs.apiUrl = 'http://work.stk.908.vc';
+			StickersModule.Configs.storeUrl = 'http://localhost/stickerpipe/store/build';
+		} else if (window.location.href.indexOf('work') != -1) {
+			StickersModule.Configs.apiUrl = 'http://work.stk.908.vc';
+		}
+
+		window.app = new App();
+	})();
+</script>
+</body>
+</html>
