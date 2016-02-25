@@ -398,4 +398,5 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   color: white; }
 
 .progress {
-  line-height: 24px; }
+  line-height: 24px;
+  height: 24px; }

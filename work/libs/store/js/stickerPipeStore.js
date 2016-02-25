@@ -106,6 +106,23 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/modules/base-page/view.tpl',
+    '<div class="version">0.0.31</div>\n' +
+    '<div data-ng-class="{\'screen-header\': isJSPlatform }" data-ng-show="isJSPlatform"></div>\n' +
+    '<div class="store" data-sp-auto-scroll>\n' +
+    '	<div data-ng-show="!error && showContent" data-ng-view></div>\n' +
+    '	<div data-ng-show="error" data-error></div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/directives/sp-button/view.tpl',
     '<button data-ng-show="!btnInProgress"\n' +
     '		data-ng-click="btnClick()"\n' +
@@ -119,23 +136,6 @@ module.run(['$templateCache', function($templateCache) {
     '		<div class="bounce2"></div>\n' +
     '		<div class="bounce3"></div>\n' +
     '	</div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/modules/base-page/view.tpl',
-    '<!--<div class="version">0.0.30</div>-->\n' +
-    '<div data-ng-class="{\'screen-header\': isJSPlatform }" data-ng-show="isJSPlatform"></div>\n' +
-    '<div class="store" data-sp-auto-scroll>\n' +
-    '	<div data-ng-show="!error && showContent" data-ng-view></div>\n' +
-    '	<div data-ng-show="error" data-error></div>\n' +
     '</div>');
 }]);
 })();
@@ -995,17 +995,6 @@ appStickerPipeStore.directive('spButton', function () {
 	};
 });
 
-appStickerPipeStore.directive('basePage', function(Helper) {
-
-	return {
-		restrict: 'AE',
-		templateUrl: '/modules/base-page/view.tpl',
-		link: function($scope, $el, attrs) {
-			$scope.isJSPlatform = Helper.isJS();
-		}
-	};
-});
-
 appStickerPipeStore.controller('PackController', function($scope, Config, PlatformAPI, $rootScope, PackService, pack, $window) {
 
 	PlatformAPI.showBackButton('#/store');
@@ -1114,6 +1103,17 @@ appStickerPipeStore.controller('PackController', function($scope, Config, Platfo
 		$scope.removeProgress = false;
 		apply();
 	});
+});
+
+appStickerPipeStore.directive('basePage', function(Helper) {
+
+	return {
+		restrict: 'AE',
+		templateUrl: '/modules/base-page/view.tpl',
+		link: function($scope, $el, attrs) {
+			$scope.isJSPlatform = Helper.isJS();
+		}
+	};
 });
 
 appStickerPipeStore.controller('StoreController', function($scope, packs, PlatformAPI) {
