@@ -33,13 +33,60 @@ var App = _makeClass(function(options) {
 		stickerpipe: {}
 	},
 
+	envConfigs: {
+		local: {
+			stickerpipe: {
+				sdkUrl: 'libs/sdk/work/',
+				apiUrl: 'http://work.stk.908.vc',
+				storeUrl: 'http://localhost/stickerpipe/store/build'
+			}
+		},
+		work: {
+			stickerpipe: {
+				sdkUrl: 'libs/sdk/work/',
+				apiUrl: 'http://work.stk.908.vc'
+			}
+		},
+		prod: {
+			stickerpipe: {
+				sdkUrl: 'libs/sdk/stable/'
+			}
+		}
+	},
+
+	getEnvConfigs: function() {
+		var arr = window.location.href.split('/');
+
+		switch (arr[2]) {
+			case 'localhost':
+				return this.envConfigs.local;
+			case 'demo.stk.908.vc':
+				return this.envConfigs.work;
+			default:
+				return this.envConfigs.prod;
+		}
+	},
+
 	_constructor: function() {
 
-		this.$wipeData.on('click', (function() {
-			localStorage.clear();
-			location.reload();
-		}).bind(this));
+		var envConfigs = this.getEnvConfigs();
 
+		var $head = $('head');
+		$head.append('<link rel="stylesheet" type="text/css" href="' + envConfigs.stickerpipe.sdkUrl + 'css/stickerpipe.css">');
+		$head.append('<script src="' + envConfigs.stickerpipe.sdkUrl + 'js/stickerpipe.js"></script>">');
+
+		if (envConfigs.stickerpipe.apiUrl) {
+			StickersModule.Configs.apiUrl = envConfigs.stickerpipe.apiUrl;
+		}
+
+		if (envConfigs.stickerpipe.storeUrl) {
+			StickersModule.Configs.storeUrl = envConfigs.stickerpipe.storeUrl;
+		}
+
+		this.init();
+	},
+
+	init: function() {
 		// setting lo-dash template
 		_.templateSettings = {
 			evaluate: /\{\[([\s\S]+?)\]\}/g,   // {[ alert() ]}
@@ -47,20 +94,6 @@ var App = _makeClass(function(options) {
 			escape: /\{\{-([\s\S]+?)-\}\}/g // {{- html -}}
 		};
 
-		this.init();
-
-		_.delay((function() {
-			this.$window.resize();
-		}).bind(this), 100);
-
-		this.$messages.on('click', 'img.stickerpipe-sticker', (function(e) {
-			var $target = $(e.target);
-
-			this.stickerpipe.openStore($target.attr('data-sticker-id'));
-		}).bind(this));
-	},
-
-	init: function() {
 		this.configs.stickerpipe = {
 			elId: 'stickersToggle',
 
@@ -83,6 +116,11 @@ var App = _makeClass(function(options) {
 			priceC: '9.99 UAH'
 		};
 
+		this.$wipeData.on('click', (function() {
+			localStorage.clear();
+			location.reload();
+		}).bind(this));
+
 		this.initStickers();
 
 		var self = this;
@@ -96,6 +134,16 @@ var App = _makeClass(function(options) {
 
 		this.fetchRandomUsersMock();
 		this.initMessageBox();
+
+		_.delay((function() {
+			this.$window.resize();
+		}).bind(this), 100);
+
+		this.$messages.on('click', 'img.stickerpipe-sticker', (function(e) {
+			var $target = $(e.target);
+
+			this.stickerpipe.openStore($target.attr('data-sticker-id'));
+		}).bind(this));
 	},
 	initStickers: function() {
 

@@ -5,10 +5,6 @@
 
 	<title>Storage</title>
 
-	<!-- Bootstrap -->
-<!--	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">-->
-<!--	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">-->
-
 	<link id="css" type="text/css" rel="stylesheet" href="css/<?=($_GET['style'] ?: 'js');?>" />
 </head>
 
@@ -19,7 +15,7 @@
 <!-- AngularJS -->
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.2/angular.min.js"></script>
 
-<script src="js/stickerPipeStore.js?v=1456410502958"></script>
+<script src="js/stickerPipeStore.js?v=1456423773241"></script>
 
 <script>
 	(function() {
