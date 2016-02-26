@@ -15,7 +15,7 @@
 <!-- AngularJS -->
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.2/angular.min.js"></script>
 
-<script src="js/stickerPipeStore.js?v=1456474626924"></script>
+<script src="js/stickerPipeStore.js?v=1456482723321"></script>
 
 <script>
 	(function() {

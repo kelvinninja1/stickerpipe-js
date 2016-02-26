@@ -107,35 +107,11 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/view.tpl',
-    '<div class="version">0.0.31</div>\n' +
+    '<div class="version">0.0.32</div>\n' +
     '<div data-ng-class="{\'screen-header\': isJSPlatform }" data-ng-show="isJSPlatform"></div>\n' +
     '<div class="store" data-sp-auto-scroll>\n' +
     '	<div data-ng-show="!error && showContent" data-ng-view></div>\n' +
     '	<div data-ng-show="error" data-error></div>\n' +
-    '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('partials');
-} catch (e) {
-  module = angular.module('partials', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/directives/sp-button/view.tpl',
-    '<button data-ng-show="!btnInProgress"\n' +
-    '		data-ng-click="btnClick()"\n' +
-    '        class="{{ btnClass }}"\n' +
-    '        data-ng-transclude>\n' +
-    '</button>\n' +
-    '\n' +
-    '<div data-ng-show="btnInProgress" style="display: inline-table;">\n' +
-    '	<div class="progress">\n' +
-    '		<div class="bounce1"></div>\n' +
-    '		<div class="bounce2"></div>\n' +
-    '		<div class="bounce3"></div>\n' +
-    '	</div>\n' +
     '</div>');
 }]);
 })();
@@ -252,6 +228,30 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('/directives/sp-button/view.tpl',
+    '<button data-ng-show="!btnInProgress"\n' +
+    '		data-ng-click="btnClick()"\n' +
+    '        class="{{ btnClass }}"\n' +
+    '        data-ng-transclude>\n' +
+    '</button>\n' +
+    '\n' +
+    '<div data-ng-show="btnInProgress" style="display: inline-table;">\n' +
+    '	<div class="progress">\n' +
+    '		<div class="bounce1"></div>\n' +
+    '		<div class="bounce2"></div>\n' +
+    '		<div class="bounce3"></div>\n' +
+    '	</div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('partials');
+} catch (e) {
+  module = angular.module('partials', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('/modules/base-page/error/view.tpl',
     '<div class="error">\n' +
     '	<div class="error-content">\n' +
@@ -317,6 +317,28 @@ appStickerPipeStore.config(function($routeProvider) {
 		.otherwise({
 			redirectTo:'/store'
 		});
+});
+
+appStickerPipeStore.value('En', {
+	download: 'Download',
+	sendSticker: 'Send sticker',
+	buyPack: 'Buy pack',
+	unavailableContent: 'This content is currently unavailable',
+	get: 'Get',
+	free: 'Free',
+	previewIsUndefined: 'Pack preview is undefined',
+	remove: 'Remove'
+});
+
+appStickerPipeStore.value('Ru', {
+	download: 'Скачать',
+	sendSticker: 'Отправить стикер',
+	buyPack: 'Купить',
+	unavailableContent: 'В данный момент этот контент недоступен',
+	get: 'Скачать',
+	free: 'Бесплатно',
+	previewIsUndefined: 'Превью пака недоступно',
+	remove: 'Удалить'
 });
 
 appStickerPipeStore.directive('spAutoScroll', function ($document, $timeout, $location, $window, $rootScope, PlatformAPI) {
@@ -455,28 +477,6 @@ appStickerPipeStore.directive('spSticker', function (Config, DataCache) { 
 		} 
 	};
  });
-
-appStickerPipeStore.value('En', {
-	download: 'Download',
-	sendSticker: 'Send sticker',
-	buyPack: 'Buy pack',
-	unavailableContent: 'This content is currently unavailable',
-	get: 'Get',
-	free: 'Free',
-	previewIsUndefined: 'Pack preview is undefined',
-	remove: 'Remove'
-});
-
-appStickerPipeStore.value('Ru', {
-	download: 'Скачать',
-	sendSticker: 'Отправить стикер',
-	buyPack: 'Купить',
-	unavailableContent: 'В данный момент этот контент недоступен',
-	get: 'Скачать',
-	free: 'Бесплатно',
-	previewIsUndefined: 'Превью пака недоступно',
-	remove: 'Удалить'
-});
 appStickerPipeStore.factory('Api', function(Http, EnvConfig, Config, DataCache, $q) {
 
     var apiVersion = 2,
