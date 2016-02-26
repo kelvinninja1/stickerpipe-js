@@ -319,28 +319,6 @@ appStickerPipeStore.config(function($routeProvider) {
 		});
 });
 
-appStickerPipeStore.value('En', {
-	download: 'Download',
-	sendSticker: 'Send sticker',
-	buyPack: 'Buy pack',
-	unavailableContent: 'This content is currently unavailable',
-	get: 'Get',
-	free: 'Free',
-	previewIsUndefined: 'Pack preview is undefined',
-	remove: 'Remove'
-});
-
-appStickerPipeStore.value('Ru', {
-	download: 'Скачать',
-	sendSticker: 'Отправить стикер',
-	buyPack: 'Купить',
-	unavailableContent: 'В данный момент этот контент недоступен',
-	get: 'Скачать',
-	free: 'Бесплатно',
-	previewIsUndefined: 'Превью пака недоступно',
-	remove: 'Удалить'
-});
-
 appStickerPipeStore.directive('spAutoScroll', function ($document, $timeout, $location, $window, $rootScope, PlatformAPI) {
 	return {
 		restrict: 'A',
@@ -477,6 +455,28 @@ appStickerPipeStore.directive('spSticker', function (Config, DataCache) { 
 		} 
 	};
  });
+
+appStickerPipeStore.value('En', {
+	download: 'Download',
+	sendSticker: 'Send sticker',
+	buyPack: 'Buy pack',
+	unavailableContent: 'This content is currently unavailable',
+	get: 'Get',
+	free: 'Free',
+	previewIsUndefined: 'Pack preview is undefined',
+	remove: 'Remove'
+});
+
+appStickerPipeStore.value('Ru', {
+	download: 'Скачать',
+	sendSticker: 'Отправить стикер',
+	buyPack: 'Купить',
+	unavailableContent: 'В данный момент этот контент недоступен',
+	get: 'Скачать',
+	free: 'Бесплатно',
+	previewIsUndefined: 'Превью пака недоступно',
+	remove: 'Удалить'
+});
 appStickerPipeStore.factory('Api', function(Http, EnvConfig, Config, DataCache, $q) {
 
     var apiVersion = 2,
@@ -970,30 +970,6 @@ appStickerPipeStore.factory('StoreApi', function($rootScope, $route, PlatformAPI
 	};
 
 });
-appStickerPipeStore.directive('spButton', function () {
-	return {
-		restrict: 'AE',
-		transclude: true,
-		templateUrl: '/directives/sp-button/view.tpl',
-		scope: {
-			btnClick: '&',
-			btnClass: '@',
-			btnInProgress: '='
-		},
-		link: function ($scope, $el, attrs) {
-			var border = 2,
-				progressEl = $el[0].getElementsByClassName('progress')[0];
-			var buttonEl = $el[0].getElementsByTagName('button')[0];
-
-
-			$scope.$watch('btnInProgress', function() {
-				if (progressEl.clientWidth < buttonEl.clientWidth) {
-					progressEl.style.width = buttonEl.clientWidth + border + 'px';
-				}
-			});
-		}
-	};
-});
 
 appStickerPipeStore.directive('basePage', function(Helper) {
 
@@ -1113,6 +1089,30 @@ appStickerPipeStore.controller('PackController', function($scope, Config, Platfo
 		$scope.removeProgress = false;
 		apply();
 	});
+});
+appStickerPipeStore.directive('spButton', function () {
+	return {
+		restrict: 'AE',
+		transclude: true,
+		templateUrl: '/directives/sp-button/view.tpl',
+		scope: {
+			btnClick: '&',
+			btnClass: '@',
+			btnInProgress: '='
+		},
+		link: function ($scope, $el, attrs) {
+			var border = 2,
+				progressEl = $el[0].getElementsByClassName('progress')[0];
+			var buttonEl = $el[0].getElementsByTagName('button')[0];
+
+
+			$scope.$watch('btnInProgress', function() {
+				if (progressEl.clientWidth < buttonEl.clientWidth) {
+					progressEl.style.width = buttonEl.clientWidth + border + 'px';
+				}
+			});
+		}
+	};
 });
 
 appStickerPipeStore.controller('StoreController', function($scope, packs, PlatformAPI) {

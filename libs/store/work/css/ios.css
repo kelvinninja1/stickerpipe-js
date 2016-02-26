@@ -208,6 +208,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   font-size: 14px;
   font-weight: bolder;
   line-height: 14px;
+  margin: 0;
   outline: none;
   padding: 0 18px; }
   .btn:hover,
