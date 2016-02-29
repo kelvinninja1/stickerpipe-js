@@ -36,14 +36,14 @@ var App = _makeClass(function(options) {
 	envConfigs: {
 		local: {
 			stickerpipe: {
-				sdkUrl: 'libs/sdk/work/',
+				sdkUrl: 'libs/sdk/stable/',
 				apiUrl: 'http://work.stk.908.vc',
-				storeUrl: 'http://localhost/stickerpipe/store/build'
+				//storeUrl: 'http://localhost/stickerpipe/store/build'
 			}
 		},
 		work: {
 			stickerpipe: {
-				sdkUrl: 'libs/sdk/work/',
+				sdkUrl: 'libs/sdk/stable/',
 				apiUrl: 'http://work.stk.908.vc'
 			}
 		},
