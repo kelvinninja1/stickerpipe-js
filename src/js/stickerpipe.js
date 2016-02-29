@@ -82,14 +82,14 @@ window.StickersModule.View = {};
 			this.delegateEvents();
 
 			// todo
-			Plugin.Service.Pack.fetchPacks(function() {
+			Plugin.Service.Packs.fetch(function() {
 				self.view.render();
 
 				callback && callback();
 			});
 
 			setInterval(function() {
-				Plugin.Service.Pack.fetchPacks();
+				Plugin.Service.Packs.fetch();
 			}, 1000 * 60 * 60);
 		},
 
@@ -143,7 +143,7 @@ window.StickersModule.View = {};
 		},
 
 		fetchPacks: function(callback) {
-			Plugin.Service.Pack.fetchPacks(callback);
+			Plugin.Service.Packs.fetch(callback);
 		},
 
 		isSticker: function(text) {

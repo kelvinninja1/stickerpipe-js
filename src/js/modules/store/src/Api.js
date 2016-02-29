@@ -3,6 +3,18 @@
 
 	var stickerpipe;
 
+	function isPackHidden(packName) {
+		var packs = Plugin.Service.Storage.getPacks();
+
+		for (var i = 0; i < packs.length; i++) {
+			if (packs[i].pack_name == packName) {
+				return Plugin.Service.Pack.isHidden(packs[i]);
+			}
+		}
+
+		return false;
+	}
+
 	Module.Api= {
 
 		init: function(_stickerpipe) {
@@ -19,7 +31,9 @@
 				packTitle = data.attrs.packTitle,
 				pricePoint = data.attrs.pricePoint;
 
-			if (pricePoint == 'A' || (pricePoint == 'B' && Plugin.Configs.userPremium)) {
+			var isHidden = isPackHidden(packName);
+
+			if (pricePoint == 'A' || (pricePoint == 'B' && Plugin.Configs.userPremium) || isHidden) {
 				Module.Controller.downloadPack(packName, pricePoint);
 			} else {
 				Module.Controller.onPurchaseCallback &&

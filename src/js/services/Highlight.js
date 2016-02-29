@@ -5,7 +5,7 @@
 
 		check: function() {
 
-			var showContentHighlight = Plugin.Service.Pack.isExistUnwatchedPacks();
+			var showContentHighlight = Plugin.Service.Packs.isExistUnwatched();
 			if (!showContentHighlight && Plugin.Service.Storage.getRecentStickers().length == 0) {
 				showContentHighlight = true;
 			}

@@ -192,6 +192,11 @@
 
 			for (var i = 0; i < packs.length; i++) {
 				var pack = packs[i];
+
+				if (Plugin.Service.Pack.isHidden(pack)) {
+					continue;
+				}
+
 				this.scrollableContentEl.appendChild(this.renderPackTab(pack));
 				this.packTabsIndexes[pack.pack_name] = i;
 			}

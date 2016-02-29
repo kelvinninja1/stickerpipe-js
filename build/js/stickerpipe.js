@@ -3379,7 +3379,7 @@ window.StickersModule.Service = {};
 
 		check: function() {
 
-			var showContentHighlight = Plugin.Service.Pack.isExistUnwatchedPacks();
+			var showContentHighlight = Plugin.Service.Packs.isExistUnwatched();
 			if (!showContentHighlight && Plugin.Service.Storage.getRecentStickers().length == 0) {
 				showContentHighlight = true;
 			}
@@ -3398,15 +3398,80 @@ window.StickersModule.Service = {};
 
 	var stickerpipe;
 
-	function filterActivePacks(packs) {
-		for (var i = 0; i < packs.length; i++) {
-			if (packs[i].user_status != 'active') {
-				packs.splice(i, 1);
-			}
-		}
+	Plugin.Service.Pack = {
 
-		return packs;
-	}
+		init: function(_stickerpipe) {
+			stickerpipe = _stickerpipe;
+		},
+
+		purchase: function(packName, pricePoint, isUnwatched, successCallback, failCallback) {
+			isUnwatched = (typeof isUnwatched == 'undefined') ? true : isUnwatched;
+
+			Plugin.Service.Api.purchasePack(packName, pricePoint, function(pack) {
+				pack.isUnwatched = isUnwatched;
+
+				var packContentIds = [];
+				for (var i = 0; i < pack.stickers.length; i++) {
+					var sticker = pack.stickers[i];
+					sticker.pack = packName;
+
+					Plugin.Service.Storage.setContentById(sticker.content_id, sticker);
+
+					packContentIds.push(sticker.content_id);
+				}
+
+				pack.stickers = packContentIds;
+
+				Plugin.Service.Storage.setPack(pack.pack_name, pack);
+
+				if (stickerpipe && stickerpipe.view.isRendered) {
+					stickerpipe.view.tabsView.renderPacks();
+				}
+
+				successCallback && successCallback(pack);
+			}, function() {
+				failCallback && failCallback();
+			});
+		},
+
+		remove: function(packName, successCallback, failCallback) {
+			Plugin.Service.Api.hidePack(packName, function() {
+
+				var packs = Plugin.Service.Storage.getPacks();
+				for (var i = 0; i < packs.length; i++) {
+					if (packs[i].pack_name == packName) {
+						packs.splice(i, 1);
+					}
+				}
+				Plugin.Service.Storage.setPacks(packs);
+
+				if (stickerpipe && stickerpipe.view.isRendered) {
+					stickerpipe.view.tabsView.renderPacks();
+					stickerpipe.view.tabsView.controls.history.el.click();
+				}
+
+				successCallback && successCallback();
+			}, function() {
+				failCallback && failCallback();
+			});
+		},
+
+		getMainIcon: function(packName, successCallback) {
+			Plugin.Service.Api.getPackPreview(packName, function(pack) {
+				var url = (pack && pack.main_icon && pack.main_icon[Plugin.Configs.stickerResolutionType]) || null;
+
+				successCallback && successCallback(url);
+			});
+		},
+
+		isHidden: function(pack) {
+			return pack.user_status == 'hidden';
+		}
+	};
+
+})(window.StickersModule);
+
+(function(Plugin) {
 
 	function filterRecentStickers() {
 
@@ -3452,47 +3517,11 @@ window.StickersModule.Service = {};
 		}
 	}
 
-	Plugin.Service.Pack = {
+	Plugin.Service.Packs = {
 
-		init: function(_stickerpipe) {
-			stickerpipe = _stickerpipe;
-		},
-
-		purchase: function(packName, pricePoint, isUnwatched, successCallback, failCallback) {
-			isUnwatched = (typeof isUnwatched == 'undefined') ? true : isUnwatched;
-
-			Plugin.Service.Api.purchasePack(packName, pricePoint, function(pack) {
-				pack.isUnwatched = isUnwatched;
-
-				var packContentIds = [];
-				for (var i = 0; i < pack.stickers.length; i++) {
-					var sticker = pack.stickers[i];
-					sticker.pack = packName;
-
-					Plugin.Service.Storage.setContentById(sticker.content_id, sticker);
-
-					packContentIds.push(sticker.content_id);
-				}
-
-				pack.stickers = packContentIds;
-
-				Plugin.Service.Storage.setPack(pack.pack_name, pack);
-
-				if (stickerpipe && stickerpipe.view.isRendered) {
-					stickerpipe.view.tabsView.renderPacks();
-				}
-
-				successCallback && successCallback(pack);
-			}, function() {
-				failCallback && failCallback();
-			});
-		},
-
-		fetchPacks: function(callback) {
+		fetch: function(callback) {
 
 			Plugin.Service.Api.getPacks(function(packs) {
-
-				packs = filterActivePacks(packs);
 
 				var packsInStorage = Plugin.Service.Storage.getPacks(),
 					undefinedPacksInStorage = [];
@@ -3521,6 +3550,10 @@ window.StickersModule.Service = {};
 				Plugin.Service.Storage.setPacks(packs);
 
 				for (var i = 0; i < undefinedPacksInStorage.length; i++) {
+					if (Plugin.Service.Pack.isHidden(undefinedPacksInStorage[i])) {
+						continue;
+					}
+
 					Plugin.Service.Pack.purchase(
 						undefinedPacksInStorage[i].pack_name,
 						undefinedPacksInStorage[i].pricepoint,
@@ -3536,37 +3569,7 @@ window.StickersModule.Service = {};
 			});
 		},
 
-		remove: function(packName, successCallback, failCallback) {
-			Plugin.Service.Api.hidePack(packName, function() {
-
-				var packs = Plugin.Service.Storage.getPacks();
-				for (var i = 0; i < packs.length; i++) {
-					if (packs[i].pack_name == packName) {
-						packs.splice(i, 1);
-					}
-				}
-				Plugin.Service.Storage.setPacks(packs);
-
-				if (stickerpipe && stickerpipe.view.isRendered) {
-					stickerpipe.view.tabsView.renderPacks();
-					stickerpipe.view.tabsView.controls.history.el.click();
-				}
-
-				successCallback && successCallback();
-			}, function() {
-				failCallback && failCallback();
-			});
-		},
-
-		getMainIcon: function(packName, successCallback) {
-			Plugin.Service.Api.getPackPreview(packName, function(pack) {
-				var url = (pack && pack.main_icon && pack.main_icon[Plugin.Configs.stickerResolutionType]) || null;
-
-				successCallback && successCallback(url);
-			});
-		},
-
-		isExistUnwatchedPacks: function() {
+		isExistUnwatched: function() {
 			var packs = Plugin.Service.Storage.getPacks();
 
 			for(var i = 0; i < packs.length; i++) {
@@ -5013,6 +5016,18 @@ window.StickersModule.Module = {};
 
 	var stickerpipe;
 
+	function isPackHidden(packName) {
+		var packs = Plugin.Service.Storage.getPacks();
+
+		for (var i = 0; i < packs.length; i++) {
+			if (packs[i].pack_name == packName) {
+				return Plugin.Service.Pack.isHidden(packs[i]);
+			}
+		}
+
+		return false;
+	}
+
 	Module.Api= {
 
 		init: function(_stickerpipe) {
@@ -5029,7 +5044,9 @@ window.StickersModule.Module = {};
 				packTitle = data.attrs.packTitle,
 				pricePoint = data.attrs.pricePoint;
 
-			if (pricePoint == 'A' || (pricePoint == 'B' && Plugin.Configs.userPremium)) {
+			var isHidden = isPackHidden(packName);
+
+			if (pricePoint == 'A' || (pricePoint == 'B' && Plugin.Configs.userPremium) || isHidden) {
 				Module.Controller.downloadPack(packName, pricePoint);
 			} else {
 				Module.Controller.onPurchaseCallback &&
@@ -6192,6 +6209,11 @@ window.StickersModule.View = {};
 
 			for (var i = 0; i < packs.length; i++) {
 				var pack = packs[i];
+
+				if (Plugin.Service.Pack.isHidden(pack)) {
+					continue;
+				}
+
 				this.scrollableContentEl.appendChild(this.renderPackTab(pack));
 				this.packTabsIndexes[pack.pack_name] = i;
 			}
@@ -6383,14 +6405,14 @@ window.StickersModule.View = {};
 			this.delegateEvents();
 
 			// todo
-			Plugin.Service.Pack.fetchPacks(function() {
+			Plugin.Service.Packs.fetch(function() {
 				self.view.render();
 
 				callback && callback();
 			});
 
 			setInterval(function() {
-				Plugin.Service.Pack.fetchPacks();
+				Plugin.Service.Packs.fetch();
 			}, 1000 * 60 * 60);
 		},
 
@@ -6444,7 +6466,7 @@ window.StickersModule.View = {};
 		},
 
 		fetchPacks: function(callback) {
-			Plugin.Service.Pack.fetchPacks(callback);
+			Plugin.Service.Packs.fetch(callback);
 		},
 
 		isSticker: function(text) {
