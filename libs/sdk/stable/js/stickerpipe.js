@@ -3,25 +3,8 @@
 window.StickersModule = {};
 
 
-window.StickersModule.Utils = {};
-document.addEventListener("DOMContentLoaded", function(event) {
-
-	if(typeof window.ga === "undefined"){
-
-		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-	}
-
-	ga('create', 'UA-1113296-81', 'auto', {'name': 'stickerTracker'});
-	ga('stickerTracker.send', 'pageview');
-
-});
+window.StickersModule.Libs = {};
 (function(Plugin) {
-
-	Plugin.StickersModule = Plugin.StickersModule || {};
 
 	/**
 	 *
@@ -257,10 +240,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
 	if (typeof module !== "undefined") {
 		module.exports = Class;
 	} else {
-		Plugin.StickersModule.Class = Class;   // for browser
+		Plugin.Libs.Class = Class;   // for browser
 	}
 
-})(window);
+})(window.StickersModule);
+
+// todo: remove
 
 /*
  * classList.js: Cross-browser full element.classList implementation.
@@ -499,10 +484,25 @@ if ("document" in self) {
 	}
 
 }
+document.addEventListener("DOMContentLoaded", function(event) {
+
+	if(typeof window.ga === "undefined"){
+
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	}
+
+	ga('create', 'UA-1113296-81', 'auto', {'name': 'stickerTracker'});
+	ga('stickerTracker.send', 'pageview');
+
+});
 
 (function(Plugin) {
 
-	Plugin.StickersModule.Lockr = {
+	Plugin.Libs.Lockr = {
 		prefix: '',
 
 		_getPrefixedKey: function(key, options) {
@@ -620,10 +620,10 @@ if ("document" in self) {
 		}
 	};
 
-})(window);
+})(window.StickersModule);
 (function(Plugin) {
 
-	Plugin.StickersModule.MD5 = function (string) {
+	Plugin.Libs.MD5 = function (string) {
 
 		string = string.toString();
 
@@ -826,432 +826,1549 @@ if ("document" in self) {
 		return temp.toLowerCase();
 	};
 
-})(window);
-;(function(window, undefined) {
-	"use strict";
+})(window.StickersModule);
+/* perfect-scrollbar v0.6.10 */
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+'use strict';
 
+var ps = require('../main');
 
-	function extend() {
-		for(var i=1; i < arguments.length; i++) {
-			for(var key in arguments[i]) {
-				if(arguments[i].hasOwnProperty(key)) {
-					arguments[0][key] = arguments[i][key];
-				}
-			}
-		}
-		return arguments[0];
-	}
+if (typeof define === 'function' && define.amd) {
+  // AMD
+  define(ps);
+} else {
+  // Add to a global object.
+  window.StickersModule.Libs.PerfectScrollbar = ps;
+}
 
-	var pluginName = "tinyscrollbar"
-		,   defaults = {
-			axis: 'y'
-			,   wheel: true
-			,   wheelSpeed: 40
-			,   wheelLock: true
-			,   touchLock: true
-			,   trackSize: false
-			,   thumbSize: false
-			,   thumbSizeMin: 20
-		}
-		;
+},{"../main":7}],2:[function(require,module,exports){
+'use strict';
 
-	function Plugin($container, options) {
-		/**
-		 * The options of the carousel extend with the defaults.
-		 *
-		 * @property options
-		 * @type Object
-		 * @default defaults
-		 */
-		this.options = extend({}, defaults, options);
+function oldAdd(element, className) {
+  var classes = element.className.split(' ');
+  if (classes.indexOf(className) < 0) {
+    classes.push(className);
+  }
+  element.className = classes.join(' ');
+}
 
-		/**
-		 * @property _defaults
-		 * @type Object
-		 * @private
-		 * @default defaults
-		 */
-		this._defaults = defaults;
+function oldRemove(element, className) {
+  var classes = element.className.split(' ');
+  var idx = classes.indexOf(className);
+  if (idx >= 0) {
+    classes.splice(idx, 1);
+  }
+  element.className = classes.join(' ');
+}
 
-		/**
-		 * @property _name
-		 * @type String
-		 * @private
-		 * @final
-		 * @default 'tinyscrollbar'
-		 */
-		this._name = pluginName;
+exports.add = function (element, className) {
+  if (element.classList) {
+    element.classList.add(className);
+  } else {
+    oldAdd(element, className);
+  }
+};
 
-		var self = this
-			,   $body = document.querySelectorAll("body")[0]
-			,   $viewport = $container.querySelectorAll(".viewport")[0]
-			,   $overview = $container.querySelectorAll(".overview")[0]
-			,   $scrollbar = $container.querySelectorAll(".scrollbar")[0]
-			,   $track = $scrollbar.querySelectorAll(".track")[0]
-			,   $thumb = $scrollbar.querySelectorAll(".thumb")[0]
+exports.remove = function (element, className) {
+  if (element.classList) {
+    element.classList.remove(className);
+  } else {
+    oldRemove(element, className);
+  }
+};
 
-			,   mousePosition = 0
-			,   isHorizontal = this.options.axis === 'x'
-			,   hasTouchEvents = ("ontouchstart" in document.documentElement)
-			,   wheelEvent = "onwheel" in document.createElement("div") ? "wheel" : // Modern browsers support "wheel"
-				document.onmousewheel !== undefined ? "mousewheel" : // Webkit and IE support at least "mousewheel"
-					"DOMMouseScroll" // let's assume that remaining browsers are older Firefox
+exports.list = function (element) {
+  if (element.classList) {
+    return Array.prototype.slice.apply(element.classList);
+  } else {
+    return element.className.split(' ');
+  }
+};
 
-			,   sizeLabel = isHorizontal ? "width" : "height"
-			,   posiLabel = isHorizontal ? "left" : "top"
-			,   moveEvent = document.createEvent("HTMLEvents")
-			;
+},{}],3:[function(require,module,exports){
+'use strict';
 
-		moveEvent.initEvent("move", true, true);
+var DOM = {};
 
-		/**
-		 * The position of the content relative to the viewport.
-		 *
-		 * @property contentPosition
-		 * @type Number
-		 * @default 0
-		 */
-		this.contentPosition = 0;
+DOM.e = function (tagName, className) {
+  var element = document.createElement(tagName);
+  element.className = className;
+  return element;
+};
 
-		/**
-		 * The height or width of the viewport.
-		 *
-		 * @property viewportSize
-		 * @type Number
-		 * @default 0
-		 */
-		this.viewportSize = 0;
+DOM.appendTo = function (child, parent) {
+  parent.appendChild(child);
+  return child;
+};
 
-		/**
-		 * The height or width of the content.
-		 *
-		 * @property contentSize
-		 * @type Number
-		 * @default 0
-		 */
-		this.contentSize = 0;
+function cssGet(element, styleName) {
+  return window.getComputedStyle(element)[styleName];
+}
 
-		/**
-		 * The ratio of the content size relative to the viewport size.
-		 *
-		 * @property contentRatio
-		 * @type Number
-		 * @default 0
-		 */
-		this.contentRatio = 0;
+function cssSet(element, styleName, styleValue) {
+  if (typeof styleValue === 'number') {
+    styleValue = styleValue.toString() + 'px';
+  }
+  element.style[styleName] = styleValue;
+  return element;
+}
 
-		/**
-		 * The height or width of the content.
-		 *
-		 * @property trackSize
-		 * @type Number
-		 * @default 0
-		 */
-		this.trackSize = 0;
+function cssMultiSet(element, obj) {
+  for (var key in obj) {
+    var val = obj[key];
+    if (typeof val === 'number') {
+      val = val.toString() + 'px';
+    }
+    element.style[key] = val;
+  }
+  return element;
+}
 
-		/**
-		 * The size of the track relative to the size of the content.
-		 *
-		 * @property trackRatio
-		 * @type Number
-		 * @default 0
-		 */
-		this.trackRatio = 0;
+DOM.css = function (element, styleNameOrObject, styleValue) {
+  if (typeof styleNameOrObject === 'object') {
+    // multiple set with object
+    return cssMultiSet(element, styleNameOrObject);
+  } else {
+    if (typeof styleValue === 'undefined') {
+      return cssGet(element, styleNameOrObject);
+    } else {
+      return cssSet(element, styleNameOrObject, styleValue);
+    }
+  }
+};
 
-		/**
-		 * The height or width of the thumb.
-		 *
-		 * @property thumbSize
-		 * @type Number
-		 * @default 0
-		 */
-		this.thumbSize = 0;
+DOM.matches = function (element, query) {
+  if (typeof element.matches !== 'undefined') {
+    return element.matches(query);
+  } else {
+    if (typeof element.matchesSelector !== 'undefined') {
+      return element.matchesSelector(query);
+    } else if (typeof element.webkitMatchesSelector !== 'undefined') {
+      return element.webkitMatchesSelector(query);
+    } else if (typeof element.mozMatchesSelector !== 'undefined') {
+      return element.mozMatchesSelector(query);
+    } else if (typeof element.msMatchesSelector !== 'undefined') {
+      return element.msMatchesSelector(query);
+    }
+  }
+};
 
-		/**
-		 * The position of the thumb relative to the track.
-		 *
-		 * @property thumbPosition
-		 * @type Number
-		 * @default 0
-		 */
-		this.thumbPosition = 0;
+DOM.remove = function (element) {
+  if (typeof element.remove !== 'undefined') {
+    element.remove();
+  } else {
+    if (element.parentNode) {
+      element.parentNode.removeChild(element);
+    }
+  }
+};
 
-		/**
-		 * Will be true if there is content to scroll.
-		 *
-		 * @property hasContentToSroll
-		 * @type Boolean
-		 * @default false
-		 */
-		this.hasContentToSroll = false;
+DOM.queryChildren = function (element, selector) {
+  return Array.prototype.filter.call(element.childNodes, function (child) {
+    return DOM.matches(child, selector);
+  });
+};
 
-		/**
-		 * @method _initialize
-		 * @private
-		 */
-		function _initialize() {
-			self.update();
-			_setEvents();
+module.exports = DOM;
 
-			return self;
-		}
+},{}],4:[function(require,module,exports){
+'use strict';
 
-		/**
-		 * You can use the update method to adjust the scrollbar to new content or to move the scrollbar to a certain point.
-		 *
-		 * @method update
-		 * @chainable
-		 * @param {Number|String} [scrollTo] Number in pixels or the values "relative" or "bottom". If you dont specify a parameter it will default to top
-		 */
-		this.update = function(scrollTo) {
-			var sizeLabelCap = sizeLabel.charAt(0).toUpperCase() + sizeLabel.slice(1).toLowerCase();
-			var scrcls = $scrollbar.className;
+var EventElement = function (element) {
+  this.element = element;
+  this.events = {};
+};
 
-			this.viewportSize = $viewport['offset'+ sizeLabelCap];
-			this.contentSize = $overview['scroll'+ sizeLabelCap];
-			this.contentRatio = this.viewportSize / this.contentSize;
-			this.trackSize = this.options.trackSize || this.viewportSize;
-			this.trackSize -= 2; // bugfix (for css - top: 2px)
-			this.thumbSize = Math.min(this.trackSize, Math.max(this.options.thumbSizeMin, (this.options.thumbSize || (this.trackSize * this.contentRatio))));
-			this.trackRatio = (this.contentSize - this.viewportSize) / (this.trackSize - this.thumbSize);
-			this.hasContentToSroll = this.contentRatio < 1;
+EventElement.prototype.bind = function (eventName, handler) {
+  if (typeof this.events[eventName] === 'undefined') {
+    this.events[eventName] = [];
+  }
+  this.events[eventName].push(handler);
+  this.element.addEventListener(eventName, handler, false);
+};
 
-			$scrollbar.className = this.hasContentToSroll ? scrcls.replace(/disable/g, "") : scrcls.replace(/ disable/g, "") + " disable";
+EventElement.prototype.unbind = function (eventName, handler) {
+  var isHandlerProvided = (typeof handler !== 'undefined');
+  this.events[eventName] = this.events[eventName].filter(function (hdlr) {
+    if (isHandlerProvided && hdlr !== handler) {
+      return true;
+    }
+    this.element.removeEventListener(eventName, hdlr, false);
+    return false;
+  }, this);
+};
 
-			switch (scrollTo) {
-				case "bottom":
-					this.contentPosition = Math.max(this.contentSize - this.viewportSize, 0);
-					break;
+EventElement.prototype.unbindAll = function () {
+  for (var name in this.events) {
+    this.unbind(name);
+  }
+};
 
-				case "relative":
-					this.contentPosition = Math.min(Math.max(this.contentSize - this.viewportSize, 0), Math.max(0, this.contentPosition));
-					break;
+var EventManager = function () {
+  this.eventElements = [];
+};
 
-				default:
-					this.contentPosition = parseInt(scrollTo, 10) || 0;
-			}
+EventManager.prototype.eventElement = function (element) {
+  var ee = this.eventElements.filter(function (eventElement) {
+    return eventElement.element === element;
+  })[0];
+  if (typeof ee === 'undefined') {
+    ee = new EventElement(element);
+    this.eventElements.push(ee);
+  }
+  return ee;
+};
 
-			this.thumbPosition = self.contentPosition / self.trackRatio;
+EventManager.prototype.bind = function (element, eventName, handler) {
+  this.eventElement(element).bind(eventName, handler);
+};
 
-			_setCss();
+EventManager.prototype.unbind = function (element, eventName, handler) {
+  this.eventElement(element).unbind(eventName, handler);
+};
 
-			return self;
-		};
+EventManager.prototype.unbindAll = function () {
+  for (var i = 0; i < this.eventElements.length; i++) {
+    this.eventElements[i].unbindAll();
+  }
+};
 
-		this._isAtEnd = function() {
-			return _isAtEnd();
-		};
+EventManager.prototype.once = function (element, eventName, handler) {
+  var ee = this.eventElement(element);
+  var onceHandler = function (e) {
+    ee.unbind(eventName, onceHandler);
+    handler(e);
+  };
+  ee.bind(eventName, onceHandler);
+};
 
-		this._isAtBegin = function() {
-			return _isAtBegin();
-		};
+module.exports = EventManager;
 
-		/**
-		 * @method _setCss
-		 * @private
-		 */
-		function _setCss() {
-			$thumb.style[posiLabel] = self.thumbPosition + "px";
-			$overview.style[posiLabel] = -self.contentPosition + "px";
-			$scrollbar.style[sizeLabel] = self.trackSize + "px";
-			$track.style[sizeLabel] = self.trackSize + "px";
-			$thumb.style[sizeLabel] = self.thumbSize + "px";
-		}
+},{}],5:[function(require,module,exports){
+'use strict';
 
-		/**
-		 * @method _setEvents
-		 * @private
-		 */
-		function _setEvents() {
-			if(hasTouchEvents) {
-				$viewport.ontouchstart = function(event) {
-					if(1 === event.touches.length) {
-						_start(event.touches[0]);
-						event.stopPropagation();
-					}
-				};
-			}
-			else {
-				$thumb.onmousedown = function(event) {
-					event.stopPropagation();
-					_start(event);
-				};
+module.exports = (function () {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+               .toString(16)
+               .substring(1);
+  }
+  return function () {
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+           s4() + '-' + s4() + s4() + s4();
+  };
+})();
 
-				$track.onmousedown = function(event) {
-					_start(event, true);
-				};
-			}
+},{}],6:[function(require,module,exports){
+'use strict';
 
-			window.addEventListener("resize", function() {
-				self.update("relative");
-			}, true);
+var cls = require('./class')
+  , d = require('./dom');
 
-			if(self.options.wheel && window.addEventListener) {
-				$container.addEventListener(wheelEvent, _wheel, false );
-			}
-			else if(self.options.wheel) {
-				$container.onmousewheel = _wheel;
-			}
-		}
+exports.toInt = function (x) {
+  return parseInt(x, 10) || 0;
+};
 
-		/**
-		 * @method _isAtBegin
-		 * @private
-		 */
-		function _isAtBegin() {
-			return self.contentPosition > 0;
-		}
+exports.clone = function (obj) {
+  if (obj === null) {
+    return null;
+  } else if (typeof obj === 'object') {
+    var result = {};
+    for (var key in obj) {
+      result[key] = this.clone(obj[key]);
+    }
+    return result;
+  } else {
+    return obj;
+  }
+};
 
-		/**
-		 * @method _isAtEnd
-		 * @private
-		 */
-		function _isAtEnd() {
-			return self.contentPosition <= (self.contentSize - self.viewportSize) - 5;
-		}
+exports.extend = function (original, source) {
+  var result = this.clone(original);
+  for (var key in source) {
+    result[key] = this.clone(source[key]);
+  }
+  return result;
+};
 
-		/**
-		 * @method _start
-		 * @private
-		 */
-		function _start(event, gotoMouse) {
-			if(self.hasContentToSroll) {
-				var posiLabelCap = posiLabel.charAt(0).toUpperCase() + posiLabel.slice(1).toLowerCase();
-				mousePosition = gotoMouse ? $thumb.getBoundingClientRect()[posiLabel] : (isHorizontal ? event.clientX : event.clientY);
+exports.isEditable = function (el) {
+  return d.matches(el, "input,[contenteditable]") ||
+         d.matches(el, "select,[contenteditable]") ||
+         d.matches(el, "textarea,[contenteditable]") ||
+         d.matches(el, "button,[contenteditable]");
+};
 
-				$body.className += " noSelect";
+exports.removePsClasses = function (element) {
+  var clsList = cls.list(element);
+  for (var i = 0; i < clsList.length; i++) {
+    var className = clsList[i];
+    if (className.indexOf('ps-') === 0) {
+      cls.remove(element, className);
+    }
+  }
+};
 
-				if(hasTouchEvents) {
-					document.ontouchmove = function(event) {
-						if(self.options.touchLock || _isAtBegin() && _isAtEnd()) {
-							event.preventDefault();
-						}
-						_drag(event.touches[0]);
-					};
-					document.ontouchend = _end;
-				}
-				else {
-					document.onmousemove = _drag;
-					document.onmouseup = $thumb.onmouseup = _end;
-				}
+exports.outerWidth = function (element) {
+  return this.toInt(d.css(element, 'width')) +
+         this.toInt(d.css(element, 'paddingLeft')) +
+         this.toInt(d.css(element, 'paddingRight')) +
+         this.toInt(d.css(element, 'borderLeftWidth')) +
+         this.toInt(d.css(element, 'borderRightWidth'));
+};
 
-				_drag(event);
-			}
-		}
+exports.startScrolling = function (element, axis) {
+  cls.add(element, 'ps-in-scrolling');
+  if (typeof axis !== 'undefined') {
+    cls.add(element, 'ps-' + axis);
+  } else {
+    cls.add(element, 'ps-x');
+    cls.add(element, 'ps-y');
+  }
+};
 
-		/**
-		 * @method _wheel
-		 * @private
-		 */
-		function _wheel(event) {
-			if(self.hasContentToSroll) {
-				var evntObj = event || window.event
-					,   wheelSpeedDelta = -(evntObj.deltaY || evntObj.detail || (-1 / 3 * evntObj.wheelDelta)) / 40
-					,   multiply = (evntObj.deltaMode === 1) ? self.options.wheelSpeed : 1
-					;
+exports.stopScrolling = function (element, axis) {
+  cls.remove(element, 'ps-in-scrolling');
+  if (typeof axis !== 'undefined') {
+    cls.remove(element, 'ps-' + axis);
+  } else {
+    cls.remove(element, 'ps-x');
+    cls.remove(element, 'ps-y');
+  }
+};
 
-				// bugfix
-				wheelSpeedDelta = wheelSpeedDelta || 0;
+exports.env = {
+  isWebKit: 'WebkitAppearance' in document.documentElement.style,
+  supportsTouch: (('ontouchstart' in window) || window.DocumentTouch && document instanceof window.DocumentTouch),
+  supportsIePointer: window.navigator.msMaxTouchPoints !== null
+};
 
-				// todo
-				if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1 &&
-					navigator.platform.indexOf('Win') > -1) {
+},{"./class":2,"./dom":3}],7:[function(require,module,exports){
+'use strict';
 
-					if (wheelSpeedDelta > 0) {
-						wheelSpeedDelta = 2.5;
-					} else {
-						wheelSpeedDelta = -2.5;
-					}
-				}
+var destroy = require('./plugin/destroy')
+  , initialize = require('./plugin/initialize')
+  , update = require('./plugin/update');
 
-				//console.log(wheelSpeedDelta, self.options.wheelSpeed, self.contentSize, self.viewportSize, self.contentPosition);
+module.exports = {
+  initialize: initialize,
+  update: update,
+  destroy: destroy
+};
 
-				self.contentPosition -= wheelSpeedDelta * self.options.wheelSpeed;
-				self.contentPosition = Math.min((self.contentSize - self.viewportSize), Math.max(0, self.contentPosition));
-				self.thumbPosition = self.contentPosition / self.trackRatio;
+},{"./plugin/destroy":9,"./plugin/initialize":17,"./plugin/update":21}],8:[function(require,module,exports){
+'use strict';
 
-				$container.dispatchEvent(moveEvent);
+module.exports = {
+  maxScrollbarLength: null,
+  minScrollbarLength: null,
+  scrollXMarginOffset: 0,
+  scrollYMarginOffset: 0,
+  stopPropagationOnClick: true,
+  suppressScrollX: false,
+  suppressScrollY: false,
+  swipePropagation: true,
+  useBothWheelAxes: false,
+  useKeyboard: true,
+  useSelectionScroll: false,
+  wheelPropagation: false,
+  wheelSpeed: 1,
+  theme: 'default'
+};
 
-				$thumb.style[posiLabel] = self.thumbPosition + "px";
-				$overview.style[posiLabel] = -self.contentPosition + "px";
+},{}],9:[function(require,module,exports){
+'use strict';
 
-				if(self.options.wheelLock || _isAtBegin() && _isAtEnd()) {
-					evntObj.preventDefault();
-				}
-			}
-		}
+var d = require('../lib/dom')
+  , h = require('../lib/helper')
+  , instances = require('./instances');
 
-		/**
-		 * @method _drag
-		 * @private
-		 */
-		function _drag(event) {
-			if(self.hasContentToSroll)
-			{
-				var mousePositionNew = isHorizontal ? event.clientX : event.clientY
-					,   thumbPositionDelta = hasTouchEvents ? (mousePosition - mousePositionNew) : (mousePositionNew - mousePosition)
-					,   thumbPositionNew = Math.min((self.trackSize - self.thumbSize), Math.max(0, self.thumbPosition + thumbPositionDelta))
-					;
+module.exports = function (element) {
+  var i = instances.get(element);
 
-				self.contentPosition = thumbPositionNew * self.trackRatio;
+  if (!i) {
+    return;
+  }
 
-				$container.dispatchEvent(moveEvent);
+  i.event.unbindAll();
+  d.remove(i.scrollbarX);
+  d.remove(i.scrollbarY);
+  d.remove(i.scrollbarXRail);
+  d.remove(i.scrollbarYRail);
+  h.removePsClasses(element);
 
-				$thumb.style[posiLabel] = thumbPositionNew + "px";
-				$overview.style[posiLabel] = -self.contentPosition + "px";
-			}
-		}
+  instances.remove(element);
+};
 
+},{"../lib/dom":3,"../lib/helper":6,"./instances":18}],10:[function(require,module,exports){
+'use strict';
 
-		/**
-		 * @method _end
-		 * @private
-		 */
-		function _end() {
-			self.thumbPosition = parseInt($thumb.style[posiLabel], 10) || 0;
+var h = require('../../lib/helper')
+  , instances = require('../instances')
+  , updateGeometry = require('../update-geometry')
+  , updateScroll = require('../update-scroll');
 
-			$body.className = $body.className.replace(" noSelect", "");
-			document.onmousemove = document.onmouseup = null;
-			$thumb.onmouseup = null;
-			$track.onmouseup = null;
-			document.ontouchmove = document.ontouchend = null;
-		}
+function bindClickRailHandler(element, i) {
+  function pageOffset(el) {
+    return el.getBoundingClientRect();
+  }
+  var stopPropagation = window.Event.prototype.stopPropagation.bind;
 
-		return _initialize();
-	}
+  if (i.settings.stopPropagationOnClick) {
+    i.event.bind(i.scrollbarY, 'click', stopPropagation);
+  }
+  i.event.bind(i.scrollbarYRail, 'click', function (e) {
+    var halfOfScrollbarLength = h.toInt(i.scrollbarYHeight / 2);
+    var positionTop = i.railYRatio * (e.pageY - window.pageYOffset - pageOffset(i.scrollbarYRail).top - halfOfScrollbarLength);
+    var maxPositionTop = i.railYRatio * (i.railYHeight - i.scrollbarYHeight);
+    var positionRatio = positionTop / maxPositionTop;
 
-	/**
-	 * @class window.tinyscrollbar
-	 * @constructor
-	 * @param {Object} [$container] Element to attach scrollbar to.
-	 * @param {Object} options
-	 @param {String} [options.axis='y'] Vertical or horizontal scroller? ( x || y ).
-	 @param {Boolean} [options.wheel=true] Enable or disable the mousewheel.
-	 @param {Boolean} [options.wheelSpeed=40] How many pixels must the mouswheel scroll at a time.
-	 @param {Boolean} [options.wheelLock=true] Lock default window wheel scrolling when there is no more content to scroll.
-	 @param {Number} [options.touchLock=true] Lock default window touch scrolling when there is no more content to scroll.
-	 @param {Boolean|Number} [options.trackSize=false] Set the size of the scrollbar to auto(false) or a fixed number.
-	 @param {Boolean|Number} [options.thumbSize=false] Set the size of the thumb to auto(false) or a fixed number
-	 @param {Boolean} [options.thumbSizeMin=20] Minimum thumb size.
-	 */
-	var tinyscrollbar = function($container, options) {
-		return new Plugin($container, options);
-	};
+    if (positionRatio < 0) {
+      positionRatio = 0;
+    } else if (positionRatio > 1) {
+      positionRatio = 1;
+    }
 
-	if(typeof define == 'function' && define.amd) {
-		define(function(){ return tinyscrollbar; });
-	}
-	else if(typeof module === 'object' && module.exports) {
-		module.exports = tinyscrollbar;
-	}
-	else {
-		window.StickersModule.Tinyscrollbar = tinyscrollbar;
-	}
-})(window);
+    updateScroll(element, 'top', (i.contentHeight - i.containerHeight) * positionRatio);
+    updateGeometry(element);
+
+    e.stopPropagation();
+  });
+
+  if (i.settings.stopPropagationOnClick) {
+    i.event.bind(i.scrollbarX, 'click', stopPropagation);
+  }
+  i.event.bind(i.scrollbarXRail, 'click', function (e) {
+    var halfOfScrollbarLength = h.toInt(i.scrollbarXWidth / 2);
+    var positionLeft = i.railXRatio * (e.pageX - window.pageXOffset - pageOffset(i.scrollbarXRail).left - halfOfScrollbarLength);
+    var maxPositionLeft = i.railXRatio * (i.railXWidth - i.scrollbarXWidth);
+    var positionRatio = positionLeft / maxPositionLeft;
+
+    if (positionRatio < 0) {
+      positionRatio = 0;
+    } else if (positionRatio > 1) {
+      positionRatio = 1;
+    }
+
+    updateScroll(element, 'left', ((i.contentWidth - i.containerWidth) * positionRatio) - i.negativeScrollAdjustment);
+    updateGeometry(element);
+
+    e.stopPropagation();
+  });
+}
+
+module.exports = function (element) {
+  var i = instances.get(element);
+  bindClickRailHandler(element, i);
+};
+
+},{"../../lib/helper":6,"../instances":18,"../update-geometry":19,"../update-scroll":20}],11:[function(require,module,exports){
+'use strict';
+
+var d = require('../../lib/dom')
+  , h = require('../../lib/helper')
+  , instances = require('../instances')
+  , updateGeometry = require('../update-geometry')
+  , updateScroll = require('../update-scroll');
+
+function bindMouseScrollXHandler(element, i) {
+  var currentLeft = null;
+  var currentPageX = null;
+
+  function updateScrollLeft(deltaX) {
+    var newLeft = currentLeft + (deltaX * i.railXRatio);
+    var maxLeft = Math.max(0, i.scrollbarXRail.getBoundingClientRect().left) + (i.railXRatio * (i.railXWidth - i.scrollbarXWidth));
+
+    if (newLeft < 0) {
+      i.scrollbarXLeft = 0;
+    } else if (newLeft > maxLeft) {
+      i.scrollbarXLeft = maxLeft;
+    } else {
+      i.scrollbarXLeft = newLeft;
+    }
+
+    var scrollLeft = h.toInt(i.scrollbarXLeft * (i.contentWidth - i.containerWidth) / (i.containerWidth - (i.railXRatio * i.scrollbarXWidth))) - i.negativeScrollAdjustment;
+    updateScroll(element, 'left', scrollLeft);
+  }
+
+  var mouseMoveHandler = function (e) {
+    updateScrollLeft(e.pageX - currentPageX);
+    updateGeometry(element);
+    e.stopPropagation();
+    e.preventDefault();
+  };
+
+  var mouseUpHandler = function () {
+    h.stopScrolling(element, 'x');
+    i.event.unbind(i.ownerDocument, 'mousemove', mouseMoveHandler);
+  };
+
+  i.event.bind(i.scrollbarX, 'mousedown', function (e) {
+    currentPageX = e.pageX;
+    currentLeft = h.toInt(d.css(i.scrollbarX, 'left')) * i.railXRatio;
+    h.startScrolling(element, 'x');
+
+    i.event.bind(i.ownerDocument, 'mousemove', mouseMoveHandler);
+    i.event.once(i.ownerDocument, 'mouseup', mouseUpHandler);
+
+    e.stopPropagation();
+    e.preventDefault();
+  });
+}
+
+function bindMouseScrollYHandler(element, i) {
+  var currentTop = null;
+  var currentPageY = null;
+
+  function updateScrollTop(deltaY) {
+    var newTop = currentTop + (deltaY * i.railYRatio);
+    var maxTop = Math.max(0, i.scrollbarYRail.getBoundingClientRect().top) + (i.railYRatio * (i.railYHeight - i.scrollbarYHeight));
+
+    if (newTop < 0) {
+      i.scrollbarYTop = 0;
+    } else if (newTop > maxTop) {
+      i.scrollbarYTop = maxTop;
+    } else {
+      i.scrollbarYTop = newTop;
+    }
+
+    var scrollTop = h.toInt(i.scrollbarYTop * (i.contentHeight - i.containerHeight) / (i.containerHeight - (i.railYRatio * i.scrollbarYHeight)));
+    updateScroll(element, 'top', scrollTop);
+  }
+
+  var mouseMoveHandler = function (e) {
+    updateScrollTop(e.pageY - currentPageY);
+    updateGeometry(element);
+    e.stopPropagation();
+    e.preventDefault();
+  };
+
+  var mouseUpHandler = function () {
+    h.stopScrolling(element, 'y');
+    i.event.unbind(i.ownerDocument, 'mousemove', mouseMoveHandler);
+  };
+
+  i.event.bind(i.scrollbarY, 'mousedown', function (e) {
+    currentPageY = e.pageY;
+    currentTop = h.toInt(d.css(i.scrollbarY, 'top')) * i.railYRatio;
+    h.startScrolling(element, 'y');
+
+    i.event.bind(i.ownerDocument, 'mousemove', mouseMoveHandler);
+    i.event.once(i.ownerDocument, 'mouseup', mouseUpHandler);
+
+    e.stopPropagation();
+    e.preventDefault();
+  });
+}
+
+module.exports = function (element) {
+  var i = instances.get(element);
+  bindMouseScrollXHandler(element, i);
+  bindMouseScrollYHandler(element, i);
+};
+
+},{"../../lib/dom":3,"../../lib/helper":6,"../instances":18,"../update-geometry":19,"../update-scroll":20}],12:[function(require,module,exports){
+'use strict';
+
+var h = require('../../lib/helper')
+  , d = require('../../lib/dom')
+  , instances = require('../instances')
+  , updateGeometry = require('../update-geometry')
+  , updateScroll = require('../update-scroll');
+
+function bindKeyboardHandler(element, i) {
+  var hovered = false;
+  i.event.bind(element, 'mouseenter', function () {
+    hovered = true;
+  });
+  i.event.bind(element, 'mouseleave', function () {
+    hovered = false;
+  });
+
+  var shouldPrevent = false;
+  function shouldPreventDefault(deltaX, deltaY) {
+    var scrollTop = element.scrollTop;
+    if (deltaX === 0) {
+      if (!i.scrollbarYActive) {
+        return false;
+      }
+      if ((scrollTop === 0 && deltaY > 0) || (scrollTop >= i.contentHeight - i.containerHeight && deltaY < 0)) {
+        return !i.settings.wheelPropagation;
+      }
+    }
+
+    var scrollLeft = element.scrollLeft;
+    if (deltaY === 0) {
+      if (!i.scrollbarXActive) {
+        return false;
+      }
+      if ((scrollLeft === 0 && deltaX < 0) || (scrollLeft >= i.contentWidth - i.containerWidth && deltaX > 0)) {
+        return !i.settings.wheelPropagation;
+      }
+    }
+    return true;
+  }
+
+  i.event.bind(i.ownerDocument, 'keydown', function (e) {
+    if (e.isDefaultPrevented && e.isDefaultPrevented()) {
+      return;
+    }
+
+    var focused = d.matches(i.scrollbarX, ':focus') ||
+                  d.matches(i.scrollbarY, ':focus');
+
+    if (!hovered && !focused) {
+      return;
+    }
+
+    var activeElement = document.activeElement ? document.activeElement : i.ownerDocument.activeElement;
+    if (activeElement) {
+      // go deeper if element is a webcomponent
+      while (activeElement.shadowRoot) {
+        activeElement = activeElement.shadowRoot.activeElement;
+      }
+      if (h.isEditable(activeElement)) {
+        return;
+      }
+    }
+
+    var deltaX = 0;
+    var deltaY = 0;
+
+    switch (e.which) {
+    case 37: // left
+      deltaX = -30;
+      break;
+    case 38: // up
+      deltaY = 30;
+      break;
+    case 39: // right
+      deltaX = 30;
+      break;
+    case 40: // down
+      deltaY = -30;
+      break;
+    case 33: // page up
+      deltaY = 90;
+      break;
+    case 32: // space bar
+      if (e.shiftKey) {
+        deltaY = 90;
+      } else {
+        deltaY = -90;
+      }
+      break;
+    case 34: // page down
+      deltaY = -90;
+      break;
+    case 35: // end
+      if (e.ctrlKey) {
+        deltaY = -i.contentHeight;
+      } else {
+        deltaY = -i.containerHeight;
+      }
+      break;
+    case 36: // home
+      if (e.ctrlKey) {
+        deltaY = element.scrollTop;
+      } else {
+        deltaY = i.containerHeight;
+      }
+      break;
+    default:
+      return;
+    }
+
+    updateScroll(element, 'top', element.scrollTop - deltaY);
+    updateScroll(element, 'left', element.scrollLeft + deltaX);
+    updateGeometry(element);
+
+    shouldPrevent = shouldPreventDefault(deltaX, deltaY);
+    if (shouldPrevent) {
+      e.preventDefault();
+    }
+  });
+}
+
+module.exports = function (element) {
+  var i = instances.get(element);
+  bindKeyboardHandler(element, i);
+};
+
+},{"../../lib/dom":3,"../../lib/helper":6,"../instances":18,"../update-geometry":19,"../update-scroll":20}],13:[function(require,module,exports){
+'use strict';
+
+var instances = require('../instances')
+  , updateGeometry = require('../update-geometry')
+  , updateScroll = require('../update-scroll');
+
+function bindMouseWheelHandler(element, i) {
+  var shouldPrevent = false;
+
+  function shouldPreventDefault(deltaX, deltaY) {
+    var scrollTop = element.scrollTop;
+    if (deltaX === 0) {
+      if (!i.scrollbarYActive) {
+        return false;
+      }
+      if ((scrollTop === 0 && deltaY > 0) || (scrollTop >= i.contentHeight - i.containerHeight && deltaY < 0)) {
+        return !i.settings.wheelPropagation;
+      }
+    }
+
+    var scrollLeft = element.scrollLeft;
+    if (deltaY === 0) {
+      if (!i.scrollbarXActive) {
+        return false;
+      }
+      if ((scrollLeft === 0 && deltaX < 0) || (scrollLeft >= i.contentWidth - i.containerWidth && deltaX > 0)) {
+        return !i.settings.wheelPropagation;
+      }
+    }
+    return true;
+  }
+
+  function getDeltaFromEvent(e) {
+    var deltaX = e.deltaX;
+    var deltaY = -1 * e.deltaY;
+
+    if (typeof deltaX === "undefined" || typeof deltaY === "undefined") {
+      // OS X Safari
+      deltaX = -1 * e.wheelDeltaX / 6;
+      deltaY = e.wheelDeltaY / 6;
+    }
+
+    if (e.deltaMode && e.deltaMode === 1) {
+      // Firefox in deltaMode 1: Line scrolling
+      deltaX *= 10;
+      deltaY *= 10;
+    }
+
+    if (deltaX !== deltaX && deltaY !== deltaY/* NaN checks */) {
+      // IE in some mouse drivers
+      deltaX = 0;
+      deltaY = e.wheelDelta;
+    }
+
+    return [deltaX, deltaY];
+  }
+
+  function shouldBeConsumedByTextarea(deltaX, deltaY) {
+    var hoveredTextarea = element.querySelector('textarea:hover');
+    if (hoveredTextarea) {
+      var maxScrollTop = hoveredTextarea.scrollHeight - hoveredTextarea.clientHeight;
+      if (maxScrollTop > 0) {
+        if (!(hoveredTextarea.scrollTop === 0 && deltaY > 0) &&
+            !(hoveredTextarea.scrollTop === maxScrollTop && deltaY < 0)) {
+          return true;
+        }
+      }
+      var maxScrollLeft = hoveredTextarea.scrollLeft - hoveredTextarea.clientWidth;
+      if (maxScrollLeft > 0) {
+        if (!(hoveredTextarea.scrollLeft === 0 && deltaX < 0) &&
+            !(hoveredTextarea.scrollLeft === maxScrollLeft && deltaX > 0)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  function mousewheelHandler(e) {
+    var delta = getDeltaFromEvent(e);
+
+    var deltaX = delta[0];
+    var deltaY = delta[1];
+
+    if (shouldBeConsumedByTextarea(deltaX, deltaY)) {
+      return;
+    }
+
+    shouldPrevent = false;
+    if (!i.settings.useBothWheelAxes) {
+      // deltaX will only be used for horizontal scrolling and deltaY will
+      // only be used for vertical scrolling - this is the default
+      updateScroll(element, 'top', element.scrollTop - (deltaY * i.settings.wheelSpeed));
+      updateScroll(element, 'left', element.scrollLeft + (deltaX * i.settings.wheelSpeed));
+    } else if (i.scrollbarYActive && !i.scrollbarXActive) {
+      // only vertical scrollbar is active and useBothWheelAxes option is
+      // active, so let's scroll vertical bar using both mouse wheel axes
+      if (deltaY) {
+        updateScroll(element, 'top', element.scrollTop - (deltaY * i.settings.wheelSpeed));
+      } else {
+        updateScroll(element, 'top', element.scrollTop + (deltaX * i.settings.wheelSpeed));
+      }
+      shouldPrevent = true;
+    } else if (i.scrollbarXActive && !i.scrollbarYActive) {
+      // useBothWheelAxes and only horizontal bar is active, so use both
+      // wheel axes for horizontal bar
+      if (deltaX) {
+        updateScroll(element, 'left', element.scrollLeft + (deltaX * i.settings.wheelSpeed));
+      } else {
+        updateScroll(element, 'left', element.scrollLeft - (deltaY * i.settings.wheelSpeed));
+      }
+      shouldPrevent = true;
+    }
+
+    updateGeometry(element);
+
+    shouldPrevent = (shouldPrevent || shouldPreventDefault(deltaX, deltaY));
+    if (shouldPrevent) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+  }
+
+  if (typeof window.onwheel !== "undefined") {
+    i.event.bind(element, 'wheel', mousewheelHandler);
+  } else if (typeof window.onmousewheel !== "undefined") {
+    i.event.bind(element, 'mousewheel', mousewheelHandler);
+  }
+}
+
+module.exports = function (element) {
+  var i = instances.get(element);
+  bindMouseWheelHandler(element, i);
+};
+
+},{"../instances":18,"../update-geometry":19,"../update-scroll":20}],14:[function(require,module,exports){
+'use strict';
+
+var instances = require('../instances')
+  , updateGeometry = require('../update-geometry');
+
+function bindNativeScrollHandler(element, i) {
+  i.event.bind(element, 'scroll', function () {
+    updateGeometry(element);
+  });
+}
+
+module.exports = function (element) {
+  var i = instances.get(element);
+  bindNativeScrollHandler(element, i);
+};
+
+},{"../instances":18,"../update-geometry":19}],15:[function(require,module,exports){
+'use strict';
+
+var h = require('../../lib/helper')
+  , instances = require('../instances')
+  , updateGeometry = require('../update-geometry')
+  , updateScroll = require('../update-scroll');
+
+function bindSelectionHandler(element, i) {
+  function getRangeNode() {
+    var selection = window.getSelection ? window.getSelection() :
+                    document.getSelection ? document.getSelection() : '';
+    if (selection.toString().length === 0) {
+      return null;
+    } else {
+      return selection.getRangeAt(0).commonAncestorContainer;
+    }
+  }
+
+  var scrollingLoop = null;
+  var scrollDiff = {top: 0, left: 0};
+  function startScrolling() {
+    if (!scrollingLoop) {
+      scrollingLoop = setInterval(function () {
+        if (!instances.get(element)) {
+          clearInterval(scrollingLoop);
+          return;
+        }
+
+        updateScroll(element, 'top', element.scrollTop + scrollDiff.top);
+        updateScroll(element, 'left', element.scrollLeft + scrollDiff.left);
+        updateGeometry(element);
+      }, 50); // every .1 sec
+    }
+  }
+  function stopScrolling() {
+    if (scrollingLoop) {
+      clearInterval(scrollingLoop);
+      scrollingLoop = null;
+    }
+    h.stopScrolling(element);
+  }
+
+  var isSelected = false;
+  i.event.bind(i.ownerDocument, 'selectionchange', function () {
+    if (element.contains(getRangeNode())) {
+      isSelected = true;
+    } else {
+      isSelected = false;
+      stopScrolling();
+    }
+  });
+  i.event.bind(window, 'mouseup', function () {
+    if (isSelected) {
+      isSelected = false;
+      stopScrolling();
+    }
+  });
+
+  i.event.bind(window, 'mousemove', function (e) {
+    if (isSelected) {
+      var mousePosition = {x: e.pageX, y: e.pageY};
+      var containerGeometry = {
+        left: element.offsetLeft,
+        right: element.offsetLeft + element.offsetWidth,
+        top: element.offsetTop,
+        bottom: element.offsetTop + element.offsetHeight
+      };
+
+      if (mousePosition.x < containerGeometry.left + 3) {
+        scrollDiff.left = -5;
+        h.startScrolling(element, 'x');
+      } else if (mousePosition.x > containerGeometry.right - 3) {
+        scrollDiff.left = 5;
+        h.startScrolling(element, 'x');
+      } else {
+        scrollDiff.left = 0;
+      }
+
+      if (mousePosition.y < containerGeometry.top + 3) {
+        if (containerGeometry.top + 3 - mousePosition.y < 5) {
+          scrollDiff.top = -5;
+        } else {
+          scrollDiff.top = -20;
+        }
+        h.startScrolling(element, 'y');
+      } else if (mousePosition.y > containerGeometry.bottom - 3) {
+        if (mousePosition.y - containerGeometry.bottom + 3 < 5) {
+          scrollDiff.top = 5;
+        } else {
+          scrollDiff.top = 20;
+        }
+        h.startScrolling(element, 'y');
+      } else {
+        scrollDiff.top = 0;
+      }
+
+      if (scrollDiff.top === 0 && scrollDiff.left === 0) {
+        stopScrolling();
+      } else {
+        startScrolling();
+      }
+    }
+  });
+}
+
+module.exports = function (element) {
+  var i = instances.get(element);
+  bindSelectionHandler(element, i);
+};
+
+},{"../../lib/helper":6,"../instances":18,"../update-geometry":19,"../update-scroll":20}],16:[function(require,module,exports){
+'use strict';
+
+var instances = require('../instances')
+  , updateGeometry = require('../update-geometry')
+  , updateScroll = require('../update-scroll');
+
+function bindTouchHandler(element, i, supportsTouch, supportsIePointer) {
+  function shouldPreventDefault(deltaX, deltaY) {
+    var scrollTop = element.scrollTop;
+    var scrollLeft = element.scrollLeft;
+    var magnitudeX = Math.abs(deltaX);
+    var magnitudeY = Math.abs(deltaY);
+
+    if (magnitudeY > magnitudeX) {
+      // user is perhaps trying to swipe up/down the page
+
+      if (((deltaY < 0) && (scrollTop === i.contentHeight - i.containerHeight)) ||
+          ((deltaY > 0) && (scrollTop === 0))) {
+        return !i.settings.swipePropagation;
+      }
+    } else if (magnitudeX > magnitudeY) {
+      // user is perhaps trying to swipe left/right across the page
+
+      if (((deltaX < 0) && (scrollLeft === i.contentWidth - i.containerWidth)) ||
+          ((deltaX > 0) && (scrollLeft === 0))) {
+        return !i.settings.swipePropagation;
+      }
+    }
+
+    return true;
+  }
+
+  function applyTouchMove(differenceX, differenceY) {
+    updateScroll(element, 'top', element.scrollTop - differenceY);
+    updateScroll(element, 'left', element.scrollLeft - differenceX);
+
+    updateGeometry(element);
+  }
+
+  var startOffset = {};
+  var startTime = 0;
+  var speed = {};
+  var easingLoop = null;
+  var inGlobalTouch = false;
+  var inLocalTouch = false;
+
+  function globalTouchStart() {
+    inGlobalTouch = true;
+  }
+  function globalTouchEnd() {
+    inGlobalTouch = false;
+  }
+
+  function getTouch(e) {
+    if (e.targetTouches) {
+      return e.targetTouches[0];
+    } else {
+      // Maybe IE pointer
+      return e;
+    }
+  }
+  function shouldHandle(e) {
+    if (e.targetTouches && e.targetTouches.length === 1) {
+      return true;
+    }
+    if (e.pointerType && e.pointerType !== 'mouse' && e.pointerType !== e.MSPOINTER_TYPE_MOUSE) {
+      return true;
+    }
+    return false;
+  }
+  function touchStart(e) {
+    if (shouldHandle(e)) {
+      inLocalTouch = true;
+
+      var touch = getTouch(e);
+
+      startOffset.pageX = touch.pageX;
+      startOffset.pageY = touch.pageY;
+
+      startTime = (new Date()).getTime();
+
+      if (easingLoop !== null) {
+        clearInterval(easingLoop);
+      }
+
+      e.stopPropagation();
+    }
+  }
+  function touchMove(e) {
+    if (!inGlobalTouch && inLocalTouch && shouldHandle(e)) {
+      var touch = getTouch(e);
+
+      var currentOffset = {pageX: touch.pageX, pageY: touch.pageY};
+
+      var differenceX = currentOffset.pageX - startOffset.pageX;
+      var differenceY = currentOffset.pageY - startOffset.pageY;
+
+      applyTouchMove(differenceX, differenceY);
+      startOffset = currentOffset;
+
+      var currentTime = (new Date()).getTime();
+
+      var timeGap = currentTime - startTime;
+      if (timeGap > 0) {
+        speed.x = differenceX / timeGap;
+        speed.y = differenceY / timeGap;
+        startTime = currentTime;
+      }
+
+      if (shouldPreventDefault(differenceX, differenceY)) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
+    }
+  }
+  function touchEnd() {
+    if (!inGlobalTouch && inLocalTouch) {
+      inLocalTouch = false;
+
+      clearInterval(easingLoop);
+      easingLoop = setInterval(function () {
+        if (!instances.get(element)) {
+          clearInterval(easingLoop);
+          return;
+        }
+
+        if (Math.abs(speed.x) < 0.01 && Math.abs(speed.y) < 0.01) {
+          clearInterval(easingLoop);
+          return;
+        }
+
+        applyTouchMove(speed.x * 30, speed.y * 30);
+
+        speed.x *= 0.8;
+        speed.y *= 0.8;
+      }, 10);
+    }
+  }
+
+  if (supportsTouch) {
+    i.event.bind(window, 'touchstart', globalTouchStart);
+    i.event.bind(window, 'touchend', globalTouchEnd);
+    i.event.bind(element, 'touchstart', touchStart);
+    i.event.bind(element, 'touchmove', touchMove);
+    i.event.bind(element, 'touchend', touchEnd);
+  }
+
+  if (supportsIePointer) {
+    if (window.PointerEvent) {
+      i.event.bind(window, 'pointerdown', globalTouchStart);
+      i.event.bind(window, 'pointerup', globalTouchEnd);
+      i.event.bind(element, 'pointerdown', touchStart);
+      i.event.bind(element, 'pointermove', touchMove);
+      i.event.bind(element, 'pointerup', touchEnd);
+    } else if (window.MSPointerEvent) {
+      i.event.bind(window, 'MSPointerDown', globalTouchStart);
+      i.event.bind(window, 'MSPointerUp', globalTouchEnd);
+      i.event.bind(element, 'MSPointerDown', touchStart);
+      i.event.bind(element, 'MSPointerMove', touchMove);
+      i.event.bind(element, 'MSPointerUp', touchEnd);
+    }
+  }
+}
+
+module.exports = function (element, supportsTouch, supportsIePointer) {
+  var i = instances.get(element);
+  bindTouchHandler(element, i, supportsTouch, supportsIePointer);
+};
+
+},{"../instances":18,"../update-geometry":19,"../update-scroll":20}],17:[function(require,module,exports){
+'use strict';
+
+var cls = require('../lib/class')
+  , h = require('../lib/helper')
+  , instances = require('./instances')
+  , updateGeometry = require('./update-geometry');
+
+// Handlers
+var clickRailHandler = require('./handler/click-rail')
+  , dragScrollbarHandler = require('./handler/drag-scrollbar')
+  , keyboardHandler = require('./handler/keyboard')
+  , mouseWheelHandler = require('./handler/mouse-wheel')
+  , nativeScrollHandler = require('./handler/native-scroll')
+  , selectionHandler = require('./handler/selection')
+  , touchHandler = require('./handler/touch');
+
+module.exports = function (element, userSettings) {
+  userSettings = typeof userSettings === 'object' ? userSettings : {};
+
+  cls.add(element, 'ps-container');
+
+  // Create a plugin instance.
+  var i = instances.add(element);
+
+  i.settings = h.extend(i.settings, userSettings);
+  cls.add(element, 'ps-theme-' + i.settings.theme);
+
+  clickRailHandler(element);
+  dragScrollbarHandler(element);
+  mouseWheelHandler(element);
+  nativeScrollHandler(element);
+
+  if (i.settings.useSelectionScroll) {
+    selectionHandler(element);
+  }
+
+  if (h.env.supportsTouch || h.env.supportsIePointer) {
+    touchHandler(element, h.env.supportsTouch, h.env.supportsIePointer);
+  }
+  if (i.settings.useKeyboard) {
+    keyboardHandler(element);
+  }
+
+  updateGeometry(element);
+};
+
+},{"../lib/class":2,"../lib/helper":6,"./handler/click-rail":10,"./handler/drag-scrollbar":11,"./handler/keyboard":12,"./handler/mouse-wheel":13,"./handler/native-scroll":14,"./handler/selection":15,"./handler/touch":16,"./instances":18,"./update-geometry":19}],18:[function(require,module,exports){
+'use strict';
+
+var cls = require('../lib/class')
+  , d = require('../lib/dom')
+  , defaultSettings = require('./default-setting')
+  , EventManager = require('../lib/event-manager')
+  , guid = require('../lib/guid')
+  , h = require('../lib/helper');
+
+var instances = {};
+
+function Instance(element) {
+  var i = this;
+
+  i.settings = h.clone(defaultSettings);
+  i.containerWidth = null;
+  i.containerHeight = null;
+  i.contentWidth = null;
+  i.contentHeight = null;
+
+  i.isRtl = d.css(element, 'direction') === "rtl";
+  i.isNegativeScroll = (function () {
+    var originalScrollLeft = element.scrollLeft;
+    var result = null;
+    element.scrollLeft = -1;
+    result = element.scrollLeft < 0;
+    element.scrollLeft = originalScrollLeft;
+    return result;
+  })();
+  i.negativeScrollAdjustment = i.isNegativeScroll ? element.scrollWidth - element.clientWidth : 0;
+  i.event = new EventManager();
+  i.ownerDocument = element.ownerDocument || document;
+
+  function focus() {
+    cls.add(element, 'ps-focus');
+  }
+
+  function blur() {
+    cls.remove(element, 'ps-focus');
+  }
+
+  i.scrollbarXRail = d.appendTo(d.e('div', 'ps-scrollbar-x-rail'), element);
+  i.scrollbarX = d.appendTo(d.e('div', 'ps-scrollbar-x'), i.scrollbarXRail);
+  i.scrollbarX.setAttribute('tabindex', 0);
+  i.event.bind(i.scrollbarX, 'focus', focus);
+  i.event.bind(i.scrollbarX, 'blur', blur);
+  i.scrollbarXActive = null;
+  i.scrollbarXWidth = null;
+  i.scrollbarXLeft = null;
+  i.scrollbarXBottom = h.toInt(d.css(i.scrollbarXRail, 'bottom'));
+  i.isScrollbarXUsingBottom = i.scrollbarXBottom === i.scrollbarXBottom; // !isNaN
+  i.scrollbarXTop = i.isScrollbarXUsingBottom ? null : h.toInt(d.css(i.scrollbarXRail, 'top'));
+  i.railBorderXWidth = h.toInt(d.css(i.scrollbarXRail, 'borderLeftWidth')) + h.toInt(d.css(i.scrollbarXRail, 'borderRightWidth'));
+  // Set rail to display:block to calculate margins
+  d.css(i.scrollbarXRail, 'display', 'block');
+  i.railXMarginWidth = h.toInt(d.css(i.scrollbarXRail, 'marginLeft')) + h.toInt(d.css(i.scrollbarXRail, 'marginRight'));
+  d.css(i.scrollbarXRail, 'display', '');
+  i.railXWidth = null;
+  i.railXRatio = null;
+
+  i.scrollbarYRail = d.appendTo(d.e('div', 'ps-scrollbar-y-rail'), element);
+  i.scrollbarY = d.appendTo(d.e('div', 'ps-scrollbar-y'), i.scrollbarYRail);
+  i.scrollbarY.setAttribute('tabindex', 0);
+  i.event.bind(i.scrollbarY, 'focus', focus);
+  i.event.bind(i.scrollbarY, 'blur', blur);
+  i.scrollbarYActive = null;
+  i.scrollbarYHeight = null;
+  i.scrollbarYTop = null;
+  i.scrollbarYRight = h.toInt(d.css(i.scrollbarYRail, 'right'));
+  i.isScrollbarYUsingRight = i.scrollbarYRight === i.scrollbarYRight; // !isNaN
+  i.scrollbarYLeft = i.isScrollbarYUsingRight ? null : h.toInt(d.css(i.scrollbarYRail, 'left'));
+  i.scrollbarYOuterWidth = i.isRtl ? h.outerWidth(i.scrollbarY) : null;
+  i.railBorderYWidth = h.toInt(d.css(i.scrollbarYRail, 'borderTopWidth')) + h.toInt(d.css(i.scrollbarYRail, 'borderBottomWidth'));
+  d.css(i.scrollbarYRail, 'display', 'block');
+  i.railYMarginHeight = h.toInt(d.css(i.scrollbarYRail, 'marginTop')) + h.toInt(d.css(i.scrollbarYRail, 'marginBottom'));
+  d.css(i.scrollbarYRail, 'display', '');
+  i.railYHeight = null;
+  i.railYRatio = null;
+}
+
+function getId(element) {
+  if (typeof element.dataset === 'undefined') {
+    return element.getAttribute('data-ps-id');
+  } else {
+    return element.dataset.psId;
+  }
+}
+
+function setId(element, id) {
+  if (typeof element.dataset === 'undefined') {
+    element.setAttribute('data-ps-id', id);
+  } else {
+    element.dataset.psId = id;
+  }
+}
+
+function removeId(element) {
+  if (typeof element.dataset === 'undefined') {
+    element.removeAttribute('data-ps-id');
+  } else {
+    delete element.dataset.psId;
+  }
+}
+
+exports.add = function (element) {
+  var newId = guid();
+  setId(element, newId);
+  instances[newId] = new Instance(element);
+  return instances[newId];
+};
+
+exports.remove = function (element) {
+  delete instances[getId(element)];
+  removeId(element);
+};
+
+exports.get = function (element) {
+  return instances[getId(element)];
+};
+
+},{"../lib/class":2,"../lib/dom":3,"../lib/event-manager":4,"../lib/guid":5,"../lib/helper":6,"./default-setting":8}],19:[function(require,module,exports){
+'use strict';
+
+var cls = require('../lib/class')
+  , d = require('../lib/dom')
+  , h = require('../lib/helper')
+  , instances = require('./instances')
+  , updateScroll = require('./update-scroll');
+
+function getThumbSize(i, thumbSize) {
+  if (i.settings.minScrollbarLength) {
+    thumbSize = Math.max(thumbSize, i.settings.minScrollbarLength);
+  }
+  if (i.settings.maxScrollbarLength) {
+    thumbSize = Math.min(thumbSize, i.settings.maxScrollbarLength);
+  }
+  return thumbSize;
+}
+
+function updateCss(element, i) {
+  var xRailOffset = {width: i.railXWidth};
+  if (i.isRtl) {
+    xRailOffset.left = i.negativeScrollAdjustment + element.scrollLeft + i.containerWidth - i.contentWidth;
+  } else {
+    xRailOffset.left = element.scrollLeft;
+  }
+  if (i.isScrollbarXUsingBottom) {
+    xRailOffset.bottom = i.scrollbarXBottom - element.scrollTop;
+  } else {
+    xRailOffset.top = i.scrollbarXTop + element.scrollTop;
+  }
+  d.css(i.scrollbarXRail, xRailOffset);
+
+  var yRailOffset = {top: element.scrollTop, height: i.railYHeight};
+  if (i.isScrollbarYUsingRight) {
+    if (i.isRtl) {
+      yRailOffset.right = i.contentWidth - (i.negativeScrollAdjustment + element.scrollLeft) - i.scrollbarYRight - i.scrollbarYOuterWidth;
+    } else {
+      yRailOffset.right = i.scrollbarYRight - element.scrollLeft;
+    }
+  } else {
+    if (i.isRtl) {
+      yRailOffset.left = i.negativeScrollAdjustment + element.scrollLeft + i.containerWidth * 2 - i.contentWidth - i.scrollbarYLeft - i.scrollbarYOuterWidth;
+    } else {
+      yRailOffset.left = i.scrollbarYLeft + element.scrollLeft;
+    }
+  }
+  d.css(i.scrollbarYRail, yRailOffset);
+
+  d.css(i.scrollbarX, {left: i.scrollbarXLeft, width: i.scrollbarXWidth - i.railBorderXWidth});
+  d.css(i.scrollbarY, {top: i.scrollbarYTop, height: i.scrollbarYHeight - i.railBorderYWidth});
+}
+
+module.exports = function (element) {
+  var i = instances.get(element);
+
+  i.containerWidth = element.clientWidth;
+  i.containerHeight = element.clientHeight;
+  i.contentWidth = element.scrollWidth;
+  i.contentHeight = element.scrollHeight;
+
+  var existingRails;
+  if (!element.contains(i.scrollbarXRail)) {
+    existingRails = d.queryChildren(element, '.ps-scrollbar-x-rail');
+    if (existingRails.length > 0) {
+      existingRails.forEach(function (rail) {
+        d.remove(rail);
+      });
+    }
+    d.appendTo(i.scrollbarXRail, element);
+  }
+  if (!element.contains(i.scrollbarYRail)) {
+    existingRails = d.queryChildren(element, '.ps-scrollbar-y-rail');
+    if (existingRails.length > 0) {
+      existingRails.forEach(function (rail) {
+        d.remove(rail);
+      });
+    }
+    d.appendTo(i.scrollbarYRail, element);
+  }
+
+  if (!i.settings.suppressScrollX && i.containerWidth + i.settings.scrollXMarginOffset < i.contentWidth) {
+    i.scrollbarXActive = true;
+    i.railXWidth = i.containerWidth - i.railXMarginWidth;
+    i.railXRatio = i.containerWidth / i.railXWidth;
+    i.scrollbarXWidth = getThumbSize(i, h.toInt(i.railXWidth * i.containerWidth / i.contentWidth));
+    i.scrollbarXLeft = h.toInt((i.negativeScrollAdjustment + element.scrollLeft) * (i.railXWidth - i.scrollbarXWidth) / (i.contentWidth - i.containerWidth));
+  } else {
+    i.scrollbarXActive = false;
+  }
+
+  if (!i.settings.suppressScrollY && i.containerHeight + i.settings.scrollYMarginOffset < i.contentHeight) {
+    i.scrollbarYActive = true;
+    i.railYHeight = i.containerHeight - i.railYMarginHeight;
+    i.railYRatio = i.containerHeight / i.railYHeight;
+    i.scrollbarYHeight = getThumbSize(i, h.toInt(i.railYHeight * i.containerHeight / i.contentHeight));
+    i.scrollbarYTop = h.toInt(element.scrollTop * (i.railYHeight - i.scrollbarYHeight) / (i.contentHeight - i.containerHeight));
+  } else {
+    i.scrollbarYActive = false;
+  }
+
+  if (i.scrollbarXLeft >= i.railXWidth - i.scrollbarXWidth) {
+    i.scrollbarXLeft = i.railXWidth - i.scrollbarXWidth;
+  }
+  if (i.scrollbarYTop >= i.railYHeight - i.scrollbarYHeight) {
+    i.scrollbarYTop = i.railYHeight - i.scrollbarYHeight;
+  }
+
+  updateCss(element, i);
+
+  if (i.scrollbarXActive) {
+    cls.add(element, 'ps-active-x');
+  } else {
+    cls.remove(element, 'ps-active-x');
+    i.scrollbarXWidth = 0;
+    i.scrollbarXLeft = 0;
+    updateScroll(element, 'left', 0);
+  }
+  if (i.scrollbarYActive) {
+    cls.add(element, 'ps-active-y');
+  } else {
+    cls.remove(element, 'ps-active-y');
+    i.scrollbarYHeight = 0;
+    i.scrollbarYTop = 0;
+    updateScroll(element, 'top', 0);
+  }
+};
+
+},{"../lib/class":2,"../lib/dom":3,"../lib/helper":6,"./instances":18,"./update-scroll":20}],20:[function(require,module,exports){
+'use strict';
+
+var instances = require('./instances');
+
+var upEvent = document.createEvent('Event')
+  , downEvent = document.createEvent('Event')
+  , leftEvent = document.createEvent('Event')
+  , rightEvent = document.createEvent('Event')
+  , yEvent = document.createEvent('Event')
+  , xEvent = document.createEvent('Event')
+  , xStartEvent = document.createEvent('Event')
+  , xEndEvent = document.createEvent('Event')
+  , yStartEvent = document.createEvent('Event')
+  , yEndEvent = document.createEvent('Event')
+  , lastTop
+  , lastLeft;
+
+upEvent.initEvent('ps-scroll-up', true, true);
+downEvent.initEvent('ps-scroll-down', true, true);
+leftEvent.initEvent('ps-scroll-left', true, true);
+rightEvent.initEvent('ps-scroll-right', true, true);
+yEvent.initEvent('ps-scroll-y', true, true);
+xEvent.initEvent('ps-scroll-x', true, true);
+xStartEvent.initEvent('ps-x-reach-start', true, true);
+xEndEvent.initEvent('ps-x-reach-end', true, true);
+yStartEvent.initEvent('ps-y-reach-start', true, true);
+yEndEvent.initEvent('ps-y-reach-end', true, true);
+
+module.exports = function (element, axis, value) {
+  if (typeof element === 'undefined') {
+    throw 'You must provide an element to the update-scroll function';
+  }
+
+  if (typeof axis === 'undefined') {
+    throw 'You must provide an axis to the update-scroll function';
+  }
+
+  if (typeof value === 'undefined') {
+    throw 'You must provide a value to the update-scroll function';
+  }
+
+  if (axis === 'top' && value <= 0) {
+    element.scrollTop = value = 0; // don't allow negative scroll
+    element.dispatchEvent(yStartEvent);
+  }
+
+  if (axis === 'left' && value <= 0) {
+    element.scrollLeft = value = 0; // don't allow negative scroll
+    element.dispatchEvent(xStartEvent);
+  }
+
+  var i = instances.get(element);
+
+  if (axis === 'top' && value >= i.contentHeight - i.containerHeight) {
+    element.scrollTop = value = i.contentHeight - i.containerHeight; // don't allow scroll past container
+    element.dispatchEvent(yEndEvent);
+  }
+
+  if (axis === 'left' && value >= i.contentWidth - i.containerWidth) {
+    element.scrollLeft = value = i.contentWidth - i.containerWidth; // don't allow scroll past container
+    element.dispatchEvent(xEndEvent);
+  }
+
+  if (!lastTop) {
+    lastTop = element.scrollTop;
+  }
+
+  if (!lastLeft) {
+    lastLeft = element.scrollLeft;
+  }
+
+  if (axis === 'top' && value < lastTop) {
+    element.dispatchEvent(upEvent);
+  }
+
+  if (axis === 'top' && value > lastTop) {
+    element.dispatchEvent(downEvent);
+  }
+
+  if (axis === 'left' && value < lastLeft) {
+    element.dispatchEvent(leftEvent);
+  }
+
+  if (axis === 'left' && value > lastLeft) {
+    element.dispatchEvent(rightEvent);
+  }
+
+  if (axis === 'top') {
+    element.scrollTop = lastTop = value;
+    element.dispatchEvent(yEvent);
+  }
+
+  if (axis === 'left') {
+    element.scrollLeft = lastLeft = value;
+    element.dispatchEvent(xEvent);
+  }
+
+};
+
+},{"./instances":18}],21:[function(require,module,exports){
+'use strict';
+
+var d = require('../lib/dom')
+  , h = require('../lib/helper')
+  , instances = require('./instances')
+  , updateGeometry = require('./update-geometry')
+  , updateScroll = require('./update-scroll');
+
+module.exports = function (element) {
+  var i = instances.get(element);
+
+  if (!i) {
+    return;
+  }
+
+  // Recalcuate negative scrollLeft adjustment
+  i.negativeScrollAdjustment = i.isNegativeScroll ? element.scrollWidth - element.clientWidth : 0;
+
+  // Recalculate rail margins
+  d.css(i.scrollbarXRail, 'display', 'block');
+  d.css(i.scrollbarYRail, 'display', 'block');
+  i.railXMarginWidth = h.toInt(d.css(i.scrollbarXRail, 'marginLeft')) + h.toInt(d.css(i.scrollbarXRail, 'marginRight'));
+  i.railYMarginHeight = h.toInt(d.css(i.scrollbarYRail, 'marginTop')) + h.toInt(d.css(i.scrollbarYRail, 'marginBottom'));
+
+  // Hide scrollbars not to affect scrollWidth and scrollHeight
+  d.css(i.scrollbarXRail, 'display', 'none');
+  d.css(i.scrollbarYRail, 'display', 'none');
+
+  updateGeometry(element);
+
+  // Update top/left scroll to trigger events
+  updateScroll(element, 'top', element.scrollTop);
+  updateScroll(element, 'left', element.scrollLeft);
+
+  d.css(i.scrollbarXRail, 'display', '');
+  d.css(i.scrollbarYRail, 'display', '');
+};
+
+},{"../lib/dom":3,"../lib/helper":6,"./instances":18,"./update-geometry":19,"./update-scroll":20}]},{},[1]);
+
 (function(Plugin) {
 
 	/*jslint indent: 2, browser: true, bitwise: true, plusplus: true */
-	Plugin.StickersModule.Twemoji = (function (
+	Plugin.Libs.Twemoji = (function (
 		/*! Copyright Twitter Inc. and other contributors. Licensed under MIT *//*
 		 https://github.com/twitter/twemoji/blob/gh-pages/LICENSE
 		 */
@@ -1841,36 +2958,115 @@ if ("document" in self) {
 
 	}());
 
-})(window);
+})(window.StickersModule);
 
 window.StickersModule.Service = {};
 
-(function(Module) {
+(function(Plugin) {
 
-	var API_VERSION = 1;
+	Plugin.Service.Ajax = function(options) {
+		options = options || {};
 
-	Module.Api = {
+		if (!options.url) {
+			return;
+		}
+
+		options.type = (options.type && options.type.toUpperCase()) || 'GET';
+		options.headers = options.headers || {};
+		options.data = options.data || {};
+		options.success = options.success || function() {};
+		options.error = options.error || function() {};
+		options.complete = options.complete || function() {};
+
+		options.headers.Apikey = Plugin.Configs.apiKey;
+		options.headers.Platform = 'JS';
+		options.headers.Localization = Plugin.Configs.lang;
+		options.headers.UserId = Plugin.Configs.userId;
+
+		if (options.type == 'POST' || options.type == 'PUT') {
+			options.headers['Content-Type'] = options.headers['Content-Type'] || 'application/json';
+			options.headers['DeviceId'] = Plugin.Service.Storage.getDeviceId();
+		}
+
+
+		var xmlhttp = new XMLHttpRequest();
+		xmlhttp.open(options.type, options.url, true);
+
+		for (var name in options.headers) {
+			xmlhttp.setRequestHeader(name, options.headers[name]);
+		}
+
+		xmlhttp.onreadystatechange = function() {
+			if (xmlhttp.readyState == 4) {
+				if (xmlhttp.status == 200) {
+					options.success(JSON.parse(xmlhttp.responseText), xmlhttp);
+				} else {
+					var response = {};
+					try {
+						response = JSON.parse(xmlhttp.responseText);
+					} catch (ex) {
+						response = {}
+					}
+					options.error(response, xmlhttp);
+				}
+
+				options.complete(JSON.parse(xmlhttp.responseText), xmlhttp);
+			}
+		};
+
+		xmlhttp.send(JSON.stringify(options.data));
+	};
+
+})(window.StickersModule);
+
+(function(Plugin) {
+
+	var API_VERSION = 2;
+
+	Plugin.Service.Api = {
 
 		getApiVersion: function() {
 			return API_VERSION;
 		},
 
-		getPacks: function(doneCallback) {
-			var url = Module.Url.getPacksUrl();
+		getPacks: function(successCallback) {
+			Plugin.Service.Ajax({
+				type: 'get',
+				url: Plugin.Service.Url.getUserPacksUrl(),
+				success: function(response) {
+					response = response || {};
+					response.meta = response.meta || {};
+					response.meta.shop_last_modified = response.meta.shop_last_modified || 0;
 
-			Module.Http.get(url, {
-				success: doneCallback
+					Plugin.Service.Storage.setStoreLastModified(response.meta.shop_last_modified * 1000);
+
+					successCallback && successCallback(response.data);
+				}
+			});
+		},
+
+		getPackPreview: function(packName, successCallback) {
+			Plugin.Service.Ajax({
+				type: 'get',
+				url: Plugin.Service.Url.getPackPreviewUrl(packName),
+				success: function(response) {
+					successCallback && successCallback(response.data);
+				}
 			});
 		},
 
 		sendStatistic: function(statistic) {
-			Module.Http.post(Module.Url.getStatisticUrl(), statistic);
+			Plugin.Service.Ajax({
+				type: 'post',
+				url: Plugin.Service.Url.getStatisticUrl(),
+				data: statistic
+			});
 		},
 
 		updateUserData: function(userData) {
-			return Module.Http.ajax({
-				type: 'PUT',
-				url: Module.Url.getUserDataUrl(),
+			return Plugin.Service.Ajax({
+				type: 'put',
+				url: Plugin.Service.Url.getUserDataUrl(),
 				data: userData,
 				headers: {
 					'Content-Type': 'application/json'
@@ -1878,198 +3074,163 @@ window.StickersModule.Service = {};
 			});
 		},
 
-		changeUserPackStatus: function(packName, status, pricePoint, doneCallback) {
-
-			var url = Module.Url.getUserPackUrl(packName, pricePoint);
-
-			Module.Http.post(url, {
-				status: status
-			}, {
-				success: function() {
-					doneCallback && doneCallback();
+		purchasePack: function(packName, pricePoint, successCallback, failCallback) {
+			Plugin.Service.Ajax({
+				type: 'post',
+				url: Plugin.Service.Url.getPurchaseUrl(packName, pricePoint),
+				success: function(response) {
+					successCallback && successCallback(response.data);
 				},
 				error: function() {
-					if (status) {
-						var pr = Module.Service.PendingRequest;
-						pr.add(pr.tasks.activateUserPack, {
-							packName: packName,
-							pricePoint: pricePoint
-						});
-					}
-				}
-			}, {
-				'Content-Type': 'application/json'
-			});
-		}
-
-	};
-})(window.StickersModule);
-
-(function(Module) {
-
-	Module.BaseService = {
-
-		markNewPacks: function(newPacks) {
-			var globalNew = false,
-				oldPacks = Module.Storage.getPacks();
-
-			if (oldPacks.length != 0){
-
-				Module.Service.Helper.forEach(newPacks, function(newPack, key) {
-					var isNewPack = true;
-
-					Module.Service.Helper.forEach(oldPacks, function(oldPack) {
-
-
-						if(newPack.pack_name == oldPack.pack_name) {
-							isNewPack = oldPack.newPack;
-						}
-
+					var pr = Plugin.Service.PendingRequest;
+					pr.add(pr.tasks.purchasePack, {
+						packName: packName,
+						pricePoint: pricePoint
 					});
 
-					if(isNewPack)  globalNew = true;
-					newPacks[key]['newPack'] = isNewPack;
-				});
-
-
-				// todo: to other function
-				// todo: check & fix
-				//if (globalNew) {
-
-				if (globalNew == false && Module.Storage.getUsedStickers().length == 0) {
-					globalNew = true;
+					failCallback && failCallback();
 				}
-				Module.DOMEventService.changeContentHighlight(globalNew);
-				//}
-
-
-				// *****************************************************************************************************
-				// todo: do in other function
-				// update used stickers
-
-				var used = Module.Storage.getUsedStickers();
-
-				for (var i = 0; i < used.length; i++) {
-					var sticker = this.parseStickerFromText('[[' + used[i].code + ']]');
-
-					var pack = null;
-					for (var j = 0; j < newPacks.length; j++) {
-						if (newPacks[j].pack_name == sticker.pack) {
-							pack = newPacks[j];
-							break;
-						}
-					}
-
-					if (pack == null) {
-						used.splice(i, 1);
-						continue;
-					}
-
-					var isset = false;
-					for (var j = 0; j < pack.stickers.length; j++) {
-						if (pack.stickers[j].name == sticker.name) {
-							isset = true;
-							break;
-						}
-					}
-
-					if (!isset) {
-						used.splice(i, 1);
-						continue;
-					}
-				}
-
-				Module.Storage.setUsedStickers(used);
-
-				// *****************************************************************************************************
-			} else {
-				Module.DOMEventService.changeContentHighlight(true);
-			}
-
-			return newPacks;
+			});
 		},
 
-		parseStickerFromText: function(text) {
-			var outData = {
-					isSticker: false,
-					url: ''
+		getContentById: function(contentId, successCallback) {
+			Plugin.Service.Ajax({
+				type: 'get',
+				url: Plugin.Service.Url.getContentByIdUrl(contentId),
+				success: function(response) {
+					successCallback && successCallback(response.data);
+				}
+			});
+		},
+
+		hidePack: function(packName, successCallback, failCallback) {
+			return Plugin.Service.Ajax({
+				type: 'DELETE',
+				url: Plugin.Service.Url.getHidePackUrl(packName),
+				success: function(response) {
+					successCallback && successCallback(response.data);
 				},
-				matchData = text.match(/\[\[(\S+)_(\S+)\]\]/);
+				error: function() {
+					failCallback && failCallback();
+				}
+			});
+		}
+	};
+})(window.StickersModule);
 
-			if (matchData) {
-				outData.isSticker = true;
-				outData.url = Module.Url.getStickerUrl(matchData[1], matchData[2]);
+(function(Plugin) {
 
+	Plugin.Service.El = {
 
-				outData.pack = matchData[1];
-				outData.name = matchData[2];
+		css: function(el, property) {
+			// todo: getComputedStyle add IE 8 supporting
+
+			return (el.style && el.style[property])
+				|| (el.currentStyle && el.currentStyle[property])
+				|| (getComputedStyle(el)[property]);
+
+		},
+
+		outerWidth: function(el) {
+			var width = el.offsetWidth;
+			width += parseInt(this.css(el, 'marginLeft')) + parseInt(this.css(el, 'marginRight'));
+			return width;
+		},
+
+		appendAfter: function(newNode, referenceNode) {
+			referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+		},
+
+		getParents: function (elem, selector) {
+
+			var parents = [];
+			if ( selector ) {
+				var firstChar = selector.charAt(0);
 			}
 
-			return outData;
-		},
+			// Get matches
+			for ( ; elem && elem !== document; elem = elem.parentNode ) {
+				if ( selector ) {
 
-		onUserMessageSent: function(isSticker) {
-			var nowDate = new Date().getTime() / 1000 | 0,
-				action = 'send',
-				category = 'message',
-				label = (isSticker) ? 'sticker' : 'text';
-
-
-			Module.Api.sendStatistic([{
-				action: action,
-				category: category,
-				label: label,
-				time: nowDate
-			}]);
-
-			ga('stickerTracker.send', 'event', category, action, label);
-		},
-
-		updatePacks: function(successCallback) {
-
-			Module.Api.getPacks(
-				(function(response) {
-					if(response.status != 'success') {
-						return;
-					}
-
-					var packs = response.data;
-
-					// show only active packs
-					for (var i = 0; i < packs.length; i++) {
-						if (packs[i].user_status != 'active') {
-							packs.splice(i, 1);
+					// If selector is a class
+					if ( firstChar === '.' ) {
+						if ( elem.classList.contains( selector.substr(1) ) ) {
+							parents.push( elem );
 						}
 					}
 
-					packs = this.markNewPacks(packs);
+					// If selector is an ID
+					if ( firstChar === '#' ) {
+						if ( elem.id === selector.substr(1) ) {
+							parents.push( elem );
+						}
+					}
 
-					Module.Storage.setPacks(packs);
+					// If selector is a data attribute
+					if ( firstChar === '[' ) {
+						if ( elem.hasAttribute( selector.substr(1, selector.length - 1) )) {
+							parents.push( elem );
+						}
+					}
 
-					successCallback && successCallback(packs);
-				}).bind(this)
-			);
+					// If selector is a tag
+					if ( elem.tagName.toLowerCase() === selector ) {
+						parents.push( elem );
+					}
+
+				} else {
+					parents.push( elem );
+				}
+
+			}
+
+			// Return parents if any exist
+			if ( parents.length === 0 ) {
+				return null;
+			} else {
+				return parents;
+			}
+
+		}
+	};
+})(window.StickersModule);
+
+(function(Plugin) {
+
+	Plugin.Service.Emoji = {
+
+		emojiProvider: null,
+
+		init: function(emojiProvider) {
+			this.emojiProvider = emojiProvider;
 		},
 
-		trackUserData: function() {
-			if (!Module.Configs.userId || !Module.Configs.userData) {
-				return;
+		parseEmojiFromText: function(text) {
+			return this.emojiProvider.parse(text, {
+				size: (window.devicePixelRatio == 2) ? 72 : 36
+			});
+		},
+
+		parseEmojiFromHtml: function(html) {
+			var content = document.createElement('div');
+			content.innerHTML = html;
+
+			var emojisEls = content.getElementsByClassName('emoji');
+
+			for (var i = emojisEls.length - 1; i >= 0; i--) {
+				var emoji = emojisEls[i].getAttribute('alt');
+				content.replaceChild(document.createTextNode(emoji), emojisEls[i]);
 			}
 
-			var storedUserData = Module.Storage.getUserData() || {};
-
-			if (!Module.Service.Helper.deepCompare(Module.Configs.userData, storedUserData)) {
-				Module.Api.updateUserData(Module.Configs.userData);
-				Module.Storage.setUserData(Module.Configs.userData);
-			}
+			return content.innerHTML;
 		}
 	};
 
 })(window.StickersModule);
 
-(function(Module) {
+(function(Plugin) {
 
-	Module.DOMEventService = {
+	Plugin.Service.Event = {
 
 		events: {
 			resize: 'resize',
@@ -2127,137 +3288,28 @@ window.StickersModule.Service = {};
 
 })(window.StickersModule);
 
-(function(Module) {
+(function(Plugin) {
 
-	Module.El = {
+	Plugin.Service.Helper = {
 
-		css: function(el, property) {
-			// todo: getComputedStyle add IE 8 supporting
+		extend: function(out) {
+			out = out || {};
 
-			return (el.style && el.style[property])
-				|| (el.currentStyle && el.currentStyle[property])
-				|| (getComputedStyle(el)[property]);
+			for (var i = 1; i < arguments.length; i++) {
+				if (!arguments[i])
+					continue;
 
-		},
-
-		outerWidth: function(el) {
-			var width = el.offsetWidth;
-			width += parseInt(this.css(el, 'marginLeft')) + parseInt(this.css(el, 'marginRight'));
-			return width;
-		},
-
-		getParents: function (elem, selector) {
-
-			var parents = [];
-			if ( selector ) {
-				var firstChar = selector.charAt(0);
-			}
-
-			// Get matches
-			for ( ; elem && elem !== document; elem = elem.parentNode ) {
-				if ( selector ) {
-
-					// If selector is a class
-					if ( firstChar === '.' ) {
-						if ( elem.classList.contains( selector.substr(1) ) ) {
-							parents.push( elem );
-						}
-					}
-
-					// If selector is an ID
-					if ( firstChar === '#' ) {
-						if ( elem.id === selector.substr(1) ) {
-							parents.push( elem );
-						}
-					}
-
-					// If selector is a data attribute
-					if ( firstChar === '[' ) {
-						if ( elem.hasAttribute( selector.substr(1, selector.length - 1) )) {
-							parents.push( elem );
-						}
-					}
-
-					// If selector is a tag
-					if ( elem.tagName.toLowerCase() === selector ) {
-						parents.push( elem );
-					}
-
-				} else {
-					parents.push( elem );
+				for (var key in arguments[i]) {
+					if (arguments[i].hasOwnProperty(key))
+						out[key] = arguments[i][key];
 				}
-
 			}
 
-			// Return parents if any exist
-			if ( parents.length === 0 ) {
-				return null;
-			} else {
-				return parents;
-			}
-
-		}
-	};
-})(window.StickersModule);
-
-(function(Module) {
-
-	Module.EmojiService = Module.Class({
-
-		emojiProvider: null,
-
-		_constructor: function(emojiProvider) {
-			this.emojiProvider = emojiProvider;
-		},
-
-		parseEmojiFromText: function(text) {
-			return this.emojiProvider.parse(text, {
-				size: (window.devicePixelRatio == 2) ? 72 : 36
-			});
-		},
-
-		parseEmojiFromHtml: function(html) {
-			var content = document.createElement('div');
-			content.innerHTML = html;
-
-			var emojisEls = content.getElementsByClassName('emoji');
-
-			for (var i = emojisEls.length - 1; i >= 0; i--) {
-				var emoji = emojisEls[i].getAttribute('alt');
-				content.replaceChild(document.createTextNode(emoji), emojisEls[i]);
-			}
-
-			return content.innerHTML;
-		}
-	});
-
-})(window.StickersModule);
-
-(function(Module) {
-
-	Module.Service.Helper = {
-		forEach: function(data, callback) {
-			for (var x in data) {
-				callback(data[x], x);
-			}
-		},
-
-		merge: function(obj1, obj2) {
-			var obj3 = {};
-
-			for(var attrname in obj1) {
-				obj3[attrname] = obj1[attrname];
-			}
-
-			for(var attrname in obj2) {
-				obj3[attrname] = obj2[attrname];
-			}
-
-			return obj3;
+			return out;
 		},
 
 		setConfig: function(config) {
-			Module.Configs = this.merge(Module.Configs || {}, config);
+			Plugin.Configs = this.extend({}, Plugin.Configs || {}, config);
 		},
 
 		setEvent: function(eventType, el, className, callback) {
@@ -2291,123 +3343,8 @@ window.StickersModule.Service = {};
 			(navigator.userAgent.match(/Trident\/\d+\.\d+/)));
 		},
 
-		// todo: maybe remove
-		deepCompare: function() {
-			var i, l, leftChain, rightChain;
-
-			function compare2Objects (x, y) {
-				var p;
-
-				// remember that NaN === NaN returns false
-				// and isNaN(undefined) returns true
-				if (isNaN(x) && isNaN(y) && typeof x === 'number' && typeof y === 'number') {
-					return true;
-				}
-
-				// Compare primitives and functions.
-				// Check if both arguments link to the same object.
-				// Especially useful on step when comparing prototypes
-				if (x === y) {
-					return true;
-				}
-
-				// Works in case when functions are created in constructor.
-				// Comparing dates is a common scenario. Another built-ins?
-				// We can even handle functions passed across iframes
-				if ((typeof x === 'function' && typeof y === 'function') ||
-					(x instanceof Date && y instanceof Date) ||
-					(x instanceof RegExp && y instanceof RegExp) ||
-					(x instanceof String && y instanceof String) ||
-					(x instanceof Number && y instanceof Number)) {
-					return x.toString() === y.toString();
-				}
-
-				// At last checking prototypes as good a we can
-				if (!(x instanceof Object && y instanceof Object)) {
-					return false;
-				}
-
-				if (x.isPrototypeOf(y) || y.isPrototypeOf(x)) {
-					return false;
-				}
-
-				if (x.constructor !== y.constructor) {
-					return false;
-				}
-
-				if (x.prototype !== y.prototype) {
-					return false;
-				}
-
-				// Check for infinitive linking loops
-				if (leftChain.indexOf(x) > -1 || rightChain.indexOf(y) > -1) {
-					return false;
-				}
-
-				// Quick checking of one object beeing a subset of another.
-				for (p in y) {
-					if (y.hasOwnProperty(p) !== x.hasOwnProperty(p)) {
-						return false;
-					}
-					else if (typeof y[p] !== typeof x[p]) {
-						return false;
-					}
-				}
-
-				for (p in x) {
-					if (y.hasOwnProperty(p) !== x.hasOwnProperty(p)) {
-						return false;
-					}
-					else if (typeof y[p] !== typeof x[p]) {
-						return false;
-					}
-
-					switch (typeof (x[p])) {
-						case 'object':
-						case 'function':
-
-							leftChain.push(x);
-							rightChain.push(y);
-
-							if (!compare2Objects (x[p], y[p])) {
-								return false;
-							}
-
-							leftChain.pop();
-							rightChain.pop();
-							break;
-
-						default:
-							if (x[p] !== y[p]) {
-								return false;
-							}
-							break;
-					}
-				}
-
-				return true;
-			}
-
-			if (arguments.length < 1) {
-				return true; //Die silently? Don't know how to handle such case, please help...
-				// throw "Need two or more arguments to compare";
-			}
-
-			for (i = 1, l = arguments.length; i < l; i++) {
-
-				leftChain = [];
-				rightChain = [];
-
-				if (!compare2Objects(arguments[0], arguments[i])) {
-					return false;
-				}
-			}
-
-			return true;
-		},
-
 		md5: function(string) {
-			return Module.MD5(string);
+			return Plugin.Libs.MD5(string);
 		},
 
 		getLocation: function(url) {
@@ -2436,232 +3373,459 @@ window.StickersModule.Service = {};
 
 })(window.StickersModule);
 
-(function(Module) {
+(function(Plugin) {
 
-	Module.Http = {
+	Plugin.Service.Highlight = {
 
-		// todo: refactor post(options) & get(options)
+		check: function() {
 
-		get: function(url, callbacks, headers) {
-			callbacks = callbacks || {};
-			headers = headers || {};
-
-			this.ajax({
-				type: 'GET',
-				url: url,
-				headers: headers,
-				success: callbacks.success,
-				error: callbacks.error,
-				complete: callbacks.complete
-			});
-		},
-
-		post: function(url, data, callbacks, headers) {
-			data = data || {};
-			callbacks = callbacks || {};
-			headers = headers || {};
-
-			this.ajax({
-				type: 'POST',
-				url: url,
-				data: data,
-				headers: headers,
-				success: callbacks.success,
-				error: callbacks.error,
-				complete: callbacks.complete
-			});
-		},
-
-		ajax: function(options) {
-			options = options || {};
-
-			if (!options.url) {
-				return;
+			var showContentHighlight = Plugin.Service.Pack.isExistUnwatchedPacks();
+			if (!showContentHighlight && Plugin.Service.Storage.getRecentStickers().length == 0) {
+				showContentHighlight = true;
 			}
 
-			options.type = (options.type && options.type.toUpperCase()) || 'GET';
-			options.headers = options.headers || {};
-			options.data = options.data || {};
-			options.success = options.success || function() {};
-			options.error = options.error || function() {};
-			options.complete = options.complete || function() {};
-
-			options.headers.Apikey = Module.Configs.apiKey;
-			options.headers.Platform = 'JS';
-			options.headers.Localization = Module.Configs.lang;
-
-			if (Module.Configs.userId !== null) {
-				options.headers.UserId = Module.Configs.userId;
+			if (!showContentHighlight &&
+				Plugin.Service.Storage.getStoreLastModified() > Plugin.Service.Storage.getStoreLastVisit()) {
+				showContentHighlight = true;
 			}
-
-			if (options.type == 'POST' || options.type == 'PUT') {
-				options.headers['Content-Type'] = options.headers['Content-Type'] || 'application/x-www-form-urlencoded';
-				options.headers['DeviceId'] = Module.Storage.getDeviceId();
-			}
-
-
-			var xmlhttp = new XMLHttpRequest();
-			xmlhttp.open(options.type, options.url, true);
-
-			Module.Service.Helper.forEach(options.headers, function(value, name) {
-				xmlhttp.setRequestHeader(name, value);
-			});
-
-			xmlhttp.onreadystatechange = function() {
-				if (xmlhttp.readyState == 4) {
-					if (xmlhttp.status == 200) {
-						options.success(JSON.parse(xmlhttp.responseText), xmlhttp);
-					} else {
-						var response = {};
-						try {
-							response = JSON.parse(xmlhttp.responseText);
-						} catch (ex) {
-							response = {}
-						}
-						options.error(response, xmlhttp);
-					}
-
-					options.complete(JSON.parse(xmlhttp.responseText), xmlhttp);
-				}
-			};
-
-			xmlhttp.send(JSON.stringify(options.data));
+			Plugin.Service.Event.changeContentHighlight(showContentHighlight);
 		}
+
 	};
 })(window.StickersModule);
 
-(function(Module) {
+(function(Plugin) {
 
 	var stickerpipe;
 
-	Module.Service.Pack = {
+	function filterActivePacks(packs) {
+		for (var i = 0; i < packs.length; i++) {
+			if (packs[i].user_status != 'active') {
+				packs.splice(i, 1);
+			}
+		}
+
+		return packs;
+	}
+
+	function filterRecentStickers() {
+
+		var packs = Plugin.Service.Storage.getPacks(),
+			recentStickersIds = Plugin.Service.Storage.getRecentStickers();
+
+		for (var i = 0; i < recentStickersIds.length; i++) {
+
+			Plugin.Service.Sticker.getById(recentStickersIds[i], function(sticker) {
+
+				// check existing sticker pack
+				var pack = null;
+
+				for (var j = 0; j < packs.length; j++) {
+					if (packs[j].pack_name == sticker.pack) {
+						pack = packs[j];
+						break;
+					}
+				}
+
+				if (pack == null) {
+					recentStickersIds.splice(i, 1);
+					Plugin.Service.Storage.setRecentStickers(recentStickersIds);
+					return;
+				}
+
+				// check existing sticker in pack
+				var exist = false;
+				for (var j = 0; j < pack.stickers.length; j++) {
+					if (pack.stickers[j] == sticker.content_id) {
+						exist = true;
+						break;
+					}
+				}
+
+				if (!exist) {
+					recentStickersIds.splice(i, 1);
+					Plugin.Service.Storage.setRecentStickers(recentStickersIds);
+					return;
+				}
+			});
+
+		}
+	}
+
+	Plugin.Service.Pack = {
 
 		init: function(_stickerpipe) {
 			stickerpipe = _stickerpipe;
 		},
 
-		activateUserPack: function(packName, pricePoint, doneCallback) {
-			Module.Api.changeUserPackStatus(packName, true, pricePoint, function() {
+		purchase: function(packName, pricePoint, isUnwatched, successCallback, failCallback) {
+			isUnwatched = (typeof isUnwatched == 'undefined') ? true : isUnwatched;
 
-				// todo: add event ~ "packs fetched" & remove "stickerpipe" variable
-				stickerpipe.fetchPacks(function() {
-					doneCallback && doneCallback();
-				});
+			Plugin.Service.Api.purchasePack(packName, pricePoint, function(pack) {
+				pack.isUnwatched = isUnwatched;
 
+				var packContentIds = [];
+				for (var i = 0; i < pack.stickers.length; i++) {
+					var sticker = pack.stickers[i];
+					sticker.pack = packName;
+
+					Plugin.Service.Storage.setContentById(sticker.content_id, sticker);
+
+					packContentIds.push(sticker.content_id);
+				}
+
+				pack.stickers = packContentIds;
+
+				Plugin.Service.Storage.setPack(pack.pack_name, pack);
+
+				if (stickerpipe && stickerpipe.view.isRendered) {
+					stickerpipe.view.tabsView.renderPacks();
+				}
+
+				successCallback && successCallback(pack);
+			}, function() {
+				failCallback && failCallback();
 			});
+		},
+
+		fetchPacks: function(callback) {
+
+			Plugin.Service.Api.getPacks(function(packs) {
+
+				packs = filterActivePacks(packs);
+
+				var packsInStorage = Plugin.Service.Storage.getPacks(),
+					undefinedPacksInStorage = [];
+
+				if (!packsInStorage.length) {
+					undefinedPacksInStorage = packs;
+				} else {
+					for (var i = 0; i < packs.length; i++) {
+						var packInStorage = null;
+
+						for (var j = 0; j < packsInStorage.length; j++) {
+							if (packs[i].pack_name == packsInStorage[j].pack_name) {
+								packInStorage = packsInStorage[j];
+								break;
+							}
+						}
+
+						if (packInStorage && packs[i].updated_at == packInStorage.updated_at) {
+							packs[i] = packInStorage;
+						} else {
+							undefinedPacksInStorage.push(packs[i]);
+						}
+					}
+				}
+
+				Plugin.Service.Storage.setPacks(packs);
+
+				for (var i = 0; i < undefinedPacksInStorage.length; i++) {
+					Plugin.Service.Pack.purchase(
+						undefinedPacksInStorage[i].pack_name,
+						undefinedPacksInStorage[i].pricepoint,
+						(packsInStorage.length) ? true : false
+					);
+				}
+
+				filterRecentStickers();
+
+				Plugin.Service.Highlight.check();
+
+				callback && callback();
+			});
+		},
+
+		remove: function(packName, successCallback, failCallback) {
+			Plugin.Service.Api.hidePack(packName, function() {
+
+				var packs = Plugin.Service.Storage.getPacks();
+				for (var i = 0; i < packs.length; i++) {
+					if (packs[i].pack_name == packName) {
+						packs.splice(i, 1);
+					}
+				}
+				Plugin.Service.Storage.setPacks(packs);
+
+				if (stickerpipe && stickerpipe.view.isRendered) {
+					stickerpipe.view.tabsView.renderPacks();
+					stickerpipe.view.tabsView.controls.history.el.click();
+				}
+
+				successCallback && successCallback();
+			}, function() {
+				failCallback && failCallback();
+			});
+		},
+
+		getMainIcon: function(packName, successCallback) {
+			Plugin.Service.Api.getPackPreview(packName, function(pack) {
+				var url = (pack && pack.main_icon && pack.main_icon[Plugin.Configs.stickerResolutionType]) || null;
+
+				successCallback && successCallback(url);
+			});
+		},
+
+		isExistUnwatchedPacks: function() {
+			var packs = Plugin.Service.Storage.getPacks();
+
+			for(var i = 0; i < packs.length; i++) {
+				if (!!packs[i].isUnwatched) {
+					return true;
+				}
+			}
+
+			return false;
 		}
 	};
+
 })(window.StickersModule);
 
-(function(Module) {
+(function(Plugin) {
 
-	function activateUserPack(taskData) {
-		Module.Service.Pack.activateUserPack(taskData.packName, taskData.pricePoint);
+	function purchasePack(taskData) {
+		Plugin.Service.Pack.purchase(taskData.packName, taskData.pricePoint);
 	}
 
-	Module.Service.PendingRequest = {
+	Plugin.Service.PendingRequest = {
 
 		tasks: {
-			activateUserPack: 'activateUserPack'
+			activateUserPack: 'activateUserPack',
+			purchasePack: 'purchasePack'
+		},
+
+		init: function() {
+			this.run();
 		},
 
 		add: function(taskName, taskData) {
-			Module.Storage.addPendingRequestTask({
+			Plugin.Service.Storage.addPendingRequestTask({
 				name: taskName,
 				data: taskData
 			});
 		},
 
 		run: function() {
-			var task = Module.Storage.popPendingRequestTask();
+			var task = Plugin.Service.Storage.popPendingRequestTask();
 
 			while(task) {
 				switch (task.name) {
 					case this.tasks.activateUserPack:
-						activateUserPack(task.data);
+					case this.tasks.purchasePack:
+						purchasePack(task.data);
 						break;
 					default :
 						break;
 				}
 
-				task = Module.Storage.popPendingRequestTask();
+				task = Plugin.Service.Storage.popPendingRequestTask();
 			}
 		}
 
 	};
 })(window.StickersModule);
 
-// todo: StatisticService
+(function(Plugin) {
 
-(function(Module) {
+	function trackStatistic(category, action, label) {
+		Plugin.Service.Api.sendStatistic([{
+			category: category,
+			action: action,
+			label: label
+		}]);
 
-	Module.Storage = {
+		ga('stickerTracker.send', 'event', category, action, label);
+	}
 
-		lockr: Module.Lockr,
+	Plugin.Service.Statistic = {
 
-		setPrefix: function(storagePrefix) {
-			this.lockr.prefix = storagePrefix;
+		messageSend: function(isSticker) {
+			trackStatistic('message', 'send', ((isSticker) ? 'sticker' : 'text'));
+		},
+
+		useSticker: function(stickerId) {
+			trackStatistic('sticker', 'use', stickerId);
+		},
+
+		useEmoji: function(emoji) {
+			trackStatistic('emoji', 'use', emoji);
+		}
+
+	};
+
+})(StickersModule);
+
+
+(function(Plugin) {
+
+
+	Plugin.Service.Sticker = {
+
+		parseStickerId: function(text) {
+			if (!text) {
+				return null;
+			}
+
+			var stickerId = null,
+				formatV1 = text.match(/\[\[(\S+)_(\S+)\]\]/),
+				formatV2 = text.match(/\[\[(\d+)\]\]/);
+
+			if (formatV1) {
+				stickerId = formatV1[1] + '_' + formatV1[2];
+			} else if (formatV2) {
+				stickerId = formatV2[1];
+			}
+
+			return stickerId;
+		},
+
+		parse: function(text, callback) {
+
+			var stickerId = this.parseStickerId(text);
+
+			if (!stickerId) {
+				callback && callback(null);
+				return;
+			}
+
+			Plugin.Service.Sticker.getById(stickerId, function(sticker, async) {
+				var url = sticker.image && sticker.image[Plugin.Configs.stickerResolutionType];
+
+				callback && callback({
+					id: stickerId,
+					url: url,
+					html: '<img src="' + url + '" class="stickerpipe-sticker" data-sticker-id="' + stickerId + '">'
+				}, async);
+			});
+		},
+
+		getById: function(contentId, successCallback) {
+			var sticker = Plugin.Service.Storage.getContentById(contentId);
+
+			if (sticker) {
+				successCallback && successCallback(sticker, false);
+				return;
+			}
+
+			Plugin.Service.Api.getContentById(contentId, function(sticker) {
+				Plugin.Service.Storage.setContentById(contentId, sticker);
+				successCallback && successCallback(sticker, true);
+			});
+		},
+
+		isSticker: function(text) {
+			return !!this.parseStickerId(text);
+		}
+	};
+})(window.StickersModule);
+
+(function(Plugin) {
+
+	var lockr = Plugin.Libs.Lockr;
+
+	Plugin.Service.Storage = {
+
+		get: function(key) {
+			lockr.prefix = Plugin.Configs.storagePrefix;
+			return lockr.get(key);
+		},
+		set: function(key, data) {
+			lockr.prefix = Plugin.Configs.storagePrefix;
+			return lockr.set(key, data);
 		},
 
 		///////////////////////////////////////
 		// Used stickers
 		///////////////////////////////////////
-		getUsedStickers: function() {
-			return this.lockr.get('sticker_latest_use') || [];
+		getRecentStickers: function() {
+			return this.get('recent_stickers') || [];
 		},
-		setUsedStickers: function(usedStickers) {
-			return this.lockr.set('sticker_latest_use', usedStickers);
+		setRecentStickers: function(recentStickers) {
+			return this.set('recent_stickers', recentStickers);
 		},
-		addUsedSticker: function(stickerCode) {
+		addRecentSticker: function(stickerId) {
 
-			var usedStickers = this.getUsedStickers(),
-				newStorageDate = [];
+			var recentStickers = this.getRecentStickers();
 
-			// todo: rewrite function as for & slice
-			Module.Service.Helper.forEach(usedStickers, function(usedSticker) {
-
-				if (usedSticker.code != stickerCode) {
-					newStorageDate.push(usedSticker);
+			for (var i = 0; i < recentStickers.length; i++) {
+				if (recentStickers[i] == stickerId) {
+					recentStickers.splice(i, 1);
 				}
+			}
 
-			});
+			recentStickers.unshift(stickerId);
 
-			usedStickers = newStorageDate;
-
-			usedStickers.unshift({
-				code : stickerCode
-			});
-
-			this.setUsedStickers(usedStickers);
+			this.setRecentStickers(recentStickers);
 		},
 
 		///////////////////////////////////////
 		// Packs
 		///////////////////////////////////////
 		getPacks: function() {
-			var packs = this.lockr.get('sticker_packs');
-
-			if (typeof packs == 'object' && packs.packs) {
-				packs = packs.packs;
-			} else if (Object.prototype.toString.call(packs) !== '[object Array]') {
-				packs = [];
-			}
-
-			return packs;
+			return this.get('packs') || [];
 		},
 		setPacks: function(packs) {
-			return this.lockr.set('sticker_packs', packs)
+			return this.set('packs', packs)
 		},
 
+		getPack: function(packName) {
+			var packs = this.getPacks();
+
+			for (var i = 0; i < packs.length; i++) {
+				if (packName == packs[i].pack_name) {
+					return packs[i];
+				}
+			}
+
+			return null;
+		},
+		setPack: function(packName, pack) {
+
+			var packExist = false,
+				packs = this.getPacks();
+
+			for (var i = 0; i < packs.length; i++) {
+				if (packName == packs[i].pack_name) {
+					packs[i] = pack;
+					packExist = true;
+					break;
+				}
+			}
+
+			if (!packExist) {
+				packs.unshift(pack);
+			}
+
+			this.setPacks(packs);
+		},
+
+		///////////////////////////////////////
+		// Content
+		///////////////////////////////////////
+		getContent: function() {
+			return this.get('content') || {};
+		},
+		setContent: function(content) {
+			return this.set('content', content || {})
+		},
+
+		getContentById: function(id) {
+			return this.getContent()['id' + id] || null;
+		},
+		setContentById: function(id, data) {
+			var content = this.getContent();
+			content['id' + id] = data || null;
+			this.setContent(content);
+		},
 		///////////////////////////////////////
 		// Device ID
 		///////////////////////////////////////
 		getDeviceId: function() {
-			var deviceId = this.lockr.get('device_id');
+			var deviceId = this.get('device_id');
 
 			if (typeof deviceId == 'undefined') {
 				deviceId = + new Date();
-				this.lockr.set('device_id', deviceId);
+				this.set('device_id', deviceId);
 			}
 
 			return deviceId;
@@ -2671,30 +3835,30 @@ window.StickersModule.Service = {};
 		// User ID
 		///////////////////////////////////////
 		getUserId: function() {
-			return this.lockr.get('user_id');
+			return this.get('user_id');
 		},
 		setUserId: function(userId) {
-			return this.lockr.set('user_id', userId);
+			return this.set('user_id', userId);
 		},
 
 		///////////////////////////////////////
 		// User data
 		///////////////////////////////////////
 		getUserData: function() {
-			return this.lockr.get('user_data');
+			return this.get('user_data');
 		},
 		setUserData: function(userData) {
-			return this.lockr.set('user_data', userData);
+			return this.set('user_data', userData);
 		},
 
 		///////////////////////////////////////
 		// Pending request
 		///////////////////////////////////////
 		getPendingRequestTasks: function() {
-			return this.lockr.get('pending_request_tasks') || [];
+			return this.get('pending_request_tasks') || [];
 		},
 		setPendingRequestTasks: function(tasks) {
-			return this.lockr.set('pending_request_tasks', tasks);
+			return this.set('pending_request_tasks', tasks);
 		},
 		addPendingRequestTask: function(task) {
 
@@ -2711,173 +3875,135 @@ window.StickersModule.Service = {};
 			this.setPendingRequestTasks(tasks);
 
 			return task;
+		},
+
+		///////////////////////////////////////
+		// Metadata
+		///////////////////////////////////////
+		getMetadata: function(key) {
+			var metadata = this.get('metadata');
+
+			if (key) {
+				metadata = metadata[key];
+			}
+
+			return metadata;
+		},
+		setMetadata: function(key, value) {
+			var metadata = this.getMetadata() || {};
+
+			metadata[key] = value;
+
+			return this.set('metadata', metadata);
+		},
+
+		///////////////////////////////////////
+		// Last store visit
+		///////////////////////////////////////
+		getStoreLastVisit: function() {
+			return this.getMetadata()['last_store_visit'] || 0;
+		},
+		setStoreLastVisit: function(time) {
+			time = time || +(new Date());
+			return this.setMetadata('last_store_visit', time);
+		},
+
+		///////////////////////////////////////
+		// Last store visit
+		///////////////////////////////////////
+		getStoreLastModified: function() {
+			return this.getMetadata()['shop_last_modified'];
+		},
+		setStoreLastModified: function(time) {
+			time = time || +(new Date());
+			return this.setMetadata('shop_last_modified', time);
 		}
 	};
 
 })(window.StickersModule);
 
-(function(Module) {
+(function(Plugin) {
 
-	function sendAPIMessage(action, attrs) {
-		var iframe = Module.Service.Store.stickerpipe.storeView.iframe;
-
-		iframe && iframe.contentWindow.postMessage(JSON.stringify({
-			action: action,
-			attrs: attrs
-		}), Module.Service.Helper.getDomain(Module.Configs.storeUrl));
-	}
-
-	Module.Service.Store = {
-
-		stickerpipe: null,
-
-		onPurchaseCallback: null,
-
-		init: function(stickerpipe) {
-			this.stickerpipe = stickerpipe;
-		},
-
-		showCollections: function(packName) {
-			this.stickerpipe.storeView.close();
-			this.stickerpipe.open(packName);
-		},
-
-		downloadPack: function(packName, pricePoint) {
-			Module.Service.Pack.activateUserPack(packName, pricePoint, function() {
-				sendAPIMessage('reload');
-				sendAPIMessage('onPackDownloaded', {
-					packName: packName
-				});
-			});
-		},
-
-		purchaseSuccess: function(packName, pricePoint) {
-			this.downloadPack(packName, pricePoint);
-		},
-
-		purchaseFail: function() {
-			sendAPIMessage('hideActionProgress');
-		},
-
-		goBack: function() {
-			sendAPIMessage('goBack');
-		},
-
-		api: {
-			showCollections: function(data) {
-				Module.Service.Store.showCollections(data.attrs.packName);
-			},
-
-			purchasePack: function(data) {
-				var packName = data.attrs.packName,
-					packTitle = data.attrs.packTitle,
-					pricePoint = data.attrs.pricePoint;
-
-				if (pricePoint == 'A' || (pricePoint == 'B' && Module.Configs.userPremium)) {
-					Module.Service.Store.downloadPack(packName, pricePoint);
-				} else {
-					var onPurchaseCallback = Module.Service.Store.onPurchaseCallback;
-
-					onPurchaseCallback && onPurchaseCallback(packName, packTitle, pricePoint);
-				}
-			},
-
-			resizeStore: function(data) {
-				Module.Service.Store.stickerpipe.storeView.resize(data.attrs.height);
-			},
-
-			showBackButton: function(data) {
-				var modal = Module.Service.Store.stickerpipe.storeView.modal;
-
-				if (data.attrs.show) {
-					modal.backButton.style.display = 'block';
-				} else {
-					modal.backButton.style.display = 'none';
-				}
-			}
-		}
-	};
-
-})(StickersModule);
-
-
-(function(Module) {
-
-	Module.Url = {
+	Plugin.Service.Url = {
 
 		buildStoreUrl: function(uri) {
 			uri = uri || '';
 
+			var platform = 'JS',
+				style = platform,
+				primaryColor = Plugin.Configs.primaryColor;
+
+			if (Plugin.Service.Helper.getMobileOS() == 'ios' || navigator.appVersion.indexOf('Mac') != -1) {
+				style = 'ios';
+			}
+
+			if (primaryColor.charAt(0) == '#') {
+				primaryColor = primaryColor.substr(1);
+			}
+
 			var params = {
-				apiKey: Module.Configs.apiKey,
-				platform: 'JS',
-				userId: Module.Configs.userId,
-				density: Module.Configs.stickerResolutionType,
-				priceB: Module.Configs.priceB,
-				priceC: Module.Configs.priceC,
-				is_subscriber: (Module.Configs.userPremium ? 1 : 0),
-				localization: Module.Configs.lang
+				apiKey: Plugin.Configs.apiKey,
+				platform: platform,
+				userId: Plugin.Configs.userId,
+				density: Plugin.Configs.stickerResolutionType,
+				priceB: Plugin.Configs.priceB,
+				priceC: Plugin.Configs.priceC,
+				is_subscriber: (Plugin.Configs.userPremium ? 1 : 0),
+				localization: Plugin.Configs.lang,
+				style: style,
+				primaryColor: primaryColor
 			};
 
-			return Module.Configs.storeUrl + ((Module.Configs.storeUrl.indexOf('?') == -1) ? '?' : '&')
-				+ Module.Service.Helper.urlParamsSerialize(params) + '#/' + uri;
-		},
+			var url = Plugin.Configs.storeUrl || this.buildApiUrl('/web');
 
-		buildCdnUrl: function(uri) {
-			uri = uri || '';
+			url += ((url.indexOf('?') == -1) ? '?' : '&')
+				+ Plugin.Service.Helper.urlParamsSerialize(params)
+				+ '#/' + uri;
 
-			return Module.Configs.cdnUrl + '/stk/' + uri;
+			return url;
 		},
 
 		buildApiUrl: function(uri) {
 			uri = uri || '';
 
-			return Module.Configs.apiUrl + '/api/v' + Module.Api.getApiVersion() + '/' + uri;
+			return Plugin.Configs.apiUrl + '/api/v' + Plugin.Service.Api.getApiVersion() + uri;
 		},
 
-		getStickerUrl: function(packName, stickerName) {
-			return this.buildCdnUrl(
-				packName + '/' + stickerName +
-				'_' + Module.Configs.stickerResolutionType + '.png'
-			);
+		getUserPacksUrl: function() {
+			var url = this.buildApiUrl('/shop/my');
+
+			if (Plugin.Configs.userPremium) {
+				url += '?is_subscriber=1';
+			}
+
+			return url;
 		},
 
-		getPackTabIconUrl: function(packName) {
-			return this.buildCdnUrl(
-				packName + '/' +
-				'tab_icon_' + Module.Configs.tabResolutionType + '.png'
-			);
-		},
+		getPackPreviewUrl: function(packName) {
+			var url = this.buildApiUrl('/packs/' + packName);
 
-		getPacksUrl: function() {
-			var url = this.buildApiUrl('client-packs');
-
-			if (Module.Configs.userId !== null) {
-				url = this.buildApiUrl('packs');
-
-				if (Module.Configs.userPremium) {
-					url += '?is_subscriber=1';
-				}
+			if (Plugin.Configs.userPremium) {
+				url += '?is_subscriber=1';
 			}
 
 			return url;
 		},
 
 		getStatisticUrl: function() {
-			return this.buildApiUrl('track-statistic');
+			return this.buildApiUrl('/statistics');
 		},
 
 		getUserDataUrl: function() {
-			return this.buildApiUrl('user');
+			return this.buildApiUrl('/user');
 		},
 
-		getUserPackUrl: function(packName, pricePoint) {
+		getPurchaseUrl: function(packName, pricePoint) {
 
 			// detect purchase type
 			var purchaseType = 'free';
 			if (pricePoint == 'B') {
 				purchaseType = 'oneoff';
-				if (Module.Configs.userPremium) {
+				if (Plugin.Configs.userPremium) {
 					purchaseType = 'subscription';
 				}
 			} else if (pricePoint == 'C') {
@@ -2885,12 +4011,20 @@ window.StickersModule.Service = {};
 			}
 
 			// build url
-			var url = this.buildApiUrl('user/pack/' + packName);
-			url += '?' + Module.Service.Helper.urlParamsSerialize({
+			var url = this.buildApiUrl('/packs/' + packName);
+			url += '?' + Plugin.Service.Helper.urlParamsSerialize({
 					purchase_type: purchaseType
 				});
 
 			return url;
+		},
+
+		getContentByIdUrl: function(contentId) {
+			return this.buildApiUrl('/content/' + contentId);
+		},
+
+		getHidePackUrl: function(packName) {
+			return this.buildApiUrl('/packs/' + packName);
 		},
 
 		getStoreUrl: function() {
@@ -2904,14 +4038,37 @@ window.StickersModule.Service = {};
 	};
 })(window.StickersModule);
 
+(function(Plugin) {
+
+	Plugin.Service.User = {
+
+		init: function() {
+			this.updateUserData();
+		},
+
+		updateUserData: function() {
+			if (!Plugin.Configs.userData) {
+				return;
+			}
+
+			var storedUserData = Plugin.Service.Storage.getUserData() || {};
+
+			if (JSON.stringify(storedUserData) != JSON.stringify(Plugin.Configs.userData)) {
+				Plugin.Service.Api.updateUserData(Plugin.Configs.userData);
+				Plugin.Service.Storage.setUserData(Plugin.Configs.userData);
+			}
+		}
+	};
+
+})(window.StickersModule);
+
 window.StickersModule.Configs = {};
 
-(function(Module) {
+(function(Plugin) {
 
-	Module.Service.Helper.setConfig({
+	Plugin.Service.Helper.setConfig({
 
 		elId: 'stickerPipe',
-		storeContainerId: 'stickerPipeStore',
 
 		// todo: more than 2 resolution
 		stickerResolutionType : (window.devicePixelRatio == 1) ? 'mdpi' : 'xhdpi',
@@ -2921,13 +4078,11 @@ window.StickersModule.Configs = {};
 		stickerItemClass: 'sp-sticker-item',
 		emojiItemClass: 'sp-emoji',
 
-		htmlForEmptyRecent: '<div class="emptyRecent">No recent stickers</div>',
+		htmlForEmptyRecent: 'No recent stickers',
 
-		apiKey: null, // example: 72921666b5ff8651f374747bfefaf7b2
+		apiKey: null,
 
-		cdnUrl: 'http://cdn.stickerpipe.com',
 		apiUrl: 'http://api.stickerpipe.com',
-		storeUrl: 'http://api.stickerpipe.com/api/v1/web',
 
 		storagePrefix: 'stickerpipe_',
 
@@ -2943,6 +4098,8 @@ window.StickersModule.Configs = {};
 		priceB: null,
 		priceC: null,
 
+		primaryColor: '#e1e1e1',
+
 		// todo: block or popover
 		display: 'block',
 		height: '350px',
@@ -2953,9 +4110,9 @@ window.StickersModule.Configs = {};
 
 })(window.StickersModule);
 
-(function(Module) {
+(function(Plugin) {
 
-	Module.Service.Helper.setConfig({
+	Plugin.Service.Helper.setConfig({
 		emojiList: [
 			// Emoticons		
 			"😊",
@@ -3813,39 +4970,242 @@ window.StickersModule.Configs = {};
 
 
 
-window.StickersModule.View = {};
+/////////////////////////////////////////////////////////////
+// Load modules
+/////////////////////////////////////////////////////////////
+window.StickersModule.Module = {};
 
-(function(Module) {
+(function(Plugin) {
 
-	Module.BlockView = Module.Class({
+	Plugin.Module.Store = {
 
-		emojisOffset: 0,
-		emojisLimit: 100,
+		init: function(stickerpipe) {
+			Plugin.Module.Store.View.init();
+			Plugin.Module.Store.ApiListener.init();
+			Plugin.Module.Store.Api.init(stickerpipe);
+		},
 
-		// todo
-		isRendered: false,
+		open: function(contentId) {
+			Plugin.Module.Store.View.open(contentId);
+		},
 
-		emojiService: null,
+		close: function() {
+			Plugin.Module.Store.View.close();
+		},
 
-		el: null,
-		contentEl: null,
+		setOnPurchaseCallback: function(callback) {
+			Plugin.Module.Store.Controller.onPurchaseCallback = callback;
+		},
 
-		tabsView: null,
-		scrollView: null,
+		purchaseSuccess: function(packName, pricePoint) {
+			Plugin.Module.Store.Controller.onPurchaseSuccess(packName, pricePoint);
+		},
 
-		_constructor: function(emojiService) {
-			this.emojiService = emojiService;
+		purchaseFail: function() {
+			Plugin.Module.Store.Controller.onPurchaseFail();
+		}
+	};
 
-			this.el = document.getElementById(Module.Configs.elId);
-			this.contentEl = document.createElement('div');
+})(StickersModule);
 
-			this.tabsView = new Module.TabsView();
-			this.scrollView = new Module.ScrollView();
 
-			this.scrollView.onScroll((function() {
-				if (this.contentEl.classList.contains('sp-emojis') && this.scrollView.isAtEnd()) {
-					this.renderEmojis(this.emojisOffset);
+(function(Plugin, Module) {
+
+	var stickerpipe;
+
+	Module.Api= {
+
+		init: function(_stickerpipe) {
+			stickerpipe = _stickerpipe;
+		},
+
+		showPack: function(data) {
+			Module.View.close();
+			stickerpipe.open(data.attrs.packName);
+		},
+
+		purchasePack: function(data) {
+			var packName = data.attrs.packName,
+				packTitle = data.attrs.packTitle,
+				pricePoint = data.attrs.pricePoint;
+
+			if (pricePoint == 'A' || (pricePoint == 'B' && Plugin.Configs.userPremium)) {
+				Module.Controller.downloadPack(packName, pricePoint);
+			} else {
+				Module.Controller.onPurchaseCallback &&
+				Module.Controller.onPurchaseCallback(packName, packTitle, pricePoint);
+			}
+		},
+
+		showPagePreloader: function(data) {
+			Module.View.showPagePreloader(data.attrs.show);
+		},
+
+		removePack: function(data) {
+			Module.Controller.removePack(data.attrs.packName);
+		},
+
+		showBackButton: function(data) {
+			Module.View.showBackButton(data.attrs.show);
+		},
+
+		setYScroll: function(data) {
+			Module.View.setYScroll(data.attrs.yPosition);
+		},
+
+		keyUp: function(data) {
+			var ESC_CODE = 27;
+
+			if (data.attrs.keyCode == ESC_CODE) {
+				Module.View.close();
+			}
+		}
+	};
+
+})(StickersModule, StickersModule.Module.Store);
+
+
+(function(Plugin, Module) {
+
+	var initialized = false;
+
+	Module.ApiListener = {
+
+		init: function() {
+			if (initialized) {
+				return;
+			}
+
+			window.addEventListener('message', function(e) {
+				var data = JSON.parse(e.data);
+
+				if (!data.action) {
+					return;
 				}
+
+				var api = Module.Api;
+				api[data.action] && api[data.action](data);
+			});
+
+			initialized = true;
+		}
+	};
+
+})(window.StickersModule, StickersModule.Module.Store);
+
+(function(Plugin, Module) {
+
+	function callStoreMethod(action, attrs) {
+		var iframe = Module.View.iframe;
+
+		iframe && iframe.contentWindow.postMessage(JSON.stringify({
+			action: action,
+			attrs: attrs
+		}), Plugin.Service.Helper.getDomain(Plugin.Service.Url.buildStoreUrl('/')));
+	}
+
+	Module.Controller = {
+
+		onPurchaseCallback: null,
+
+		configureStore: function() {
+			callStoreMethod('configure', {
+				canShowPack: true,
+				canRemovePack: true
+			});
+		},
+
+		downloadPack: function(packName, pricePoint) {
+			Plugin.Service.Pack.purchase(packName, pricePoint, true, function() {
+				callStoreMethod('onPackPurchaseSuccess');
+			}, function() {
+				callStoreMethod('onPackPurchaseFail');
+			});
+		},
+
+		removePack: function(packName) {
+			Plugin.Service.Pack.remove(packName, function() {
+				callStoreMethod('onPackRemoveSuccess');
+			}, function() {
+				callStoreMethod('onPackRemoveFail');
+			});
+		},
+
+		goBack: function() {
+			callStoreMethod('goBack');
+		},
+
+		///////////////////////////////////////////
+		// Callbacks
+		///////////////////////////////////////////
+
+		onPurchaseSuccess: function(packName, pricePoint) {
+			this.downloadPack(packName, pricePoint);
+		},
+
+		onPurchaseFail: function() {
+			callStoreMethod('onPackPurchaseFail');
+		},
+
+		onScrollContent: function(yPosition) {
+			callStoreMethod('onScrollContent', {
+				yPosition: yPosition
+			});
+		}
+	};
+
+})(StickersModule, StickersModule.Module.Store);
+
+
+(function(Plugin, Module) {
+
+	Module.View = {
+
+		modal: null,
+		iframe: null,
+
+		modalBody: null,
+
+		preloader: null,
+
+		init: function() {
+			this.iframe = document.createElement('iframe');
+
+			this.iframe.style.width = '100%';
+			this.iframe.style.height = '100%';
+			this.iframe.style.border = '0';
+
+			this.modal = Plugin.Module.Modal.init(this.iframe, {
+				onOpen: (function(contentEl, modalEl, overlay) {
+					Plugin.Service.Event.resize();
+					Module.ApiListener.init();
+
+					if (Plugin.Service.Helper.getMobileOS() == 'ios') {
+						var modalBody = modalEl.getElementsByClassName('sp-modal-body')[0];
+						modalBody.style.overflowY = 'scroll';
+
+						modalBody.addEventListener('scroll', (function() {
+							Module.Controller.onScrollContent(modalBody.scrollTop);
+						}).bind(this));
+
+						this.modalBody = modalBody;
+					}
+
+					this.iframe.onload = function() {
+						Module.Controller.configureStore();
+					};
+
+
+					if (!this.preloader) {
+						var modalDialog = modalEl.getElementsByClassName('sp-modal-dialog')[0];
+						this.preloader = new Plugin.View.Preloader(modalDialog);
+						this.preloader.hide();
+					}
+				}).bind(this)
+			});
+
+			this.modal.backButton.addEventListener('click', (function() {
+				Module.Controller.goBack();
 			}).bind(this));
 
 			window.addEventListener('resize', (function() {
@@ -3853,164 +5213,61 @@ window.StickersModule.View = {};
 			}).bind(this));
 		},
 
+		open: function(contentId) {
 
-		render: function(stickerPacks) {
-			this.tabsView.render(stickerPacks);
-
-			this.el.innerHTML = '';
-			this.el.classList.add('sticker-pipe');
-			this.el.style.width = Module.Configs.width;
-
-			this.scrollView.el.setAttribute('class', 'sp-scroll-content');
-			this.scrollView.getOverview().appendChild(this.contentEl);
-
-			this.scrollView.viewportEl.style.height = parseInt(Module.Configs.height, 10) - 49 + 'px';
-
-			this.contentEl.classList.add('sp-content');
-
-			this.el.appendChild(this.tabsView.el);
-			this.el.appendChild(this.scrollView.el);
-
-			this.isRendered = true;
-
-			this.tabsView.onWindowResize();
-			this.onWindowResize();
-		},
-		renderUsedStickers: function() {
-
-			var usedStickers = Module.Storage.getUsedStickers();
-
-			this.contentEl.innerHTML = '';
-
-			this.contentEl.classList.remove('sp-stickers');
-			this.contentEl.classList.remove('sp-emojis');
-
-			if (usedStickers.length == 0) {
-				this.contentEl.innerHTML += Module.Configs.htmlForEmptyRecent;
-				this.scrollView.update();
-				return false;
-			}
-
-			var stickers = [];
-			Module.Service.Helper.forEach(usedStickers, function(sticker) {
-				stickers.push(sticker.code);
-			});
-
-			this.renderStickers(stickers);
-		},
-		renderEmojiBlock: function() {
-
-			this.contentEl.innerHTML = '';
-
-			this.contentEl.classList.remove('sp-stickers');
-			this.contentEl.classList.add('sp-emojis');
-
-			this.emojisOffset = 0;
-			this.renderEmojis(this.emojisOffset);
-
-			this.scrollView.update();
-		},
-		renderPack: function(pack) {
-
-			this.contentEl.innerHTML = '';
-
-			var stickers = [];
-			Module.Service.Helper.forEach(pack.stickers, function(sticker) {
-				stickers.push(pack.pack_name + '_' + sticker.name);
-			});
-
-			this.renderStickers(stickers);
-		},
-		renderStickers: function(stickers) {
 			var self = this;
 
-			this.contentEl.classList.remove('sp-emojis');
-			this.contentEl.classList.add('sp-stickers');
+			self.iframe.src = Plugin.Service.Url.getStoreUrl();
 
-			Module.Service.Helper.forEach(stickers, function(stickerCode) {
-
-				var placeHolderClass = 'sp-sticker-placeholder';
-
-				var stickerImgSrc = Module.BaseService.parseStickerFromText('[[' + stickerCode + ']]');
-
-				var stickersSpanEl = document.createElement('span');
-				stickersSpanEl.classList.add(placeHolderClass);
-
-				var image = new Image();
-				image.onload = function() {
-					stickersSpanEl.classList.remove(placeHolderClass);
-					stickersSpanEl.classList.add(Module.Configs.stickerItemClass);
-					stickersSpanEl.setAttribute('data-sticker-string', stickerCode);
-					stickersSpanEl.appendChild(image);
-
-					self.scrollView.update('relative');
-				};
-				image.onerror = function() {};
-
-				image.src = stickerImgSrc.url;
-
-				self.contentEl.appendChild(stickersSpanEl);
-			});
-
-			self.scrollView.update();
-		},
-		renderEmojis: function(offset) {
-
-			if (offset > Module.Configs.emojiList.length - 1) {
-				return;
+			if (contentId) {
+				Plugin.Service.Sticker.getById(contentId, function (sticker) {
+					self.iframe.src = Plugin.Service.Url.getStorePackUrl(sticker.pack);
+				});
 			}
 
-			var limit = offset + this.emojisLimit;
-			if (limit > Module.Configs.emojiList.length - 1) {
-				limit = Module.Configs.emojiList.length;
-			}
-
-			for (var i = offset; i < limit; i++) {
-				var emoji = Module.Configs.emojiList[i],
-					emojiEl = document.createElement('span'),
-					emojiImgHtml = this.emojiService.parseEmojiFromText(emoji);
-
-				emojiEl.className = Module.Configs.emojiItemClass;
-				emojiEl.innerHTML = emojiImgHtml;
-
-				this.contentEl.appendChild(emojiEl);
-			}
-
-			this.emojisOffset = limit;
-
-			this.scrollView.update('relative');
+			this.modal.open();
 		},
 
-
-		handleClickOnSticker: function(callback) {
-			// todo: create static Module.Configs.stickerItemClass
-			Module.Service.Helper.setEvent('click', this.contentEl, Module.Configs.stickerItemClass, callback);
-		},
-		handleClickOnEmoji: function(callback) {
-			// todo: create static Module.Configs.emojiItemClass
-			Module.Service.Helper.setEvent('click', this.contentEl, Module.Configs.emojiItemClass, callback);
-		},
-
-		open: function(tabName) {
-			tabName = tabName || null;
-
-			if (tabName) {
-				this.tabsView.activeTab(tabName);
-			}
-
-			if (!this.tabsView.hasActiveTab) {
-				this.tabsView.activeLastUsedStickersTab();
+		close: function() {
+			if (this.modal && this.modal.hasGlobalOpened()) {
+				this.modal.close();
 			}
 		},
-		close: function() {},
 
+		showPagePreloader: function(show) {
+			this.preloader[(show ? 'show' : 'hide')]();
+		},
 
-		onWindowResize: function() {}
-	});
+		showBackButton: function(show) {
+			var modal = this.modal;
+			modal.backButton.style.display = (show) ? 'block' : 'none';
+		},
 
-})(window.StickersModule);
+		setYScroll: function(yPosition) {
+			if (this.modalBody) {
+				this.modalBody.scrollTop = yPosition;
+			}
+		},
 
-(function(Module) {
+		onWindowResize: function() {
+			var dialog = this.modal.modalEl.getElementsByClassName('sp-modal-dialog')[0];
+			dialog.style.height = '';
+
+			if (window.innerWidth > 700) {
+
+				var marginTop = parseInt(Plugin.Service.El.css(dialog, 'marginTop'), 10),
+					marginBottom = parseInt(Plugin.Service.El.css(dialog, 'marginBottom'), 10);
+
+				var minHeight = window.innerHeight - marginTop - marginBottom;
+
+				dialog.style.height = minHeight + 'px';
+			}
+		}
+	};
+
+})(window.StickersModule, StickersModule.Module.Store);
+
+(function(Plugin) {
 
 	// todo: + bind & unbind methods for events (error on ESC two modals)
 
@@ -4021,7 +5278,6 @@ window.StickersModule.View = {};
 
 		oMargin = {},
 		ieBodyTopMargin = 0,
-		pluginNamespace = 'sp-modal',
 
 		classes = {
 			lock: 'sp-modal-lock',
@@ -4047,23 +5303,6 @@ window.StickersModule.View = {};
 
 		overlay = null;
 
-	// todo: extend --> HelperModule
-	function extend(out) {
-		out = out || {};
-
-		for (var i = 1; i < arguments.length; i++) {
-			if (!arguments[i])
-				continue;
-
-			for (var key in arguments[i]) {
-				if (arguments[i].hasOwnProperty(key))
-					out[key] = arguments[i][key];
-			}
-		}
-
-		return out;
-	}
-
 	function lockContainer() {
 		if (overlay) {
 			return;
@@ -4074,14 +5313,14 @@ window.StickersModule.View = {};
 
 		document.body.insertBefore(overlay, document.body.firstChild);
 
-		var bodyOuterWidth = Module.El.outerWidth(document.body);
+		var bodyOuterWidth = Plugin.Service.El.outerWidth(document.body);
 		document.body.classList.add(classes.lock);
 		document.getElementsByTagName('html')[0].classList.add(classes.lock);
 
-		var scrollbarWidth = Module.El.outerWidth(document.body) - bodyOuterWidth;
+		var scrollbarWidth = Plugin.Service.El.outerWidth(document.body) - bodyOuterWidth;
 
-		if (Module.Service.Helper.isIE()) {
-			ieBodyTopMargin = Module.El.css(document.body, 'marginTop');
+		if (Plugin.Service.Helper.isIE()) {
+			ieBodyTopMargin = Plugin.Service.El.css(document.body, 'marginTop');
 			document.body.style.marginTop = 0;
 		}
 
@@ -4091,7 +5330,7 @@ window.StickersModule.View = {};
 				var tag = tags[i],
 					tagEl = document.getElementsByTagName(tag)[0];
 
-				oMargin[tag.toLowerCase()] = parseInt(Module.El.css(tagEl, 'marginRight'));
+				oMargin[tag.toLowerCase()] = parseInt(Plugin.Service.El.css(tagEl, 'marginRight'));
 			}
 
 			document.getElementsByTagName('html')[0].style.marginRight = oMargin['html'] + scrollbarWidth + 'px';
@@ -4104,14 +5343,14 @@ window.StickersModule.View = {};
 		overlay.parentNode.removeChild(overlay);
 		overlay = null;
 
-		if (Module.Service.Helper.isIE()) {
+		if (Plugin.Service.Helper.isIE()) {
 			document.body.style.marginTop = ieBodyTopMargin + 'px';
 		}
 
-		var bodyOuterWidth = Module.El.outerWidth(document.body);
+		var bodyOuterWidth = Plugin.Service.El.outerWidth(document.body);
 		document.body.classList.remove(classes.lock);
 		document.getElementsByTagName('html')[0].classList.remove(classes.lock);
-		var scrollbarWidth = Module.El.outerWidth(document.body) - bodyOuterWidth;
+		var scrollbarWidth = Plugin.Service.El.outerWidth(document.body) - bodyOuterWidth;
 
 		if (scrollbarWidth != 0) {
 			var tags = ['html', 'body'];
@@ -4124,21 +5363,13 @@ window.StickersModule.View = {};
 		}
 	}
 
-	function insertAfter(newNode, referenceNode) {
-		referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
-	}
-
-
-	Module.View = Module.View || {};
-
-	Module.View.Modal = {
+	Plugin.Module.Modal = {
 
 		init: function(contentEl, options) {
 
-			options = extend({}, defaultOptions, (options || {}));
+			options = Plugin.Service.Helper.extend({}, defaultOptions, (options || {}));
 
 			var modalInstance = {};
-
 
 			// ****************************************************************************
 
@@ -4146,6 +5377,12 @@ window.StickersModule.View = {};
 			var modalEl = document.createElement('div');
 			modalEl.style.display = 'none';
 			modalEl.className = classes.modal;
+
+			if (options.closeOnOverlayClick) {
+				modalEl.addEventListener('click', (function() {
+					modalInstance.close(options);
+				}).bind(this));
+			}
 
 
 			// DIALOG
@@ -4228,7 +5465,7 @@ window.StickersModule.View = {};
 			//	}
 			//});
 
-			return extend(modalInstance, {
+			return Plugin.Service.Helper.extend(modalInstance, {
 
 				options: options,
 				contentEl: contentEl,
@@ -4250,7 +5487,7 @@ window.StickersModule.View = {};
 
 
 					//overlay.appendChild(this.modalEl); // openedModalElement
-					insertAfter(this.modalEl, overlay);
+					Plugin.Service.El.appendAfter(this.modalEl, overlay);
 
 					this.modalEl.style.display = 'block';
 
@@ -4260,30 +5497,16 @@ window.StickersModule.View = {};
 								this.close(this.options);
 							}
 						}).bind(this));
-
-						// if iframe
-						if (this.contentEl && this.contentEl.contentWindow) {
-							this.contentEl.contentWindow.addEventListener('keyup', (function(e) {
-								if(e.keyCode === KEY_CODE_ESC && isOpen) {
-									this.close(this.options);
-								}
-							}).bind(this));
-						}
 					}
 
 					if (this.options.closeOnOverlayClick) {
-						for (var i = overlay.children.length; i--;) {
-							if (overlay.children[i].nodeType != 8) {
-								overlay.children[i].addEventListener('click', function(e) {
+						for (var i = this.modalEl.children.length; i--;) {
+							if (this.modalEl.children[i].nodeType != 8) {
+								this.modalEl.children[i].addEventListener('click', function(e) {
 									e.stopPropagation();
 								});
 							}
 						}
-
-						document.getElementsByClassName(classes.overlay)[0]
-							.addEventListener('click', (function() {
-								this.close(this.options);
-							}).bind(this));
 					}
 
 					//document.addEventListener('touchmove', (function(e) {
@@ -4322,7 +5545,7 @@ window.StickersModule.View = {};
 
 					document.addEventListener('touchmove', function(e) {
 
-						//var q = Module.El.getParents(e.target, '.' + classes.overlay);
+						//var q = Plugin.Service.El.getParents(e.target, '.' + classes.overlay);
 						//if (!q.length) {
 						//	e.preventDefault();
 						//}
@@ -4391,22 +5614,213 @@ window.StickersModule.View = {};
 					}
 
 					isOpen = false;
+				},
+
+				// todo
+				hasGlobalOpened: function() {
+					return isOpen;
 				}
 			});
 		},
 
 		setDefaultOptions: function(options) {
-			defaultOptions = extend({}, defaultOptions, options);
+			defaultOptions = Plugin.Service.Helper.extend({}, defaultOptions, options);
 		}
 	};
 
 })(window.StickersModule);
 
-(function(Module) {
+/////////////////////////////////////////////////////////////
 
-	var parent = Module.BlockView;
+window.StickersModule.View = {};
 
-	Module.PopoverView = parent.extend({
+(function(Plugin) {
+
+	Plugin.View.Block = Plugin.Libs.Class({
+
+		emojisOffset: 0,
+		emojisLimit: 100,
+
+		// todo
+		isRendered: false,
+
+		el: null,
+		contentEl: null,
+
+		tabsView: null,
+
+		scrollableEl: null,
+
+		_constructor: function() {
+
+			this.el = document.getElementById(Plugin.Configs.elId);
+			this.contentEl = document.createElement('div');
+
+			this.tabsView = new Plugin.View.Tabs();
+
+			window.addEventListener('resize', (function() {
+				this.onWindowResize();
+			}).bind(this));
+		},
+
+		render: function() {
+
+			this.tabsView.render();
+
+			this.el.innerHTML = '';
+			this.el.className ='sticker-pipe';
+			this.el.style.width = Plugin.Configs.width;
+
+			this.scrollableEl = document.createElement('div');
+			this.scrollableEl.className = 'sp-scroll-content';
+			this.scrollableEl.style.height = parseInt(Plugin.Configs.height, 10) - 49 + 'px';
+			this.scrollableEl.appendChild(this.contentEl);
+
+			this.scrollableEl.addEventListener('ps-y-reach-end', (function () {
+				if (this.contentEl.className == 'sp-emojis') {
+					this.renderEmojis(this.emojisOffset);
+				}
+			}).bind(this));
+
+			this.el.appendChild(this.tabsView.el);
+			this.el.appendChild(this.scrollableEl);
+
+			Plugin.Libs.PerfectScrollbar.initialize(this.scrollableEl);
+
+			this.isRendered = true;
+
+			this.tabsView.onWindowResize();
+			this.onWindowResize();
+		},
+		renderRecentStickers: function() {
+
+			var recentStickers = Plugin.Service.Storage.getRecentStickers();
+
+			if (!recentStickers.length) {
+				this.contentEl.className = 'sp-recent-empty';
+				this.contentEl.innerHTML = Plugin.Configs.htmlForEmptyRecent;
+				this.updateScroll('top');
+				return false;
+			}
+
+			this.renderStickers(recentStickers);
+		},
+		renderEmojiBlock: function() {
+
+			this.contentEl.innerHTML = '';
+			this.contentEl.className = 'sp-emojis';
+
+			this.emojisOffset = 0;
+			this.renderEmojis(this.emojisOffset);
+
+			this.updateScroll('top');
+		},
+		renderPack: function(pack) {
+			this.renderStickers(pack.stickers);
+		},
+		renderStickers: function(stickersIds) {
+			var self = this;
+
+			this.contentEl.innerHTML = '';
+			this.contentEl.className = 'sp-stickers';
+
+			function appendSticker(stickerId) {
+				var stickersSpanEl = document.createElement('span');
+				stickersSpanEl.className = 'sp-sticker-placeholder';
+				stickersSpanEl.style.background = Plugin.Configs.primaryColor;
+				stickersSpanEl.setAttribute('data-sticker-id', stickerId);
+
+				var image = new Image();
+				image.onload = function() {
+					stickersSpanEl.className = Plugin.Configs.stickerItemClass;
+					stickersSpanEl.style.background = '';
+					stickersSpanEl.appendChild(image);
+				};
+				image.onerror = function() {};
+
+				Plugin.Service.Sticker.getById(stickerId, function(sticker) {
+					image.src = sticker.image[Plugin.Configs.stickerResolutionType];
+				});
+
+				self.contentEl.appendChild(stickersSpanEl);
+			}
+
+			for (var i = 0; i < stickersIds.length; i++) {
+				var stickerId = stickersIds[i];
+				appendSticker(stickerId);
+			}
+
+			this.updateScroll('top');
+		},
+		renderEmojis: function(offset) {
+
+			if (offset > Plugin.Configs.emojiList.length - 1) {
+				return;
+			}
+
+			var limit = offset + this.emojisLimit;
+			if (limit > Plugin.Configs.emojiList.length - 1) {
+				limit = Plugin.Configs.emojiList.length;
+			}
+
+			for (var i = offset; i < limit; i++) {
+				var emoji = Plugin.Configs.emojiList[i],
+					emojiEl = document.createElement('span'),
+					emojiImgHtml = Plugin.Service.Emoji.parseEmojiFromText(emoji);
+
+				emojiEl.className = Plugin.Configs.emojiItemClass;
+				emojiEl.innerHTML = emojiImgHtml;
+
+				this.contentEl.appendChild(emojiEl);
+			}
+
+			this.emojisOffset = limit;
+
+			this.updateScroll();
+		},
+
+		handleClickOnSticker: function(callback) {
+			// todo: create static Plugin.Configs.stickerItemClass
+			Plugin.Service.Helper.setEvent('click', this.contentEl, Plugin.Configs.stickerItemClass, callback);
+		},
+		handleClickOnEmoji: function(callback) {
+			// todo: create static Plugin.Configs.emojiItemClass
+			Plugin.Service.Helper.setEvent('click', this.contentEl, Plugin.Configs.emojiItemClass, callback);
+		},
+
+		open: function(tabName) {
+			tabName = tabName || null;
+
+			if (tabName) {
+				this.tabsView.activeTab(tabName);
+			}
+
+			if (!this.tabsView.hasActiveTab) {
+				this.tabsView.activeLastUsedStickersTab();
+			}
+		},
+		close: function() {},
+
+		updateScroll: function(position) {
+			position = position || 'relative';
+
+			if (position == 'top') {
+				this.scrollableEl.scrollTop = 0;
+			}
+
+			Plugin.Libs.PerfectScrollbar.update(this.scrollableEl);
+		},
+
+		onWindowResize: function() {}
+	});
+
+})(window.StickersModule);
+
+(function(Plugin) {
+
+	var parent = Plugin.View.Block;
+
+	Plugin.View.Popover = parent.extend({
 
 		popoverEl: null,
 		triangleEl: null,
@@ -4417,13 +5831,13 @@ window.StickersModule.View = {};
 		_constructor: function() {
 			parent.prototype._constructor.apply(this, arguments);
 
-			this.toggleEl = document.getElementById(Module.Configs.elId);
+			this.toggleEl = document.getElementById(Plugin.Configs.elId);
 			this.toggleEl.addEventListener('click', (function() {
 				this.toggle();
 			}).bind(this));
 
 			this.popoverEl = document.createElement('div');
-			this.popoverEl.classList.add('sp-popover');
+			this.popoverEl.className = 'sp-popover';
 
 			this.el = document.createElement('div');
 
@@ -4458,14 +5872,22 @@ window.StickersModule.View = {};
 				}
 			}).bind(this));
 
+			window.addEventListener(Plugin.Service.Event.events.showContentHighlight, (function() {
+				this.toggleEl.classList.add('stickerpipe-content-highlight');
+			}).bind(this));
+
+			window.addEventListener(Plugin.Service.Event.events.hideContentHighlight, (function() {
+				this.toggleEl.classList.remove('stickerpipe-content-highlight');
+			}).bind(this));
+
 			// todo: addEventListener --> DOMEventService
 			if (window.addEventListener) {
-				window.addEventListener(Module.DOMEventService.events.popoverShown, function() {
-					Module.DOMEventService.resize();
+				window.addEventListener(Plugin.Service.Event.events.popoverShown, function() {
+					Plugin.Service.Event.resize();
 				});
 			} else {
-				window.attachEvent('on' + Module.DOMEventService.events.popoverShown, function() {
-					Module.DOMEventService.resize();
+				window.attachEvent('on' + Plugin.Service.Event.events.popoverShown, function() {
+					Plugin.Service.Event.resize();
 				});
 			}
 		},
@@ -4485,7 +5907,7 @@ window.StickersModule.View = {};
 
 				this.toggleEl.parentElement.appendChild(this.popoverEl);
 				this.positioned();
-				Module.DOMEventService.popoverShown();
+				Plugin.Service.Event.popoverShown();
 			}
 
 			parent.prototype.open.apply(this, arguments);
@@ -4494,7 +5916,7 @@ window.StickersModule.View = {};
 		close: function() {
 			this.active = false;
 			this.toggleEl.parentElement.removeChild(this.popoverEl);
-			Module.DOMEventService.popoverHidden();
+			Plugin.Service.Event.popoverHidden();
 			// todo
 			this.popoverEl.style.marginTop = 0;
 		},
@@ -4536,239 +5958,121 @@ window.StickersModule.View = {};
 
 })(window.StickersModule);
 
-(function(Module) {
+(function(Plugin) {
 
-	Module.ScrollView = Module.Class({
+	Plugin.View.Preloader = function(parentEl) {
 
-		el: null,
+		// Constructor
 
-		scrollbarEl: null,
-		trackEl: null,
-		thumbEl: null,
-		viewportEl: null,
-		overviewEl: null,
+		var el = document.createElement('div');
+		el.className = 'sp-preloader';
 
-		scrollbar: null,
+		el.innerHTML = '' +
+			'<div class="sp-preloader-content">' +
+				'<div class="sp-preloader-chasing-dots">' +
+					'<div class="sp-preloader-child sp-preloader-dot1"></div>' +
+					'<div class="sp-preloader-child sp-preloader-dot2"></div>' +
+				'</div>' +
+			'</div>';
 
-		_constructor: function() {
-			this.el = document.createElement('div');
-			this.scrollbarEl = document.createElement('div');
-			this.trackEl = document.createElement('div');
-			this.thumbEl = document.createElement('div');
-			this.viewportEl = document.createElement('div');
-			this.overviewEl = document.createElement('div');
-
-			this.scrollbarEl.className = 'scrollbar';
-			this.trackEl.className = 'track';
-			this.thumbEl.className = 'thumb';
-			this.viewportEl.className = 'viewport';
-			this.overviewEl.className = 'overview';
-
-			this.trackEl.appendChild(this.thumbEl);
-			this.scrollbarEl.appendChild(this.trackEl);
-
-			this.viewportEl.appendChild(this.overviewEl);
-
-			this.el.appendChild(this.scrollbarEl);
-			this.el.appendChild(this.viewportEl);
-
-			this.scrollbar = Module.Tinyscrollbar(this.el);
-
-			window.addEventListener('resize', (function() {
-				this.update();
-			}).bind(this));
-		},
-
-		getOverview: function() {
-			return this.overviewEl;
-		},
-
-		update: function(scrollTo) {
-			this.scrollbar.update(scrollTo);
-		},
-
-		onScroll: function(callback) {
-			this.el.addEventListener('move', (function() {
-				callback && callback();
-			}).bind(this));
-		},
-
-		isAtBegin: function() {
-			return !this.scrollbar._isAtBegin();
-		},
-
-		isAtEnd: function() {
-			return !this.scrollbar._isAtEnd();
+		if (parentEl) {
+			parentEl.appendChild(el);
 		}
-	});
 
-})(window.StickersModule);
+		// ***********
 
-(function(Module) {
+		return {
 
+			getEl: function() {
+				return el;
+			},
 
-	var hasMessageListener = false;
+			show: function() {
+				el.style.display = '';
+			},
 
-	function setWindowMessageListener() {
-		if (!hasMessageListener) {
-			window.addEventListener('message', (function(e) {
-				var data = JSON.parse(e.data);
-
-				if (!data.action) {
-					return;
-				}
-
-				var StoreService = Module.Service.Store;
-				StoreService.api[data.action] && StoreService.api[data.action](data);
-
-			}).bind(this));
-
-			hasMessageListener = true;
-		}
-	}
-
-	Module.StoreView = Module.Class({
-
-		modal: null,
-		iframe: null,
-		overlay: null,
-
-		_constructor: function() {
-
-			this.iframe = document.createElement('iframe');
-
-			this.iframe.style.width = '100%';
-			this.iframe.style.height = '100%';
-			this.iframe.style.border = '0';
-
-			this.modal = Module.View.Modal.init(this.iframe, {
-				onOpen: (function(contentEl, modalEl, overlay) {
-					this.overlay = overlay;
-					Module.DOMEventService.resize();
-					setWindowMessageListener.bind(this)();
-
-					if (Module.Service.Helper.getMobileOS() == 'ios') {
-						modalEl.getElementsByClassName('sp-modal-body')[0].style.overflowY = 'scroll';
-					}
-				}).bind(this)
-			});
-
-			this.modal.backButton.addEventListener('click', (function() {
-				Module.Service.Store.goBack();
-			}).bind(this));
-
-
-			window.addEventListener('resize', (function() {
-				this.resize();
-			}).bind(this));
-		},
-
-		renderStore: function() {
-			this.iframe.src = Module.Url.getStoreUrl();
-			this.modal.open();
-		},
-
-		renderPack: function(packName) {
-			this.iframe.src = Module.Url.getStorePackUrl(packName);
-			this.modal.open();
-		},
-
-		close: function() {
-			this.modal.close();
-		},
-
-		resize: function(height) {
-			var dialog = this.modal.modalEl.getElementsByClassName('sp-modal-dialog')[0];
-			dialog.style.height = '';
-
-			if (window.innerWidth > 700) {
-
-				var marginTop = parseInt(Module.El.css(dialog, 'marginTop'), 10),
-					marginBottom = parseInt(Module.El.css(dialog, 'marginBottom'), 10);
-
-				var minHeight = window.innerHeight - marginTop - marginBottom;
-
-				dialog.style.height = minHeight + 'px';
+			hide: function() {
+				el.style.display = 'none';
 			}
-		}
-	});
+		};
+	};
 
 })(window.StickersModule);
 
-(function(Module) {
+(function(Plugin) {
 
 
-	Module.TabsView = Module.Class({
+	var packTabSize = 48,
+		classes = {
+			scrollableContainer: 'sp-tabs-scrollable-container',
+			scrollableContent: 'sp-tabs-scrollable-content',
+			controlTab: 'sp-control-tab',
+			controlButton: 'sp-control-button',
+			unwatched: 'sp-unwatched-content',
+			packTab: 'sp-pack-tab',
+			tabActive: 'sp-tab-active',
+			tabs: 'sp-tabs'
+		};
+
+	Plugin.View.Tabs = Plugin.Libs.Class({
 
 		el: null,
 		scrollableContainerEl: null,
 		scrollableContentEl: null,
 
-		controls: null,
 		packTabs: {},
 		packTabsIndexes: {},
 
 		hasActiveTab: false,
 
-		classes: {
-			scrollableContainer: 'sp-tabs-scrollable-container',
-			scrollableContent: 'sp-tabs-scrollable-content',
-			controlTab: 'sp-control-tab',
-			controlButton: 'sp-control-button',
-			newPack: 'sp-new-pack',
-			packTab: 'sp-pack-tab',
-			tabActive: 'sp-tab-active',
-			tabs: 'sp-tabs'
+		controls: {
+			emoji: {
+				id: 'spTabEmoji',
+				class: 'sp-tab-emoji',
+				icon: 'sp-icon-face',
+				el: null,
+				isTab: true
+			},
+			history: {
+				id: 'spTabHistory',
+				class: 'sp-tab-history',
+				icon: 'sp-icon-clock',
+				el: null,
+				isTab: true
+			},
+			settings: {
+				id: 'spTabSettings',
+				class: 'sp-tab-settings',
+				icon: 'sp-icon-settings',
+				el: null,
+				isTab: false
+			},
+			store: {
+				id: 'spTabStore',
+				class: 'sp-tab-store',
+				icon: 'sp-icon-plus',
+				el: null,
+				isTab: false
+			},
+			prevPacks: {
+				id: 'spTabPrevPacks',
+				class: 'sp-tab-prev-packs',
+				icon: 'sp-icon-arrow-back',
+				el: null,
+				isTab: false
+			},
+			nextPacks: {
+				id: 'spTabNextPacks',
+				class: 'sp-tab-next-packs',
+				icon: 'sp-icon-arrow-forward',
+				el: null,
+				isTab: false
+			}
 		},
 
 		_constructor: function() {
 
 			this.el = document.createElement('div');
-
-			this.controls = {
-				emoji: {
-					id: 'spTabEmoji',
-					class: 'sp-tab-emoji',
-					icon: 'sp-icon-face',
-					el: null,
-					isTab: true
-				},
-				history: {
-					id: 'spTabHistory',
-					class: 'sp-tab-history',
-					icon: 'sp-icon-clock',
-					el: null,
-					isTab: true
-				},
-				settings: {
-					id: 'spTabSettings',
-					class: 'sp-tab-settings',
-					icon: 'sp-icon-settings',
-					el: null,
-					isTab: false
-				},
-				store: {
-					id: 'spTabStore',
-					class: 'sp-tab-store',
-					icon: 'sp-icon-plus',
-					el: null,
-					isTab: false
-				},
-				prevPacks: {
-					id: 'spTabPrevPacks',
-					class: 'sp-tab-prev-packs',
-					icon: 'sp-icon-arrow-back',
-					el: null,
-					isTab: false
-				},
-				nextPacks: {
-					id: 'spTabNextPacks',
-					class: 'sp-tab-next-packs',
-					icon: 'sp-icon-arrow-forward',
-					el: null,
-					isTab: false
-				}
-			};
 
 			window.addEventListener('resize', (function() {
 				this.onWindowResize();
@@ -4776,16 +6080,16 @@ window.StickersModule.View = {};
 		},
 
 
-		render: function(stickerPacks) {
+		render: function() {
 
-			this.el.classList.add(this.classes.tabs);
+			this.el.className = classes.tabs;
 			this.el.innerHTML = '';
 
 			this.renderPrevPacksTab();
 
 			this.renderScrollableContainer();
 
-			this.renderPacks(stickerPacks);
+			this.renderPacks();
 
 			this.renderNextPacksTab();
 
@@ -4794,10 +6098,10 @@ window.StickersModule.View = {};
 		renderScrollableContainer: function() {
 
 			this.scrollableContentEl = document.createElement('div');
-			this.scrollableContentEl.className = this.classes.scrollableContent;
+			this.scrollableContentEl.className = classes.scrollableContent;
 
 			this.scrollableContainerEl = document.createElement('div');
-			this.scrollableContainerEl.className = this.classes.scrollableContainer;
+			this.scrollableContainerEl.className = classes.scrollableContainer;
 
 			this.scrollableContainerEl.appendChild(this.scrollableContentEl);
 			this.el.appendChild(this.scrollableContainerEl);
@@ -4805,39 +6109,37 @@ window.StickersModule.View = {};
 		renderControlButton: function(controlButton) {
 			controlButton.isTab = controlButton.isTab || false;
 
-			var classes = [controlButton.class];
-			classes.push((controlButton.isTab) ? this.classes.controlTab : this.classes.controlButton);
+			var buttonClasses = [controlButton.class];
+			buttonClasses.push((controlButton.isTab) ? classes.controlTab : classes.controlButton);
 
 			var content = '<span class="' + controlButton.icon + '"></span>';
 
-			controlButton.el = this.renderTab(controlButton.id, classes, content);
+			controlButton.el = this.renderTab(controlButton.id, buttonClasses, content);
 			return controlButton.el;
 		},
 		renderPackTab: function(pack) {
-			var classes = [this.classes.packTab];
+			var tabClasses = [classes.packTab];
 
-			if(pack.newPack) {
-				classes.push(this.classes.newPack);
+			if (pack.isUnwatched) {
+				tabClasses.push(classes.unwatched);
 			}
 
-			var iconSrc = Module.Url.getPackTabIconUrl(pack.pack_name);
+			var content = '<img src=' + pack.tab_icon[Plugin.Configs.tabResolutionType] + '>';
 
-			var content = '<img src=' + iconSrc + '>';
-
-			var tabEl = this.renderTab(null, classes, content, {
+			var tabEl = this.renderTab(null, tabClasses, content, {
 				'data-pack-name': pack.pack_name
 			});
 
 			tabEl.addEventListener('click', (function() {
-				tabEl.classList.remove(this.classes.newPack);
+				tabEl.classList.remove(classes.unwatched);
 			}).bind(this));
 
 			this.packTabs[pack.pack_name] = tabEl;
 
 			return tabEl;
 		},
-		renderTab: function(id, classes, content, attrs) {
-			classes = classes || [];
+		renderTab: function(id, tabClasses, content, attrs) {
+			tabClasses = tabClasses || [];
 			attrs = attrs || {};
 
 			var tabEl = document.createElement('span');
@@ -4846,47 +6148,50 @@ window.StickersModule.View = {};
 				tabEl.id = id;
 			}
 
-			classes.push(Module.Configs.tabItemClass);
+			tabClasses.push(Plugin.Configs.tabItemClass);
 
-			tabEl.classList.add.apply(tabEl.classList, classes);
+			tabEl.classList.add.apply(tabEl.classList, tabClasses);
 
-			Module.Service.Helper.forEach(attrs, function(value, name) {
-				tabEl.setAttribute(name, value);
-			});
+			for (var name in attrs) {
+				tabEl.setAttribute(name, attrs[name]);
+			}
 
 			tabEl.innerHTML = content;
 
 			tabEl.addEventListener('click', (function() {
-				if (!tabEl.classList.contains(this.classes.controlTab) &&
-					!tabEl.classList.contains(this.classes.packTab)) {
+				if (!tabEl.classList.contains(classes.controlTab) &&
+					!tabEl.classList.contains(classes.packTab)) {
 					return;
 				}
 
-				Module.Service.Helper.forEach(this.packTabs, (function(tabEl) {
-					tabEl.classList.remove(this.classes.tabActive);
-				}).bind(this));
+				for (var tabName in this.packTabs) {
+					this.packTabs[tabName].classList.remove(classes.tabActive);
+				}
 
-				Module.Service.Helper.forEach(this.controls, (function(controlTab) {
+				for (var controlName in this.controls) {
+					var controlTab = this.controls[controlName];
 					if (controlTab && controlTab.el) {
-						controlTab.el.classList.remove(this.classes.tabActive);
+						controlTab.el.classList.remove(classes.tabActive);
 					}
-				}).bind(this));
+				}
 
-				tabEl.classList.add(this.classes.tabActive);
+				tabEl.classList.add(classes.tabActive);
 			}).bind(this));
 
 			return tabEl;
 		},
 
 
-		renderPacks: function(stickerPacks) {
+		renderPacks: function() {
 			this.scrollableContentEl.innerHTML = '';
 
 			this.renderEmojiTab();
 			this.renderHistoryTab();
 
-			for (var i = 0; i < stickerPacks.length; i++) {
-				var pack = stickerPacks[i];
+			var packs = Plugin.Service.Storage.getPacks();
+
+			for (var i = 0; i < packs.length; i++) {
+				var pack = packs[i];
 				this.scrollableContentEl.appendChild(this.renderPackTab(pack));
 				this.packTabsIndexes[pack.pack_name] = i;
 			}
@@ -4894,53 +6199,55 @@ window.StickersModule.View = {};
 			this.renderSettingsTab();
 		},
 		renderEmojiTab: function() {
-			if (Module.Configs.enableEmojiTab) {
+			if (Plugin.Configs.enableEmojiTab) {
 				this.scrollableContentEl.appendChild(this.renderControlButton(this.controls.emoji));
 			}
 		},
 		renderHistoryTab: function() {
-			if (Module.Configs.enableHistoryTab) {
+			if (Plugin.Configs.enableHistoryTab) {
 				this.scrollableContentEl.appendChild(this.renderControlButton(this.controls.history));
 			}
 		},
 		renderSettingsTab: function() {
-			if (Module.Configs.enableSettingsTab) {
+			if (Plugin.Configs.enableSettingsTab) {
 				this.scrollableContentEl.appendChild(this.renderControlButton(this.controls.settings));
 			}
 		},
 		renderStoreTab: function() {
-			if (Module.Configs.enableStoreTab) {
+			if (Plugin.Configs.enableStoreTab) {
 				this.el.appendChild(this.renderControlButton(this.controls.store));
+
+				if (Plugin.Service.Storage.getStoreLastModified() > Plugin.Service.Storage.getStoreLastVisit()) {
+					this.controls.store.el.classList.add('sp-unwatched-content');
+				}
 			}
 		},
 		renderPrevPacksTab: function() {
 			this.el.appendChild(this.renderControlButton(this.controls.prevPacks));
-			Module.Service.Helper.setEvent('click', this.el, this.controls.prevPacks.class, this.onClickPrevPacksButton.bind(this));
+			Plugin.Service.Helper.setEvent('click', this.el, this.controls.prevPacks.class, this.onClickPrevPacksButton.bind(this));
 		},
 		renderNextPacksTab: function() {
 			this.el.appendChild(this.renderControlButton(this.controls.nextPacks));
-			Module.Service.Helper.setEvent('click', this.el, this.controls.nextPacks.class, this.onClickNextPacksButton.bind(this));
+			Plugin.Service.Helper.setEvent('click', this.el, this.controls.nextPacks.class, this.onClickNextPacksButton.bind(this));
 		},
 
 
 		onClickPrevPacksButton: function() {
-			var tabWidth = this.scrollableContentEl.getElementsByClassName(this.classes.packTab)[0].offsetWidth;
 			var containerWidth = this.scrollableContainerEl.offsetWidth;
 			var contentOffset = parseInt(this.scrollableContentEl.style.left, 10) || 0;
-			var countFullShownTabs = parseInt((containerWidth / tabWidth), 10);
+			var countFullShownTabs = parseInt((containerWidth / packTabSize), 10);
 
-			var offset = contentOffset + (tabWidth * countFullShownTabs);
+			var offset = contentOffset + (packTabSize * countFullShownTabs);
 			offset = (offset > 0) ? 0 : offset;
 			this.scrollableContentEl.style.left = offset + 'px';
 			this.onWindowResize();
 		},
 		onClickNextPacksButton: function() {
-			var tabWidth = this.scrollableContentEl.getElementsByClassName(this.classes.packTab)[0].offsetWidth;
 			var containerWidth = this.scrollableContainerEl.offsetWidth;
 			var contentOffset = parseInt(this.scrollableContentEl.style.left, 10) || 0;
-			var countFullShownTabs = parseInt((containerWidth / tabWidth), 10);
+			var countFullShownTabs = parseInt((containerWidth / packTabSize), 10);
 
-			var offset = -(tabWidth * countFullShownTabs) + contentOffset;
+			var offset = -(packTabSize * countFullShownTabs) + contentOffset;
 			this.scrollableContentEl.style.left = offset + 'px';
 			this.onWindowResize();
 		},
@@ -4949,22 +6256,24 @@ window.StickersModule.View = {};
 		activeTab: function(tabName) {
 			var i = this.packTabsIndexes[tabName];
 
-			if (Module.Configs.enableEmojiTab) {
+			if (Plugin.Configs.enableEmojiTab) {
 				i++;
 			}
-			if (Module.Configs.enableHistoryTab) {
+			if (Plugin.Configs.enableHistoryTab) {
 				i++;
 			}
 
 			this.packTabs[tabName].click();
 			this.hasActiveTab = true;
 
-			var tabWidth = this.scrollableContentEl.getElementsByClassName(this.classes.packTab)[0].offsetWidth;
+			var packTabSize = this.scrollableContentEl.getElementsByClassName(classes.packTab)[0].offsetWidth;
 			var containerWidth = this.scrollableContainerEl.offsetWidth;
-			var countFullShownTabs = parseInt((containerWidth / tabWidth), 10);
+			var countFullShownTabs = parseInt((containerWidth / packTabSize), 10);
 
 			var offset = -(parseInt((i / countFullShownTabs), 10) * containerWidth);
-			offset = (offset > 0) ? 0 : offset - 1;
+			//offset = (offset > 0) ? 0 : offset + 6; // old code
+			offset = (-offset < countFullShownTabs * packTabSize) ? 0 : offset + 6; // bugfix todo
+
 			this.scrollableContentEl.style.left = offset + 'px';
 
 			this.onWindowResize();
@@ -4976,16 +6285,16 @@ window.StickersModule.View = {};
 
 
 		handleClickOnEmojiTab: function(callback) {
-			Module.Service.Helper.setEvent('click', this.el, this.controls.emoji.class, callback);
+			Plugin.Service.Helper.setEvent('click', this.el, this.controls.emoji.class, callback);
 		},
-		handleClickOnLastUsedPacksTab: function(callback) {
-			Module.Service.Helper.setEvent('click', this.el, this.controls.history.class, callback);
+		handleClickOnRecentTab: function(callback) {
+			Plugin.Service.Helper.setEvent('click', this.el, this.controls.history.class, callback);
 		},
 		handleClickOnPackTab: function(callback) {
-			Module.Service.Helper.setEvent('click', this.el, this.classes.packTab, callback);
+			Plugin.Service.Helper.setEvent('click', this.el, classes.packTab, callback);
 		},
 		handleClickOnStoreTab: function(callback) {
-			Module.Service.Helper.setEvent('click', this.el, this.controls.store.class, callback);
+			Plugin.Service.Helper.setEvent('click', this.el, this.controls.store.class, callback);
 		},
 
 
@@ -5019,213 +6328,152 @@ window.StickersModule.View = {};
 
 })(window.StickersModule);
 
-(function(Plugin, Module) {
+(function(window, Plugin) {
 
 	// todo: rename Stickers --> StickerPipe
-	Plugin.Stickers = Module.Class({
+	window.Stickers = Plugin.Libs.Class({
 
-		emojiService: null,
-		stickersModel: {},
 		view: null,
-		storeView: null,
 
 		_constructor: function(config) {
 
-			Module.Service.Helper.setConfig(config);
-
-			// ***** Init Storage ******
-			Module.Storage.setPrefix(Module.Configs.storagePrefix);
+			Plugin.Service.Helper.setConfig(config);
 
 			// ***** Init Emoji tab *****
-			var mobileOS = Module.Service.Helper.getMobileOS();
+			var mobileOS = Plugin.Service.Helper.getMobileOS();
 			if (mobileOS == 'ios' || mobileOS == 'android') {
 				config.enableEmojiTab = false;
 			}
 
-			// ***** Check ApiKey *****
-			if (!Module.Configs.apiKey) {
-				throw new Error('Empty apiKey');
+			// ***** Check required params *****
+			if (!Plugin.Configs.apiKey || !Plugin.Configs.userId) {
+				throw new Error('Empty one of required data [apiKey, userId]');
 			}
-
 
 			// ***** Init UserId *****
-			var savedUserId = Module.Storage.getUserId();
+			Plugin.Configs.userId = Plugin.Service.Helper.md5(Plugin.Configs.userId + Plugin.Configs.apiKey);
 
-			if (Module.Configs.userId) {
-				Module.Configs.userId = Module.Service.Helper.md5(Module.Configs.userId + Module.Configs.apiKey);
-				Module.Storage.setUserId(Module.Configs.userId);
+			if (Plugin.Configs.userId != Plugin.Service.Storage.getUserId()) {
+				Plugin.Service.Storage.setRecentStickers([]);
 			}
 
-			if (Module.Configs.userId != savedUserId) {
-				Module.Storage.setUsedStickers([]);
-			}
+			Plugin.Service.Storage.setUserId(Plugin.Configs.userId);
+
+			// ***** Init modules *****
+			Plugin.Module.Store.init(this);
 
 			// ***** Init services ******
-			Module.Service.Store.init(this);
-			Module.Service.Pack.init(this);
-
-			this.emojiService = new Module.EmojiService(Module.Twemoji);
-
-			Module.Service.PendingRequest.run();
+			Plugin.Service.User.init();
+			Plugin.Service.Pack.init(this);
+			Plugin.Service.Emoji.init(Plugin.Libs.Twemoji);
+			Plugin.Service.PendingRequest.init();
 		},
 
 		////////////////////
 		//   Functions
 		////////////////////
 
-		render: function(onload, elId) {
-			Module.Configs.elId = elId || Module.Configs.elId;
+		render: function(callback, elId) {
+			Plugin.Configs.elId = elId || Plugin.Configs.elId;
 
-			this.view = new Module.PopoverView(this.emojiService);
-			this.storeView = new Module.StoreView();
+			var self = this;
+
+			this.view = new Plugin.View.Popover();
 
 			this.delegateEvents();
 
 			// todo
-			//// ***** START *******************************************************************************************
-
-			var callback = onload || null;
-
-			this.fetchPacks((function() {
-				// todo: move to initialize (with API v2)
-				Module.BaseService.trackUserData();
-
-				this.view.render(this.stickersModel);
+			Plugin.Service.Pack.fetchPacks(function() {
+				self.view.render();
 
 				callback && callback();
-			}).bind(this));
+			});
 
-			setInterval((function() {
-				this.fetchPacks();
-			}).bind(this), 1000 * 60 * 60); // hour
+			setInterval(function() {
+				Plugin.Service.Pack.fetchPacks();
+			}, 1000 * 60 * 60);
 		},
 
 		delegateEvents: function() {
+			var self = this;
 
-			this.view.tabsView.handleClickOnEmojiTab((function() {
-				this.view.renderEmojiBlock();
-			}).bind(this));
+			this.view.tabsView.handleClickOnEmojiTab(function() {
+				self.view.renderEmojiBlock();
+			});
 
-			this.view.tabsView.handleClickOnLastUsedPacksTab((function() {
-				this.view.renderUsedStickers();
-			}).bind(this));
+			this.view.tabsView.handleClickOnRecentTab(function() {
+				self.view.renderRecentStickers();
+			});
 
-			this.view.tabsView.handleClickOnStoreTab((function() {
-				this.openStore();
-			}).bind(this));
+			this.view.tabsView.handleClickOnStoreTab(function() {
+				Plugin.Module.Store.open();
 
-			this.view.tabsView.handleClickOnPackTab((function(el) {
-				var pack = null,
-					packName = el.getAttribute('data-pack-name');
+				Plugin.Service.Storage.setStoreLastVisit(+(new Date()));
+				Plugin.Service.Highlight.check();
 
-				// todo rename
-				var changed = false,
-					hasNewContent = false;
+				self.view.tabsView.controls.store.el.classList.remove('sp-unwatched-content');
+			});
 
-				for (var i = 0; i < this.stickersModel.length; i++) {
-					if (this.stickersModel[i].pack_name == packName) {
+			this.view.tabsView.handleClickOnPackTab(function(el) {
+				var packName = el.getAttribute('data-pack-name'),
+					pack = Plugin.Service.Storage.getPack(packName);
 
-						// set newPack - false
-						changed = true;
-						this.stickersModel[i].newPack = false;
-						Module.Storage.setPacks(this.stickersModel);
-
-						pack = this.stickersModel[i];
-					}
-
-					if (this.stickersModel[i].newPack == true) {
-						hasNewContent = true;
-					}
+				if (pack) {
+					pack.isUnwatched = false;
+					Plugin.Service.Storage.setPack(packName, pack);
+					self.view.renderPack(pack);
 				}
 
-				if (changed == true && Module.Storage.getUsedStickers().length != 0 && hasNewContent == false) {
-					Module.DOMEventService.changeContentHighlight(false);
-				}
+				Plugin.Service.Highlight.check();
+			});
 
-				pack && this.view.renderPack(pack);
-			}).bind(this));
+			this.view.handleClickOnSticker(function(el) {
 
-			this.view.handleClickOnSticker((function(el) {
+				var stickerId = el.getAttribute('data-sticker-id');
 
-				var stickerAttribute = el.getAttribute('data-sticker-string'),
-					nowDate = new Date().getTime() / 1000|0;
+				Plugin.Service.Statistic.useSticker(stickerId);
+				Plugin.Service.Storage.addRecentSticker(stickerId);
 
-				Module.Api.sendStatistic([{
-					action: 'use',
-					category: 'sticker',
-					label: '[[' + stickerAttribute + ']]',
-					time: nowDate
-				}]);
+				Plugin.Service.Highlight.check();
+			});
 
-				ga('stickerTracker.send', 'event', 'sticker', stickerAttribute.split('_')[0], stickerAttribute.split('_')[1], 1);
-
-				Module.Storage.addUsedSticker(stickerAttribute);
-
-				// todo: rewrite
-				// new content mark
-
-				var hasNewContent = false;
-				for (var i = 0; i < this.stickersModel.length; i++) {
-					if (this.stickersModel[i].newPack == true) {
-						hasNewContent = true;
-						break;
-					}
-				}
-
-				if (Module.Storage.getUsedStickers().length != 0 && hasNewContent == false) {
-					Module.DOMEventService.changeContentHighlight(false);
-				}
-			}).bind(this));
-
-			this.view.handleClickOnEmoji((function(el) {
-				var nowDate = new Date().getTime() / 1000| 0,
-					emoji = this.emojiService.parseEmojiFromHtml(el.innerHTML);
-
-				Module.Api.sendStatistic([{
-					action: 'use',
-					category: 'emoji',
-					label: emoji,
-					time: nowDate
-				}]);
-
-				ga('stickerTracker.send', 'event', 'emoji', 'use', emoji);
-			}).bind(this));
+			this.view.handleClickOnEmoji(function(el) {
+				var emoji = Plugin.Service.Emoji.parseEmojiFromHtml(el.innerHTML);
+				Plugin.Service.Statistic.useEmoji(emoji);
+			});
 		},
 
 		fetchPacks: function(callback) {
-			Module.BaseService.updatePacks((function(stickerPacks) {
-				this.stickersModel = stickerPacks;
-
-				if (this.view.isRendered) {
-					this.view.tabsView.renderPacks(this.stickersModel);
-				}
-
-				callback && callback.apply();
-			}).bind(this));
+			Plugin.Service.Pack.fetchPacks(callback);
 		},
 
-		parseStickerFromText: function(text) {
-			return Module.BaseService.parseStickerFromText(text);
+		isSticker: function(text) {
+			console.log(Plugin.Service.Sticker.isSticker(text));
+			return Plugin.Service.Sticker.isSticker(text);
+		},
+
+		parseStickerFromText: function(text, callback) {
+			return Plugin.Service.Sticker.parse(text, callback);
 		},
 
 		parseEmojiFromText: function(text) {
-			return this.emojiService.parseEmojiFromText(text);
+			return Plugin.Service.Emoji.parseEmojiFromText(text);
 		},
 
 		parseEmojiFromHtml: function(html) {
-			return this.emojiService.parseEmojiFromHtml(html);
+			return Plugin.Service.Emoji.parseEmojiFromHtml(html);
 		},
 
 		onUserMessageSent: function(isSticker) {
-			return Module.BaseService.onUserMessageSent(isSticker);
+			Plugin.Service.Statistic.messageSend(isSticker);
 		},
 
 		purchaseSuccess: function(packName, pricePoint) {
-			Module.Service.Store.purchaseSuccess(packName, pricePoint);
+			Plugin.Module.Store.purchaseSuccess(packName, pricePoint);
 		},
 
 		purchaseFail: function() {
-			Module.Service.Store.purchaseFail();
+			Plugin.Module.Store.purchaseFail();
 		},
 
 		open: function(tabName) {
@@ -5236,12 +6484,16 @@ window.StickersModule.View = {};
 			this.view.close();
 		},
 
-		openStore: function() {
-			this.storeView.renderStore();
+		openStore: function(contentId) {
+			Plugin.Module.Store.open(contentId);
 		},
 
 		closeStore: function() {
-			this.storeView.close();
+			Plugin.Module.Store.close();
+		},
+
+		getPackMainIcon: function(packName, callback) {
+			Plugin.Service.Pack.getMainIcon(packName, callback);
 		},
 
 		////////////////////
@@ -5250,20 +6502,20 @@ window.StickersModule.View = {};
 
 		onClickSticker: function(callback, context) {
 			this.view.handleClickOnSticker(function(el) {
-				callback.call(context, '[[' + el.getAttribute('data-sticker-string') + ']]');
+				callback.call(context, '[[' + el.getAttribute('data-sticker-id') + ']]');
 			});
 		},
 
 		onClickEmoji: function(callback, context) {
 			this.view.handleClickOnEmoji((function(el) {
-				var emoji = this.emojiService.parseEmojiFromHtml(el.innerHTML);
+				var emoji = this.parseEmojiFromHtml(el.innerHTML);
 
 				callback.call(context, emoji);
 			}).bind(this));
 		},
 
 		onPurchase: function(callback) {
-			Module.Service.Store.onPurchaseCallback = callback;
+			Plugin.Module.Store.setOnPurchaseCallback(callback);
 		}
 	});
 
