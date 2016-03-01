@@ -36,21 +36,17 @@ var App = _makeClass(function(options) {
 	envConfigs: {
 		local: {
 			stickerpipe: {
-				sdkUrl: 'libs/sdk/stable/',
 				apiUrl: 'http://work.stk.908.vc',
-				//storeUrl: 'http://localhost/stickerpipe/store/build'
+				storeUrl: 'http://localhost/stickerpipe/store/build'
 			}
 		},
 		work: {
 			stickerpipe: {
-				sdkUrl: 'libs/sdk/stable/',
 				apiUrl: 'http://work.stk.908.vc'
 			}
 		},
 		prod: {
-			stickerpipe: {
-				sdkUrl: 'libs/sdk/stable/'
-			}
+			stickerpipe: {}
 		}
 	},
 
@@ -70,10 +66,6 @@ var App = _makeClass(function(options) {
 	_constructor: function() {
 
 		var envConfigs = this.getEnvConfigs();
-
-		var $head = $('head');
-		$head.append('<link rel="stylesheet" type="text/css" href="' + envConfigs.stickerpipe.sdkUrl + 'css/stickerpipe.css">');
-		$head.append('<script src="' + envConfigs.stickerpipe.sdkUrl + 'js/stickerpipe.js"></script>">');
 
 		if (envConfigs.stickerpipe.apiUrl) {
 			StickersModule.Configs.apiUrl = envConfigs.stickerpipe.apiUrl;
