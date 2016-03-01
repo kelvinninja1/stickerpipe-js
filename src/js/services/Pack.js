@@ -42,13 +42,9 @@
 		remove: function(packName, successCallback, failCallback) {
 			Plugin.Service.Api.hidePack(packName, function() {
 
-				var packs = Plugin.Service.Storage.getPacks();
-				for (var i = 0; i < packs.length; i++) {
-					if (packs[i].pack_name == packName) {
-						packs[i].user_status = 'hidden';
-					}
-				}
-				Plugin.Service.Storage.setPacks(packs);
+				var pack = Plugin.Service.Storage.getPack(packName);
+				pack.user_status = 'hidden';
+				Plugin.Service.Storage.setPack(packName, pack);
 
 				if (stickerpipe && stickerpipe.view.isRendered) {
 					stickerpipe.view.tabsView.renderPacks();
