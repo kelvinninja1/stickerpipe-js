@@ -14,7 +14,7 @@ var gulp = require('gulp'),
 	minifyCss = require('gulp-minify-css');
 
 var pluginName = 'stickerpipe',
-	exampleSrc = '../demo/libs/sdk/work';
+	exampleSrc = '../demo/libs/sdk';
 
 // *** *** *** MAIN TASKS *** *** ****
 

@@ -3440,7 +3440,7 @@ window.StickersModule.Service = {};
 				var packs = Plugin.Service.Storage.getPacks();
 				for (var i = 0; i < packs.length; i++) {
 					if (packs[i].pack_name == packName) {
-						packs.splice(i, 1);
+						packs[i].user_status = 'hidden';
 					}
 				}
 				Plugin.Service.Storage.setPacks(packs);
