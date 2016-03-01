@@ -4097,7 +4097,7 @@ window.StickersModule.Configs = {};
 		priceB: null,
 		priceC: null,
 
-		primaryColor: '#e1e1e1',
+		primaryColor: '',
 
 		// todo: block or popover
 		display: 'block',
@@ -5740,7 +5740,7 @@ window.StickersModule.View = {};
 			function appendSticker(stickerId) {
 				var stickersSpanEl = document.createElement('span');
 				stickersSpanEl.className = 'sp-sticker-placeholder';
-				stickersSpanEl.style.background = Plugin.Configs.primaryColor;
+				stickersSpanEl.style.background = Plugin.Configs.primaryColor || '#e1e1e1';
 				stickersSpanEl.setAttribute('data-sticker-id', stickerId);
 
 				var image = new Image();
