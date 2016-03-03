@@ -3422,7 +3422,7 @@ window.StickersModule.Service = {};
 
 				pack.stickers = packContentIds;
 
-				Plugin.Service.Storage.setPack(pack.pack_name, pack);
+				Plugin.Service.Storage.setPack(pack.pack_name, pack, true);
 
 				if (stickerpipe && stickerpipe.view.isRendered) {
 					stickerpipe.view.tabsView.renderPacks();
@@ -3778,7 +3778,8 @@ window.StickersModule.Service = {};
 
 			return null;
 		},
-		setPack: function(packName, pack) {
+		setPack: function(packName, pack, toBeginning) {
+			toBeginning = (typeof toBeginning != 'undefined') ? toBeginning : false;
 
 			var packExist = false,
 				packs = this.getPacks();
@@ -3787,11 +3788,15 @@ window.StickersModule.Service = {};
 				if (packName == packs[i].pack_name) {
 					packs[i] = pack;
 					packExist = true;
+
+					if (toBeginning) {
+						packs.splice(i, 1);
+					}
 					break;
 				}
 			}
 
-			if (!packExist) {
+			if (!packExist || toBeginning) {
 				packs.unshift(pack);
 			}
 
@@ -3896,6 +3901,7 @@ window.StickersModule.Service = {};
 			return this.set('metadata', metadata);
 		},
 
+		// todo: create Metadata service
 		///////////////////////////////////////
 		// Last store visit
 		///////////////////////////////////////
@@ -3903,7 +3909,6 @@ window.StickersModule.Service = {};
 			return this.getMetadata()['last_store_visit'] || 0;
 		},
 		setStoreLastVisit: function(time) {
-			time = time || +(new Date());
 			return this.setMetadata('last_store_visit', time);
 		},
 
@@ -3914,7 +3919,6 @@ window.StickersModule.Service = {};
 			return this.getMetadata()['shop_last_modified'];
 		},
 		setStoreLastModified: function(time) {
-			time = time || +(new Date());
 			return this.setMetadata('shop_last_modified', time);
 		}
 	};
@@ -6372,7 +6376,11 @@ window.StickersModule.View = {};
 			Plugin.Configs.userId = Plugin.Service.Helper.md5(Plugin.Configs.userId + Plugin.Configs.apiKey);
 
 			if (Plugin.Configs.userId != Plugin.Service.Storage.getUserId()) {
+				Plugin.Service.Storage.setPacks([]);
 				Plugin.Service.Storage.setRecentStickers([]);
+				Plugin.Service.Storage.setUserData({});
+				Plugin.Service.Storage.setPendingRequestTasks([]);
+				Plugin.Service.Storage.setStoreLastVisit(0);
 			}
 
 			Plugin.Service.Storage.setUserId(Plugin.Configs.userId);
