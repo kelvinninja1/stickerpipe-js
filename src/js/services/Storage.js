@@ -59,7 +59,8 @@
 
 			return null;
 		},
-		setPack: function(packName, pack) {
+		setPack: function(packName, pack, toBeginning) {
+			toBeginning = (typeof toBeginning != 'undefined') ? toBeginning : false;
 
 			var packExist = false,
 				packs = this.getPacks();
@@ -68,11 +69,15 @@
 				if (packName == packs[i].pack_name) {
 					packs[i] = pack;
 					packExist = true;
+
+					if (toBeginning) {
+						packs.splice(i, 1);
+					}
 					break;
 				}
 			}
 
-			if (!packExist) {
+			if (!packExist || toBeginning) {
 				packs.unshift(pack);
 			}
 

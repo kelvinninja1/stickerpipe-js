@@ -3422,7 +3422,7 @@ window.StickersModule.Service = {};
 
 				pack.stickers = packContentIds;
 
-				Plugin.Service.Storage.setPack(pack.pack_name, pack);
+				Plugin.Service.Storage.setPack(pack.pack_name, pack, true);
 
 				if (stickerpipe && stickerpipe.view.isRendered) {
 					stickerpipe.view.tabsView.renderPacks();
@@ -3778,7 +3778,8 @@ window.StickersModule.Service = {};
 
 			return null;
 		},
-		setPack: function(packName, pack) {
+		setPack: function(packName, pack, toBeginning) {
+			toBeginning = (typeof toBeginning != 'undefined') ? toBeginning : false;
 
 			var packExist = false,
 				packs = this.getPacks();
@@ -3787,11 +3788,15 @@ window.StickersModule.Service = {};
 				if (packName == packs[i].pack_name) {
 					packs[i] = pack;
 					packExist = true;
+
+					if (toBeginning) {
+						packs.splice(i, 1);
+					}
 					break;
 				}
 			}
 
-			if (!packExist) {
+			if (!packExist || toBeginning) {
 				packs.unshift(pack);
 			}
 

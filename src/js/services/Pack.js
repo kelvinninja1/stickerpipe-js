@@ -27,7 +27,7 @@
 
 				pack.stickers = packContentIds;
 
-				Plugin.Service.Storage.setPack(pack.pack_name, pack);
+				Plugin.Service.Storage.setPack(pack.pack_name, pack, true);
 
 				if (stickerpipe && stickerpipe.view.isRendered) {
 					stickerpipe.view.tabsView.renderPacks();
