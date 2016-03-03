@@ -177,6 +177,7 @@
 			return this.set('metadata', metadata);
 		},
 
+		// todo: create Metadata service
 		///////////////////////////////////////
 		// Last store visit
 		///////////////////////////////////////
@@ -184,7 +185,6 @@
 			return this.getMetadata()['last_store_visit'] || 0;
 		},
 		setStoreLastVisit: function(time) {
-			time = time || +(new Date());
 			return this.setMetadata('last_store_visit', time);
 		},
 
@@ -195,7 +195,6 @@
 			return this.getMetadata()['shop_last_modified'];
 		},
 		setStoreLastModified: function(time) {
-			time = time || +(new Date());
 			return this.setMetadata('shop_last_modified', time);
 		}
 	};

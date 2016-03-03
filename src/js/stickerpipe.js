@@ -53,7 +53,11 @@ window.StickersModule.View = {};
 			Plugin.Configs.userId = Plugin.Service.Helper.md5(Plugin.Configs.userId + Plugin.Configs.apiKey);
 
 			if (Plugin.Configs.userId != Plugin.Service.Storage.getUserId()) {
+				Plugin.Service.Storage.setPacks([]);
 				Plugin.Service.Storage.setRecentStickers([]);
+				Plugin.Service.Storage.setUserData({});
+				Plugin.Service.Storage.setPendingRequestTasks([]);
+				Plugin.Service.Storage.setStoreLastVisit(0);
 			}
 
 			Plugin.Service.Storage.setUserId(Plugin.Configs.userId);
