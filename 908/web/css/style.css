@@ -180,6 +180,9 @@ button.get-pack {
 .sound-sticker {
   position: relative;
   display: table; }
+  .sound-sticker img {
+    -webkit-transition: 1s;
+    transition: 1s; }
   .sound-sticker.not-played img {
     opacity: 0.1; }
   .sound-sticker .player {
