@@ -109,14 +109,14 @@ app.directive('miniPlayer', function() {
 				$scope.progress = false;
 			}, false);
 
-			$el.find('.play')[0].addEventListener('click', function() {
+			$el.find('.play')[0].onclick = function() {
 				if (!audio.src) {
 					audio.src = $scope.audioUrl;
 					$scope.progress = true;
 				}
 
 				audio.play();
-			});
+			};
 		}
 	};
 
