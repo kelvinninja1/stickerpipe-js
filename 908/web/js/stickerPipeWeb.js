@@ -6,18 +6,60 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/directives/miniPlayer/view',
-    '<div class="player">\n' +
-    '	<div class="progress" data-ng-show="progress">\n' +
-    '		<div class="bounce1"></div>\n' +
-    '		<div class="bounce2"></div>\n' +
-    '		<div class="bounce3"></div>\n' +
+  $templateCache.put('/directives/audioSticker/view',
+    '<div data-ng-class="{\'sound-sticker\': true, \'center-block\': true, \'not-played\': !played}">\n' +
+    '	<img data-ng-src="img/audio-stickers/{{ audioSticker.img }}"\n' +
+    '	     alt=""\n' +
+    '	     class="pack-preview-sticker img-responsive center-block">\n' +
+    '	<div class="player">\n' +
+    '		<div class="progress" data-ng-show="progress">\n' +
+    '			<div class="bounce1"></div>\n' +
+    '			<div class="bounce2"></div>\n' +
+    '			<div class="bounce3"></div>\n' +
+    '		</div>\n' +
+    '		<div class="play" data-ng-show="!progress"></div>\n' +
     '	</div>\n' +
-    '	<div class="play" data-ng-show="!progress"></div>\n' +
     '</div>');
 }]);
 })();
 
+
+app.directive('audioSticker', function() {
+
+	return {
+		restrict: 'A',
+		scope: {
+			audioSticker: '='
+		},
+		templateUrl: '/directives/audioSticker/view',
+		link: function ($scope, $el, attrs) {
+
+			var audio = new Audio();
+
+			$scope.showAudioProgress = false;
+			$scope.played = false;
+
+			audio.addEventListener('loadeddata', function() {
+				$scope.showAudioProgress = false;
+			}, false);
+
+			$el.find('.play')[0].onclick = function() {
+				if (!audio.src) {
+					audio.src = $scope.audioSticker.audio;
+					$scope.showAudioProgress = true;
+				}
+
+				$scope.played = true;
+				audio.play();
+
+				if (!$scope.$$phase) {
+					$scope.$apply();
+				}
+			};
+		}
+	};
+
+});
 
 app.controller('SoundStickersController', function($scope, ngAudio) {
 
@@ -89,35 +131,4 @@ app.controller('SoundStickersController', function($scope, ngAudio) {
 				audio: loadAudio('Sweetie/finger3') }
 		]
 	});
-});
-
-app.directive('miniPlayer', function() {
-
-	return {
-		restrict: 'A',
-		scope: {
-			audioUrl: '@'
-		},
-		templateUrl: '/directives/miniPlayer/view',
-		link: function ($scope, $el, attrs) {
-
-			var audio = new Audio();
-
-			$scope.progress = false;
-
-			audio.addEventListener('loadeddata', function() {
-				$scope.progress = false;
-			}, false);
-
-			$el.find('.play')[0].onclick = function() {
-				if (!audio.src) {
-					audio.src = $scope.audioUrl;
-					$scope.progress = true;
-				}
-
-				audio.play();
-			};
-		}
-	};
-
 });

@@ -180,6 +180,8 @@ button.get-pack {
 .sound-sticker {
   position: relative;
   display: table; }
+  .sound-sticker.not-played img {
+    opacity: 0.1; }
   .sound-sticker .player {
     bottom: -16px;
     position: absolute;
