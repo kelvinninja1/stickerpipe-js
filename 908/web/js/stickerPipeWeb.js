@@ -100,7 +100,7 @@ app.controller('SoundStickersController', function($scope, ngAudio) {
 				audio: loadAudio('BobAndBary/go_go_go') },
 			{
 				img: 'music.png',
-				audio: loadAudio('gorilla/drum1') },
+				audio: loadAudio('Gorilla/drum1') },
 			{
 				img: 'goat.png',
 				audio: loadAudio('Sweetie/koza1') },
@@ -130,7 +130,7 @@ app.controller('SoundStickersController', function($scope, ngAudio) {
 				audio: loadAudio('Sweetie/koza2') },
 			{
 				img: 'music.png',
-				audio: loadAudio('gorilla/drum2') },
+				audio: loadAudio('Gorilla/drum2') },
 			{
 				img: 'attention.png',
 				audio: loadAudio('Sweetie/finger3') }
