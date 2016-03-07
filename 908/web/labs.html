@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-ng-app="js-app">
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -40,43 +40,17 @@
 	</div>
 </nav>
 
-<div class="jumbotron jumbotron-1">
-	<div class="container">
-		<div class="row">
-			<div class="col-sm-12 col-md-8 col-md-offset-2 text-center">
-				<h2>Add stickers to your chat. Boost your messenger with stickers SDK!</h2>
-				<p>Brand new service for quick integration of stickers and emoji to your Android, iOS or Web instant messaging application. Stickers SDK is free for any platform. Supports all resolutions.</p>
-
-				<form class="form-inline email-form">
-					<div class="form-group">
-						<input type="text" placeholder="Email" class="form-control">
-						<button type="submit" class="btn btn-primary">Get Stickers SDK</button>
-					</div>
-				</form>
-			</div>
+<div class="container packs">
+	<div class="row">
+		<div class="col-sm-12">
+			<h2>Sound stickers</h2>
 		</div>
 	</div>
-</div>
-
-<div class="jumbotron jumbotron-2">
-	<div class="container">
-		<div class="row">
-			<div class="col-xs-12 text-center">
-				<h3>StickerPipe on GitHub</h3>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-sm-4 col-xs-6">
-				<h4>Android SDK</h4>
-				<p><a href="#" role="button">Android stickers integration chat sample</a></p>
-			</div>
-			<div class="col-sm-4 col-xs-6">
-				<h4>iOS SDK</h4>
-				<p><a href="#" role="button">iOS stickers integration chat sample</a></p>
-			</div>
-			<div class="col-sm-4 col-xs-6 col-xs-offset-3 col-sm-offset-0">
-				<h4>JavaScript SDK</h4>
-				<p><a href="#" role="button">Javascript stickers integration chat sample</a></p>
+	<div class="row" data-ng-controller="SoundStickersController">
+		<div class="col-sm-3 col-xs-6 text-center" data-ng-repeat="sticker in stickers">
+			<div class="sound-sticker center-block">
+				<img data-ng-src="img/audio-stickers/{{ sticker.img }}" alt="" class="pack-preview-sticker img-responsive center-block">
+				<div class="player" data-ng-click="sticker.audio.play()"></div>
 			</div>
 		</div>
 	</div>
@@ -117,25 +91,15 @@
 	</div>
 </div>
 
-<div class="container">
-	<div class="row">
-		<div class="col-xs-12 text-center">
-			<h3>Add emotions to your product</h3>
-		</div>
-	</div>
-
-	<div class="row">
-		<div class="col-sm-12 text-center">
-			<img src="img/ios_.png" alt="" style="margin-left: 40px;">
-			<img src="img/android_.png" alt="" style="margin-left: -80px; padding-top: 12px;">
-		</div>
-	</div>
-</div>
 
 <div class="container">
+
 	<footer class="text-center">
+
 		<p>&copy; StickerPipe 2015 &bull; All Rights Reserved &bull; <a href="mailto:i@stickerpipe.com">i@stickerpipe.com</a></p>
+
 	</footer>
+
 </div>
 
 <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->

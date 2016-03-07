@@ -142,3 +142,21 @@ button.get-pack {
   margin-top: 30px; }
   .pack-stickers > div {
     margin-bottom: 30px; }
+
+.sound-sticker {
+  position: relative;
+  display: table; }
+  .sound-sticker .player {
+    background: url("./../img/btn-play.png");
+    background-size: 32px;
+    bottom: -16px;
+    display: table;
+    cursor: pointer;
+    height: 32px;
+    position: absolute;
+    right: -16px;
+    width: 32px; }
+    .sound-sticker .player:hover {
+      opacity: 0.8; }
+    .sound-sticker .player:active {
+      opacity: 0.9; }
