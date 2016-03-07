@@ -50,7 +50,7 @@
 		<div class="col-sm-3 col-xs-6 text-center" data-ng-repeat="sticker in stickers">
 			<div class="sound-sticker center-block">
 				<img data-ng-src="img/audio-stickers/{{ sticker.img }}" alt="" class="pack-preview-sticker img-responsive center-block">
-				<div class="player" data-ng-click="sticker.audio.play()"></div>
+				<div data-mini-player audio-url="{{ sticker.audio }}"></div>
 			</div>
 		</div>
 	</div>

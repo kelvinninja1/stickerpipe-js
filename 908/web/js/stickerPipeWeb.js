@@ -6,62 +6,15 @@ try {
   module = angular.module('partials', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('/controllers/audio-stickers/view',
-    '<div class="col-sm-3 col-xs-6 text-center">\n' +
-    '	<div class="sound-sticker center-block">\n' +
-    '		<img src="img/packs/1.png" alt="" class="pack-preview-sticker img-responsive center-block">\n' +
-    '		<div class="player"></div>\n' +
+  $templateCache.put('/directives/miniPlayer/view',
+    '<div class="player">\n' +
+    '	<div class="progress" data-ng-show="progress">\n' +
+    '		<div class="bounce1"></div>\n' +
+    '		<div class="bounce2"></div>\n' +
+    '		<div class="bounce3"></div>\n' +
     '	</div>\n' +
-    '</div>\n' +
-    '\n' +
-    '<!--<div class="col-sm-3 col-xs-6 text-center">-->\n' +
-    '	<!--<div class="sound-sticker center-block">-->\n' +
-    '		<!--<img src="img/packs/2.png" alt="" class="pack-preview-sticker img-responsive center-block">-->\n' +
-    '		<!--<div class="player"></div>-->\n' +
-    '	<!--</div>-->\n' +
-    '<!--</div>-->\n' +
-    '\n' +
-    '<!--<div class="col-sm-3 col-xs-6 text-center">-->\n' +
-    '	<!--<div class="sound-sticker center-block">-->\n' +
-    '		<!--<img src="img/packs/3.png" alt="" class="pack-preview-sticker img-responsive center-block">-->\n' +
-    '		<!--<div class="player"></div>-->\n' +
-    '	<!--</div>-->\n' +
-    '<!--</div>-->\n' +
-    '\n' +
-    '<!--<div class="col-sm-3 col-xs-6 text-center">-->\n' +
-    '	<!--<div class="sound-sticker center-block">-->\n' +
-    '		<!--<img src="img/packs/4.png" alt="" class="pack-preview-sticker img-responsive center-block">-->\n' +
-    '		<!--<div class="player"></div>-->\n' +
-    '	<!--</div>-->\n' +
-    '<!--</div>-->\n' +
-    '\n' +
-    '<!--<div class="col-sm-3 col-xs-6 text-center">-->\n' +
-    '	<!--<div class="sound-sticker center-block">-->\n' +
-    '		<!--<img src="img/packs/5.png" alt="" class="pack-preview-sticker img-responsive center-block">-->\n' +
-    '		<!--<div class="player"></div>-->\n' +
-    '	<!--</div>-->\n' +
-    '<!--</div>-->\n' +
-    '\n' +
-    '<!--<div class="col-sm-3 col-xs-6 text-center">-->\n' +
-    '	<!--<div class="sound-sticker center-block">-->\n' +
-    '		<!--<img src="img/packs/6.png" alt="" class="pack-preview-sticker img-responsive center-block">-->\n' +
-    '		<!--<div class="player"></div>-->\n' +
-    '	<!--</div>-->\n' +
-    '<!--</div>-->\n' +
-    '\n' +
-    '<!--<div class="col-sm-3 col-xs-6 text-center">-->\n' +
-    '	<!--<div class="sound-sticker center-block">-->\n' +
-    '		<!--<img src="img/packs/7.png" alt="" class="pack-preview-sticker img-responsive center-block">-->\n' +
-    '		<!--<div class="player"></div>-->\n' +
-    '	<!--</div>-->\n' +
-    '<!--</div>-->\n' +
-    '\n' +
-    '<!--<div class="col-sm-3 col-xs-6 text-center">-->\n' +
-    '	<!--<div class="sound-sticker center-block">-->\n' +
-    '		<!--<img src="img/packs/8.png" alt="" class="pack-preview-sticker img-responsive center-block">-->\n' +
-    '		<!--<div class="player"></div>-->\n' +
-    '	<!--</div>-->\n' +
-    '<!--</div>-->');
+    '	<div class="play" data-ng-show="!progress"></div>\n' +
+    '</div>');
 }]);
 })();
 
@@ -69,7 +22,7 @@ module.run(['$templateCache', function($templateCache) {
 app.controller('SoundStickersController', function($scope, ngAudio) {
 
 	function loadAudio(name) {
-		return ngAudio.load('mp3/audio-stickers/' + name + '.mp3');
+		return 'mp3/audio-stickers/' + name + '.mp3';
 	}
 
 	angular.extend($scope, {
@@ -136,4 +89,35 @@ app.controller('SoundStickersController', function($scope, ngAudio) {
 				audio: loadAudio('Sweetie/finger3') }
 		]
 	});
+});
+
+app.directive('miniPlayer', function() {
+
+	return {
+		restrict: 'A',
+		scope: {
+			audioUrl: '@'
+		},
+		templateUrl: '/directives/miniPlayer/view',
+		link: function ($scope, $el, attrs) {
+
+			var audio = new Audio();
+
+			$scope.progress = false;
+
+			audio.addEventListener('loadeddata', function() {
+				$scope.progress = false;
+			}, false);
+
+			$el.find('.play')[0].addEventListener('click', function() {
+				if (!audio.src) {
+					audio.src = $scope.audioUrl;
+					$scope.progress = true;
+				}
+
+				audio.play();
+			});
+		}
+	};
+
 });
