@@ -44,7 +44,6 @@ gulp.task('build:css', ['clean:css'], function () {
 });
 
 gulp.task('build:js', ['clean:js'], function() {
-	// todo: rename pluginName + '.js' --> app.js --> gulp.dest(... pluginName + '.js')
 	return gulp.src(['src/js/' + pluginName + '.js'])
 		.pipe(include())
 		.pipe(gulp.dest('build/js'))
