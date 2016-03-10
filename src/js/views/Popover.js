@@ -20,7 +20,7 @@
 			}).bind(this));
 
 			this.popoverEl = document.createElement('div');
-			this.popoverEl.className = 'sp-popover';
+			this.popoverEl.className = 'stickerpipe-popover';
 
 			this.el = document.createElement('div');
 

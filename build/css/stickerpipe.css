@@ -373,7 +373,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   }
 }
 
-.sp-popover {
+.stickerpipe-popover {
   border: 1px solid #c8c8c8;
   border-radius: 3px;
   position: absolute;
@@ -382,12 +382,12 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   -webkit-box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.15);
 }
 
-.sp-popover > .stickerpipe {
+.stickerpipe-popover > .stickerpipe {
   border-radius: 3px;
 }
 
-.sp-popover .sp-arrow,
-.sp-popover .sp-arrow:after {
+.stickerpipe-popover .sp-arrow,
+.stickerpipe-popover .sp-arrow:after {
   position: absolute;
   display: block;
   width: 0;
@@ -396,7 +396,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   border-style: solid;
 }
 
-.sp-popover .sp-arrow {
+.stickerpipe-popover .sp-arrow {
   bottom: -11px;
   margin-left: 1px;
   border-top-color: rgba(0, 0, 0, 0.25);
@@ -405,12 +405,12 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 }
 
 @media (max-width: 544px) {
-  .sp-popover .sp-arrow {
+  .stickerpipe-popover .sp-arrow {
     display: none;
   }
 }
 
-.sp-popover .sp-arrow:after {
+.stickerpipe-popover .sp-arrow:after {
   bottom: 1px;
   margin-left: -10px;
   content: " ";
