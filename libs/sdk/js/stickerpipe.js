@@ -3454,7 +3454,7 @@ window.StickersModule.Service = {};
 
 		getMainIcon: function(packName, successCallback) {
 			Plugin.Service.Api.getPackPreview(packName, function(pack) {
-				var url = (pack && pack.main_icon && pack.main_icon[Plugin.Configs.stickerResolutionType]) || null;
+				var url = (pack && pack.main_icon && pack.main_icon[Plugin.Configs.resolution]) || null;
 
 				successCallback && successCallback(url);
 			});
@@ -3688,7 +3688,7 @@ window.StickersModule.Service = {};
 			}
 
 			Plugin.Service.Sticker.getById(stickerId, function(sticker, async) {
-				var url = sticker.image && sticker.image[Plugin.Configs.stickerResolutionType];
+				var url = sticker.image && sticker.image[Plugin.Configs.resolution];
 
 				callback && callback({
 					id: stickerId,
@@ -3948,7 +3948,7 @@ window.StickersModule.Service = {};
 				apiKey: Plugin.Configs.apiKey,
 				platform: platform,
 				userId: Plugin.Configs.userId,
-				density: Plugin.Configs.stickerResolutionType,
+				density: Plugin.Configs.resolution,
 				priceB: Plugin.Configs.priceB,
 				priceC: Plugin.Configs.priceC,
 				is_subscriber: (Plugin.Configs.userPremium ? 1 : 0),
@@ -4073,9 +4073,7 @@ window.StickersModule.Configs = {};
 
 		elId: 'stickerPipe',
 
-		// todo: more than 2 resolution
-		stickerResolutionType : (window.devicePixelRatio == 1) ? 'mdpi' : 'xhdpi',
-		tabResolutionType: (window.devicePixelRatio == 1) ? 'hdpi' : 'xxhdpi',
+		resolution: 'xxhdpi',
 
 		tabItemClass: 'sp-tab-item',
 		stickerItemClass: 'sp-sticker-item',
@@ -4110,6 +4108,18 @@ window.StickersModule.Configs = {};
 
 		lang: document.documentElement.lang.substr(0, 2) || 'en'
 	});
+
+	switch(window.devicePixelRatio) {
+		case 1:
+			Plugin.Configs.resolution = 'mdpi';
+			break;
+		case 2:
+			Plugin.Configs.resolution = 'xhdpi';
+			break;
+		default:
+			Plugin.Configs.resolution = 'xxhdpi';
+			break;
+	}
 
 })(window.StickersModule);
 
@@ -5756,7 +5766,7 @@ window.StickersModule.View = {};
 				image.onerror = function() {};
 
 				Plugin.Service.Sticker.getById(stickerId, function(sticker) {
-					image.src = sticker.image[Plugin.Configs.stickerResolutionType];
+					image.src = sticker.image[Plugin.Configs.resolution];
 				});
 
 				self.contentEl.appendChild(stickersSpanEl);
@@ -6141,7 +6151,7 @@ window.StickersModule.View = {};
 				tabClasses.push(classes.unwatched);
 			}
 
-			var content = '<img src=' + pack.tab_icon[Plugin.Configs.tabResolutionType] + '>';
+			var content = '<img src=' + pack.tab_icon['xxhdpi'] + '>';
 
 			var tabEl = this.renderTab(null, tabClasses, content, {
 				'data-pack-name': pack.pack_name
