@@ -4,12 +4,9 @@
 	Plugin.Service.El = {
 
 		css: function(el, property) {
-			// todo: getComputedStyle add IE 8 supporting
-
 			return (el.style && el.style[property])
 				|| (el.currentStyle && el.currentStyle[property])
 				|| (getComputedStyle(el)[property]);
-
 		},
 
 		outerWidth: function(el) {
