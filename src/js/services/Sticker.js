@@ -32,7 +32,7 @@
 			}
 
 			Plugin.Service.Sticker.getById(stickerId, function(sticker, async) {
-				var url = sticker.image && sticker.image[Plugin.Configs.stickerResolutionType];
+				var url = sticker.image && sticker.image[Plugin.Configs.resolution];
 
 				callback && callback({
 					id: stickerId,

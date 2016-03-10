@@ -124,7 +124,7 @@
 				tabClasses.push(classes.unwatched);
 			}
 
-			var content = '<img src=' + pack.tab_icon[Plugin.Configs.tabResolutionType] + '>';
+			var content = '<img src=' + pack.tab_icon['xxhdpi'] + '>';
 
 			var tabEl = this.renderTab(null, tabClasses, content, {
 				'data-pack-name': pack.pack_name

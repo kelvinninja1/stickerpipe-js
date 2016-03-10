@@ -59,7 +59,7 @@
 
 		getMainIcon: function(packName, successCallback) {
 			Plugin.Service.Api.getPackPreview(packName, function(pack) {
-				var url = (pack && pack.main_icon && pack.main_icon[Plugin.Configs.stickerResolutionType]) || null;
+				var url = (pack && pack.main_icon && pack.main_icon[Plugin.Configs.resolution]) || null;
 
 				successCallback && successCallback(url);
 			});

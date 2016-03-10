@@ -104,7 +104,7 @@
 				image.onerror = function() {};
 
 				Plugin.Service.Sticker.getById(stickerId, function(sticker) {
-					image.src = sticker.image[Plugin.Configs.stickerResolutionType];
+					image.src = sticker.image[Plugin.Configs.resolution];
 				});
 
 				self.contentEl.appendChild(stickersSpanEl);

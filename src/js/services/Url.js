@@ -22,7 +22,7 @@
 				apiKey: Plugin.Configs.apiKey,
 				platform: platform,
 				userId: Plugin.Configs.userId,
-				density: Plugin.Configs.stickerResolutionType,
+				density: Plugin.Configs.resolution,
 				priceB: Plugin.Configs.priceB,
 				priceC: Plugin.Configs.priceC,
 				is_subscriber: (Plugin.Configs.userPremium ? 1 : 0),

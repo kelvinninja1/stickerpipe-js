@@ -6,8 +6,7 @@
 		elId: 'stickerPipe',
 
 		// todo: more than 2 resolution
-		stickerResolutionType : (window.devicePixelRatio == 1) ? 'mdpi' : 'xhdpi',
-		tabResolutionType: (window.devicePixelRatio == 1) ? 'hdpi' : 'xxhdpi',
+		resolution: (window.devicePixelRatio == 1) ? 'mdpi' : 'xhdpi',
 
 		tabItemClass: 'sp-tab-item',
 		stickerItemClass: 'sp-sticker-item',
