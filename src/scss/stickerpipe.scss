@@ -16,7 +16,7 @@
 	-moz-box-shadow: 1px 1px 1px 0 rgba(0,0,0,0.15);
 	-webkit-box-shadow: 1px 1px 1px 0 rgba(0,0,0,0.15);
 
-	> .sticker-pipe {
+	> .stickerpipe {
 		border-radius: $popoverBorderRadius;
 	}
 
@@ -55,8 +55,7 @@
 	}
 }
 
-// todo: rename sticker-pipe --> stickerpipe
-.sticker-pipe {
+.stickerpipe {
 	background: $contentBackground;
 	width: 100%;
 

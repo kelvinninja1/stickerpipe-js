@@ -382,7 +382,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   -webkit-box-shadow: 1px 1px 1px 0 rgba(0, 0, 0, 0.15);
 }
 
-.sp-popover > .sticker-pipe {
+.sp-popover > .stickerpipe {
   border-radius: 3px;
 }
 
@@ -419,16 +419,16 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   border-bottom-width: 0;
 }
 
-.sticker-pipe {
+.stickerpipe {
   background: #fafafa;
   width: 100%;
 }
 
-.sticker-pipe .sp-store {
+.stickerpipe .sp-store {
   background: white;
 }
 
-.sticker-pipe .sp-tabs {
+.stickerpipe .sp-tabs {
   display: -webkit-box;
   display: -ms-flexbox;
   display: -webkit-flex;
@@ -440,7 +440,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   white-space: nowrap;
 }
 
-.sticker-pipe .sp-tabs .sp-tabs-scrollable-container {
+.stickerpipe .sp-tabs .sp-tabs-scrollable-container {
   -webkit-box-flex: 1;
   -webkit-flex: 1;
   -ms-flex: 1;
@@ -450,7 +450,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   position: relative;
 }
 
-.sticker-pipe .sp-tabs .sp-tabs-scrollable-container .sp-tabs-scrollable-content {
+.stickerpipe .sp-tabs .sp-tabs-scrollable-container .sp-tabs-scrollable-content {
   display: -webkit-box;
   display: -ms-flexbox;
   display: -webkit-flex;
@@ -462,79 +462,79 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   white-space: nowrap;
 }
 
-.sticker-pipe .sp-tabs .sp-tab-item {
+.stickerpipe .sp-tabs .sp-tab-item {
   display: inline-table;
   cursor: pointer;
   padding: 6px;
   position: relative;
 }
 
-.sticker-pipe .sp-tabs .sp-tab-item img {
+.stickerpipe .sp-tabs .sp-tab-item img {
   border-radius: 50%;
   height: 36px;
   width: 36px;
   opacity: .5;
 }
 
-.sticker-pipe .sp-tabs .sp-tab-item img:hover {
+.stickerpipe .sp-tabs .sp-tab-item img:hover {
   opacity: .7;
 }
 
-.sticker-pipe .sp-tabs .sp-tab-item.sp-tab-active {
+.stickerpipe .sp-tabs .sp-tab-item.sp-tab-active {
   background: rgba(0, 0, 0, 0.1);
   color: orange;
 }
 
-.sticker-pipe .sp-tabs .sp-tab-item.sp-tab-active img {
+.stickerpipe .sp-tabs .sp-tab-item.sp-tab-active img {
   opacity: 1;
 }
 
-.sticker-pipe .sp-tabs .sp-tab-item.sp-tab-active.sp-control-tab > span,
-.sticker-pipe .sp-tabs .sp-tab-item.sp-tab-active.sp-control-button > span {
+.stickerpipe .sp-tabs .sp-tab-item.sp-tab-active.sp-control-tab > span,
+.stickerpipe .sp-tabs .sp-tab-item.sp-tab-active.sp-control-button > span {
   opacity: 0.9;
 }
 
-.sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab,
-.sticker-pipe .sp-tabs .sp-tab-item.sp-control-button {
+.stickerpipe .sp-tabs .sp-tab-item.sp-control-tab,
+.stickerpipe .sp-tabs .sp-tab-item.sp-control-button {
   margin: 0;
   padding: 12px;
 }
 
-.sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab:hover > span,
-.sticker-pipe .sp-tabs .sp-tab-item.sp-control-button:hover > span {
+.stickerpipe .sp-tabs .sp-tab-item.sp-control-tab:hover > span,
+.stickerpipe .sp-tabs .sp-tab-item.sp-control-button:hover > span {
   opacity: .7;
 }
 
-.sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab > span,
-.sticker-pipe .sp-tabs .sp-tab-item.sp-control-button > span {
+.stickerpipe .sp-tabs .sp-tab-item.sp-control-tab > span,
+.stickerpipe .sp-tabs .sp-tab-item.sp-control-button > span {
   display: table;
   opacity: .5;
 }
 
-.sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-next-packs,
-.sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-store,
-.sticker-pipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-next-packs,
-.sticker-pipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-store {
+.stickerpipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-next-packs,
+.stickerpipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-store,
+.stickerpipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-next-packs,
+.stickerpipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-store {
   border-left: 1px solid #c8c8c8;
   border-radius: 0;
 }
 
-.sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-prev-packs,
-.sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-history,
-.sticker-pipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-prev-packs,
-.sticker-pipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-history {
+.stickerpipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-prev-packs,
+.stickerpipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-history,
+.stickerpipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-prev-packs,
+.stickerpipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-history {
   border-right: 1px solid #c8c8c8;
 }
 
-.sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-prev-packs,
-.sticker-pipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-next-packs,
-.sticker-pipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-prev-packs,
-.sticker-pipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-next-packs {
+.stickerpipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-prev-packs,
+.stickerpipe .sp-tabs .sp-tab-item.sp-control-tab.sp-tab-next-packs,
+.stickerpipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-prev-packs,
+.stickerpipe .sp-tabs .sp-tab-item.sp-control-button.sp-tab-next-packs {
   padding-left: 0;
   padding-right: 0;
 }
 
-.sticker-pipe .sp-unwatched-content::after {
+.stickerpipe .sp-unwatched-content::after {
   content: "";
   width: 10px;
   height: 10px;
@@ -546,45 +546,45 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   left: 35px;
 }
 
-.sticker-pipe .sp-scroll-content {
+.stickerpipe .sp-scroll-content {
   position: relative;
   overflow: hidden;
 }
 
-.sticker-pipe .sp-emojis,
-.sticker-pipe .sp-stickers {
+.stickerpipe .sp-emojis,
+.stickerpipe .sp-stickers {
   border-radius: 0 0 3px 3px;
   display: table;
 }
 
-.sticker-pipe .sp-emojis {
+.stickerpipe .sp-emojis {
   padding: 8px 16px;
 }
 
-.sticker-pipe .sp-emojis .sp-emoji {
+.stickerpipe .sp-emojis .sp-emoji {
   display: inline-table;
   float: left;
   padding: 8px;
   cursor: pointer;
 }
 
-.sticker-pipe .sp-emojis .sp-emoji:hover {
+.stickerpipe .sp-emojis .sp-emoji:hover {
   background: rgba(0, 0, 0, 0.1);
   border-radius: 5px;
 }
 
-.sticker-pipe .sp-emojis .sp-emoji img {
+.stickerpipe .sp-emojis .sp-emoji img {
   height: 24px;
   width: 24px;
 }
 
-.sticker-pipe .sp-stickers .sp-sticker-item,
-.sticker-pipe .sp-stickers .sp-sticker-placeholder {
+.stickerpipe .sp-stickers .sp-sticker-item,
+.stickerpipe .sp-stickers .sp-sticker-placeholder {
   float: left;
   display: inline-table;
 }
 
-.sticker-pipe .sp-stickers .sp-sticker-placeholder {
+.stickerpipe .sp-stickers .sp-sticker-placeholder {
   background: rgba(0, 0, 0, 0.1);
   border-radius: 50%;
   height: 40px;
@@ -592,7 +592,7 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   margin: 32px;
 }
 
-.sticker-pipe .sp-stickers .sp-sticker-item {
+.stickerpipe .sp-stickers .sp-sticker-item {
   cursor: pointer;
   display: inline-table;
   float: left;
@@ -600,17 +600,17 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   padding: 3px;
 }
 
-.sticker-pipe .sp-stickers .sp-sticker-item:not(.sp-sticker-placeholder):hover {
+.stickerpipe .sp-stickers .sp-sticker-item:not(.sp-sticker-placeholder):hover {
   background: rgba(0, 0, 0, 0.1);
   border-radius: 5px;
 }
 
-.sticker-pipe .sp-stickers .sp-sticker-item img {
+.stickerpipe .sp-stickers .sp-sticker-item img {
   height: 80px;
   width: 80px;
 }
 
-.sticker-pipe .sp-recent-empty {
+.stickerpipe .sp-recent-empty {
   text-align: center;
   margin-top: 135px;
   font-size: 20px;

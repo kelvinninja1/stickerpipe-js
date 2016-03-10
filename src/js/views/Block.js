@@ -38,7 +38,7 @@
 			this.tabsView.render();
 
 			this.el.innerHTML = '';
-			this.el.className ='sticker-pipe';
+			this.el.className ='stickerpipe';
 			this.el.style.width = Plugin.Configs.width;
 
 			this.scrollableEl = document.createElement('div');
