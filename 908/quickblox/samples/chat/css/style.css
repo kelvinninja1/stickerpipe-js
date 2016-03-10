@@ -374,3 +374,7 @@ a.pull_push.active  {
 .sp-modal {
 	z-index: 1000005;
 }
+
+iframe::-webkit-scrollbar {
+	width: 0;
+}

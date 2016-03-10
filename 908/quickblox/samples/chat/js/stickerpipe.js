@@ -3,8 +3,6 @@ var stickerpipe = null;
 
 function setupStickerPipe() {
 
-	StickersModule.Configs.apiUrl = 'http://work.stk.908.vc';
-
 		var stickerpipeConfig = config.stickerpipe,
 
 				$stickersBtn = $('#' + stickerpipeConfig.elId + ' i'),
