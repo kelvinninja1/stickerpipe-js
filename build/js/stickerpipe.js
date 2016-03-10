@@ -4073,8 +4073,7 @@ window.StickersModule.Configs = {};
 
 		elId: 'stickerPipe',
 
-		// todo: more than 2 resolution
-		resolution: (window.devicePixelRatio == 1) ? 'mdpi' : 'xhdpi',
+		resolution: 'xxhdpi',
 
 		tabItemClass: 'sp-tab-item',
 		stickerItemClass: 'sp-sticker-item',
@@ -4109,6 +4108,18 @@ window.StickersModule.Configs = {};
 
 		lang: document.documentElement.lang.substr(0, 2) || 'en'
 	});
+
+	switch(window.devicePixelRatio) {
+		case 1:
+			Plugin.Configs.resolution = 'mdpi';
+			break;
+		case 2:
+			Plugin.Configs.resolution = 'xhdpi';
+			break;
+		default:
+			Plugin.Configs.resolution = 'xxhdpi';
+			break;
+	}
 
 })(window.StickersModule);
 
