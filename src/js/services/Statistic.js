@@ -7,8 +7,6 @@
 			action: action,
 			label: label
 		}]);
-
-		ga('stickerTracker.send', 'event', category, action, label);
 	}
 
 	Plugin.Service.Statistic = {
