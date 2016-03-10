@@ -1,17 +1,50 @@
 
 (function(Plugin) {
 
-	var lockr = Plugin.Libs.Lockr;
+	function getKey(key) {
+		return Plugin.Configs.storagePrefix + key;
+	}
 
 	Plugin.Service.Storage = {
 
-		get: function(key) {
-			lockr.prefix = Plugin.Configs.storagePrefix;
-			return lockr.get(key);
+		set: function (key, value) {
+			key = getKey(key);
+
+			try {
+				localStorage.setItem(key, JSON.stringify({
+					data: value
+				}));
+			} catch (e) {
+				console && console.warn('LocalStorage didn\'t successfully save the "{'+ key +': '+ value +'}" pair, because the localStorage is full.');
+			}
 		},
-		set: function(key, data) {
-			lockr.prefix = Plugin.Configs.storagePrefix;
-			return lockr.set(key, data);
+		get: function (key, missing) {
+			key = getKey(key);
+
+			var value;
+
+			try {
+				value = JSON.parse(localStorage.getItem(key));
+			} catch (e) {
+				value = null;
+			}
+
+			return (value === null) ? missing : (value.data || missing);
+		},
+		getAll: function () {
+			var keys = Object.keys(localStorage);
+
+			return keys.map((function (key) {
+				return this.get(key);
+			}).bind(this));
+		},
+		rm: function (key) {
+			key = getKey(key);
+
+			localStorage.removeItem(key);
+		},
+		flush: function () {
+			localStorage.clear();
 		},
 
 		///////////////////////////////////////
