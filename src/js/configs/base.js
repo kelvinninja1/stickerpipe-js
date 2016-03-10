@@ -7,10 +7,6 @@
 
 		resolution: 'xxhdpi',
 
-		tabItemClass: 'sp-tab-item',
-		stickerItemClass: 'sp-sticker-item',
-		emojiItemClass: 'sp-emoji',
-
 		htmlForEmptyRecent: 'No recent stickers',
 
 		apiKey: null,

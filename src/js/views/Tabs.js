@@ -11,7 +11,8 @@
 			unwatched: 'sp-unwatched-content',
 			packTab: 'sp-pack-tab',
 			tabActive: 'sp-tab-active',
-			tabs: 'sp-tabs'
+			tabs: 'sp-tabs',
+			tabItem: 'sp-tab-item'
 		};
 
 	Plugin.View.Tabs = Plugin.Libs.Class({
@@ -148,7 +149,7 @@
 				tabEl.id = id;
 			}
 
-			tabClasses.push(Plugin.Configs.tabItemClass);
+			tabClasses.push(classes.tabItem);
 
 			tabEl.classList.add.apply(tabEl.classList, tabClasses);
 

@@ -1,6 +1,11 @@
 
 (function(Plugin) {
 
+	var classes = {
+		stickerItem: 'sp-sticker-item',
+		emojiItem: 'sp-emoji'
+	};
+
 	Plugin.View.Block = Plugin.Libs.Class({
 
 		emojisOffset: 0,
@@ -97,7 +102,7 @@
 
 				var image = new Image();
 				image.onload = function() {
-					stickersSpanEl.className = Plugin.Configs.stickerItemClass;
+					stickersSpanEl.className = classes.stickerItem;
 					stickersSpanEl.style.background = '';
 					stickersSpanEl.appendChild(image);
 				};
@@ -133,7 +138,7 @@
 					emojiEl = document.createElement('span'),
 					emojiImgHtml = Plugin.Service.Emoji.parseEmojiFromText(emoji);
 
-				emojiEl.className = Plugin.Configs.emojiItemClass;
+				emojiEl.className = classes.emojiItem;
 				emojiEl.innerHTML = emojiImgHtml;
 
 				this.contentEl.appendChild(emojiEl);
@@ -145,12 +150,10 @@
 		},
 
 		handleClickOnSticker: function(callback) {
-			// todo: create static Plugin.Configs.stickerItemClass
-			Plugin.Service.Helper.setEvent('click', this.contentEl, Plugin.Configs.stickerItemClass, callback);
+			Plugin.Service.Helper.setEvent('click', this.contentEl, classes.stickerItem, callback);
 		},
 		handleClickOnEmoji: function(callback) {
-			// todo: create static Plugin.Configs.emojiItemClass
-			Plugin.Service.Helper.setEvent('click', this.contentEl, Plugin.Configs.emojiItemClass, callback);
+			Plugin.Service.Helper.setEvent('click', this.contentEl, classes.emojiItem, callback);
 		},
 
 		open: function(tabName) {

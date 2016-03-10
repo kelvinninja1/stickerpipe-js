@@ -3735,10 +3735,6 @@ window.StickersModule.Configs = {};
 
 		resolution: 'xxhdpi',
 
-		tabItemClass: 'sp-tab-item',
-		stickerItemClass: 'sp-sticker-item',
-		emojiItemClass: 'sp-emoji',
-
 		htmlForEmptyRecent: 'No recent stickers',
 
 		apiKey: null,
@@ -5323,6 +5319,11 @@ window.StickersModule.View = {};
 
 (function(Plugin) {
 
+	var classes = {
+		stickerItem: 'sp-sticker-item',
+		emojiItem: 'sp-emoji'
+	};
+
 	Plugin.View.Block = Plugin.Libs.Class({
 
 		emojisOffset: 0,
@@ -5419,7 +5420,7 @@ window.StickersModule.View = {};
 
 				var image = new Image();
 				image.onload = function() {
-					stickersSpanEl.className = Plugin.Configs.stickerItemClass;
+					stickersSpanEl.className = classes.stickerItem;
 					stickersSpanEl.style.background = '';
 					stickersSpanEl.appendChild(image);
 				};
@@ -5455,7 +5456,7 @@ window.StickersModule.View = {};
 					emojiEl = document.createElement('span'),
 					emojiImgHtml = Plugin.Service.Emoji.parseEmojiFromText(emoji);
 
-				emojiEl.className = Plugin.Configs.emojiItemClass;
+				emojiEl.className = classes.emojiItem;
 				emojiEl.innerHTML = emojiImgHtml;
 
 				this.contentEl.appendChild(emojiEl);
@@ -5467,12 +5468,10 @@ window.StickersModule.View = {};
 		},
 
 		handleClickOnSticker: function(callback) {
-			// todo: create static Plugin.Configs.stickerItemClass
-			Plugin.Service.Helper.setEvent('click', this.contentEl, Plugin.Configs.stickerItemClass, callback);
+			Plugin.Service.Helper.setEvent('click', this.contentEl, classes.stickerItem, callback);
 		},
 		handleClickOnEmoji: function(callback) {
-			// todo: create static Plugin.Configs.emojiItemClass
-			Plugin.Service.Helper.setEvent('click', this.contentEl, Plugin.Configs.emojiItemClass, callback);
+			Plugin.Service.Helper.setEvent('click', this.contentEl, classes.emojiItem, callback);
 		},
 
 		open: function(tabName) {
@@ -5698,7 +5697,8 @@ window.StickersModule.View = {};
 			unwatched: 'sp-unwatched-content',
 			packTab: 'sp-pack-tab',
 			tabActive: 'sp-tab-active',
-			tabs: 'sp-tabs'
+			tabs: 'sp-tabs',
+			tabItem: 'sp-tab-item'
 		};
 
 	Plugin.View.Tabs = Plugin.Libs.Class({
@@ -5835,7 +5835,7 @@ window.StickersModule.View = {};
 				tabEl.id = id;
 			}
 
-			tabClasses.push(Plugin.Configs.tabItemClass);
+			tabClasses.push(classes.tabItem);
 
 			tabEl.classList.add.apply(tabEl.classList, tabClasses);
 
