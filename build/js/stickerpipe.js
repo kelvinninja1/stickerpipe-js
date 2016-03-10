@@ -2661,7 +2661,7 @@ window.StickersModule.Service = {};
 					response.meta = response.meta || {};
 					response.meta.shop_last_modified = response.meta.shop_last_modified || 0;
 
-					Plugin.Service.Storage.setStoreLastModified(response.meta.shop_last_modified * 1000);
+					Plugin.Service.Metadata.setStoreLastModified(response.meta.shop_last_modified * 1000);
 
 					successCallback && successCallback(response.data);
 				}
@@ -3005,13 +3005,53 @@ window.StickersModule.Service = {};
 			}
 
 			if (!showContentHighlight &&
-				Plugin.Service.Storage.getStoreLastModified() > Plugin.Service.Storage.getStoreLastVisit()) {
+				Plugin.Service.Metadata.getStoreLastModified() > Plugin.Service.Metadata.getStoreLastVisit()) {
 				showContentHighlight = true;
 			}
 			Plugin.Service.Event.changeContentHighlight(showContentHighlight);
 		}
 
 	};
+})(window.StickersModule);
+
+(function(Plugin) {
+
+	Plugin.Service.Metadata = {
+
+		metadata: null,
+
+		get: function(key) {
+			this.metadata = this.metadata || Plugin.Service.Storage.getMetadata() || {};
+			return this.metadata[key] || null;
+		},
+		set: function(key, value) {
+			this.metadata = this.metadata || Plugin.Service.Storage.getMetadata() || {};
+			this.metadata[key] =  value;
+
+			Plugin.Service.Storage.setMetadata(this.metadata);
+		},
+
+		///////////////////////////////////////
+		// Last store visit
+		///////////////////////////////////////
+		getStoreLastVisit: function() {
+			return this.get('last_store_visit') || 0;
+		},
+		setStoreLastVisit: function(time) {
+			return this.set('last_store_visit', time);
+		},
+
+		///////////////////////////////////////
+		// Last store visit
+		///////////////////////////////////////
+		getStoreLastModified: function() {
+			return this.get('shop_last_modified');
+		},
+		setStoreLastModified: function(time) {
+			return this.set('shop_last_modified', time);
+		}
+	};
+
 })(window.StickersModule);
 
 (function(Plugin) {
@@ -3535,42 +3575,11 @@ window.StickersModule.Service = {};
 		///////////////////////////////////////
 		// Metadata
 		///////////////////////////////////////
-		getMetadata: function(key) {
-			var metadata = this.get('metadata');
-
-			if (key) {
-				metadata = metadata[key];
-			}
-
-			return metadata;
+		getMetadata: function() {
+			return this.get('metadata');
 		},
-		setMetadata: function(key, value) {
-			var metadata = this.getMetadata() || {};
-
-			metadata[key] = value;
-
+		setMetadata: function(metadata) {
 			return this.set('metadata', metadata);
-		},
-
-		// todo: create Metadata service
-		///////////////////////////////////////
-		// Last store visit
-		///////////////////////////////////////
-		getStoreLastVisit: function() {
-			return this.getMetadata()['last_store_visit'] || 0;
-		},
-		setStoreLastVisit: function(time) {
-			return this.setMetadata('last_store_visit', time);
-		},
-
-		///////////////////////////////////////
-		// Last store visit
-		///////////////////////////////////////
-		getStoreLastModified: function() {
-			return this.getMetadata()['shop_last_modified'];
-		},
-		setStoreLastModified: function(time) {
-			return this.setMetadata('shop_last_modified', time);
 		}
 	};
 
@@ -5900,7 +5909,7 @@ window.StickersModule.View = {};
 			if (Plugin.Configs.enableStoreTab) {
 				this.el.appendChild(this.renderControlButton(this.controls.store));
 
-				if (Plugin.Service.Storage.getStoreLastModified() > Plugin.Service.Storage.getStoreLastVisit()) {
+				if (Plugin.Service.Metadata.getStoreLastModified() > Plugin.Service.Metadata.getStoreLastVisit()) {
 					this.controls.store.el.classList.add('sp-unwatched-content');
 				}
 			}
@@ -6041,7 +6050,7 @@ window.StickersModule.View = {};
 				Plugin.Service.Storage.setRecentStickers([]);
 				Plugin.Service.Storage.setUserData({});
 				Plugin.Service.Storage.setPendingRequestTasks([]);
-				Plugin.Service.Storage.setStoreLastVisit(0);
+				Plugin.Service.Metadata.setStoreLastVisit(0);
 			}
 
 			Plugin.Service.Storage.setUserId(Plugin.Configs.userId);
@@ -6095,7 +6104,7 @@ window.StickersModule.View = {};
 			this.view.tabsView.handleClickOnStoreTab(function() {
 				Plugin.Module.Store.open();
 
-				Plugin.Service.Storage.setStoreLastVisit(+(new Date()));
+				Plugin.Service.Metadata.setStoreLastVisit(+(new Date()));
 				Plugin.Service.Highlight.check();
 
 				self.view.tabsView.controls.store.el.classList.remove('sp-unwatched-content');

@@ -11,7 +11,7 @@
 			}
 
 			if (!showContentHighlight &&
-				Plugin.Service.Storage.getStoreLastModified() > Plugin.Service.Storage.getStoreLastVisit()) {
+				Plugin.Service.Metadata.getStoreLastModified() > Plugin.Service.Metadata.getStoreLastVisit()) {
 				showContentHighlight = true;
 			}
 			Plugin.Service.Event.changeContentHighlight(showContentHighlight);

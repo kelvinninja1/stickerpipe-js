@@ -222,7 +222,7 @@
 			if (Plugin.Configs.enableStoreTab) {
 				this.el.appendChild(this.renderControlButton(this.controls.store));
 
-				if (Plugin.Service.Storage.getStoreLastModified() > Plugin.Service.Storage.getStoreLastVisit()) {
+				if (Plugin.Service.Metadata.getStoreLastModified() > Plugin.Service.Metadata.getStoreLastVisit()) {
 					this.controls.store.el.classList.add('sp-unwatched-content');
 				}
 			}

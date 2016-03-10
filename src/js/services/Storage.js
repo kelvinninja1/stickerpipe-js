@@ -198,42 +198,11 @@
 		///////////////////////////////////////
 		// Metadata
 		///////////////////////////////////////
-		getMetadata: function(key) {
-			var metadata = this.get('metadata');
-
-			if (key) {
-				metadata = metadata[key];
-			}
-
-			return metadata;
+		getMetadata: function() {
+			return this.get('metadata');
 		},
-		setMetadata: function(key, value) {
-			var metadata = this.getMetadata() || {};
-
-			metadata[key] = value;
-
+		setMetadata: function(metadata) {
 			return this.set('metadata', metadata);
-		},
-
-		// todo: create Metadata service
-		///////////////////////////////////////
-		// Last store visit
-		///////////////////////////////////////
-		getStoreLastVisit: function() {
-			return this.getMetadata()['last_store_visit'] || 0;
-		},
-		setStoreLastVisit: function(time) {
-			return this.setMetadata('last_store_visit', time);
-		},
-
-		///////////////////////////////////////
-		// Last store visit
-		///////////////////////////////////////
-		getStoreLastModified: function() {
-			return this.getMetadata()['shop_last_modified'];
-		},
-		setStoreLastModified: function(time) {
-			return this.setMetadata('shop_last_modified', time);
 		}
 	};
 

@@ -57,7 +57,7 @@ window.StickersModule.View = {};
 				Plugin.Service.Storage.setRecentStickers([]);
 				Plugin.Service.Storage.setUserData({});
 				Plugin.Service.Storage.setPendingRequestTasks([]);
-				Plugin.Service.Storage.setStoreLastVisit(0);
+				Plugin.Service.Metadata.setStoreLastVisit(0);
 			}
 
 			Plugin.Service.Storage.setUserId(Plugin.Configs.userId);
@@ -111,7 +111,7 @@ window.StickersModule.View = {};
 			this.view.tabsView.handleClickOnStoreTab(function() {
 				Plugin.Module.Store.open();
 
-				Plugin.Service.Storage.setStoreLastVisit(+(new Date()));
+				Plugin.Service.Metadata.setStoreLastVisit(+(new Date()));
 				Plugin.Service.Highlight.check();
 
 				self.view.tabsView.controls.store.el.classList.remove('sp-unwatched-content');
