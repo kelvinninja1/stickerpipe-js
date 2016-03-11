@@ -5517,6 +5517,8 @@ window.StickersModule.View = {};
 		_constructor: function() {
 			parent.prototype._constructor.apply(this, arguments);
 
+			var self = this;
+
 			this.toggleEl = document.getElementById(Plugin.Configs.elId);
 			this.toggleEl.addEventListener('click', (function() {
 				this.toggle();
@@ -5537,7 +5539,8 @@ window.StickersModule.View = {};
 				this.toggle();
 			}).bind(this));
 
-			document.getElementsByTagName('body')[0].addEventListener('click', (function(e) {
+			// check if click outside popover - hide popover
+			document.body.addEventListener('click', function(e) {
 				function isDescendant(parent, child) {
 					var node = child.parentNode;
 					while (node != null) {
@@ -5549,33 +5552,26 @@ window.StickersModule.View = {};
 					return false;
 				}
 
-				if (!this.active) {
+				if (!self.active) {
 					return;
 				}
 
-				if (!isDescendant(this.popoverEl, e.target) && !isDescendant(this.toggleEl.parentElement, e.target)) {
-					this.toggle();
+				if (!isDescendant(self.popoverEl, e.target) && !isDescendant(self.toggleEl.parentElement, e.target)) {
+					self.toggle();
 				}
-			}).bind(this));
+			});
 
-			window.addEventListener(Plugin.Service.Event.events.showContentHighlight, (function() {
-				this.toggleEl.classList.add('stickerpipe-content-highlight');
-			}).bind(this));
+			window.addEventListener(Plugin.Service.Event.events.showContentHighlight, function() {
+				self.toggleEl.classList.add('stickerpipe-content-highlight');
+			});
 
-			window.addEventListener(Plugin.Service.Event.events.hideContentHighlight, (function() {
-				this.toggleEl.classList.remove('stickerpipe-content-highlight');
-			}).bind(this));
+			window.addEventListener(Plugin.Service.Event.events.hideContentHighlight, function() {
+				self.toggleEl.classList.remove('stickerpipe-content-highlight');
+			});
 
-			// todo: addEventListener --> DOMEventService
-			if (window.addEventListener) {
-				window.addEventListener(Plugin.Service.Event.events.popoverShown, function() {
-					Plugin.Service.Event.resize();
-				});
-			} else {
-				window.attachEvent('on' + Plugin.Service.Event.events.popoverShown, function() {
-					Plugin.Service.Event.resize();
-				});
-			}
+			window.addEventListener(Plugin.Service.Event.events.popoverShown, function() {
+				Plugin.Service.Event.resize();
+			})
 		},
 
 		toggle: function() {
