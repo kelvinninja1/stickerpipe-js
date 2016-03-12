@@ -244,383 +244,6 @@ window.StickersModule.Libs = {};
 	}
 
 })(window.StickersModule);
-
-// todo: remove
-
-/*
- * classList.js: Cross-browser full element.classList implementation.
- * 2014-12-13
- *
- * By Eli Grey, http://eligrey.com
- * Public Domain.
- * NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
- */
-
-/*global self, document, DOMException */
-
-/*! @source http://purl.eligrey.com/github/classList.js/blob/master/classList.js */
-
-if ("document" in self) {
-
-// Full polyfill for browsers with no classList support
-	if (!("classList" in document.createElement("_"))) {
-
-		(function (view) {
-
-			"use strict";
-
-			if (!('Element' in view)) return;
-
-			var
-				classListProp = "classList"
-				, protoProp = "prototype"
-				, elemCtrProto = view.Element[protoProp]
-				, objCtr = Object
-				, strTrim = String[protoProp].trim || function () {
-						return this.replace(/^\s+|\s+$/g, "");
-					}
-				, arrIndexOf = Array[protoProp].indexOf || function (item) {
-						var
-							i = 0
-							, len = this.length
-							;
-						for (; i < len; i++) {
-							if (i in this && this[i] === item) {
-								return i;
-							}
-						}
-						return -1;
-					}
-			// Vendors: please allow content code to instantiate DOMExceptions
-				, DOMEx = function (type, message) {
-					this.name = type;
-					this.code = DOMException[type];
-					this.message = message;
-				}
-				, checkTokenAndGetIndex = function (classList, token) {
-					if (token === "") {
-						throw new DOMEx(
-							"SYNTAX_ERR"
-							, "An invalid or illegal string was specified"
-						);
-					}
-					if (/\s/.test(token)) {
-						throw new DOMEx(
-							"INVALID_CHARACTER_ERR"
-							, "String contains an invalid character"
-						);
-					}
-					return arrIndexOf.call(classList, token);
-				}
-				, ClassList = function (elem) {
-					var
-						trimmedClasses = strTrim.call(elem.getAttribute("class") || "")
-						, classes = trimmedClasses ? trimmedClasses.split(/\s+/) : []
-						, i = 0
-						, len = classes.length
-						;
-					for (; i < len; i++) {
-						this.push(classes[i]);
-					}
-					this._updateClassName = function () {
-						elem.setAttribute("class", this.toString());
-					};
-				}
-				, classListProto = ClassList[protoProp] = []
-				, classListGetter = function () {
-					return new ClassList(this);
-				}
-				;
-// Most DOMException implementations don't allow calling DOMException's toString()
-// on non-DOMExceptions. Error's toString() is sufficient here.
-			DOMEx[protoProp] = Error[protoProp];
-			classListProto.item = function (i) {
-				return this[i] || null;
-			};
-			classListProto.contains = function (token) {
-				token += "";
-				return checkTokenAndGetIndex(this, token) !== -1;
-			};
-			classListProto.add = function () {
-				var
-					tokens = arguments
-					, i = 0
-					, l = tokens.length
-					, token
-					, updated = false
-					;
-				do {
-					token = tokens[i] + "";
-					if (checkTokenAndGetIndex(this, token) === -1) {
-						this.push(token);
-						updated = true;
-					}
-				}
-				while (++i < l);
-
-				if (updated) {
-					this._updateClassName();
-				}
-			};
-			classListProto.remove = function () {
-				var
-					tokens = arguments
-					, i = 0
-					, l = tokens.length
-					, token
-					, updated = false
-					, index
-					;
-				do {
-					token = tokens[i] + "";
-					index = checkTokenAndGetIndex(this, token);
-					while (index !== -1) {
-						this.splice(index, 1);
-						updated = true;
-						index = checkTokenAndGetIndex(this, token);
-					}
-				}
-				while (++i < l);
-
-				if (updated) {
-					this._updateClassName();
-				}
-			};
-			classListProto.toggle = function (token, force) {
-				token += "";
-
-				var
-					result = this.contains(token)
-					, method = result ?
-					force !== true && "remove"
-						:
-					force !== false && "add"
-					;
-
-				if (method) {
-					this[method](token);
-				}
-
-				if (force === true || force === false) {
-					return force;
-				} else {
-					return !result;
-				}
-			};
-			classListProto.toString = function () {
-				return this.join(" ");
-			};
-
-			if (objCtr.defineProperty) {
-				var classListPropDesc = {
-					get: classListGetter
-					, enumerable: true
-					, configurable: true
-				};
-				try {
-					objCtr.defineProperty(elemCtrProto, classListProp, classListPropDesc);
-				} catch (ex) { // IE 8 doesn't support enumerable:true
-					if (ex.number === -0x7FF5EC54) {
-						classListPropDesc.enumerable = false;
-						objCtr.defineProperty(elemCtrProto, classListProp, classListPropDesc);
-					}
-				}
-			} else if (objCtr[protoProp].__defineGetter__) {
-				elemCtrProto.__defineGetter__(classListProp, classListGetter);
-			}
-
-		}(self));
-
-	} else {
-// There is full or partial native classList support, so just check if we need
-// to normalize the add/remove and toggle APIs.
-
-		(function () {
-			"use strict";
-
-			var testElement = document.createElement("_");
-
-			testElement.classList.add("c1", "c2");
-
-			// Polyfill for IE 10/11 and Firefox <26, where classList.add and
-			// classList.remove exist but support only one argument at a time.
-			if (!testElement.classList.contains("c2")) {
-				var createMethod = function(method) {
-					var original = DOMTokenList.prototype[method];
-
-					DOMTokenList.prototype[method] = function(token) {
-						var i, len = arguments.length;
-
-						for (i = 0; i < len; i++) {
-							token = arguments[i];
-							original.call(this, token);
-						}
-					};
-				};
-				createMethod('add');
-				createMethod('remove');
-			}
-
-			testElement.classList.toggle("c3", false);
-
-			// Polyfill for IE 10 and Firefox <24, where classList.toggle does not
-			// support the second argument.
-			if (testElement.classList.contains("c3")) {
-				var _toggle = DOMTokenList.prototype.toggle;
-
-				DOMTokenList.prototype.toggle = function(token, force) {
-					if (1 in arguments && !this.contains(token) === !force) {
-						return force;
-					} else {
-						return _toggle.call(this, token);
-					}
-				};
-
-			}
-
-			testElement = null;
-		}());
-
-	}
-
-}
-document.addEventListener("DOMContentLoaded", function(event) {
-
-	if(typeof window.ga === "undefined"){
-
-		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-	}
-
-	ga('create', 'UA-1113296-81', 'auto', {'name': 'stickerTracker'});
-	ga('stickerTracker.send', 'pageview');
-
-});
-
-(function(Plugin) {
-
-	Plugin.Libs.Lockr = {
-		prefix: '',
-
-		_getPrefixedKey: function(key, options) {
-			options = options || {};
-
-			if (options.noPrefix) {
-				return key;
-			} else {
-				return this.prefix + key;
-			}
-		},
-
-		set: function (key, value, options) {
-			var query_key = this._getPrefixedKey(key, options);
-
-			try {
-				localStorage.setItem(query_key, JSON.stringify({
-					data: value
-				}));
-			} catch (e) {
-				console && console.warn('Lockr didn\'t successfully save the "{'+ key +': '+ value +'}" pair, because the localStorage is full.');
-			}
-		},
-
-		get: function (key, missing, options) {
-			var query_key = this._getPrefixedKey(key, options),
-				value;
-
-			try {
-				value = JSON.parse(localStorage.getItem(query_key));
-			} catch (e) {
-				value = null;
-			}
-
-			return (value === null) ? missing : (value.data || missing);
-		},
-
-		sadd: function(key, value, options) {
-			var query_key = this._getPrefixedKey(key, options),
-				json;
-
-			var values = this.smembers(key);
-
-			if (values.indexOf(value) > -1) {
-				return null;
-			}
-
-			try {
-				values.push(value);
-				json = JSON.stringify({"data": values});
-				localStorage.setItem(query_key, json);
-			} catch (e) {
-				if (console) {
-					console.log(e);
-					console.warn('Lockr didn\'t successfully add the '+ value +' to '+ key +' set, because the localStorage is full.');
-				}
-			}
-		},
-
-		smembers: function(key, options) {
-			var query_key = this._getPrefixedKey(key, options),
-				value;
-
-			try {
-				value = JSON.parse(localStorage.getItem(query_key));
-			} catch (e) {
-				value = null;
-			}
-
-			return (value === null) ? [] : (value.data || []);
-		},
-
-		sismember: function(key, value, options) {
-			var query_key = this._getPrefixedKey(key, options);
-			return this.smembers(key).indexOf(value) > -1;
-		},
-
-		getAll: function () {
-			var keys = Object.keys(localStorage);
-
-			return keys.map((function (key) {
-				return this.get(key);
-			}).bind(this));
-		},
-
-		srem: function(key, value, options) {
-			var query_key = this._getPrefixedKey(key, options),
-				json,
-				index;
-
-			var values = this.smembers(key, value);
-
-			index = values.indexOf(value);
-
-			if (index > -1)
-				values.splice(index, 1);
-
-			json = JSON.stringify({
-				data: values
-			});
-
-			try {
-				localStorage.setItem(query_key, json);
-			} catch (e) {
-				console && console.warn('Lockr couldn\'t remove the ' + value + ' from the set ' + key);
-			}
-		},
-
-		rm: function (key) {
-			localStorage.removeItem(key);
-		},
-
-		flush: function () {
-			localStorage.clear();
-		}
-	};
-
-})(window.StickersModule);
 (function(Plugin) {
 
 	Plugin.Libs.MD5 = function (string) {
@@ -3038,7 +2661,7 @@ window.StickersModule.Service = {};
 					response.meta = response.meta || {};
 					response.meta.shop_last_modified = response.meta.shop_last_modified || 0;
 
-					Plugin.Service.Storage.setStoreLastModified(response.meta.shop_last_modified * 1000);
+					Plugin.Service.Metadata.setStoreLastModified(response.meta.shop_last_modified * 1000);
 
 					successCallback && successCallback(response.data);
 				}
@@ -3123,12 +2746,9 @@ window.StickersModule.Service = {};
 	Plugin.Service.El = {
 
 		css: function(el, property) {
-			// todo: getComputedStyle add IE 8 supporting
-
 			return (el.style && el.style[property])
 				|| (el.currentStyle && el.currentStyle[property])
 				|| (getComputedStyle(el)[property]);
-
 		},
 
 		outerWidth: function(el) {
@@ -3385,13 +3005,53 @@ window.StickersModule.Service = {};
 			}
 
 			if (!showContentHighlight &&
-				Plugin.Service.Storage.getStoreLastModified() > Plugin.Service.Storage.getStoreLastVisit()) {
+				Plugin.Service.Metadata.getStoreLastModified() > Plugin.Service.Metadata.getStoreLastVisit()) {
 				showContentHighlight = true;
 			}
 			Plugin.Service.Event.changeContentHighlight(showContentHighlight);
 		}
 
 	};
+})(window.StickersModule);
+
+(function(Plugin) {
+
+	Plugin.Service.Metadata = {
+
+		metadata: null,
+
+		get: function(key) {
+			this.metadata = this.metadata || Plugin.Service.Storage.getMetadata() || {};
+			return this.metadata[key] || null;
+		},
+		set: function(key, value) {
+			this.metadata = this.metadata || Plugin.Service.Storage.getMetadata() || {};
+			this.metadata[key] =  value;
+
+			Plugin.Service.Storage.setMetadata(this.metadata);
+		},
+
+		///////////////////////////////////////
+		// Last store visit
+		///////////////////////////////////////
+		getStoreLastVisit: function() {
+			return this.get('last_store_visit') || 0;
+		},
+		setStoreLastVisit: function(time) {
+			return this.set('last_store_visit', time);
+		},
+
+		///////////////////////////////////////
+		// Last store visit
+		///////////////////////////////////////
+		getStoreLastModified: function() {
+			return this.get('shop_last_modified');
+		},
+		setStoreLastModified: function(time) {
+			return this.set('shop_last_modified', time);
+		}
+	};
+
 })(window.StickersModule);
 
 (function(Plugin) {
@@ -3632,8 +3292,6 @@ window.StickersModule.Service = {};
 			action: action,
 			label: label
 		}]);
-
-		ga('stickerTracker.send', 'event', category, action, label);
 	}
 
 	Plugin.Service.Statistic = {
@@ -3720,17 +3378,50 @@ window.StickersModule.Service = {};
 
 (function(Plugin) {
 
-	var lockr = Plugin.Libs.Lockr;
+	function getKey(key) {
+		return Plugin.Configs.storagePrefix + key;
+	}
 
 	Plugin.Service.Storage = {
 
-		get: function(key) {
-			lockr.prefix = Plugin.Configs.storagePrefix;
-			return lockr.get(key);
+		set: function (key, value) {
+			key = getKey(key);
+
+			try {
+				localStorage.setItem(key, JSON.stringify({
+					data: value
+				}));
+			} catch (e) {
+				console && console.warn('LocalStorage didn\'t successfully save the "{'+ key +': '+ value +'}" pair, because the localStorage is full.');
+			}
 		},
-		set: function(key, data) {
-			lockr.prefix = Plugin.Configs.storagePrefix;
-			return lockr.set(key, data);
+		get: function (key, missing) {
+			key = getKey(key);
+
+			var value;
+
+			try {
+				value = JSON.parse(localStorage.getItem(key));
+			} catch (e) {
+				value = null;
+			}
+
+			return (value === null) ? missing : (value.data || missing);
+		},
+		getAll: function () {
+			var keys = Object.keys(localStorage);
+
+			return keys.map((function (key) {
+				return this.get(key);
+			}).bind(this));
+		},
+		rm: function (key) {
+			key = getKey(key);
+
+			localStorage.removeItem(key);
+		},
+		flush: function () {
+			localStorage.clear();
 		},
 
 		///////////////////////////////////////
@@ -3884,42 +3575,11 @@ window.StickersModule.Service = {};
 		///////////////////////////////////////
 		// Metadata
 		///////////////////////////////////////
-		getMetadata: function(key) {
-			var metadata = this.get('metadata');
-
-			if (key) {
-				metadata = metadata[key];
-			}
-
-			return metadata;
+		getMetadata: function() {
+			return this.get('metadata');
 		},
-		setMetadata: function(key, value) {
-			var metadata = this.getMetadata() || {};
-
-			metadata[key] = value;
-
+		setMetadata: function(metadata) {
 			return this.set('metadata', metadata);
-		},
-
-		// todo: create Metadata service
-		///////////////////////////////////////
-		// Last store visit
-		///////////////////////////////////////
-		getStoreLastVisit: function() {
-			return this.getMetadata()['last_store_visit'] || 0;
-		},
-		setStoreLastVisit: function(time) {
-			return this.setMetadata('last_store_visit', time);
-		},
-
-		///////////////////////////////////////
-		// Last store visit
-		///////////////////////////////////////
-		getStoreLastModified: function() {
-			return this.getMetadata()['shop_last_modified'];
-		},
-		setStoreLastModified: function(time) {
-			return this.setMetadata('shop_last_modified', time);
 		}
 	};
 
@@ -4074,10 +3734,6 @@ window.StickersModule.Configs = {};
 		elId: 'stickerPipe',
 
 		resolution: 'xxhdpi',
-
-		tabItemClass: 'sp-tab-item',
-		stickerItemClass: 'sp-sticker-item',
-		emojiItemClass: 'sp-emoji',
 
 		htmlForEmptyRecent: 'No recent stickers',
 
@@ -5663,6 +5319,11 @@ window.StickersModule.View = {};
 
 (function(Plugin) {
 
+	var classes = {
+		stickerItem: 'sp-sticker-item',
+		emojiItem: 'sp-emoji'
+	};
+
 	Plugin.View.Block = Plugin.Libs.Class({
 
 		emojisOffset: 0,
@@ -5695,7 +5356,7 @@ window.StickersModule.View = {};
 			this.tabsView.render();
 
 			this.el.innerHTML = '';
-			this.el.className ='sticker-pipe';
+			this.el.className ='stickerpipe';
 			this.el.style.width = Plugin.Configs.width;
 
 			this.scrollableEl = document.createElement('div');
@@ -5759,7 +5420,7 @@ window.StickersModule.View = {};
 
 				var image = new Image();
 				image.onload = function() {
-					stickersSpanEl.className = Plugin.Configs.stickerItemClass;
+					stickersSpanEl.className = classes.stickerItem;
 					stickersSpanEl.style.background = '';
 					stickersSpanEl.appendChild(image);
 				};
@@ -5795,7 +5456,7 @@ window.StickersModule.View = {};
 					emojiEl = document.createElement('span'),
 					emojiImgHtml = Plugin.Service.Emoji.parseEmojiFromText(emoji);
 
-				emojiEl.className = Plugin.Configs.emojiItemClass;
+				emojiEl.className = classes.emojiItem;
 				emojiEl.innerHTML = emojiImgHtml;
 
 				this.contentEl.appendChild(emojiEl);
@@ -5807,12 +5468,10 @@ window.StickersModule.View = {};
 		},
 
 		handleClickOnSticker: function(callback) {
-			// todo: create static Plugin.Configs.stickerItemClass
-			Plugin.Service.Helper.setEvent('click', this.contentEl, Plugin.Configs.stickerItemClass, callback);
+			Plugin.Service.Helper.setEvent('click', this.contentEl, classes.stickerItem, callback);
 		},
 		handleClickOnEmoji: function(callback) {
-			// todo: create static Plugin.Configs.emojiItemClass
-			Plugin.Service.Helper.setEvent('click', this.contentEl, Plugin.Configs.emojiItemClass, callback);
+			Plugin.Service.Helper.setEvent('click', this.contentEl, classes.emojiItem, callback);
 		},
 
 		open: function(tabName) {
@@ -5858,13 +5517,15 @@ window.StickersModule.View = {};
 		_constructor: function() {
 			parent.prototype._constructor.apply(this, arguments);
 
+			var self = this;
+
 			this.toggleEl = document.getElementById(Plugin.Configs.elId);
 			this.toggleEl.addEventListener('click', (function() {
 				this.toggle();
 			}).bind(this));
 
 			this.popoverEl = document.createElement('div');
-			this.popoverEl.className = 'sp-popover';
+			this.popoverEl.className = 'stickerpipe-popover';
 
 			this.el = document.createElement('div');
 
@@ -5878,7 +5539,8 @@ window.StickersModule.View = {};
 				this.toggle();
 			}).bind(this));
 
-			document.getElementsByTagName('body')[0].addEventListener('click', (function(e) {
+			// check if click outside popover - hide popover
+			document.body.addEventListener('click', function(e) {
 				function isDescendant(parent, child) {
 					var node = child.parentNode;
 					while (node != null) {
@@ -5890,33 +5552,26 @@ window.StickersModule.View = {};
 					return false;
 				}
 
-				if (!this.active) {
+				if (!self.active) {
 					return;
 				}
 
-				if (!isDescendant(this.popoverEl, e.target) && !isDescendant(this.toggleEl.parentElement, e.target)) {
-					this.toggle();
+				if (!isDescendant(self.popoverEl, e.target) && !isDescendant(self.toggleEl.parentElement, e.target)) {
+					self.toggle();
 				}
-			}).bind(this));
+			});
 
-			window.addEventListener(Plugin.Service.Event.events.showContentHighlight, (function() {
-				this.toggleEl.classList.add('stickerpipe-content-highlight');
-			}).bind(this));
+			window.addEventListener(Plugin.Service.Event.events.showContentHighlight, function() {
+				self.toggleEl.classList.add('stickerpipe-content-highlight');
+			});
 
-			window.addEventListener(Plugin.Service.Event.events.hideContentHighlight, (function() {
-				this.toggleEl.classList.remove('stickerpipe-content-highlight');
-			}).bind(this));
+			window.addEventListener(Plugin.Service.Event.events.hideContentHighlight, function() {
+				self.toggleEl.classList.remove('stickerpipe-content-highlight');
+			});
 
-			// todo: addEventListener --> DOMEventService
-			if (window.addEventListener) {
-				window.addEventListener(Plugin.Service.Event.events.popoverShown, function() {
-					Plugin.Service.Event.resize();
-				});
-			} else {
-				window.attachEvent('on' + Plugin.Service.Event.events.popoverShown, function() {
-					Plugin.Service.Event.resize();
-				});
-			}
+			window.addEventListener(Plugin.Service.Event.events.popoverShown, function() {
+				Plugin.Service.Event.resize();
+			})
 		},
 
 		toggle: function() {
@@ -6038,7 +5693,8 @@ window.StickersModule.View = {};
 			unwatched: 'sp-unwatched-content',
 			packTab: 'sp-pack-tab',
 			tabActive: 'sp-tab-active',
-			tabs: 'sp-tabs'
+			tabs: 'sp-tabs',
+			tabItem: 'sp-tab-item'
 		};
 
 	Plugin.View.Tabs = Plugin.Libs.Class({
@@ -6175,7 +5831,7 @@ window.StickersModule.View = {};
 				tabEl.id = id;
 			}
 
-			tabClasses.push(Plugin.Configs.tabItemClass);
+			tabClasses.push(classes.tabItem);
 
 			tabEl.classList.add.apply(tabEl.classList, tabClasses);
 
@@ -6249,7 +5905,7 @@ window.StickersModule.View = {};
 			if (Plugin.Configs.enableStoreTab) {
 				this.el.appendChild(this.renderControlButton(this.controls.store));
 
-				if (Plugin.Service.Storage.getStoreLastModified() > Plugin.Service.Storage.getStoreLastVisit()) {
+				if (Plugin.Service.Metadata.getStoreLastModified() > Plugin.Service.Metadata.getStoreLastVisit()) {
 					this.controls.store.el.classList.add('sp-unwatched-content');
 				}
 			}
@@ -6390,7 +6046,7 @@ window.StickersModule.View = {};
 				Plugin.Service.Storage.setRecentStickers([]);
 				Plugin.Service.Storage.setUserData({});
 				Plugin.Service.Storage.setPendingRequestTasks([]);
-				Plugin.Service.Storage.setStoreLastVisit(0);
+				Plugin.Service.Metadata.setStoreLastVisit(0);
 			}
 
 			Plugin.Service.Storage.setUserId(Plugin.Configs.userId);
@@ -6444,7 +6100,7 @@ window.StickersModule.View = {};
 			this.view.tabsView.handleClickOnStoreTab(function() {
 				Plugin.Module.Store.open();
 
-				Plugin.Service.Storage.setStoreLastVisit(+(new Date()));
+				Plugin.Service.Metadata.setStoreLastVisit(+(new Date()));
 				Plugin.Service.Highlight.check();
 
 				self.view.tabsView.controls.store.el.classList.remove('sp-unwatched-content');

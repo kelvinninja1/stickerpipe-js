@@ -37,7 +37,7 @@ var App = _makeClass(function(options) {
 		local: {
 			stickerpipe: {
 				apiUrl: 'http://work.stk.908.vc',
-				storeUrl: 'http://localhost/stickerpipe/store/build'
+				storeUrl: 'http://stickerpipe.local/store/build'
 			}
 		},
 		work: {
@@ -54,7 +54,7 @@ var App = _makeClass(function(options) {
 		var arr = window.location.href.split('/');
 
 		switch (arr[2]) {
-			case 'localhost':
+			case 'stickerpipe.local':
 				return this.envConfigs.local;
 			case 'demo.stk.908.vc':
 				return this.envConfigs.work;
