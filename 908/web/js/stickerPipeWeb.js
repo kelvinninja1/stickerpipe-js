@@ -26,12 +26,12 @@ module.run(['$templateCache', function($templateCache) {
     '	     alt=""\n' +
     '	     class="pack-preview-sticker img-responsive center-block">\n' +
     '	<div class="player">\n' +
-    '		<div class="progress" data-ng-show="progress">\n' +
+    '		<div class="progress" data-ng-show="showAudioProgress">\n' +
     '			<div class="bounce1"></div>\n' +
     '			<div class="bounce2"></div>\n' +
     '			<div class="bounce3"></div>\n' +
     '		</div>\n' +
-    '		<div class="play" data-ng-show="!progress"></div>\n' +
+    '		<div class="play" data-ng-show="!showAudioProgress"></div>\n' +
     '	</div>\n' +
     '</div>');
 }]);
@@ -144,17 +144,9 @@ app.directive('audioSticker', function() {
 
 			$scope.showAudioProgress = false;
 			$scope.played = false;
+			$scope.loaded = false;
 
-			audio.addEventListener('loadeddata', function() {
-				$scope.showAudioProgress = false;
-			}, false);
-
-			$el.find('.play')[0].onclick = function() {
-				if (!audio.src) {
-					audio.src = $scope.audioSticker.audio;
-					$scope.showAudioProgress = true;
-				}
-
+			function play() {
 				$scope.played = true;
 				audio.play();
 
@@ -163,6 +155,23 @@ app.directive('audioSticker', function() {
 				}
 
 				ga('stickerTracker.send', 'event', 'Sound sticker', 'play', $scope.audioSticker.name);
+			}
+
+			audio.addEventListener('loadeddata', function() {
+				$scope.showAudioProgress = false;
+				$scope.loaded = true;
+				play();
+			}, false);
+
+			$el.find('.play')[0].onclick = function() {
+				if (!audio.src) {
+					audio.src = $scope.audioSticker.audio;
+					$scope.showAudioProgress = true;
+				}
+
+				if ($scope.loaded) {
+					play();
+				}
 			};
 		}
 	};
