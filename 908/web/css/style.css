@@ -91,13 +91,9 @@ nav + .jumbotron {
   background: #f0faec;
   padding: 10px 0; }
 
-@media screen and (max-width: 1178px) {
-  .jumbotron .h1, .jumbotron h1 {
-    font-size: 48px; } }
-
-@media screen and (max-width: 922px) {
-  .jumbotron .h1, .jumbotron h1 {
-    font-size: 35px; } }
+.jumbotron .h1, .jumbotron h1 {
+  font-size: 40px;
+  line-height: 48px; }
 
 .email-form .form-group {
   background: #cccccc;
