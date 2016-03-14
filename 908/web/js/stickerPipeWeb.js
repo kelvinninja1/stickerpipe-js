@@ -164,6 +164,7 @@ app.directive('audioSticker', function() {
 			}, false);
 
 			$el.find('.play')[0].onclick = function() {
+				alert(1);
 				if (!audio.src) {
 					audio.src = $scope.audioSticker.audio;
 					$scope.showAudioProgress = true;
