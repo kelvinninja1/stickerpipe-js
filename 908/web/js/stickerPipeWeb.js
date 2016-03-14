@@ -47,9 +47,9 @@ app.controller('SoundStickersController', function($scope, ngAudio) {
 	angular.extend($scope, {
 		stickers: [
 			{
-				name: 'Sweetie finger1',
+				name: 'Sweetie finger3',
 				img: 'attention.png',
-				audio: loadAudio('Sweetie/finger1') },
+				audio: loadAudio('Sweetie/finger3') },
 			{
 				name: 'Pixels car',
 				img: 'auto.png',
@@ -123,9 +123,9 @@ app.controller('SoundStickersController', function($scope, ngAudio) {
 				img: 'music.png',
 				audio: loadAudio('Gorilla/drum2') },
 			{
-				name: 'Sweetie finger3',
+				name: 'Sweetie finger1',
 				img: 'attention.png',
-				audio: loadAudio('Sweetie/finger3') }
+				audio: loadAudio('Sweetie/finger1') }
 		]
 	});
 });
