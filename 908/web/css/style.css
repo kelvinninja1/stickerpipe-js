@@ -93,6 +93,7 @@ nav + .jumbotron {
 
 .jumbotron .h1, .jumbotron h1 {
   font-size: 40px;
+  font-weight: normal;
   line-height: 48px; }
 
 .email-form .form-group {
@@ -219,5 +220,8 @@ button.get-pack {
 
 .fotorama__dot {
   border-color: black !important;
-  height: 6px !important;
-  width: 6px !important; }
+  height: 8px !important;
+  width: 8px !important; }
+
+.fotorama__nav__frame.fotorama__active .fotorama__dot {
+  border-width: 4px !important; }
