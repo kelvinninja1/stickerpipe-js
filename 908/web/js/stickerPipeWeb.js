@@ -38,6 +38,58 @@ module.run(['$templateCache', function($templateCache) {
 })();
 
 
+app.directive('audioSticker', function() {
+
+	return {
+		restrict: 'A',
+		scope: {
+			audioSticker: '='
+		},
+		templateUrl: '/directives/audioSticker/view',
+		link: function ($scope, $el, attrs) {
+
+			var audio = new Audio();
+
+			$scope.showAudioProgress = false;
+			$scope.played = false;
+			$scope.loaded = false;
+
+			function play() {
+				$scope.played = true;
+				audio.play();
+
+				if (!$scope.$$phase) {
+					$scope.$apply();
+				}
+
+				ga('stickerTracker.send', 'event', 'Sound sticker', 'play', $scope.audioSticker.name);
+			}
+
+			//audio.loadeddata = function() {
+			//audio.onloadeddata = function() {
+			audio.onload = function() {
+				alert(1234);
+				$scope.showAudioProgress = false;
+				$scope.loaded = true;
+				play();
+			};
+
+			$el.find('.play')[0].onclick = function() {
+				if (!audio.src) {
+					alert('_' + $scope.audioSticker.audio);
+					audio.src = $scope.audioSticker.audio;
+					$scope.showAudioProgress = true;
+				}
+
+				if ($scope.loaded) {
+					play();
+				}
+			};
+		}
+	};
+
+});
+
 app.controller('SoundStickersController', function($scope, ngAudio) {
 
 	function loadAudio(name) {
@@ -128,56 +180,4 @@ app.controller('SoundStickersController', function($scope, ngAudio) {
 				audio: loadAudio('Sweetie/finger3') }
 		]
 	});
-});
-
-app.directive('audioSticker', function() {
-
-	return {
-		restrict: 'A',
-		scope: {
-			audioSticker: '='
-		},
-		templateUrl: '/directives/audioSticker/view',
-		link: function ($scope, $el, attrs) {
-
-			var audio = new Audio();
-			audio.preload = 'none';
-
-			$scope.showAudioProgress = false;
-			$scope.played = false;
-			$scope.loaded = false;
-
-			function play() {
-				$scope.played = true;
-				audio.play();
-
-				if (!$scope.$$phase) {
-					$scope.$apply();
-				}
-
-				ga('stickerTracker.send', 'event', 'Sound sticker', 'play', $scope.audioSticker.name);
-			}
-
-			//audio.loadeddata = function() {
-			audio.onloadeddata = function() {
-				alert(1234);
-				$scope.showAudioProgress = false;
-				$scope.loaded = true;
-				play();
-			};
-
-			$el.find('.play')[0].onclick = function() {
-				if (!audio.src) {
-					alert('_' + $scope.audioSticker.audio);
-					audio.src = $scope.audioSticker.audio;
-					$scope.showAudioProgress = true;
-				}
-
-				if ($scope.loaded) {
-					play();
-				}
-			};
-		}
-	};
-
 });
