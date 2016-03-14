@@ -162,7 +162,6 @@ app.directive('audioSticker', function() {
 				audio.play();
 				apply();
 
-
 				ga('stickerTracker.send', 'event', 'Sound sticker', 'play', $scope.audioSticker.name);
 			}
 
@@ -170,6 +169,11 @@ app.directive('audioSticker', function() {
 				$scope.showAudioProgress = false;
 				$scope.loaded = true;
 				play();
+			};
+
+			audio.onended = function() {
+				$scope.played = false;
+				apply();
 			};
 
 			$el.find('.play')[0].onclick = function() {
@@ -182,6 +186,8 @@ app.directive('audioSticker', function() {
 				if ($scope.loaded) {
 					play();
 				}
+
+				apply();
 			};
 		}
 	};
