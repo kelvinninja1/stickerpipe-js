@@ -98,6 +98,11 @@ nav + .jumbotron {
   font-weight: normal;
   line-height: 48px; }
 
+@media (min-width: 768px) and (max-width: 1054px) {
+  .jumbotron .h1, .jumbotron h1 {
+    font-size: 34px;
+    line-height: 40px; } }
+
 .email-form .form-group {
   background: #cccccc;
   padding: 10px; }
@@ -111,6 +116,7 @@ nav + .jumbotron {
   .email-form .form-group button {
     border-radius: 0; }
 
+.labs > .row > div,
 .packs > .row > div {
   margin-bottom: 30px; }
 
