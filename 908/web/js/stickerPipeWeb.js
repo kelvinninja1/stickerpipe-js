@@ -141,6 +141,7 @@ app.directive('audioSticker', function() {
 		link: function ($scope, $el, attrs) {
 
 			var audio = new Audio();
+			audio.preload = 'none';
 
 			$scope.showAudioProgress = false;
 			$scope.played = false;
@@ -167,7 +168,7 @@ app.directive('audioSticker', function() {
 
 			$el.find('.play')[0].onclick = function() {
 				if (!audio.src) {
-					alert($scope.audioSticker.audio);
+					alert('_' + $scope.audioSticker.audio);
 					audio.src = $scope.audioSticker.audio;
 					$scope.showAudioProgress = true;
 				}
