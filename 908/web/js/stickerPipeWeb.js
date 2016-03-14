@@ -157,12 +157,13 @@ app.directive('audioSticker', function() {
 				ga('stickerTracker.send', 'event', 'Sound sticker', 'play', $scope.audioSticker.name);
 			}
 
-			audio.addEventListener('loadeddata', function() {
-				alert(123);
+			//audio.loadeddata = function() {
+			audio.onloadeddata = function() {
+				alert(1234);
 				$scope.showAudioProgress = false;
 				$scope.loaded = true;
 				play();
-			}, false);
+			};
 
 			$el.find('.play')[0].onclick = function() {
 				if (!audio.src) {
