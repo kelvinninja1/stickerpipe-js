@@ -4085,7 +4085,7 @@ window.StickersModule.Configs = {};
 
 		apiKey: null,
 
-		apiUrl: 'https://api.stickerpipe.com',
+		apiUrl: 'http://api.stickerpipe.com',
 
 		storagePrefix: 'stickerpipe_',
 

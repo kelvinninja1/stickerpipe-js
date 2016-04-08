@@ -87,7 +87,6 @@ function retrieveChatDialogs() {
           var inputFile = $("input[type=file]")[0].files[0];
           if (inputFile) {
             $("#progress").show(0);
-            $(".input-group-btn_change_load").addClass("visibility_hidden");
           }
 
           clickSendAttachments(inputFile);
