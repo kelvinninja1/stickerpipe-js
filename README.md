@@ -256,12 +256,11 @@ To count the number of sendings messages and stickers, you need call an analysts
 
 ## Credits
 
-908 Inc.
+Stickerpipe
 
 ## Contact
 
-mail@908.vc
-
+i@stickerpipe.com
 
 ## License
 
