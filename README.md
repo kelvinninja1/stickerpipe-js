@@ -43,20 +43,12 @@ https://github.com/908Inc/stickerpipe-js/tree/gh-pages (Example sources)
 
 ### Download
 
-- [stickers.js](https://github.com/908Inc/stickerpipe-js/raw/master/dist/stickers.js)  un-minified, or
-- [stickers.min.js](https://github.com/908Inc/stickerpipe-js/raw/master/dist/stickers.min.js) minified 
-
-### CDN
-
-```js
-<script src="http://cdnjs.stickerpipe.com/libs/sdk/0.0.9/stickers.js"></script>
-<!-- or -->
-<script src="http://cdnjs.stickerpipe.com/libs/sdk/0.0.9/stickers.min.js"></script>
-```
+- [stickers.js](build/js/stickers.js)  un-minified, or
+- [stickers.min.js](build/js/stickers.min.js) minified 
 
 ### Bower
 
-Bower: `bower install stickerpipe --save`
+Bower: `bower install stickers --save`
 
 ## Options
 
