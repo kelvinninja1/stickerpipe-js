@@ -43,8 +43,8 @@ https://github.com/908Inc/stickerpipe-js/tree/gh-pages (Example sources)
 
 ### Download
 
-- [stickers.js](build/js/stickers.js)  un-minified, or
-- [stickers.min.js](build/js/stickers.min.js) minified 
+- [stickerpipe.js](build/js/stickerpipe.js)  un-minified, or
+- [stickerpipe.min.js](build/js/stickerpipe.min.js) minified 
 
 ### Bower
 
