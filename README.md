@@ -5,7 +5,6 @@
 * [Demo](#demo)
 * [Install](#install)
 	* [Download](#download)
-	* [CDN](#cdn)
 	* [Bower](#bower)
 * [Options](#pptions)
 * [Methods](#methods)
